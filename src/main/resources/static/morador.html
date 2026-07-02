@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SGAV - Cadastro de Moradores</title>
+  <link rel="stylesheet" href="css/cadastroTipoOcorrencia.css?v=12" />
+  <link rel="stylesheet" href="css/funcionario.css" />
+  <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1" />
+  <link rel="stylesheet" href="css/morador.css?v=3" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="page">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-main">
+          <img src="assets/logo.png" alt="Logo Asilo Vicentino" />
+          <h1>SGAV</h1>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="secretaria.html" class="sidebar-link">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span>Painel</span>
+        </a>
+
+        <details class="sidebar-group" open>
+          <summary class="sidebar-link sidebar-group-toggle">
+            <span class="material-symbols-outlined">groups</span>
+            <span>Moradores e Família</span>
+            <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+          </summary>
+          <div class="sidebar-submenu">
+            <a href="morador.html" class="sidebar-link sidebar-sublink active">
+              <span class="material-symbols-outlined">elderly</span>
+              <span>Cadastro de Morador</span>
+            </a>
+            <a href="composicaofamiliar.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">family_restroom</span>
+              <span>Composição Familiar</span>
+            </a>
+            <a href="historico.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">history</span>
+              <span>Histórico</span>
+            </a>
+          </div>
+        </details>
+
+        <a href="funcionario.html" class="sidebar-link">
+          <span class="material-symbols-outlined">badge</span>
+          <span>Funcionários</span>
+        </a>
+
+        <a href="medicamentos.html" class="sidebar-link">
+          <span class="material-symbols-outlined">medical_services</span>
+          <span>Medicamentos</span>
+        </a>
+
+        <a href="cadastrarPrescricao.html" class="sidebar-link">
+          <span class="material-symbols-outlined">medical_services</span>
+          <span>Prescrições</span>
+        </a>
+
+        <a href="tipoOcorrencia.html" class="sidebar-link">
+          <span class="material-symbols-outlined">assignment_late</span>
+          <span>Tipo de Ocorrência</span>
+        </a>
+
+        <a href="doacao.html" class="sidebar-link">
+          <span class="material-symbols-outlined">volunteer_activism</span>
+          <span>Doações</span>
+        </a>
+
+        <a href="noticias.html" class="sidebar-link">
+          <span class="material-symbols-outlined">newspaper</span>
+          <span>Notícias</span>
+        </a>
+
+        <a href="quartos.html" class="sidebar-link">
+          <span class="material-symbols-outlined">bed</span>
+          <span>Quartos</span>
+        </a>
+
+        <details class="sidebar-group">
+          <summary class="sidebar-link sidebar-group-toggle">
+            <span class="material-symbols-outlined">event</span>
+            <span>Atividades</span>
+            <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+          </summary>
+          <div class="sidebar-submenu">
+            <a href="tipoAtividades.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">category</span>
+              <span>Tipos de Atividades</span>
+            </a>
+            <a href="atividades.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">event_note</span>
+              <span>Atividades</span>
+            </a>
+          </div>
+        </details>
+
+        <details class="sidebar-group">
+          <summary class="sidebar-link sidebar-group-toggle">
+            <span class="material-symbols-outlined">payments</span>
+            <span>Despesas</span>
+            <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+          </summary>
+          <div class="sidebar-submenu">
+            <a href="tiposDespesas.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">receipt_long</span>
+              <span>Tipos de Despesas</span>
+            </a>
+            <a href="despesa.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">request_quote</span>
+              <span>Pagamento de Despesas</span>
+            </a>
+          </div>
+        </details>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="login.html" class="sidebar-link">
+          <span class="material-symbols-outlined">logout</span>
+          <span>Sair</span>
+        </a>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="topbar-left"></div>
+        <div class="topbar-right">
+          <div class="profile-chip">
+            <div class="profile-text">
+              <p id="perfilNome">Usuário</p>
+              <span id="perfilCargo">Acesso</span>
+            </div>
+            <img
+              class="profile-avatar"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCodmM9L3Lxp3TOXze0s5ng6gdLuL6UAVgjli-uCdXTzEkbUGW02Hheh8ViQ9IWJQngxEVmN3PkjBy4wDQUFq6-YEiM2_0THjjLcJGGCmoOip-JxgrwZ8717px25oL1Jay3FWpfa0rFtZIWUl4ziBAV-Brk_KrPNka1CMvjgOj2VkctGNpmZeuD-h9E384DdNtUi5QYhfnBKjlzWndJCqrgrkoxZL2DwUV0yeu9VbpJ1wqJosFaUFqLa-oW-OzQ9gsKgXSN3d_IyOx1"
+              alt="Perfil funcionário"
+            />
+          </div>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="content-wrap">
+          <section>
+            <div class="list-header">
+              <div class="list-header-left">
+                <h2>Gestão de Moradores</h2>
+                <p>Cadastro e acompanhamento dos moradores do Asilo Vicentino.</p>
+              </div>
+
+              <div class="list-header-actions">
+                <button id="btnNovoMorador" type="button" class="primary-action secondary-open-btn" onclick="mostrarFormulario()">
+                  <span class="material-symbols-outlined">add</span>
+                  Cadastrar Novo
+                </button>
+                <button type="button" id="abrirFiltrosMorador" class="filter-open-btn" onclick="abrirFiltros()">
+                  <span class="material-symbols-outlined">filter_list</span>
+                  Filtros
+                </button>
+              </div>
+            </div>
+
+            <section class="card" id="formContainer" hidden>
+              <div class="section-header section-header-inline">
+                <div>
+                  <h2 id="formTitle">Cadastrar Novo Morador</h2>
+                  <p>Informe os dados do morador e, se necessário, vincule familiares.</p>
+                </div>
+                <button type="button" class="close-panel-btn" onclick="esconderFormulario()">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+
+              <form id="moradorForm" class="ocorrencia-form" onsubmit="salvarMorador(event)">
+                <input type="hidden" id="id" />
+
+                <div class="form-field form-field-wide">
+                  <label for="nome">Nome Completo</label>
+                  <input id="nome" type="text" placeholder="Ex: Aglae Pereira Zaupa" />
+                </div>
+
+                <div class="form-field">
+                  <label for="genero">Gênero</label>
+                  <select id="genero">
+                    <option value="">Selecione</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Feminino</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="dtNascimento">Data de Nascimento</label>
+                  <input id="dtNascimento" type="date" />
+                </div>
+
+                <div class="form-field">
+                  <label for="cpf">CPF</label>
+                  <input id="cpf" type="text" placeholder="000.000.000-00" oninput="this.value = formatarCpf(this.value)" />
+                </div>
+
+                <div class="form-field form-field-wide">
+                  <label for="endereco">Endereço</label>
+                  <input id="endereco" type="text" placeholder="Rua Elza Peretti Montali" />
+                </div>
+
+                <div class="form-field">
+                  <label for="numero">Número</label>
+                  <input id="numero" type="number" />
+                </div>
+
+                <div class="form-field">
+                  <label for="cidade">Cidade</label>
+                  <input id="cidade" type="text" />
+                </div>
+
+                <div class="form-field">
+                  <label for="estado">Estado</label>
+                  <select id="estado" name="estado" required>
+                    <option value="">Selecione</option>
+                    <option value="SP">SP</option>
+                    <option value="AC">AC</option>
+                    <option value="AL">AL</option>
+                    <option value="AP">AP</option>
+                    <option value="AM">AM</option>
+                    <option value="BA">BA</option>
+                    <option value="CE">CE</option>
+                    <option value="DF">DF</option>
+                    <option value="ES">ES</option>
+                    <option value="GO">GO</option>
+                    <option value="MA">MA</option>
+                    <option value="MT">MT</option>
+                    <option value="MS">MS</option>
+                    <option value="MG">MG</option>
+                    <option value="PA">PA</option>
+                    <option value="PB">PB</option>
+                    <option value="PR">PR</option>
+                    <option value="PE">PE</option>
+                    <option value="PI">PI</option>
+                    <option value="RJ">RJ</option>
+                    <option value="RN">RN</option>
+                    <option value="RS">RS</option>
+                    <option value="RO">RO</option>
+                    <option value="RR">RR</option>
+                    <option value="SC">SC</option>
+                    <option value="SE">SE</option>
+                    <option value="TO">TO</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="cep">CEP</label>
+                  <input id="cep" type="text" placeholder="00000-000" oninput="this.value = formatarCep(this.value)" />
+                </div>
+
+                <div class="form-field">
+                  <label for="telefone">Telefone de Contato</label>
+                  <input id="telefone" type="tel" placeholder="(00) 00000-0000" oninput="this.value = formatarTelefone(this.value)" />
+                </div>
+
+                <div class="form-field">
+                  <label for="quartoId">Quarto</label>
+                  <select id="quartoId">
+                    <option value="">Selecione um quarto...</option>
+                  </select>
+                </div>
+
+                <div class="form-field form-field-wide modo-familiar-field">
+                  <label>Familiares vinculados</label>
+                  <div class="modo-familiar-switch">
+                    <label class="modo-familiar-option">
+                      <input id="modoFamiliarExistente" type="radio" name="modoFamiliar" value="existente" checked onchange="alternarModoFamiliar()" />
+                      <span>Selecionar existente</span>
+                    </label>
+                    <label class="modo-familiar-option">
+                      <input type="radio" name="modoFamiliar" value="novo" onchange="alternarModoFamiliar()" />
+                      <span>Cadastrar novo</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div id="familiaresExistenteFields" class="form-field form-field-wide familiar-bloco familiar-select-bloco">
+                  <label for="familiarExistente">Familiar existente</label>
+                  <select id="familiarExistente">
+                    <option value="">Selecione um familiar...</option>
+                  </select>
+                </div>
+
+                <div id="familiaresNovoFields" class="form-field form-field-wide familiares-novo-fields familiar-bloco" hidden>
+                  <div class="familiares-grid">
+                    <div class="form-field">
+                      <label for="familiarNome">Nome do Familiar</label>
+                      <input id="familiarNome" type="text" placeholder="Ex: Maria Silva" />
+                    </div>
+
+                    <div class="form-field">
+                      <label for="familiarTelefone">Telefone do Familiar</label>
+                      <input id="familiarTelefone" type="tel" placeholder="(00) 00000-0000" oninput="this.value = formatarTelefone(this.value)" />
+                    </div>
+
+                    <div class="form-field">
+                      <label for="familiarCpf">CPF do Familiar</label>
+                      <input id="familiarCpf" type="text" placeholder="000.000.000-00" oninput="this.value = formatarCpf(this.value)" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-field">
+                  <label for="familiarVinculo">Vínculo</label>
+                  <select id="familiarVinculo">
+                    <option value="">Selecione</option>
+                    <option value="Filho(a)">Filho(a)</option>
+                    <option value="Pai">Pai</option>
+                    <option value="Mãe">Mãe</option>
+                    <option value="Irmão(ã)">Irmão(ã)</option>
+                    <option value="Avô(ó)">Avô(ó)</option>
+                    <option value="Tio(a)">Tio(a)</option>
+                    <option value="Sobrinho(a)">Sobrinho(a)</option>
+                    <option value="Primo(a)">Primo(a)</option>
+                    <option value="Cônjuge">Cônjuge</option>
+                    <option value="Genro">Genro</option>
+                    <option value="Nora">Nora</option>
+                    <option value="Neto(a)">Neto(a)</option>
+                    <option value="Responsável">Responsável</option>
+                    <option value="Outro">Outro</option>
+                  </select>
+                </div>
+
+                <div class="form-field form-field-action">
+                  <button type="button" class="secondary-panel-btn" onclick="adicionarFamiliarAoFormulario()">
+                    <span class="material-symbols-outlined">group_add</span>
+                    Adicionar Familiar
+                  </button>
+                </div>
+
+                <div class="form-field form-field-wide familiar-table-field">
+                  <div class="table-wrap">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Familiar</th>
+                          <th>Vínculo</th>
+                          <th id="th-telefone" class="sortable" onclick="definirOrdenacaoMoradores('telefone')">Telefone <span id="sort-telefone" class="sort-indicator"></span></th>
+                          <th>CPF</th>
+                          <th class="text-right">Ações</th>
+                        </tr>
+                      </thead>
+                      <tbody id="listaFamiliaresMorador"></tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div class="form-actions form-actions-between">
+                  <button type="button" class="secondary-panel-btn" onclick="esconderFormulario()">
+                    <span class="material-symbols-outlined">close</span>
+                    Cancelar
+                  </button>
+                  <button class="primary-action" type="submit">
+                    <span class="material-symbols-outlined">save</span>
+                    Salvar Cadastro
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            <section class="card" id="filtroMorador" hidden>
+              <div class="section-header section-header-inline">
+                <div>
+                  <h2>Filtrar Moradores</h2>
+                  <p>Pesquise por nome, CPF, endereço e outros campos.</p>
+                </div>
+                <button type="button" id="fecharFiltrosMorador" class="close-panel-btn" onclick="fecharFiltros()">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+
+              <div class="ocorrencia-form filtro-form">
+                <div class="form-field">
+                  <label for="filtroNome">Nome</label>
+                  <input id="filtroNome" type="text" placeholder="Ex: Aglae Pereira..." oninput="aplicarFiltros()" />
+                </div>
+
+                <div class="form-field">
+                  <label for="filtroCpf">CPF</label>
+                  <input id="filtroCpf" type="text" placeholder="Ex: 123.456.789-00" oninput="aplicarFiltros()" />
+                </div>
+
+                <div class="form-field">
+                  <label for="filtroDtNascimento">Data de Nascimento</label>
+                  <input id="filtroDtNascimento" type="date" oninput="aplicarFiltros()" />
+                </div>
+
+                <div class="form-field">
+                  <label for="filtroEndereco">Endereço</label>
+                  <input id="filtroEndereco" type="text" placeholder="Ex: Rua Elza Peretti..." oninput="aplicarFiltros()" />
+                </div>
+
+                <div class="form-field">
+                  <label for="filtroCidade">Cidade</label>
+                  <input id="filtroCidade" type="text" placeholder="Ex: Presidente Prudente..." oninput="aplicarFiltros()" />
+                </div>
+
+                <div class="form-field">
+                  <label for="filtroEstado">Estado</label>
+                  <select id="filtroEstado" onchange="aplicarFiltros()">
+                    <option value="">Todos</option>
+                    <option value="SP">SP</option>
+                    <option value="AC">AC</option>
+                    <option value="AL">AL</option>
+                    <option value="AP">AP</option>
+                    <option value="AM">AM</option>
+                    <option value="BA">BA</option>
+                    <option value="CE">CE</option>
+                    <option value="DF">DF</option>
+                    <option value="ES">ES</option>
+                    <option value="GO">GO</option>
+                    <option value="MA">MA</option>
+                    <option value="MT">MT</option>
+                    <option value="MS">MS</option>
+                    <option value="MG">MG</option>
+                    <option value="PA">PA</option>
+                    <option value="PB">PB</option>
+                    <option value="PR">PR</option>
+                    <option value="PE">PE</option>
+                    <option value="PI">PI</option>
+                    <option value="RJ">RJ</option>
+                    <option value="RN">RN</option>
+                    <option value="RS">RS</option>
+                    <option value="RO">RO</option>
+                    <option value="RR">RR</option>
+                    <option value="SC">SC</option>
+                    <option value="SE">SE</option>
+                    <option value="TO">TO</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="filtroTelefone">Telefone</label>
+                  <input id="filtroTelefone" type="text" placeholder="Ex: (00) 00000-0000" oninput="aplicarFiltros()" />
+                </div>
+
+                <div class="form-actions form-actions-between">
+                  <button type="button" class="secondary-panel-btn" onclick="limparFiltros()">
+                    <span class="material-symbols-outlined">cleaning_services</span>
+                    Limpar Filtros
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <div class="table-card">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th id="th-id" class="sortable" onclick="definirOrdenacaoMoradores('id')">ID <span id="sort-id" class="sort-indicator"></span></th>
+                      <th id="th-nome" class="sortable" onclick="definirOrdenacaoMoradores('nome')">Nome <span id="sort-nome" class="sort-indicator"></span></th>
+                      <th>Sexo</th>
+                      <th id="th-cpf" class="sortable" onclick="definirOrdenacaoMoradores('cpf')">CPF <span id="sort-cpf" class="sort-indicator"></span></th>
+                      <th id="th-dtNascimento" class="sortable" onclick="definirOrdenacaoMoradores('dtNascimento')">Data Nasc. <span id="sort-dtNascimento" class="sort-indicator"></span></th>
+                      <th>Ala/Quarto</th>
+                      <th id="th-endereco" class="sortable" onclick="definirOrdenacaoMoradores('endereco')">Endereço <span id="sort-endereco" class="sort-indicator"></span></th>
+                      <th id="th-cidade" class="sortable" onclick="definirOrdenacaoMoradores('cidade')">Cidade/Estado <span id="sort-cidade" class="sort-indicator"></span></th>
+                      <th>Telefone</th>
+                      <th class="text-right">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="listaMoradores"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="mensagem-feedback" class="popup-msg"></div>
+
+  <script src="js/moradorController.js"></script>
+</body>
+</html>
+

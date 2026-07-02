@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notícias - SGAV</title>
+
+  <link rel="stylesheet" href="css/funcionario.css" />
+  <link rel="stylesheet" href="css/cadastroNoticia.css?v=1" />
+  
+  <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260518-1" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <style>
+    /* Estilos extras específicos para noticias, inspirados em transparencia.css/coordenador.css */
+    .noticia-upload {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      background: var(--bg-surface);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+    .noticia-fields {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--bg-body);
+      color: var(--text-main);
+      font-family: inherit;
+      resize: vertical;
+      min-height: 100px;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+    .noticia-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: var(--bg-body);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+    }
+    .noticia-info h5 {
+      margin: 0 0 0.25rem 0;
+      color: var(--text-main);
+      font-size: 1rem;
+    }
+    .noticia-info p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    .noticia-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .noticia-icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      padding: 0.4rem;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .noticia-icon-btn:hover {
+      background: var(--bg-hover);
+      color: var(--primary-color);
+    }
+    .noticia-icon-btn.delete:hover {
+      color: var(--danger-color);
+      background: rgba(239, 68, 68, 0.1);
+    }
+  </style>
+</head>
+<body class="secretaria-page">
+  <div class="page">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-main">
+          <img src="assets/logo.png" alt="Logo Asilo Vicentino" />
+          <h1>SGAV</h1>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="secretaria.html" class="sidebar-link">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span>Painel</span>
+        </a>
+
+        <details class="sidebar-group">
+          <summary class="sidebar-link sidebar-group-toggle">
+            <span class="material-symbols-outlined">groups</span>
+            <span>Moradores e Família</span>
+            <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+          </summary>
+          <div class="sidebar-submenu">
+            <a href="morador.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">elderly</span>
+              <span>Cadastro de Morador</span>
+            </a>
+            <a href="composicaofamiliar.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">family_restroom</span>
+              <span>Composição Familiar</span>
+            </a>
+            <a href="historico.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">history</span>
+              <span>Histórico</span>
+            </a>
+          </div>
+        </details>
+
+        <a href="funcionario.html" class="sidebar-link">
+          <span class="material-symbols-outlined">badge</span>
+          <span>Funcionários</span>
+        </a>
+
+        <a href="medicamentos.html" class="sidebar-link">
+          <span class="material-symbols-outlined">medical_services</span>
+          <span>Medicamentos</span>
+        </a>
+
+        <a href="cadastrarPrescricao.html" class="sidebar-link">
+          <span class="material-symbols-outlined">medical_services</span>
+          <span>Prescricoes</span>
+        </a>
+
+        <a href="tipoOcorrencia.html" class="sidebar-link">
+          <span class="material-symbols-outlined">assignment_late</span>
+          <span>Tipo de Ocorrência</span>
+        </a>
+
+        <a href="doacao.html" class="sidebar-link">
+          <span class="material-symbols-outlined">volunteer_activism</span>
+          <span>Doações</span>
+        </a>
+
+        <a href="noticias.html" class="sidebar-link active">
+          <span class="material-symbols-outlined">newspaper</span>
+          <span>Notícias</span>
+        </a>
+
+        <a href="quartos.html" class="sidebar-link">
+          <span class="material-symbols-outlined">bed</span>
+          <span>Quartos</span>
+        </a>
+
+        <details class="sidebar-group">
+          <summary class="sidebar-link sidebar-group-toggle">
+            <span class="material-symbols-outlined">event</span>
+            <span>Atividades</span>
+            <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+          </summary>
+          <div class="sidebar-submenu">
+            <a href="tipoAtividades.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">category</span>
+              <span>Tipos de Atividades</span>
+            </a>
+            <a href="atividades.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">event_note</span>
+              <span>Atividades</span>
+            </a>
+          </div>
+        </details>
+
+        <details class="sidebar-group">
+          <summary class="sidebar-link sidebar-group-toggle">
+            <span class="material-symbols-outlined">payments</span>
+            <span>Despesas</span>
+            <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+          </summary>
+          <div class="sidebar-submenu">
+            <a href="tiposDespesas.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">receipt_long</span>
+              <span>Tipos de Despesas</span>
+            </a>
+            <a href="despesa.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">request_quote</span>
+              <span>Pagamento de Despesas</span>
+            </a>
+          </div>
+        </details>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="login.html" class="sidebar-link logout">
+          <span class="material-symbols-outlined">logout</span>
+          <span>Sair</span>
+        </a>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="topbar-left"></div>
+        <div class="topbar-right">
+          <div class="profile-chip">
+            <div class="profile-text">
+              <p id="perfilNome">Usuário</p>
+              <span id="perfilCargo">Acesso</span>
+            </div>
+            <img class="profile-avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCodmM9L3Lxp3TOXze0s5ng6gdLuL6UAVgjli-uCdXTzEkbUGW02Hheh8ViQ9IWJQngxEVmN3PkjBy4wDQUFq6-YEiM2_0THjjLcJGGCmoOip-JxgrwZ8717px25oL1Jay3FWpfa0rFtZIWUl4ziBAV-Brk_KrPNka1CMvjgOj2VkctGNpmZeuD-h9E384DdNtUi5QYhfnBKjlzWndJCqrgrkoxZL2DwUV0yeu9VbpJ1wqJosFaUFqLa-oW-OzQ9gsKgXSN3d_IyOx1" alt="Secretaria" />
+          </div>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="content-wrap">
+          <section>
+            <div class="list-header">
+              <div class="list-header-left">
+                <h2>Lista de Notícias</h2>
+                <p>Visualização das notícias registradas no sistema.</p>
+              </div>
+              <div class="list-header-actions">
+                <button type="button" id="btnNovaNoticia" class="primary-action secondary-open-btn" onclick="mostrarFormulario()">
+                  <span class="material-symbols-outlined">add</span>
+                  Publicar Nova
+                </button>
+                <button type="button" id="abrirFiltrosNoticia" class="filter-open-btn" onclick="abrirFiltros()">
+                  <span class="material-symbols-outlined">filter_list</span>
+                  Filtros
+                </button>
+              </div>
+            </div>
+
+            <section class="card" id="formContainer" style="display: none;">
+              <div class="section-header section-header-inline">
+                <div>
+                  <h2 id="formTitle">Publicar nova notícia</h2>
+                  <p>Insira os dados da notícia para exibição no mural público.</p>
+                </div>
+                <button type="button" class="close-panel-btn" onclick="esconderFormulario()">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+
+              <form id="formNoticia" class="noticia-form" style="padding: 1.5rem;">
+                <input type="hidden" id="idNoticia" name="idNoticia" />
+
+                <div class="form-field">
+                  <label for="titulo">Título</label>
+                  <input id="titulo" name="titulo" type="text" placeholder="Ex: Festa Junina 2026" required />
+                </div>
+
+                <div class="form-field">
+                  <label for="descricao">Descrição</label>
+                  <textarea id="descricao" name="descricao" placeholder="Escreva a notícia aqui..." required style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--outline-variant); border-radius: 8px; font-family: inherit; resize: vertical; min-height: 100px; background: var(--surface-container-lowest); color: var(--on-surface); outline: none;"></textarea>
+                </div>
+
+                <div class="form-field">
+                  <label for="categoria">Categoria</label>
+                  <select id="categoria" name="categoria" required>
+                    <option value="">Selecione</option>
+                    <option value="Institucional">Institucional</option>
+                    <option value="Comunidade">Comunidade</option>
+                    <option value="Eventos">Eventos</option>
+                    <option value="Atividades">Atividades</option>
+                    <option value="Convivência">Convivência</option>
+                    <option value="Rotina">Rotina</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="imagem">Imagem de Capa <small id="imagemHelp"></small></label>
+                  <input id="imagem" name="imagem" type="file" accept="image/*" required style="width: 100%; padding: 0.75rem 1rem; border: 1px dashed var(--outline-variant); border-radius: 8px; background: var(--surface-container-low); cursor: pointer;" />
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" id="btnSalvarNoticia" class="primary-action">
+                    <span class="material-symbols-outlined">save</span>
+                    Salvar Notícia
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            <section class="card" id="filtroNoticia" hidden>
+              <div class="section-header section-header-inline">
+                <div>
+                  <h2>Filtrar Notícias</h2>
+                  <p>Pesquise por título e categoria.</p>
+                </div>
+                <button type="button" id="fecharFiltrosNoticia" class="close-panel-btn" onclick="fecharFiltros()">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+
+              <div class="noticia-form filtro-form" style="padding: 1.5rem;">
+                <div class="form-field">
+                  <label for="filtroTitulo">Título</label>
+                  <input id="filtroTitulo" type="text" placeholder="Ex: Festa Junina..." oninput="aplicarFiltros()" />
+                </div>
+
+                <div class="form-field">
+                  <label for="filtroCategoria">Categoria</label>
+                  <select id="filtroCategoria" onchange="aplicarFiltros()">
+                    <option value="">Todas</option>
+                    <option value="Institucional">Institucional</option>
+                    <option value="Comunidade">Comunidade</option>
+                    <option value="Eventos">Eventos</option>
+                    <option value="Atividades">Atividades</option>
+                    <option value="Convivência">Convivência</option>
+                    <option value="Rotina">Rotina</option>
+                  </select>
+                </div>
+
+                <div class="form-actions form-actions-between">
+                  <button type="button" class="secondary-panel-btn" onclick="limparFiltros()">
+                    <span class="material-symbols-outlined">cleaning_services</span>
+                    Limpar Filtros
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <div class="table-card">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th class="sortable">ID <span class="sort-indicator"></span></th>
+                      <th class="sortable">Título <span class="sort-indicator"></span></th>
+                      <th class="sortable">Categoria <span class="sort-indicator"></span></th>
+                      <th class="sortable">Data <span class="sort-indicator"></span></th>
+                      <th class="text-right">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="listaNoticias">
+                    <tr>
+                      <td colspan="5" class="empty-row">Carregando notícias...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <div id="mensagem-feedback" class="popup-msg"></div>
+
+  <script src="js/noticias.js?v=20260520-1"></script>
+</body>
+</html>

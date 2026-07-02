@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestao de Medicacao - SGAV</title>
+
+  <link rel="stylesheet" href="css/funcionario.css" />
+  <link rel="stylesheet" href="css/cadastroMedicamento.css?v=2" />
+  <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+</head>
+
+<body onload="listarMedicamentos()">
+
+<div class="page">
+
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-main">
+        <img src="assets/logo.png" alt="Logo Asilo Vicentino" />
+        <h1>SGAV</h1>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="secretaria.html" class="sidebar-link">
+        <span class="material-symbols-outlined">dashboard</span>
+        <span>Painel</span>
+      </a>
+
+      <details class="sidebar-group">
+        <summary class="sidebar-link sidebar-group-toggle">
+          <span class="material-symbols-outlined">groups</span>
+          <span>Moradores e Familia</span>
+          <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+        </summary>
+        <div class="sidebar-submenu">
+          <a href="morador.html" class="sidebar-link sidebar-sublink">
+            <span class="material-symbols-outlined">elderly</span>
+            <span>Cadastro de Morador</span>
+          </a>
+          <a href="composicaofamiliar.html" class="sidebar-link sidebar-sublink">
+            <span class="material-symbols-outlined">family_restroom</span>
+            <span>Composicao Familiar</span>
+          </a>
+          <a href="historico.html" class="sidebar-link sidebar-sublink">
+            <span class="material-symbols-outlined">history</span>
+            <span>Historico</span>
+          </a>
+        </div>
+      </details>
+
+      <a href="funcionario.html" class="sidebar-link">
+        <span class="material-symbols-outlined">badge</span>
+        <span>Funcionarios</span>
+      </a>
+
+      <a href="medicamentos.html" class="sidebar-link active">
+        <span class="material-symbols-outlined">medical_services</span>
+        <span>Medicamentos</span>
+      </a>
+
+      <a href="cadastrarPrescricao.html" class="sidebar-link">
+        <span class="material-symbols-outlined">medical_services</span>
+        <span>Prescrições</span>
+      </a>
+
+      <a href="tipoOcorrencia.html" class="sidebar-link">
+        <span class="material-symbols-outlined">assignment_late</span>
+        <span>Tipo de Ocorrencia</span>
+      </a>
+
+      <a href="doacao.html" class="sidebar-link">
+        <span class="material-symbols-outlined">volunteer_activism</span>
+        <span>Doacoes</span>
+      </a>
+      <a href="noticias.html" class="sidebar-link">
+        <span class="material-symbols-outlined">newspaper</span>
+        <span>Noticias</span>
+      </a>
+
+      <a href="quartos.html" class="sidebar-link">
+        <span class="material-symbols-outlined">bed</span>
+        <span>Quartos</span>
+      </a>
+
+      <details class="sidebar-group">
+        <summary class="sidebar-link sidebar-group-toggle">
+          <span class="material-symbols-outlined">event</span>
+          <span>Atividades</span>
+          <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+        </summary>
+        <div class="sidebar-submenu">
+          <a href="tipoAtividades.html" class="sidebar-link sidebar-sublink">
+            <span class="material-symbols-outlined">category</span>
+            <span>Tipos de Atividades</span>
+          </a>
+          <a href="atividades.html" class="sidebar-link sidebar-sublink">
+            <span class="material-symbols-outlined">event_note</span>
+            <span>Atividades</span>
+          </a>
+        </div>
+      </details>
+
+      <details class="sidebar-group">
+        <summary class="sidebar-link sidebar-group-toggle">
+          <span class="material-symbols-outlined">payments</span>
+          <span>Despesas</span>
+          <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+        </summary>
+        <div class="sidebar-submenu">
+          <a href="tiposDespesas.html" class="sidebar-link sidebar-sublink">
+            <span class="material-symbols-outlined">receipt_long</span>
+            <span>Tipos de Despesas</span>
+          </a>
+          <a href="despesa.html" class="sidebar-link sidebar-sublink">
+            <span class="material-symbols-outlined">request_quote</span>
+            <span>Pagamento de Despesas</span>
+          </a>
+        </div>
+      </details>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="login.html" class="sidebar-link logout">
+        <span class="material-symbols-outlined">logout</span>
+        <span>Sair</span>
+      </a>
+    </div>
+  </aside>
+
+  <main class="main-area">
+    <header class="topbar">
+      <div class="topbar-left"></div>
+      <div class="topbar-right">
+        <div class="profile-chip">
+          <div class="profile-text">
+            <p id="perfilNome">Usuario</p>
+            <span id="perfilCargo">Acesso</span>
+          </div>
+          <img
+            class="profile-avatar"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCodmM9L3Lxp3TOXze0s5ng6gdLuL6UAVgjli-uCdXTzEkbUGW02Hheh8ViQ9IWJQngxEVmN3PkjBy4wDQUFq6-YEiM2_0THjjLcJGGCmoOip-JxgrwZ8717px25oL1Jay3FWpfa0rFtZIWUl4ziBAV-Brk_KrPNka1CMvjgOj2VkctGNpmZeuD-h9E384DdNtUi5QYhfnBKjlzWndJCqrgrkoxZL2DwUV0yeu9VbpJ1wqJosFaUFqLa-oW-OzQ9gsKgXSN3d_IyOx1"
+            alt="Usuario"
+          />
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <section>
+        <div class="list-header">
+          <div class="list-header-left">
+            <h2>Lista de Medicamentos Cadastrados</h2>
+            <p>Visualizacao dos medicamentos registrados no sistema.</p>
+          </div>
+
+          <div class="list-header-actions">
+            <button type="button" id="abrirCadastroMedicamento" class="primary-action secondary-open-btn">
+              <span class="material-symbols-outlined">add</span>
+              Cadastrar Novo
+            </button>
+
+            <button type="button" id="abrirFiltrosMedicamento" class="filter-open-btn">
+              <span class="material-symbols-outlined">filter_list</span>
+              Filtros
+            </button>
+          </div>
+        </div>
+
+        <section class="card" id="cadastroMedicamento" hidden>
+          <div class="section-header section-header-inline">
+            <div>
+              <h2>Cadastrar Novo Medicamento</h2>
+              <p>Insira os dados do medicamento para manter o controle correto no sistema.</p>
+            </div>
+
+            <button type="button" id="fecharCadastroMedicamento" class="close-panel-btn">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+
+          <form class="medicamento-form" onsubmit="event.preventDefault(); cadastrarMedicamento();">
+            <div class="form-field">
+              <label for="nome">Nome do Medicamento</label>
+              <input type="text" id="nome" name="nome" placeholder="Ex: Paracetamol">
+            </div>
+
+            <div class="form-field">
+              <label for="tipoMedicamento">Tipo</label>
+              <select id="tipoMedicamento" name="tipoMedicamento">
+                <option value="">Selecione</option>
+                <option value="comprimido">Comprimido</option>
+                <option value="pomada">Pomada</option>
+                <option value="xarope">Xarope</option>
+                <option value="injecao">Injecao</option>
+              </select>
+            </div>
+
+            <div class="form-field" id="grupoDosagemValor">
+              <label for="dosagemValor">Dosagem</label>
+              <input type="number" id="dosagemValor" name="dosagemValor" placeholder="Ex: 500">
+            </div>
+
+            <div class="form-field" id="grupoDosagemUnidade">
+              <label for="dosagemUnidade">Unidade</label>
+              <select id="dosagemUnidade" name="dosagemUnidade">
+                <option value="">Selecione</option>
+                <option value="mg">mg</option>
+                <option value="g">g</option>
+                <option value="mL">mL</option>
+              </select>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="primary-action">
+                <span class="material-symbols-outlined">save</span>
+                Salvar Medicamento
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <section class="card" id="filtroMedicamento" hidden>
+          <div class="section-header section-header-inline">
+            <div>
+              <h2>Filtrar Medicamentos</h2>
+              <p>Pesquise por nome, tipo do medicamento ou status da validade.</p>
+            </div>
+
+            <button type="button" id="btnFecharFiltroMedicamento" class="close-panel-btn">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+
+          <div class="medicamento-form">
+            <div class="form-field">
+              <label for="nomeFiltroMedicamento">Nome</label>
+              <input type="text" id="nomeFiltroMedicamento" placeholder="Ex: Paracetamol">
+            </div>
+
+            <div class="form-field">
+              <label for="tipoFiltroMedicamento">Tipo</label>
+              <select id="tipoFiltroMedicamento">
+                <option value="">Todos</option>
+                <option value="comprimido">Comprimido</option>
+                <option value="pomada">Pomada</option>
+                <option value="xarope">Xarope</option>
+                <option value="injecao">Injecao</option>
+              </select>
+            </div>
+
+            <div class="form-actions form-actions-between">
+              <button type="button" id="btnLimparFiltroMedicamento" class="secondary-panel-btn">
+                <span class="material-symbols-outlined">cleaning_services</span>
+                Limpar Filtros
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="editorMedicamento" hidden>
+          <div class="section-header section-header-inline">
+            <div>
+              <h2>Editar Medicamento</h2>
+              <p>Atualize os dados do medicamento selecionado.</p>
+            </div>
+
+            <button type="button" id="fecharEditorMedicamento" class="close-panel-btn">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+
+          <div class="medicamento-form">
+            <div class="form-field">
+              <label for="nomeEditar">Nome do Medicamento</label>
+              <input type="text" id="nomeEditar" placeholder="Ex: Paracetamol">
+            </div>
+
+            <div class="form-field">
+              <label for="tipoMedicamentoEditar">Tipo</label>
+              <select id="tipoMedicamentoEditar">
+                <option value="">Selecione</option>
+                <option value="comprimido">Comprimido</option>
+                <option value="pomada">Pomada</option>
+                <option value="xarope">Xarope</option>
+                <option value="injecao">Injecao</option>
+              </select>
+            </div>
+
+            <div class="form-field" id="grupoDosagemValorEditar">
+              <label for="dosagemValorEditar">Dosagem</label>
+              <input type="number" id="dosagemValorEditar" placeholder="Ex: 500">
+            </div>
+
+            <div class="form-field" id="grupoDosagemUnidadeEditar">
+              <label for="dosagemUnidadeEditar">Unidade</label>
+              <select id="dosagemUnidadeEditar">
+                <option value="">Selecione</option>
+                <option value="mg">mg</option>
+                <option value="g">g</option>
+                <option value="mL">mL</option>
+              </select>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" id="salvarEdicaoMedicamento" class="primary-action">
+                <span class="material-symbols-outlined">save</span>
+                Salvar Edicao
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <div class="table-card">
+          <div class="table-wrap">
+            <table id="tabelaMedicamentos">
+              <thead>
+              <tr>
+                <th data-col="nome">Nome</th>
+                <th data-col="tipomedicamento">Tipo</th>
+                <th data-col="dosagemvalor">Dosagem</th>
+                <th class="text-right">Acoes</th>
+              </tr>
+              </thead>
+
+              <tbody id="tbodyMedicamentos"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+</div>
+
+<script src="js/medicamentoController.js"></script>
+</body>
+
+</html>

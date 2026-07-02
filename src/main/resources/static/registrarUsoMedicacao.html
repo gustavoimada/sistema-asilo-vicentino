@@ -1,0 +1,222 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>SGAV - Registro de Medicacao</title>
+
+    <link rel="stylesheet" href="css/funcionario.css"/>
+    <link rel="stylesheet" href="css/registrarUsoMedicacao.css?v=2"/>
+    <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1"/>
+
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+</head>
+<body>
+<div class="page">
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-main">
+                <img src="assets/logo.png" alt="Logo Asilo Vicentino"/>
+                <h1>SGAV</h1>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="cuidador.html" class="sidebar-link">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span>Painel</span>
+            </a>
+
+            <a href="ocorrencia.html" class="sidebar-link">
+                <span class="material-symbols-outlined">assignment_late</span>
+                <span>Registrar Ocorrencia</span>
+            </a>
+
+            <a href="registrarUsoMedicacao.html" class="sidebar-link active">
+                <span class="material-symbols-outlined fill">medication</span>
+                <span>Registrar Uso Medicacao</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="login.html" class="sidebar-link">
+                <span class="material-symbols-outlined">logout</span>
+                <span>Sair</span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-area">
+        <header class="topbar">
+            <div class="topbar-left"></div>
+            <div class="topbar-right">
+                <div class="profile-chip">
+                    <div class="profile-text">
+                        <p id="perfilNome">Usuario</p>
+                        <span id="perfilCargo">Cuidador</span>
+                    </div>
+                    <img
+                            class="profile-avatar"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCodmM9L3Lxp3TOXze0s5ng6gdLuL6UAVgjli-uCdXTzEkbUGW02Hheh8ViQ9IWJQngxEVmN3PkjBy4wDQUFq6-YEiM2_0THjjLcJGGCmoOip-JxgrwZ8717px25oL1Jay3FWpfa0rFtZIWUl4ziBAV-Brk_KrPNka1CMvjgOj2VkctGNpmZeuD-h9E384DdNtUi5QYhfnBKjlzWndJCqrgrkoxZL2DwUV0yeu9VbpJ1wqJosFaUFqLa-oW-OzQ9gsKgXSN3d_IyOx1"
+                            alt="Perfil funcionario"
+                    />
+                </div>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="content-wrap">
+                <section class="hero">
+                    <div class="hero-title-row">
+                        <h2>Registro de Medicacao</h2>
+                        <div class="badge danger hero-pendencias" id="numeroPrescricoes">
+                            <span>0 Pendentes</span>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="content-grid">
+                    <section class="left-column">
+                        <section class="section-block">
+                            <div class="section-header">
+                                <h3>
+                                    <span class="material-symbols-outlined primary-icon">schedule</span>
+                                    Medicamentos Pendentes
+                                </h3>
+                                <div class="pending-tools">
+                                    <button type="button" id="abrirFiltrosPrescricaoDose" class="filter-open-btn">
+                                        <span class="material-symbols-outlined">filter_list</span>
+                                        Filtros
+                                    </button>
+                                    <span class="section-time" id="dataHoraAtual"></span>
+                                </div>
+                            </div>
+
+                            <section class="card" id="filtroPrescricaoDose" hidden>
+                                <div class="section-header-inline">
+                                    <div>
+                                        <h2>Filtrar Pendencias</h2>
+                                        <p>Busque por morador, horario prescrito e atrasados.</p>
+                                    </div>
+
+                                    <button type="button" id="btnFecharFiltroPrescricaoDose" class="close-panel-btn">
+                                        <span class="material-symbols-outlined">close</span>
+                                    </button>
+                                </div>
+
+                                <div class="prescription-form">
+                                    <div class="form-group">
+                                        <label for="moradorFiltroPrescricaoDose">Morador</label>
+                                        <input type="text" id="moradorFiltroPrescricaoDose" placeholder="Ex: Maria">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="horarioFiltroPrescricaoDose">Horario</label>
+                                        <input type="time" id="horarioFiltroPrescricaoDose">
+                                    </div>
+
+                                    <div class="form-group checkbox-field">
+                                        <input type="checkbox" id="atrasadosFiltroPrescricaoDose">
+                                        <label for="atrasadosFiltroPrescricaoDose">Somente atrasados</label>
+                                    </div>
+
+                                    <div class="form-actions form-actions-between">
+                                        <button type="button" id="btnLimparFiltroPrescricaoDose" class="secondary-panel-btn">
+                                            <span class="material-symbols-outlined">cleaning_services</span>
+                                            Limpar Filtros
+                                        </button>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <div class="pending-list" id="prescricaoDoseMorador"></div>
+                        </section>
+
+                        <section class="section-block">
+                            <div class="section-header">
+                                <h3 class="history-title">
+                                    <span class="material-symbols-outlined secondary-icon">warning</span>
+                                    Medicamentos Atrasados (Dias Anteriores)
+                                </h3>
+                                <div class="pending-tools">
+                                    <div class="badge danger" id="numeroPrescricoesAtrasadas">
+                                        <span class="material-symbols-outlined">priority_high</span>
+                                        <span>0 Atrasados</span>
+                                    </div>
+                                    <button type="button" id="abrirPainelAtrasados" class="filter-open-btn">
+                                        <span class="material-symbols-outlined">visibility</span>
+                                        Visualizar
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="painelAtrasadosDiasAnteriores" hidden>
+                                <section class="card" id="filtroAtrasadosDiasAnteriores">
+                                    <div class="section-header-inline">
+                                        <div>
+                                            <h2>Filtrar Atrasados</h2>
+                                            <p>Busque por dia e nome do morador.</p>
+                                        </div>
+                                        <button type="button" id="btnFecharPainelAtrasados" class="close-panel-btn">
+                                            <span class="material-symbols-outlined">close</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="prescription-form">
+                                        <div class="form-group">
+                                            <label for="diaFiltroAtrasados">Dia</label>
+                                            <input type="date" id="diaFiltroAtrasados">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="moradorFiltroAtrasados">Morador</label>
+                                            <input type="text" id="moradorFiltroAtrasados" placeholder="Ex: Maria">
+                                        </div>
+
+                                        <div class="form-actions form-actions-between">
+                                            <button type="button" id="btnLimparFiltroAtrasados" class="secondary-panel-btn">
+                                                <span class="material-symbols-outlined">cleaning_services</span>
+                                                Limpar Filtros
+                                            </button>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <div class="pending-list" id="prescricaoDoseAtrasadas"></div>
+                            </div>
+                        </section>
+
+                        <section class="section-block">
+                            <h3 class="history-title">
+                                <span class="material-symbols-outlined secondary-icon">history</span>
+                                Historico do Turno (Hoje)
+                            </h3>
+
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                    <tr>
+                                        <th>Residente</th>
+                                        <th>Medicamento</th>
+                                        <th>Horario Real</th>
+                                        <th>Status</th>
+                                        <th style="text-align: right;">Acoes</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="listarUso"></tbody>
+                                </table>
+                            </div>
+                        </section>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script src="js/registrarUsoMedicacaoController.js"></script>
+</body>
+</html>
+
+
+

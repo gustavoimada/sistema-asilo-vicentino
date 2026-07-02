@@ -1,0 +1,304 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatorio de Despesas - Serene Guardian</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/relatorioDespesas.css">
+    <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00357f",
+                        background: "#f7f9fb",
+                        secondary: "#446086",
+                        tertiary: "#003e54",
+                        surface: "#f7f9fb",
+                        error: "#ba1a1a"
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body>
+<div class="page">
+
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <div class="sidebar-brand-main">
+            <img src="assets/logo.png" alt="Logo Asilo Vicentino" />
+            <h1>SGAV</h1>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <a href="coordenador.html" class="sidebar-link">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span>Painel</span>
+        </a>
+
+        <a href="escalas.html" class="sidebar-link">
+            <span class="material-symbols-outlined">calendar_month</span>
+            <span>Escalas</span>
+        </a>
+
+        <a href="transparencia.html" class="sidebar-link">
+            <span class="material-symbols-outlined">folder</span>
+            <span>Transparência</span>
+        </a>
+
+        <details class="sidebar-group" open>
+            <summary class="sidebar-link sidebar-group-toggle active">
+                <span class="material-symbols-outlined">analytics</span>
+                <span>Relatórios</span>
+                <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+            </summary>
+            <div class="sidebar-submenu">
+                <a href="relatorioDoacoes.html" class="sidebar-link sidebar-sublink">
+                    <span class="material-symbols-outlined">volunteer_activism</span>
+                    <span>Relatório de Doações</span>
+                </a>
+
+                <a href="relatorioOcorrencias.html" class="sidebar-link sidebar-sublink">
+                    <span class="material-symbols-outlined">assignment_late</span>
+                    <span>Relatório de Ocorrências</span>
+                </a>
+
+                <a href="relatorioFuncionarios.html" class="sidebar-link sidebar-sublink">
+                    <span class="material-symbols-outlined">badge</span>
+                    <span>Relatório de Funcionários</span>
+                </a>
+
+                <a href="relatorioDespesas.html" class="sidebar-link sidebar-sublink active">
+                    <span class="material-symbols-outlined">receipt_long</span>
+                    <span>Relatório de Despesas</span>
+                </a>
+            </div>
+        </details>
+    </nav>
+
+    <div class="sidebar-footer">
+        <a href="secretaria.html" class="sidebar-link secretaria-panel-link">
+            <span class="material-symbols-outlined">admin_panel_settings</span>
+            <span>Painel de Secretaria</span>
+        </a>
+
+        <a href="login.html" class="sidebar-link">
+            <span class="material-symbols-outlined">logout</span>
+            <span>Sair</span>
+        </a>
+    </div>
+</aside>
+
+<main class="main-area">
+
+    <header class="topbar">
+        <div class="topbar-left"></div>
+        <div class="topbar-right">
+            <div class="profile-chip">
+                <div class="profile-text">
+                    <p id="perfilNome">Usuário</p>
+                    <span id="perfilCargo">Acesso</span>
+                </div>
+                <img
+                    class="profile-avatar"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCodmM9L3Lxp3TOXze0s5ng6gdLuL6UAVgjli-uCdXTzEkbUGW02Hheh8ViQ9IWJQngxEVmN3PkjBy4wDQUFq6-YEiM2_0THjjLcJGGCmoOip-JxgrwZ8717px25oL1Jay3FWpfa0rFtZIWUl4ziBAV-Brk_KrPNka1CMvjgOj2VkctGNpmZeuD-h9E384DdNtUi5QYhfnBKjlzWndJCqrgrkoxZL2DwUV0yeu9VbpJ1wqJosFaUFqLa-oW-OzQ9gsKgXSN3d_IyOx1"
+                    alt="Perfil funcionario"
+                />
+            </div>
+        </div>
+    </header>
+
+    <div class="content-area">
+
+        <div class="page-header">
+            <div>
+                <h2 class="page-title">Relatorio de Despesas</h2>
+                <p class="page-subtitle">
+                    Visao analitica dos pagamentos, pendencias e categorias de despesas.
+                </p>
+            </div>
+
+            <button class="btn-pdf" id="btnGerarPdfDespesas" type="button">
+                <span class="material-symbols-outlined">picture_as_pdf</span>
+                <span>Gerar PDF de Despesas</span>
+            </button>
+        </div>
+
+        <div class="relatorio-layout">
+            <div class="relatorio-main">
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <p class="card-label">Total de Despesas</p>
+                        <h3 class="card-value" id="totalDespesas"></h3>
+                    </div>
+
+                    <div class="info-card">
+                        <p class="card-label">Total Pago</p>
+                        <h3 class="card-value" id="totalPago"></h3>
+                    </div>
+
+                    <div class="info-card">
+                        <p class="card-label">Total Pendente</p>
+                        <h3 class="card-value" id="totalPendente"></h3>
+                    </div>
+
+                    <div class="info-card">
+                        <p class="card-label">Despesas Vencidas</p>
+                        <h3 class="card-value" id="qtdVencidas"></h3>
+                    </div>
+                </div>
+
+                <section class="filter-panel" id="filtroDespesaRelatorio" hidden>
+                    <div class="section-header section-header-inline">
+                        <div>
+                            <h2>Filtrar Despesas</h2>
+                            <p>Pesquise por categoria, valor, status, datas e observacoes.</p>
+                        </div>
+                        <button type="button" id="fecharFiltrosDespesaRelatorio" class="close-panel-btn">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+
+                    <div class="filtro-grid filtro-grid-despesas">
+                        <div class="form-field">
+                            <label for="filtroCategoriaRelatorio">Categoria</label>
+                            <select id="filtroCategoriaRelatorio">
+                                <option value="">Todas</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="filtroValorMinRelatorio">Valor Minimo</label>
+                            <input type="number" id="filtroValorMinRelatorio" min="0" step="0.01" placeholder="Ex: 100.00">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="filtroValorMaxRelatorio">Valor Maximo</label>
+                            <input type="number" id="filtroValorMaxRelatorio" min="0" step="0.01" placeholder="Ex: 500.00">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="filtroStatusRelatorio">Status</label>
+                            <select id="filtroStatusRelatorio">
+                                <option value="">Todos</option>
+                                <option value="paga">Pagas</option>
+                                <option value="pendente">Pendentes</option>
+                                <option value="vencida">Vencidas</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="filtroMesRelatorio">Mes de Vencimento</label>
+                            <input type="month" id="filtroMesRelatorio">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="filtroObservacaoRelatorio">Observacoes</label>
+                            <input type="text" id="filtroObservacaoRelatorio" placeholder="Ex: Energia eletrica">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="filtroVencimentoInicioRelatorio">Vencimento Inicial</label>
+                            <input type="date" id="filtroVencimentoInicioRelatorio">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="filtroVencimentoFimRelatorio">Vencimento Final</label>
+                            <input type="date" id="filtroVencimentoFimRelatorio">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="filtroQuitacaoInicioRelatorio">Quitacao Inicial</label>
+                            <input type="date" id="filtroQuitacaoInicioRelatorio">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="filtroQuitacaoFimRelatorio">Quitacao Final</label>
+                            <input type="date" id="filtroQuitacaoFimRelatorio">
+                        </div>
+
+                        <div class="filter-actions">
+                            <button type="button" id="limparFiltrosDespesaRelatorio" class="secondary-panel-btn">
+                                <span class="material-symbols-outlined">cleaning_services</span>
+                                Limpar Filtros
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-header-row">
+                            <h4>Despesas Recentes</h4>
+                            <button type="button" id="abrirFiltrosDespesaRelatorio" class="filter-open-btn">
+                                <span class="material-symbols-outlined">filter_list</span>
+                                Filtros
+                            </button>
+                        </div>
+                    </div>
+
+                    <table class="donation-table" id="despesas">
+                        <thead>
+                        <tr>
+                            <th>Valor</th>
+                            <th>Categoria</th>
+                            <th>Status</th>
+                            <th>Vencimento</th>
+                            <th>Quitacao</th>
+                            <th>Observacoes</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <aside class="charts-column">
+                <section class="charts-grid">
+                    <div class="chart-card">
+                        <h4>Valor por Mes de Vencimento (R$)</h4>
+                        <div id="graficoVencimento" class="apex-line-chart"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <h4>Valor Pago por Mes (R$)</h4>
+                        <div id="graficoPago" class="apex-line-chart"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <h4>Valor Pendente por Mes (R$)</h4>
+                        <div id="graficoPendente" class="apex-line-chart"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <h4>Distribuicao por Categoria</h4>
+                        <div id="graficoPizzaCategorias" class="apex-donut-chart"></div>
+                    </div>
+                </section>
+            </aside>
+        </div>
+
+    </div>
+
+</main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="js/relatorioDespesasController.js"></script>
+
+</body>
+</html>

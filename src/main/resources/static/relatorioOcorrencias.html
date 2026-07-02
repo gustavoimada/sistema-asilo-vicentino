@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de Ocorrências - Serene Guardian</title>
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/relatorioOcorrencias.css">
+    <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#00357f",
+                        background: "#f7f9fb",
+                        secondary: "#446086",
+                        tertiary: "#003e54",
+                        surface: "#f7f9fb",
+                        error: "#ba1a1a"
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-background text-on-surface">
+<div class="page">
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <div class="sidebar-brand-main">
+            <img src="assets/logo.png" alt="Logo Asilo Vicentino" />
+            <h1>SGAV</h1>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <a href="coordenador.html" class="sidebar-link">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span>Painel</span>
+        </a>
+
+        <a href="escalas.html" class="sidebar-link">
+            <span class="material-symbols-outlined">calendar_month</span>
+            <span>Escalas</span>
+        </a>
+
+        <a href="transparencia.html" class="sidebar-link">
+            <span class="material-symbols-outlined">folder</span>
+            <span>Transparência</span>
+        </a>
+
+        <details class="sidebar-group" open>
+          <summary class="sidebar-link sidebar-group-toggle active">
+            <span class="material-symbols-outlined">analytics</span>
+            <span>Relatórios</span>
+            <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+          </summary>
+          <div class="sidebar-submenu">
+        <a href="relatorioDoacoes.html" class="sidebar-link sidebar-sublink">
+            <span class="material-symbols-outlined">volunteer_activism</span>
+            <span>Relatório de Doações</span>
+        </a>
+
+        <a href="relatorioOcorrencias.html" class="sidebar-link sidebar-sublink active">
+            <span class="material-symbols-outlined">assignment_late</span>
+            <span>Relatório de Ocorrências</span>
+        </a>
+
+        <a href="relatorioFuncionarios.html" class="sidebar-link sidebar-sublink">
+            <span class="material-symbols-outlined">badge</span>
+            <span>Relatório de Funcionários</span>
+        </a>
+        <a href="relatorioDespesas.html" class="sidebar-link sidebar-sublink">
+            <span class="material-symbols-outlined">receipt_long</span>
+            <span>Relatório de Despesas</span>
+        </a>
+          </div>
+        </details>
+    </nav>
+
+    <div class="sidebar-footer">
+        <a href="secretaria.html" class="sidebar-link secretaria-panel-link">
+            <span class="material-symbols-outlined">admin_panel_settings</span>
+            <span>Painel de Secretaria</span>
+        </a>
+
+        <a href="login.html" class="sidebar-link">
+            <span class="material-symbols-outlined">logout</span>
+            <span>Sair</span>
+        </a>
+    </div>
+</aside>
+
+<main class="main-area">
+
+    <header class="topbar">
+        <div class="topbar-left"></div>
+        <div class="topbar-right">
+            <div class="profile-chip">
+                <div class="profile-text">
+                    <p id="perfilNome">Usuário</p>
+                    <span id="perfilCargo">Acesso</span>
+                </div>
+                <img
+                    class="profile-avatar"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCodmM9L3Lxp3TOXze0s5ng6gdLuL6UAVgjli-uCdXTzEkbUGW02Hheh8ViQ9IWJQngxEVmN3PkjBy4wDQUFq6-YEiM2_0THjjLcJGGCmoOip-JxgrwZ8717px25oL1Jay3FWpfa0rFtZIWUl4ziBAV-Brk_KrPNka1CMvjgOj2VkctGNpmZeuD-h9E384DdNtUi5QYhfnBKjlzWndJCqrgrkoxZL2DwUV0yeu9VbpJ1wqJosFaUFqLa-oW-OzQ9gsKgXSN3d_IyOx1"
+                    alt="Perfil funcionário"
+                />
+            </div>
+        </div>
+    </header>
+
+    <div class="content-area">
+
+        <div class="page-header">
+            <div>
+                <h2 class="page-title">Relatório de Ocorrências</h2>
+                <p class="page-subtitle">
+                    Visão consolidada dos registros de ocorrências, gravidade e moradores envolvidos.
+                </p>
+            </div>
+
+            <button class="btn-pdf" id="btnGerarPdfOcorrencias" type="button">
+                <span class="material-symbols-outlined">picture_as_pdf</span>
+                <span>Gerar PDF de Ocorrências</span>
+            </button>
+        </div>
+
+        <div class="relatorio-layout">
+            <div class="relatorio-main">
+                <div class="cards-grid">
+                    <div class="info-card">
+                        <p class="card-label">Total de Ocorrências (Mês)</p>
+                        <h3 class="card-value" id="totalOcorrenciasMes"></h3>
+                    </div>
+
+                    <div class="info-card">
+                        <p class="card-label">Tipos Registrados</p>
+                        <h3 class="card-value" id="qtdTiposOcorrencia"></h3>
+                    </div>
+
+                    <div class="info-card">
+                        <p class="card-label">Funcionários Envolvidos</p>
+                        <h3 class="card-value" id="qtdFuncionariosOcorrencia"></h3>
+                    </div>
+
+                    <div class="info-card">
+                        <p class="card-label">Moradores Citados</p>
+                        <h3 class="card-value" id="qtdMoradoresOcorrencia"></h3>
+                    </div>
+                </div>
+
+                <section class="filter-panel" id="filtroOcorrenciaRelatorio" hidden>
+                    <div class="section-header section-header-inline">
+                        <div>
+                            <h2>Filtrar Ocorrências</h2>
+                            <p>Pesquise por tipo, gravidade, funcionário, morador e período.</p>
+                        </div>
+                        <button type="button" id="fecharFiltrosOcorrenciaRelatorio" class="close-panel-btn">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+
+                    <div class="filtro-grid">
+                        <div class="form-field">
+                            <label for="filtroTipoOcorrenciaRelatorio">Tipo de Ocorrência</label>
+                            <select id="filtroTipoOcorrenciaRelatorio">
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="filtroGravidadeOcorrenciaRelatorio">Gravidade</label>
+                            <select id="filtroGravidadeOcorrenciaRelatorio">
+                                <option value="">Todas</option>
+                                <option value="1">Baixa</option>
+                                <option value="2">Média</option>
+                                <option value="3">Alta</option>
+                            </select>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="filtroFuncionarioOcorrenciaRelatorio">Funcionário</label>
+                            <input type="text" id="filtroFuncionarioOcorrenciaRelatorio" placeholder="Nome do funcionário">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="filtroMoradorOcorrenciaRelatorio">Morador envolvido</label>
+                            <input type="text" id="filtroMoradorOcorrenciaRelatorio" placeholder="Nome do morador">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="filtroDataInicialOcorrenciaRelatorio">Data inicial</label>
+                            <input type="date" id="filtroDataInicialOcorrenciaRelatorio">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="filtroDataFinalOcorrenciaRelatorio">Data final</label>
+                            <input type="date" id="filtroDataFinalOcorrenciaRelatorio">
+                        </div>
+
+                        <div class="filter-actions">
+                            <button type="button" id="limparFiltrosOcorrenciaRelatorio" class="secondary-panel-btn">
+                                <span class="material-symbols-outlined">cleaning_services</span>
+                                Limpar Filtros
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-header-row">
+                            <h4>Ocorrências Recentes</h4>
+                            <button type="button" id="abrirFiltrosOcorrenciaRelatorio" class="filter-open-btn">
+                                <span class="material-symbols-outlined">filter_list</span>
+                                Filtros
+                            </button>
+                        </div>
+                    </div>
+
+                    <table class="relatorio-table" id="ocorrenciasRelatorio">
+                        <thead>
+                        <tr>
+                            <th id="th-ocorrencia-data" class="sortable" onclick="definirOrdenacaoOcorrencias('data')">Data <span id="sort-ocorrencia-data" class="sort-indicator"></span></th>
+                            <th id="th-ocorrencia-tipo" class="sortable" onclick="definirOrdenacaoOcorrencias('tipo')">Tipo <span id="sort-ocorrencia-tipo" class="sort-indicator"></span></th>
+                            <th id="th-ocorrencia-gravidade" class="sortable" onclick="definirOrdenacaoOcorrencias('gravidade')">Gravidade <span id="sort-ocorrencia-gravidade" class="sort-indicator"></span></th>
+                            <th id="th-ocorrencia-funcionario" class="sortable" onclick="definirOrdenacaoOcorrencias('funcionario')">Funcionário <span id="sort-ocorrencia-funcionario" class="sort-indicator"></span></th>
+                            <th id="th-ocorrencia-turno" class="sortable" onclick="definirOrdenacaoOcorrencias('turno')">Turno <span id="sort-ocorrencia-turno" class="sort-indicator"></span></th>
+                            <th id="th-ocorrencia-moradores" class="sortable" onclick="definirOrdenacaoOcorrencias('moradores')">Moradores envolvidos <span id="sort-ocorrencia-moradores" class="sort-indicator"></span></th>
+                            <th id="th-ocorrencia-observacoes" class="sortable" onclick="definirOrdenacaoOcorrencias('observacoes')">Observações <span id="sort-ocorrencia-observacoes" class="sort-indicator"></span></th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <aside class="charts-column">
+                <section class="charts-grid">
+                    <div class="chart-card">
+                        <h4>Ocorrências por Mês</h4>
+                        <div id="graficoOcorrenciasMes" class="apex-line-chart"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <h4>Ocorrências por Gravidade no Ano</h4>
+                        <div id="graficoGravidadeMes" class="apex-line-chart"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <h4>Tipos Mais Frequentes</h4>
+                        <div id="graficoTiposOcorrencia" class="apex-bar-chart"></div>
+                    </div>
+
+                    <div class="chart-card">
+                        <h4>Distribuição por Gravidade</h4>
+                        <div id="graficoPizzaGravidade" class="apex-donut-chart"></div>
+                    </div>
+                </section>
+            </aside>
+        </div>
+
+    </div>
+
+</main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="js/relatorioOcorrenciasController.js"></script>
+
+</body>
+</html>
+
+
+
+

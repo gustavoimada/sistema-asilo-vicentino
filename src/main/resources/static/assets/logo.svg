@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" role="img" aria-label="Logo AAV">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1f6f5f"/>
+      <stop offset="100%" stop-color="#2e8b57"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="88" height="88" rx="20" fill="url(#g1)"/>
+  <path d="M48 20l18 18v30a6 6 0 0 1-6 6H36a6 6 0 0 1-6-6V38l18-18z" fill="#ffffff" opacity="0.95"/>
+  <path d="M48 20v16h16" fill="none" stroke="#1f6f5f" stroke-width="4"/>
+  <text x="48" y="66" text-anchor="middle" font-family="Manrope, Arial, sans-serif" font-size="18" font-weight="800" fill="#1f6f5f">AAV</text>
+</svg>

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Nova Prescricao - SGAV</title>
+
+    <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1" />
+    <link rel="stylesheet" href="css/cadastrarPrescricao.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+</head>
+<body onload="carregarTabela()">
+<aside class="sidebar">
+    <div class="sidebar-brand">
+        <div class="sidebar-brand-main">
+            <img src="assets/logo.png" alt="Logo Asilo Vicentino" />
+            <h1>SGAV</h1>
+        </div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <a href="secretaria.html" class="sidebar-link">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span>Painel</span>
+        </a>
+
+        <details class="sidebar-group">
+            <summary class="sidebar-link sidebar-group-toggle">
+                <span class="material-symbols-outlined">groups</span>
+                <span>Moradores e Familia</span>
+                <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+            </summary>
+            <div class="sidebar-submenu">
+                <a href="morador.html" class="sidebar-link sidebar-sublink">
+                    <span class="material-symbols-outlined">elderly</span>
+                    <span>Cadastro de Morador</span>
+                </a>
+                <a href="composicaofamiliar.html" class="sidebar-link sidebar-sublink">
+                    <span class="material-symbols-outlined">family_restroom</span>
+                    <span>Composicao Familiar</span>
+                </a>
+                <a href="historico.html" class="sidebar-link sidebar-sublink">
+                    <span class="material-symbols-outlined">history</span>
+                    <span>Historico</span>
+                </a>
+            </div>
+        </details>
+
+        <a href="funcionario.html" class="sidebar-link">
+            <span class="material-symbols-outlined">badge</span>
+            <span>Funcionarios</span>
+        </a>
+
+        <a href="medicamentos.html" class="sidebar-link">
+            <span class="material-symbols-outlined">medical_services</span>
+            <span>Medicamentos</span>
+        </a>
+
+        <a href="cadastrarPrescricao.html" class="sidebar-link active">
+            <span class="material-symbols-outlined">medical_services</span>
+            <span>Prescricoes</span>
+        </a>
+
+        <a href="tipoOcorrencia.html" class="sidebar-link">
+            <span class="material-symbols-outlined">assignment_late</span>
+            <span>Tipo de Ocorrencia</span>
+        </a>
+
+        <a href="doacao.html" class="sidebar-link">
+            <span class="material-symbols-outlined">volunteer_activism</span>
+            <span>Doacoes</span>
+        </a>
+        <a href="noticias.html" class="sidebar-link">
+          <span class="material-symbols-outlined">newspaper</span>
+          <span>Noticias</span>
+        </a>
+
+        <a href="quartos.html" class="sidebar-link">
+            <span class="material-symbols-outlined">bed</span>
+            <span>Quartos</span>
+        </a>
+
+        <details class="sidebar-group">
+            <summary class="sidebar-link sidebar-group-toggle">
+                <span class="material-symbols-outlined">event</span>
+                <span>Atividades</span>
+                <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+            </summary>
+            <div class="sidebar-submenu">
+                <a href="tipoAtividades.html" class="sidebar-link sidebar-sublink">
+                    <span class="material-symbols-outlined">category</span>
+                    <span>Tipos de Atividades</span>
+                </a>
+                <a href="atividades.html" class="sidebar-link sidebar-sublink">
+                    <span class="material-symbols-outlined">event_note</span>
+                    <span>Atividades</span>
+                </a>
+            </div>
+        </details>
+
+        <details class="sidebar-group">
+            <summary class="sidebar-link sidebar-group-toggle">
+                <span class="material-symbols-outlined">payments</span>
+                <span>Despesas</span>
+                <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+            </summary>
+            <div class="sidebar-submenu">
+                <a href="tiposDespesas.html" class="sidebar-link sidebar-sublink">
+                    <span class="material-symbols-outlined">receipt_long</span>
+                    <span>Tipos de Despesas</span>
+                </a>
+                <a href="pagamentoDespesas.html" class="sidebar-link sidebar-sublink">
+                    <span class="material-symbols-outlined">request_quote</span>
+                    <span>Pagamento de Despesas</span>
+                </a>
+            </div>
+        </details>
+    </nav>
+
+    <div class="sidebar-footer">
+        <a href="login.html" class="sidebar-link logout">
+            <span class="material-symbols-outlined">logout</span>
+            <span>Sair</span>
+        </a>
+    </div>
+</aside>
+
+<header class="topbar">
+    <div class="topbar-left"></div>
+    <div class="topbar-right">
+        <div class="profile-chip">
+            <div class="profile-text">
+                <p id="perfilNome">Usuario</p>
+                <span id="perfilCargo">Acesso</span>
+            </div>
+            <img
+                class="profile-avatar"
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCodmM9L3Lxp3TOXze0s5ng6gdLuL6UAVgjli-uCdXTzEkbUGW02Hheh8ViQ9IWJQngxEVmN3PkjBy4wDQUFq6-YEiM2_0THjjLcJGGCmoOip-JxgrwZ8717px25oL1Jay3FWpfa0rFtZIWUl4ziBAV-Brk_KrPNka1CMvjgOj2VkctGNpmZeuD-h9E384DdNtUi5QYhfnBKjlzWndJCqrgrkoxZL2DwUV0yeu9VbpJ1wqJosFaUFqLa-oW-OzQ9gsKgXSN3d_IyOx1"
+                alt="Usuario"
+            />
+        </div>
+    </div>
+</header>
+
+<main class="main-content">
+
+    <div class="content-stack">
+        <section class="card form-card" id="cadastroPrescricao" hidden>
+            <div class="card-title-row">
+                <div class="card-icon-box">
+                    <span class="material-symbols-outlined">edit_note</span>
+                </div>
+                <h3>Nova Prescricao</h3>
+                <button type="button" id="fecharCadastroPrescricao" class="action-btn" style="margin-left: auto;">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <form class="prescription-form" onsubmit="event.preventDefault(); cadastrar();">
+                <input type="hidden" id="idPrescricao" name="idPrescricao" value="0"/>
+
+                <div class="form-group form-col-2">
+                    <label>Morador</label>
+                    <div class="select-wrap">
+                        <select id="idMorador" name="idMorador"></select>
+                        <span class="material-symbols-outlined select-icon">schedule</span>
+                    </div>
+                </div>
+
+                <div class="form-group form-col-2">
+                    <label>Medicamento</label>
+                    <div class="select-wrap">
+                        <select id="idMedicamento" name="idMedicamento"></select>
+                        <span class="material-symbols-outlined select-icon">medical_information</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Frequencia (valor)</label>
+                    <input type="number" min="1" placeholder="Ex: 8" id="frequenciaValor" name="frequenciaValor"/>
+                </div>
+
+                <div class="form-group">
+                    <label>Frequencia (unidade)</label>
+                    <div class="select-wrap">
+                        <select id="frequenciaUnidade" name="frequenciaUnidade">
+                            <option value="">Selecione...</option>
+                            <option value="Hora">Hora(s)</option>
+                            <option value="Dia">Dia(s)</option>
+                            <option value="Semana">Semana(s)</option>
+                        </select>
+                        <span class="material-symbols-outlined select-icon">schedule</span>
+                    </div>
+                </div>
+
+                <div class="form-group" id="grupoQtdDose">
+                    <label id="labelQtdDose">Quantidade por dose</label>
+                    <input type="number" min="1" placeholder="Ex: 1" id="qtdDose" name="qtdDose"/>
+                </div>
+
+                <div class="form-group">
+                    <label>Horario da primeira dose</label>
+                    <input type="time" id="primeiraDose" name="primeiraDose"/>
+                </div>
+
+                <div class="form-group">
+                    <label>Data Inicio</label>
+                    <input type="date" id="dtInicio" name="dtInicio"/>
+                </div>
+
+                <div class="form-group">
+                    <label>Data Fim</label>
+                    <input type="date" id="dtFim" name="dtFim"/>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="save-btn">Salvar Prescricao</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="list-section">
+            <div class="list-header">
+                <div class="list-header-left">
+                    <h2>Lista de Prescricoes Cadastradas</h2>
+                    <p>Visualizacao das prescricoes registradas no sistema.</p>
+                </div>
+                <div class="list-header-actions">
+                    <button type="button" id="abrirCadastroPrescricao" class="primary-action secondary-open-btn">
+                        <span class="material-symbols-outlined">add</span>
+                        Cadastrar Prescricao
+                    </button>
+                    <button type="button" id="abrirFiltrosPrescricao" class="filter-open-btn">
+                        <span class="material-symbols-outlined">filter_list</span>
+                        Filtros
+                    </button>
+                </div>
+            </div>
+
+            <section class="card" id="filtroPrescricao" hidden>
+                <div class="section-header section-header-inline">
+                    <div>
+                        <h2>Filtrar Prescricoes</h2>
+                        <p>Pesquise por morador e medicamento.</p>
+                    </div>
+
+                    <button type="button" id="btnFecharFiltroPrescricao" class="close-panel-btn">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div class="prescription-form">
+                    <div class="form-group">
+                        <label for="moradorFiltroPrescricao">Morador</label>
+                        <input type="text" id="moradorFiltroPrescricao" placeholder="Ex: Luiz">
+                    </div>
+
+                    <div class="form-group form-col-2">
+                        <label for="medicamentoFiltroPrescricao">Medicamento</label>
+                        <input type="text" id="medicamentoFiltroPrescricao" placeholder="Ex: Paracetamol">
+                    </div>
+
+                    <div class="form-actions form-actions-between">
+                        <button type="button" id="btnLimparFiltroPrescricao" class="secondary-panel-btn">
+                            <span class="material-symbols-outlined">cleaning_services</span>
+                            Limpar Filtros
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card" id="editorPrescricao" hidden>
+                <div class="section-header section-header-inline">
+                    <div>
+                        <h2>Editar Prescricao</h2>
+                        <p>Atualize os dados da prescricao selecionada.</p>
+                    </div>
+
+                    <button type="button" id="fecharEditorPrescricao" class="close-panel-btn">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div class="prescription-form">
+                    <div class="form-group form-col-2">
+                        <label for="idMoradorEditar">Morador</label>
+                        <div class="select-wrap">
+                            <select id="idMoradorEditar" name="idMorador"></select>
+                            <span class="material-symbols-outlined select-icon">schedule</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group form-col-2">
+                        <label for="idMedicamentoEditar">Medicamento</label>
+                        <div class="select-wrap">
+                            <select id="idMedicamentoEditar"></select>
+                            <span class="material-symbols-outlined select-icon">medical_information</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="frequenciaValorEditar">Frequencia (valor)</label>
+                        <input type="number" min="1" placeholder="Ex: 8" id="frequenciaValorEditar"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="frequenciaUnidadeEditar">Frequencia (unidade)</label>
+                        <div class="select-wrap">
+                            <select id="frequenciaUnidadeEditar">
+                                <option value="">Selecione...</option>
+                                <option value="Hora">Hora(s)</option>
+                                <option value="Dia">Dia(s)</option>
+                                <option value="Semana">Semana(s)</option>
+                            </select>
+                            <span class="material-symbols-outlined select-icon">schedule</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="grupoQtdDoseEditar">
+                        <label id="labelQtdDoseEditar" for="qtdDoseEditar">Quantidade por dose</label>
+                        <input type="number" min="1" placeholder="Ex: 1" id="qtdDoseEditar"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="primeiraDoseEditar">Horario da primeira dose</label>
+                        <input type="time" id="primeiraDoseEditar"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dtInicioEditar">Data Inicio</label>
+                        <input type="date" id="dtInicioEditar"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dtFimEditar">Data Fim</label>
+                        <input type="date" id="dtFimEditar"/>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="salvarEdicaoPrescricao" class="primary-action">
+                            <span class="material-symbols-outlined">save</span>
+                            Salvar Edicao
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <div class="table-card">
+                <div class="table-wrap">
+                    <table id="tabelaPrescricao">
+                        <thead>
+                        <tr>
+                            <th data-col="morador_idmorador">Morador</th>
+                            <th data-col="medicamento_idmedicamento">Medicamento</th>
+                            <th data-col="frequenciavalor">Frequencia</th>
+                            <th data-col="qtddose">Qtd. Dose</th>
+                            <th data-col="primeiradose">Primeira Dose</th>
+                            <th data-col="dtinicio">Data Inicio</th>
+                            <th data-col="dtfim">Data Fim</th>
+                            <th>Acoes</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tbodyPrescricao"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<nav class="bottom-nav">
+    <a href="#" class="bottom-item">
+        <span class="material-symbols-outlined">home</span>
+        <span>Inicio</span>
+    </a>
+    <a href="#" class="bottom-item">
+        <span class="material-symbols-outlined">group</span>
+        <span>Moradores</span>
+    </a>
+    <a href="#" class="bottom-item active-bottom">
+        <span class="material-symbols-outlined">description</span>
+        <span>Prescricoes</span>
+    </a>
+    <a href="#" class="bottom-item">
+        <span class="material-symbols-outlined">menu</span>
+        <span>Mais</span>
+    </a>
+</nav>
+</body>
+<script src="js/prescricaoController.js"></script>
+</html>

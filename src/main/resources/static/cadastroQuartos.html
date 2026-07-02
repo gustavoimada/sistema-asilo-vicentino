@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SGAV - Gestão de Quartos</title>
+
+  <link rel="stylesheet" href="css/cadastroQuartos.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="page">
+
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-logo">
+          <img src="assets/logo.png" alt="Logo AAV" />
+        </div>
+        <div class="sidebar-brand-text">
+          <h1>SGAV</h1>
+          <p>Sistema de Gerenciamento</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="sidebar-link">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span>Dashboard</span>
+        </a>
+
+        <a href="#" class="sidebar-link">
+          <span class="material-symbols-outlined">group</span>
+          <span>Pacientes</span>
+        </a>
+
+        <a href="#" class="sidebar-link active">
+          <span class="material-symbols-outlined">bed</span>
+          <span>Gestão de Quartos</span>
+        </a>
+
+        <a href="#" class="sidebar-link">
+          <span class="material-symbols-outlined">medical_services</span>
+          <span>Funcionários</span>
+        </a>
+
+        <a href="#" class="sidebar-link">
+          <span class="material-symbols-outlined">description</span>
+          <span>Relatórios</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-link">
+          <span class="material-symbols-outlined">settings</span>
+          <span>Configurações</span>
+        </a>
+
+        <a href="#" class="sidebar-link logout">
+          <span class="material-symbols-outlined">logout</span>
+          <span>Sair</span>
+        </a>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="topbar-left">
+          <span class="material-symbols-outlined">meeting_room</span>
+          <h2 class="topbar-title">Gestão de Quartos</h2>
+        </div>
+
+        <div class="topbar-right">
+          <div class="search-group">
+            <span class="material-symbols-outlined">search</span>
+            <input type="text" placeholder="Procurar quarto ou ala..." />
+          </div>
+
+          <div class="topbar-actions">
+            <button class="icon-btn">
+              <span class="material-symbols-outlined">notifications</span>
+              <span class="notification-dot"></span>
+            </button>
+            <button class="icon-btn">
+              <span class="material-symbols-outlined">calendar_today</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="content-grid">
+
+          <section class="card">
+            <div class="card-header">
+              <h3>
+                <span class="material-symbols-outlined">add_circle</span>
+                Registar Novo Quarto
+              </h3>
+            </div>
+
+            <div class="card-body">
+              <form class="quarto-form">
+                <div class="form-field">
+                  <label>Nº/Nome do Quarto</label>
+                  <input type="text" placeholder="Ex: 101" />
+                </div>
+
+                <div class="form-field">
+                  <label>Ala</label>
+                  <select>
+                    <option>Norte</option>
+                    <option>Sul</option>
+                    <option>Nascente</option>
+                    <option>Poente</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label>Tipo</label>
+                  <select>
+                    <option>Individual</option>
+                    <option>Partilhado (2 camas)</option>
+                    <option>Enfermaria (4 camas)</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label>Status Inicial</label>
+                  <select>
+                    <option>Disponível</option>
+                    <option>Manutenção</option>
+                  </select>
+                </div>
+
+                <button class="primary-btn" type="submit">
+                  <span class="material-symbols-outlined" style="font-size: 18px;">save</span>
+                  Salvar Quarto
+                </button>
+              </form>
+            </div>
+          </section>
+
+          <section>
+            <div class="section-head">
+              <h3 style="font-size: 18px; font-weight: 800;">Listagem de Quartos</h3>
+
+              <div class="view-toggle">
+                <button class="view-btn active">
+                  <span class="material-symbols-outlined">grid_view</span>
+                </button>
+                <button class="view-btn">
+                  <span class="material-symbols-outlined">view_list</span>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section class="room-grid">
+
+            <article class="room-card">
+              <div class="room-card-top">
+                <div>
+                  <span class="room-tag">Ala Norte</span>
+                  <h4 class="room-title">Quarto 101</h4>
+                </div>
+
+                <span class="status-pill disponivel">
+                  <span class="dot"></span>
+                  Disponível
+                </span>
+              </div>
+
+              <div class="room-info">
+                <div class="room-info-row">
+                  <span class="label">Tipo:</span>
+                  <span class="value">Individual Premium</span>
+                </div>
+                <div class="room-info-row">
+                  <span class="label">Ocupação:</span>
+                  <span class="value">0/1</span>
+                </div>
+              </div>
+
+              <div class="room-actions">
+                <button class="secondary-btn">Editar</button>
+                <button class="delete-btn">Excluir</button>
+              </div>
+            </article>
+
+            <article class="room-card">
+              <div class="room-card-top">
+                <div>
+                  <span class="room-tag">Ala Sul</span>
+                  <h4 class="room-title">Quarto 204</h4>
+                </div>
+
+                <span class="status-pill ocupado">
+                  <span class="dot"></span>
+                  Ocupado
+                </span>
+              </div>
+
+              <div class="room-info">
+                <div class="room-info-row">
+                  <span class="label">Tipo:</span>
+                  <span class="value">Partilhado</span>
+                </div>
+                <div class="room-info-row">
+                  <span class="label">Ocupação:</span>
+                  <span class="value strong">2/2</span>
+                </div>
+              </div>
+
+              <div class="room-actions">
+                <button class="secondary-btn">Editar</button>
+                <button class="delete-btn">Excluir</button>
+              </div>
+            </article>
+
+            <article class="room-card">
+              <div class="room-card-top">
+                <div>
+                  <span class="room-tag">Ala Nascente</span>
+                  <h4 class="room-title">Quarto 112</h4>
+                </div>
+
+                <span class="status-pill manutencao">
+                  <span class="dot"></span>
+                  Manutenção
+                </span>
+              </div>
+
+              <div class="room-info">
+                <div class="room-info-row">
+                  <span class="label">Tipo:</span>
+                  <span class="value">Individual</span>
+                </div>
+                <div class="room-info-row">
+                  <span class="label">Ocupação:</span>
+                  <span class="value">0/1</span>
+                </div>
+              </div>
+
+              <div class="room-actions">
+                <button class="secondary-btn">Editar</button>
+                <button class="delete-btn">Excluir</button>
+              </div>
+            </article>
+
+          </section>
+
+          <section class="footer-stats">
+            <div class="footer-stat default">
+              <div class="footer-stat-icon primary">
+                <span class="material-symbols-outlined">meeting_room</span>
+              </div>
+              <div class="footer-stat-text">
+                <p>Total Quartos</p>
+                <h3>48</h3>
+              </div>
+            </div>
+
+            <div class="footer-stat blue">
+              <div class="footer-stat-icon primary">
+                <span class="material-symbols-outlined">bed</span>
+              </div>
+              <div class="footer-stat-text">
+                <p>Camas Ocupadas</p>
+                <h3 class="blue">62 <span class="sub">/ 80</span></h3>
+              </div>
+            </div>
+
+            <div class="footer-stat default">
+              <div class="footer-stat-icon green">
+                <span class="material-symbols-outlined">event_available</span>
+              </div>
+              <div class="footer-stat-text">
+                <p>Camas Livres</p>
+                <h3 class="green">18</h3>
+              </div>
+            </div>
+
+            <div class="footer-stat red">
+              <div class="footer-stat-icon red">
+                <span class="material-symbols-outlined">construction</span>
+              </div>
+              <div class="footer-stat-text">
+                <p>Em Manutenção</p>
+                <h3 class="red">5</h3>
+              </div>
+            </div>
+          </section>
+
+        </div>
+      </div>
+    </main>
+
+  </div>
+</body>
+</html>
+
+

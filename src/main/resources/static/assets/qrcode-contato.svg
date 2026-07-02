@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 220" role="img" aria-label="QR code contato">
+  <rect width="220" height="220" fill="#fff"/>
+  <rect x="10" y="10" width="54" height="54" fill="#000"/>
+  <rect x="18" y="18" width="38" height="38" fill="#fff"/>
+  <rect x="24" y="24" width="26" height="26" fill="#000"/>
+  <rect x="156" y="10" width="54" height="54" fill="#000"/>
+  <rect x="164" y="18" width="38" height="38" fill="#fff"/>
+  <rect x="170" y="24" width="26" height="26" fill="#000"/>
+  <rect x="10" y="156" width="54" height="54" fill="#000"/>
+  <rect x="18" y="164" width="38" height="38" fill="#fff"/>
+  <rect x="24" y="170" width="26" height="26" fill="#000"/>
+  <rect x="76" y="78" width="12" height="12" fill="#000"/>
+  <rect x="96" y="78" width="12" height="12" fill="#000"/>
+  <rect x="116" y="78" width="12" height="12" fill="#000"/>
+  <rect x="136" y="78" width="12" height="12" fill="#000"/>
+  <rect x="76" y="98" width="12" height="12" fill="#000"/>
+  <rect x="116" y="98" width="12" height="12" fill="#000"/>
+  <rect x="136" y="98" width="12" height="12" fill="#000"/>
+  <rect x="76" y="118" width="12" height="12" fill="#000"/>
+  <rect x="96" y="118" width="12" height="12" fill="#000"/>
+  <rect x="116" y="118" width="12" height="12" fill="#000"/>
+  <rect x="136" y="118" width="12" height="12" fill="#000"/>
+  <rect x="76" y="138" width="12" height="12" fill="#000"/>
+  <rect x="96" y="138" width="12" height="12" fill="#000"/>
+  <rect x="136" y="138" width="12" height="12" fill="#000"/>
+  <rect x="84" y="162" width="12" height="12" fill="#000"/>
+  <rect x="104" y="162" width="12" height="12" fill="#000"/>
+  <rect x="124" y="162" width="12" height="12" fill="#000"/>
+  <rect x="144" y="162" width="12" height="12" fill="#000"/>
+  <rect x="84" y="182" width="12" height="12" fill="#000"/>
+  <rect x="124" y="182" width="12" height="12" fill="#000"/>
+  <rect x="144" y="182" width="12" height="12" fill="#000"/>
+</svg>

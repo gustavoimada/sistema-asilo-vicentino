@@ -1,0 +1,354 @@
+package unoeste.projetoasilo.control;
+
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import unoeste.projetoasilo.db.util.Banco;
+import unoeste.projetoasilo.entities.Error;
+import unoeste.projetoasilo.entities.Funcionario;
+import unoeste.projetoasilo.entities.Transparencia;
+
+import jakarta.servlet.http.HttpSession;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.Instant;
+import java.sql.SQLException;
+import java.util.Locale;
+
+@RestController
+@RequestMapping("transparencia")
+public class TransparenciaControl
+{
+    private final Path raizUpload = Paths.get(uploadDirBase(), "transparencia").toAbsolutePath().normalize();
+    // Recebe o PDF enviado pelo coordenador e salva o arquivo no servidor.
+    @PostMapping("upload")
+    public ResponseEntity<Object> upload(@RequestParam("arquivo") MultipartFile arquivo, @RequestParam("ano") String ano, @RequestParam("evento") String evento, HttpSession session)
+    {
+        String anoLimpo = limparAno(ano);
+        String eventoLimpo = limparEvento(evento);
+        if (anoLimpo.isEmpty())
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Ano invalido"));
+        }
+
+        if (eventoLimpo.isEmpty())
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Evento obrigatorio"));
+        }
+
+        if (arquivo == null || arquivo.isEmpty())
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Selecione um PDF para enviar"));
+        }
+
+        String nomeOriginal;
+        if (arquivo.getOriginalFilename() == null)
+        {
+            nomeOriginal = "";
+        }
+        else
+        {
+            nomeOriginal = arquivo.getOriginalFilename();
+        }
+
+        String contentType;
+        if (arquivo.getContentType() == null)
+        {
+            contentType = "";
+        }
+        else
+        {
+            contentType = arquivo.getContentType().toLowerCase(Locale.ROOT);
+        }
+        if (!nomeOriginal.toLowerCase(Locale.ROOT).endsWith(".pdf") && !contentType.contains("pdf"))
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Somente arquivos PDF sao permitidos"));
+        }
+
+        try
+        {
+            Banco conexao = Banco.getConnection();
+            Funcionario funcionario = buscarFuncionarioDaSessao(session, conexao);
+            if (funcionario == null)
+            {
+                return ResponseEntity.badRequest().body(new Error("Erro", "Funcionario responsavel nao encontrado"));
+            }
+            if (!ehCoordenador(funcionario))
+            {
+                return ResponseEntity.status(403).body(new Error("Erro", "Apenas coordenadores podem enviar arquivos"));
+            }
+
+            String pastaEvento = limparNomePasta(eventoLimpo);
+            Files.createDirectories(raizUpload.resolve(anoLimpo).resolve(pastaEvento));
+            String baseNome = limparNomeArquivo(nomeOriginal);
+            String nomeArquivo = Instant.now().toEpochMilli() + "-" + baseNome + ".pdf";
+            Path destino = raizUpload.resolve(anoLimpo).resolve(pastaEvento).resolve(nomeArquivo).normalize();
+
+            if (!destino.startsWith(raizUpload))
+            {
+                return ResponseEntity.badRequest().body(new Error("Erro", "Nome de arquivo invalido"));
+            }
+
+            Files.copy(arquivo.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
+
+            Transparencia transparencia = new Transparencia();
+            transparencia.setAno(Integer.parseInt(anoLimpo));
+            transparencia.setNomeArquivo(nomeArquivo);
+            transparencia.setEvento(eventoLimpo);
+            transparencia.setCaminhoArquivo(raizUpload.relativize(destino).toString().replace("\\", "/"));
+            transparencia.setFuncionario(funcionario);
+
+            if (!transparencia.gravar(conexao))
+            {
+                Files.deleteIfExists(destino);
+                return ResponseEntity.badRequest().body(new Error("Erro", "Arquivo salvo, mas nao foi possivel registrar no banco"));
+            }
+
+            return ResponseEntity.ok(transparencia);
+        }
+        catch (IllegalArgumentException e)
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", e.getMessage()));
+        }
+        catch (IOException | SQLException e)
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao salvar arquivo"));
+        }
+    }
+
+    // Exclui um arquivo de transparencia e tambem remove o registro do banco.
+    @DeleteMapping("deletar/{id}")
+    public ResponseEntity<Object> deletar(@PathVariable int id, HttpSession session)
+    {
+        try
+        {
+            Banco conexao = Banco.getConnection();
+            Funcionario funcionario = buscarFuncionarioDaSessao(session, conexao);
+            if (funcionario == null || !ehCoordenador(funcionario))
+            {
+                return ResponseEntity.status(403).body(new Error("Erro", "Apenas coordenadores podem excluir arquivos"));
+            }
+
+            Transparencia transparencia = new Transparencia().buscarPorId(id, conexao);
+            if (transparencia == null)
+            {
+                return ResponseEntity.notFound().build();
+            }
+
+            Path caminho = raizUpload.resolve(transparencia.getCaminhoArquivo()).normalize();
+            if (!caminho.startsWith(raizUpload))
+            {
+                return ResponseEntity.badRequest().body(new Error("Erro", "Caminho de arquivo invalido"));
+            }
+
+            if (Files.exists(caminho) && Files.isRegularFile(caminho))
+            {
+                Files.deleteIfExists(caminho);
+            }
+
+            if (!transparencia.excluir(id, conexao))
+            {
+                return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel excluir o registro no banco"));
+            }
+
+            return ResponseEntity.ok().build();
+        }
+        catch (IOException | SQLException e)
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao excluir arquivo"));
+        }
+    }
+
+    // Faz o download publico do PDF salvo.
+    @GetMapping("download/{id}")
+    public ResponseEntity<Object> download(@PathVariable int id)
+    {
+        try
+        {
+            Banco conexao = Banco.getConnection();
+            Transparencia transparencia = new Transparencia().buscarPorId(id, conexao);
+            if (transparencia == null)
+            {
+                return ResponseEntity.notFound().build();
+            }
+
+            Path caminho = raizUpload.resolve(transparencia.getCaminhoArquivo()).normalize();
+            if (!caminho.startsWith(raizUpload) || !Files.exists(caminho) || !Files.isRegularFile(caminho))
+            {
+                return ResponseEntity.notFound().build();
+            }
+
+            Resource recurso = new UrlResource(caminho.toUri());
+            String nomeDownload = URLEncoder.encode(caminho.getFileName().toString(), StandardCharsets.UTF_8).replace("+", "%20");
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + nomeDownload)
+                    .body(recurso);
+        }
+        catch (MalformedURLException | SQLException e)
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Arquivo invalido"));
+        }
+    }
+
+    // Lista os arquivos de transparencia cadastrados no banco.
+    @GetMapping("listar")
+    public ResponseEntity<Object> listar()
+    {
+        Banco conexao = Banco.getConnection();
+        Transparencia transparencia = new Transparencia();
+        try
+        {
+            return ResponseEntity.ok(transparencia.listar(conexao));
+        }
+        catch (SQLException e)
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao listar arquivos de transparencia"));
+        }
+        finally
+        {
+        	conexao.fechar();
+        }
+    }
+
+    // Deixa o ano somente com numeros e valida se tem quatro digitos.
+    private String limparAno(String ano)
+    {
+        String anoOriginal;
+        if (ano == null)
+        {
+            anoOriginal = "";
+        }
+        else
+        {
+            anoOriginal = ano;
+        }
+
+        String valor = String.valueOf(anoOriginal).replaceAll("[^0-9]", "");
+        if (valor.matches("\\d{4}"))
+        {
+            return valor;
+        }
+        return "";
+    }
+
+    // Limpa o nome do arquivo para evitar caracteres ruins no caminho.
+    private String limparNomeArquivo(String nome)
+    {
+        String semExtensao = nome.replaceFirst("(?i)\\.pdf$", "");
+        String padronizado = java.text.Normalizer.normalize(semExtensao, java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
+        String limpo = padronizado.replaceAll("[^a-zA-Z0-9._-]+", "-")
+                .replaceAll("-{2,}", "-")
+                .replaceAll("^-|-$", "");
+        if (limpo.isBlank())
+        {
+            return "prestacao-contas";
+        }
+        return limpo;
+    }
+
+    // Limpa o nome do evento para usar como pasta.
+    private String limparNomePasta(String nome)
+    {
+        String padronizado = java.text.Normalizer.normalize(nome, java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
+        String limpo = padronizado.replaceAll("[^a-zA-Z0-9._-]+", "-")
+                .replaceAll("-{2,}", "-")
+                .replaceAll("^-|-$", "");
+        if (limpo.isBlank())
+        {
+            return "outros";
+        }
+        return limpo.toLowerCase(Locale.ROOT);
+    }
+
+    // Limpa o texto do evento antes de salvar.
+    private String limparEvento(String evento)
+    {
+        String eventoOriginal;
+        if (evento == null)
+        {
+            eventoOriginal = "";
+        }
+        else
+        {
+            eventoOriginal = evento;
+        }
+
+        String valor = String.valueOf(eventoOriginal).trim().replaceAll("\\s+", " ");
+        if (valor.length() > 80)
+        {
+            valor = valor.substring(0, 80).trim();
+        }
+        return valor;
+    }
+
+    // Confere se o funcionario logado e coordenador.
+    private boolean ehCoordenador(Funcionario funcionario)
+    {
+        return funcionario != null && "Coordenador".equalsIgnoreCase(String.valueOf(funcionario.getCategoria()).trim());
+    }
+
+    // Busca o funcionario logado usando os dados gravados na sessao.
+    private Funcionario buscarFuncionarioDaSessao(HttpSession session, Banco conexao) throws SQLException
+    {
+        if (session == null)
+        {
+            return null;
+        }
+
+        Object idFuncionarioSessao = session.getAttribute("idFuncionario");
+        if (idFuncionarioSessao != null)
+        {
+            int idFuncionario = Integer.parseInt(String.valueOf(idFuncionarioSessao));
+            if (idFuncionario > 0)
+            {
+                Funcionario funcionario = new Funcionario().buscarId(idFuncionario, conexao);
+                if (funcionario != null)
+                {
+                    return funcionario;
+                }
+            }
+        }
+
+        Object idUserSessao = session.getAttribute("idUser");
+        if (idUserSessao != null)
+        {
+            int idUser = Integer.parseInt(String.valueOf(idUserSessao));
+            if (idUser > 0)
+            {
+                return new Funcionario().buscarPorUsuario(idUser, conexao);
+            }
+        }
+
+        return null;
+    }
+
+    private static String uploadDirBase()
+    {
+        String valor = System.getenv("UPLOAD_DIR");
+        if (valor == null || valor.isBlank())
+        {
+            return "uploads";
+        }
+        return valor.trim();
+    }
+}

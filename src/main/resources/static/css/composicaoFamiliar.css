@@ -1,0 +1,70 @@
+.subgroup-header {
+  margin-top: 16px;
+  align-items: center;
+}
+
+#filtroVinculos,
+#filtroExternos {
+  margin-top: 20px;
+}
+
+#filtroExternos {
+  clear: both;
+}
+
+#listaFamiliares + #filtroExternos,
+.table-card + #filtroExternos {
+  margin-top: 28px;
+}
+
+#filtroExternos + .subgroup-header {
+  margin-top: 18px;
+}
+
+.subgroup-header .list-header-left h3 {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.01em;
+}
+
+#vinculoPessoaNome[readonly] {
+  background: var(--surface-container);
+  color: var(--on-surface-variant);
+}
+
+@media (max-width: 700px) {
+  .subgroup-header .list-header-left h3 {
+    font-size: 20px;
+  }
+}
+
+.form-field select,
+#vinculoMoradorSelect,
+#vinculoTipo {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 42px;
+  border: 1px solid #d0d7de;
+  background-color: var(--surface-container-highest);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 14px;
+  box-shadow: none;
+}
+
+.form-field select:hover,
+#vinculoMoradorSelect:hover,
+#vinculoTipo:hover {
+  border-color: #b8c2cc;
+  background-color: #dfe4ea;
+}
+
+.form-field select:focus,
+#vinculoMoradorSelect:focus,
+#vinculoTipo:focus {
+  border-color: #94a3b8;
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.18);
+}

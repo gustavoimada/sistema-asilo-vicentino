@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestão de Tipo de Ocorrência - SGAV</title>
+  <link rel="stylesheet" href="css/cadastroTipoOcorrencia.css?v=12" />
+  <link rel="stylesheet" href="css/funcionario.css" />
+  <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+</head>
+<body onload="carregarTipos()">
+  <div class="page">
+        <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-main">
+          <img src="assets/logo.png" alt="Logo Asilo Vicentino" />
+          <h1>SGAV</h1>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="secretaria.html" class="sidebar-link">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span>Painel</span>
+        </a>
+
+        <details class="sidebar-group">
+          <summary class="sidebar-link sidebar-group-toggle">
+            <span class="material-symbols-outlined">groups</span>
+            <span>Moradores e Família</span>
+            <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+          </summary>
+          <div class="sidebar-submenu">
+            <a href="morador.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">elderly</span>
+              <span>Cadastro de Morador</span>
+            </a>
+            <a href="composicaofamiliar.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">family_restroom</span>
+              <span>Composição Familiar</span>
+            </a>
+            <a href="historico.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">history</span>
+              <span>Histórico</span>
+            </a>
+          </div>
+        </details>
+
+        <a href="funcionario.html" class="sidebar-link">
+          <span class="material-symbols-outlined">badge</span>
+          <span>Funcionários</span>
+        </a>
+
+        <a href="medicamentos.html" class="sidebar-link">
+          <span class="material-symbols-outlined">medical_services</span>
+          <span>Medicamentos</span>
+        </a>
+
+        <a href="cadastrarPrescricao.html" class="sidebar-link">
+          <span class="material-symbols-outlined">medical_services</span>
+          <span>Prescrições</span>
+        </a>
+
+        <a href="tipoOcorrencia.html" class="sidebar-link active">
+          <span class="material-symbols-outlined">assignment_late</span>
+          <span>Tipo de Ocorrência</span>
+        </a>
+
+        <a href="doacao.html" class="sidebar-link">
+          <span class="material-symbols-outlined">volunteer_activism</span>
+          <span>Doações</span>
+        </a>
+
+        <a href="noticias.html" class="sidebar-link">
+          <span class="material-symbols-outlined">newspaper</span>
+          <span>Notícias</span>
+        </a>
+
+        <a href="quartos.html" class="sidebar-link">
+          <span class="material-symbols-outlined">bed</span>
+          <span>Quartos</span>
+        </a>
+
+        <details class="sidebar-group">
+          <summary class="sidebar-link sidebar-group-toggle">
+            <span class="material-symbols-outlined">event</span>
+            <span>Atividades</span>
+            <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+          </summary>
+          <div class="sidebar-submenu">
+            <a href="tipoAtividades.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">category</span>
+              <span>Tipos de Atividades</span>
+            </a>
+            <a href="atividades.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">event_note</span>
+              <span>Atividades</span>
+            </a>
+          </div>
+        </details>
+
+        <details class="sidebar-group">
+          <summary class="sidebar-link sidebar-group-toggle">
+            <span class="material-symbols-outlined">payments</span>
+            <span>Despesas</span>
+            <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+          </summary>
+          <div class="sidebar-submenu">
+            <a href="tiposDespesas.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">receipt_long</span>
+              <span>Tipos de Despesas</span>
+            </a>
+            <a href="despesa.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">request_quote</span>
+              <span>Pagamento de Despesas</span>
+            </a>
+          </div>
+        </details>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="login.html" class="sidebar-link">
+          <span class="material-symbols-outlined">logout</span>
+          <span>Sair</span>
+        </a>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="topbar-left">
+        </div>
+
+        <div class="topbar-right">
+          <div class="profile-chip">
+            <div class="profile-text">
+              <p id="perfilNome">Usuário</p>
+              <span id="perfilCargo">Acesso</span>
+            </div>
+            <img
+              class="profile-avatar"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCodmM9L3Lxp3TOXze0s5ng6gdLuL6UAVgjli-uCdXTzEkbUGW02Hheh8ViQ9IWJQngxEVmN3PkjBy4wDQUFq6-YEiM2_0THjjLcJGGCmoOip-JxgrwZ8717px25oL1Jay3FWpfa0rFtZIWUl4ziBAV-Brk_KrPNka1CMvjgOj2VkctGNpmZeuD-h9E384DdNtUi5QYhfnBKjlzWndJCqrgrkoxZL2DwUV0yeu9VbpJ1wqJosFaUFqLa-oW-OzQ9gsKgXSN3d_IyOx1"
+              alt="Secretaria"
+            />
+          </div>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="content-wrap">
+          <section>
+            <div class="list-header">
+              <div class="list-header-left">
+                <h2>Lista de Tipos de Ocorrência</h2>
+                <p>Visualização dos tipos de ocorrência registrados no sistema.</p>
+              </div>
+
+              <div class="list-header-actions">
+                <button type="button" id="abrirCadastroOcorrencia" class="primary-action secondary-open-btn">
+                  <span class="material-symbols-outlined">add</span>
+                  Cadastrar Novo
+                </button>
+                <button type="button" id="abrirFiltrosOcorrencia" class="filter-open-btn">
+                  <span class="material-symbols-outlined">filter_list</span>
+                  Filtros
+                </button>
+              </div>
+            </div>
+
+            <section class="card" id="cadastroOcorrencia" hidden>
+              <div class="section-header section-header-inline">
+                <div>
+                  <h2 id="formTitulo">Cadastrar Novo Tipo de Ocorrência</h2>
+                  <p>Insira os dados da ocorrência para manter o controle correto no sistema.</p>
+                </div>
+                <button type="button" id="fecharCadastroOcorrencia" class="close-panel-btn">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+
+              <form class="ocorrencia-form" id="tipoOcorrenciaForm">
+                <input type="hidden" id="tipoId" />
+
+                <div class="form-field">
+                  <label for="descricao">Nome da Ocorrência</label>
+                  <input id="descricao" type="text" maxlength="45" required pattern="[A-Za-zÀ-ÿ ]+" title="Use apenas letras e espaços" placeholder="Ex: Queda no corredor" />
+                </div>
+
+                <div class="form-field">
+                  <label for="gravidade">Gravidade</label>
+                  <select id="gravidade" required>
+                    <option value="">Selecione</option>
+                    <option value="1">1 - Baixa</option>
+                    <option value="2">2 - Média</option>
+                    <option value="3">3 - Alta</option>
+                  </select>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="primary-action" id="salvarBtn">
+                    <span class="material-symbols-outlined">save</span>
+                    Salvar Ocorrência
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            <section class="card" id="filtroOcorrencia" hidden>
+              <div class="section-header section-header-inline">
+                <div>
+                  <h2>Filtrar Ocorrências</h2>
+                  <p>Pesquise por descrição e gravidade.</p>
+                </div>
+                <button type="button" id="fecharFiltrosOcorrencia" class="close-panel-btn">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+
+              <div class="ocorrencia-form filtro-form">
+                <div class="form-field">
+                  <label for="filtroDescricao">Nome da Ocorrência</label>
+                  <input id="filtroDescricao" type="text" placeholder="Ex: Queda" />
+                </div>
+
+                <div class="form-field">
+                  <label for="filtroGravidade">Gravidade</label>
+                  <select id="filtroGravidade">
+                    <option value="">Todas</option>
+                    <option value="1">1 - Baixa</option>
+                    <option value="2">2 - Média</option>
+                    <option value="3">3 - Alta</option>
+                  </select>
+                </div>
+
+                <div class="form-actions form-actions-between">
+                  <button type="button" id="limparFiltros" class="secondary-panel-btn">
+                    <span class="material-symbols-outlined">cleaning_services</span>
+                    Limpar Filtros
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <div class="table-card">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th class="sortable" data-sort-key="descricao" tabindex="0">
+                        Nome <span class="sort-indicator"></span>
+                      </th>
+                      <th class="sortable" data-sort-key="gravidade" tabindex="0">
+                        Gravidade <span class="sort-indicator"></span>
+                      </th>
+                      <th class="text-right">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tabelaTipos">
+                    <tr>
+                      <td colspan="3" class="empty-row">Carregando tipos de ocorrência...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <section class="confirm-overlay" id="painelConfirmacao">
+    <div class="confirm-box">
+      <h4>Confirmar exclusão</h4>
+      <p id="textoConfirmacao">Deseja realmente excluir este tipo de ocorrência?</p>
+      <div class="confirm-actions">
+        <button class="btn btn-secondary" type="button" id="cancelarExclusao">Cancelar</button>
+        <button class="btn btn-danger" type="button" id="confirmarExclusao">Excluir</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="mensagem-feedback" class="popup-msg"></div>
+
+  <script src="js/tipoOcorrenciaController.js?v=20260524-1"></script>
+</body>
+</html>

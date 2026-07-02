@@ -1,0 +1,178 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Coordenador(a)</title>
+
+  <link rel="stylesheet" href="css/funcionario.css" />
+  <link rel="stylesheet" href="css/coordenador.css?v=9" />
+  <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="page">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-main">
+          <img src="assets/logo.png" alt="Logo Asilo Vicentino" />
+          <h1>SGAV</h1>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="coordenador.html" class="sidebar-link active">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span>Painel</span>
+        </a>
+
+        <a href="escalas.html" class="sidebar-link">
+          <span class="material-symbols-outlined">calendar_month</span>
+          <span>Escalas</span>
+        </a>
+
+        <a href="transparencia.html" class="sidebar-link">
+          <span class="material-symbols-outlined">folder</span>
+          <span>Transparência</span>
+        </a>
+
+        <details class="sidebar-group">
+          <summary class="sidebar-link sidebar-group-toggle">
+            <span class="material-symbols-outlined">analytics</span>
+            <span>Relatórios</span>
+            <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+          </summary>
+          <div class="sidebar-submenu">
+        <a href="relatorioDoacoes.html" class="sidebar-link sidebar-sublink">
+          <span class="material-symbols-outlined">volunteer_activism</span>
+          <span>Relatório de Doações</span>
+        </a>
+
+        <a href="relatorioOcorrencias.html" class="sidebar-link sidebar-sublink">
+          <span class="material-symbols-outlined">assignment_late</span>
+          <span>Relatório de Ocorrências</span>
+        </a>
+
+        <a href="relatorioFuncionarios.html" class="sidebar-link sidebar-sublink">
+          <span class="material-symbols-outlined">badge</span>
+          <span>Relatório de Funcionários</span>
+        </a>
+        <a href="relatorioDespesas.html" class="sidebar-link sidebar-sublink">
+          <span class="material-symbols-outlined">receipt_long</span>
+          <span>Relatório de Despesas</span>
+        </a>
+          </div>
+        </details>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="secretaria.html" class="sidebar-link secretaria-panel-link">
+          <span class="material-symbols-outlined">admin_panel_settings</span>
+          <span>Painel de Secretaria</span>
+        </a>
+
+        <a href="login.html" class="sidebar-link">
+          <span class="material-symbols-outlined">logout</span>
+          <span>Sair</span>
+        </a>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="topbar-left"></div>
+        <div class="topbar-right">
+          <div class="profile-chip">
+            <div class="profile-text">
+              <p id="perfilNome">Usuário</p>
+              <span id="perfilCargo">Acesso</span>
+            </div>
+            <img
+              class="profile-avatar"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMnCZatRqhMPYMimzdsueWsf9hewDk4CzXRSoKzqCI53EnJ-SJnhpYNFgBLlGo0JNBE1rcwns3-_KBqtO5yXKGtn-twLp7iJPg4iugcNDrIqys6ffRRzpMnw4OCbCTiz0_O8GBr1K_yCr-zYYvdyGUOdRu8uunPvFNb2YmPhbjv3EnN4Kecalwq3FS9RaTTeZs0640gJDs6ENRFZ8rvsJuLQivoIBWp6FqXRnIr7zo0N2rvYTkSKBOjtK7cXdggYxs44IN5cv5xxaH"
+              alt="Perfil funcionário"
+            />
+          </div>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="content-wrap">
+          <section class="hero">
+            <h2>Painel da Coordenação</h2>
+            <p>Visão rápida dos indicadores financeiros e gestão de escalas da equipe.</p>
+          </section>
+
+          <section class="dashboard-grid bloco-turnos">
+            <section class="escala-card">
+              <div class="section-title">
+                <span class="section-title-bar primary"></span>
+                <span>Turnos</span>
+              </div>
+              <div id="historicoTurnosLista" class="historico-turnos-lista">
+                <p class="empty-text">Carregando turnos...</p>
+              </div>
+            </section>
+
+            <section class="escala-card turno-detalhe-card">
+              <div class="section-title">
+                <span class="section-title-bar primary"></span>
+                <span>Detalhes do Turno</span>
+              </div>
+              <div id="detalhesTurnoCoordenador" class="turno-detalhes coordenador-turno-detalhes">
+                <p class="empty-text">Selecione um turno para ver os detalhes.</p>
+              </div>
+            </section>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="escalaModalContainer" class="modal-overlay" style="display:none;">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Escalar Cuidador(a)</h3>
+        <button type="button" id="fecharEscalaBtn" class="icon-btn" aria-label="Fechar modal">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-field">
+          <label for="selectFuncionario">Cuidador(a)</label>
+          <select id="selectFuncionario"></select>
+        </div>
+        <div class="form-field">
+          <label for="selectTurno">Turno</label>
+          <select id="selectTurno"></select>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="escalarBtn" class="quick-action-btn pequeno">
+          <div class="quick-action-icon">
+            <span class="material-symbols-outlined">check</span>
+          </div>
+          <span class="label">Salvar Escala</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="painelConfirmacaoEscala" class="confirm-overlay">
+    <div class="confirm-box">
+      <h4>Confirmar exclusão</h4>
+      <p id="textoConfirmacaoEscala">Deseja realmente excluir esta escala?</p>
+      <div class="confirm-actions">
+        <button class="btn btn-secondary" type="button" id="cancelarExclusaoEscala">Cancelar</button>
+        <button class="btn btn-danger" type="button" id="confirmarExclusaoEscala">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/coordenadorEscala.js?v=20260514-6"></script>
+</body>
+</html>
+
+
+

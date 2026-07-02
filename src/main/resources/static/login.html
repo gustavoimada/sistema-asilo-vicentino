@@ -1,0 +1,114 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light" />
+    <title>Login</title>
+
+    <script>document.documentElement.style.colorScheme = "light"; document.documentElement.classList.add("tema-claro");</script>
+    <link rel="stylesheet" href="css/login.css?v=20260504-3" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+</head>
+
+<body>
+    <header class="topbar">
+        <div class="topbar-left">
+            <img class="topbar-logo" src="assets/logo.png" alt="Logo Asilo Vicentino" />
+            <span class="brand-title">Asilo Vicentino</span>
+        </div>
+
+        <div class="topbar-right">
+            <div class="help-box">
+                <button id="helpBtn" class="help-btn" type="button" aria-label="Ajuda de acesso" aria-controls="helpPanel" aria-expanded="false">
+                    <span class="material-symbols-outlined">support_agent</span>
+                    Ajuda
+                </button>
+                <div id="helpPanel" class="help-panel" hidden>
+                    <h4>Ajuda de acesso</h4>
+                    <p>Use seu nome de usuário e senha cadastrados para entrar no sistema.</p>
+                    <p>Se não conseguir acessar, entre em contato com o suporte técnico.</p>
+                    <a href="mailto:suporte@asilovicentino.com">suporte@asilovicentino.com</a>
+                </div>
+            </div>
+            <button type="button" class="back-site-btn" onclick="window.location.href='index.html'">Voltar para o site</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="bg-shape bg-shape-top"></div>
+        <div class="bg-shape bg-shape-bottom"></div>
+
+        <div class="main-grid">
+            <section class="hero-panel">
+                <span class="hero-tag">Área de acesso do Asilo Vicentino</span>
+
+                <h1 class="hero-title">
+                    Cuidar com <span class="hero-highlight">carinho</span> faz toda a diferença.
+                </h1>
+
+                <p class="hero-text">
+                    Aqui, cada pessoa é acolhida com respeito, atenção e presença. Nosso compromisso é oferecer segurança e bem-estar todos os dias.
+                </p>
+
+
+            </section>
+
+            <section class="login-side">
+                <div class="login-card">
+                    <div class="card-accent"></div>
+
+                    <div class="login-header">
+                        <h2>Acessar Sistema</h2>
+                        <p>Insira suas credenciais para continuar.</p>
+                    </div>
+
+                    <form onsubmit="logar(event)" class="login-form">
+                        <div class="form-group">
+                            <label for="name">Nome de Usuário</label>
+                            <div class="input-wrap">
+                                <span class="input-icon material-symbols-outlined">person</span>
+                                <input type="text" id="name" name="name" placeholder="Digite seu nome de usuário" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="senha">Senha de Acesso</label>
+                            <div class="input-wrap">
+                                <span class="input-icon material-symbols-outlined">lock</span>
+                                <input type="password" id="senha" name="senha" placeholder="••••••••" />
+                            </div>
+                        </div>
+
+                        <div class="form-action">
+                            <button type="submit" class="login-btn">
+                                Entrar no Painel
+                                <span class="material-symbols-outlined arrow">arrow_forward</span>
+                            </button>
+                        </div>
+                    </form>
+
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-copy">
+            © 2026 ASILO VICENTINO. Todos os direitos reservados.
+        </div>
+    </footer>
+
+    <div id="mensagem-feedback" class="popup-msg"></div>
+
+    <script src="js/loginController.js?v=20260524-1"></script>
+</body>
+
+</html>
+
+
+

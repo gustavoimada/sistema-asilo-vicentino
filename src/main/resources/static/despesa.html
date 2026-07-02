@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SGAV - Pagamento de Despesas</title>
+  <link rel="stylesheet" href="css/cadastroTipoOcorrencia.css?v=12" />
+  <link rel="stylesheet" href="css/funcionario.css" />
+  <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1" />
+  <link rel="stylesheet" href="css/morador.css?v=2" />
+  <link rel="stylesheet" href="css/despesa.css?v=2" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="page">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-main">
+          <img src="assets/logo.png" alt="Logo Asilo Vicentino" />
+          <h1>SGAV</h1>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="secretaria.html" class="sidebar-link">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span>Painel</span>
+        </a>
+
+        <details class="sidebar-group">
+          <summary class="sidebar-link sidebar-group-toggle">
+            <span class="material-symbols-outlined">groups</span>
+            <span>Moradores e Família</span>
+            <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+          </summary>
+          <div class="sidebar-submenu">
+            <a href="morador.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">elderly</span>
+              <span>Cadastro de Morador</span>
+            </a>
+            <a href="composicaofamiliar.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">family_restroom</span>
+              <span>Composição Familiar</span>
+            </a>
+            <a href="historico.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">history</span>
+              <span>Histórico</span>
+            </a>
+          </div>
+        </details>
+
+        <a href="funcionario.html" class="sidebar-link">
+          <span class="material-symbols-outlined">badge</span>
+          <span>Funcionários</span>
+        </a>
+
+        <a href="medicamentos.html" class="sidebar-link">
+          <span class="material-symbols-outlined">medical_services</span>
+          <span>Medicamentos</span>
+        </a>
+
+        <a href="cadastrarPrescricao.html" class="sidebar-link">
+          <span class="material-symbols-outlined">medical_services</span>
+          <span>Prescrições</span>
+        </a>
+
+        <a href="tipoOcorrencia.html" class="sidebar-link">
+          <span class="material-symbols-outlined">assignment_late</span>
+          <span>Tipo de Ocorrência</span>
+        </a>
+
+        <a href="doacao.html" class="sidebar-link">
+          <span class="material-symbols-outlined">volunteer_activism</span>
+          <span>Doações</span>
+        </a>
+
+        <a href="quartos.html" class="sidebar-link">
+          <span class="material-symbols-outlined">bed</span>
+          <span>Quartos</span>
+        </a>
+
+        <details class="sidebar-group">
+          <summary class="sidebar-link sidebar-group-toggle">
+            <span class="material-symbols-outlined">event</span>
+            <span>Atividades</span>
+            <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+          </summary>
+          <div class="sidebar-submenu">
+            <a href="tipoAtividades.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">category</span>
+              <span>Tipos de Atividades</span>
+            </a>
+            <a href="atividades.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">event_note</span>
+              <span>Atividades</span>
+            </a>
+          </div>
+        </details>
+
+        <details class="sidebar-group" open>
+          <summary class="sidebar-link sidebar-group-toggle">
+            <span class="material-symbols-outlined">payments</span>
+            <span>Despesas</span>
+            <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+          </summary>
+          <div class="sidebar-submenu">
+            <a href="tiposDespesas.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">receipt_long</span>
+              <span>Tipos de Despesas</span>
+            </a>
+            <a href="despesa.html" class="sidebar-link sidebar-sublink active">
+              <span class="material-symbols-outlined">request_quote</span>
+              <span>Pagamento de Despesas</span>
+            </a>
+          </div>
+        </details>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="login.html" class="sidebar-link">
+          <span class="material-symbols-outlined">logout</span>
+          <span>Sair</span>
+        </a>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="topbar-left"></div>
+        <div class="topbar-right">
+          <div class="profile-chip">
+            <div class="profile-text">
+              <p id="perfilNome">Usuário</p>
+              <span id="perfilCargo">Acesso</span>
+            </div>
+            <img
+              class="profile-avatar"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCodmM9L3Lxp3TOXze0s5ng6gdLuL6UAVgjli-uCdXTzEkbUGW02Hheh8ViQ9IWJQngxEVmN3PkjBy4wDQUFq6-YEiM2_0THjjLcJGGCmoOip-JxgrwZ8717px25oL1Jay3FWpfa0rFtZIWUl4ziBAV-Brk_KrPNka1CMvjgOj2VkctGNpmZeuD-h9E384DdNtUi5QYhfnBKjlzWndJCqrgrkoxZL2DwUV0yeu9VbpJ1wqJosFaUFqLa-oW-OzQ9gsKgXSN3d_IyOx1"
+              alt="Perfil funcionário"
+            />
+          </div>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="content-wrap">
+          <section>
+            <div class="list-header">
+              <div class="list-header-left">
+                <h2>Gestão de Despesas</h2>
+                <p>Cadastre, acompanhe e quite as despesas do Asilo Vicentino.</p>
+              </div>
+
+              <div class="list-header-actions">
+                <button id="btnNovaDespesa" type="button" class="primary-action secondary-open-btn" onclick="mostrarFormulario()">
+                  <span class="material-symbols-outlined">add</span>
+                  Nova Despesa
+                </button>
+                <button type="button" id="abrirFiltrosDespesa" class="filter-open-btn" onclick="abrirFiltros()">
+                  <span class="material-symbols-outlined">filter_list</span>
+                  Filtros
+                </button>
+              </div>
+            </div>
+
+            <section class="card" id="formContainer" hidden>
+              <div class="section-header section-header-inline">
+                <div>
+                  <h2 id="formTitle">Cadastrar Nova Despesa</h2>
+                  <p>Informe os dados da despesa, incluindo periodicidade quando for fixa.</p>
+                </div>
+                <button type="button" class="close-panel-btn" onclick="esconderFormulario()">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+
+              <form id="despesaForm" class="ocorrencia-form" onsubmit="salvarDespesa(event)">
+                <input type="hidden" id="id" />
+
+                <div class="form-field form-field-wide">
+                  <label for="tipo">Tipo de Despesa</label>
+                  <select id="tipo" required>
+                    <option value="">Selecione</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="valor">Valor</label>
+                  <input id="valor" type="text" placeholder="0,00" oninput="this.value = formatarValor(this.value)" required />
+                </div>
+
+                <div class="form-row-inline">
+                  <div class="form-field">
+                    <label for="fixa">Despesa Fixa</label>
+                    <select id="fixa" onchange="atualizarCamposDespesaFixa()" required>
+                      <option value="false">Não</option>
+                      <option value="true">Sim</option>
+                    </select>
+                  </div>
+
+                  <div class="form-field" id="campoPeriodicidade">
+                    <label for="periodicidade">Periodicidade da Cobrança</label>
+                    <select id="periodicidade">
+                      <option value="">Selecione</option>
+                      <option value="mensal">Mensal</option>
+                      <option value="bimestral">Bimestral</option>
+                      <option value="trimestral">Trimestral</option>
+                      <option value="semestral">Semestral</option>
+                      <option value="anual">Anual</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-field">
+                  <label for="dtVencimento">Data de Vencimento</label>
+                  <input id="dtVencimento" type="date" required />
+                </div>
+
+                <div class="form-field">
+                  <label for="dtQuitacao">Data de Quitação</label>
+                  <input id="dtQuitacao" type="date" />
+                </div>
+
+                <div class="form-field form-field-wide">
+                  <label for="observacoes">Observações</label>
+                  <input id="observacoes" type="text" placeholder="Ex: Conta do mês..." required />
+                </div>
+
+                <div class="form-actions form-actions-between">
+                  <button type="button" class="secondary-panel-btn" onclick="esconderFormulario()">
+                    <span class="material-symbols-outlined">close</span>
+                    Cancelar
+                  </button>
+                  <button class="primary-action" type="submit">
+                    <span class="material-symbols-outlined">save</span>
+                    Salvar Cadastro
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            <section class="card" id="filtroDespesa" hidden>
+              <div class="section-header section-header-inline">
+                <div>
+                  <h2>Filtrar Despesas</h2>
+                  <p>Pesquise por tipo, status, datas e observações.</p>
+                </div>
+                <button type="button" id="fecharFiltrosDespesa" class="close-panel-btn" onclick="fecharFiltros()">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+
+              <div class="ocorrencia-form filtro-form">
+                <div class="form-field">
+                  <label for="filtroTipo">Tipo de Despesa</label>
+                  <select id="filtroTipo" onchange="aplicarFiltros()">
+                    <option value="">Todos os tipos</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="filtroStatus">Status</label>
+                  <select id="filtroStatus" onchange="aplicarFiltros()">
+                    <option value="">Todos</option>
+                    <option value="pendente">Pendentes</option>
+                    <option value="vencido">Vencidas</option>
+                    <option value="pago">Pagas</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="filtroFixa">Despesa Fixa</label>
+                  <select id="filtroFixa" onchange="aplicarFiltros()">
+                    <option value="">Todas</option>
+                    <option value="true">Sim</option>
+                    <option value="false">Não</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="filtroPeriodicidade">Periodicidade</label>
+                  <select id="filtroPeriodicidade" onchange="aplicarFiltros()">
+                    <option value="">Todas</option>
+                    <option value="mensal">Mensal</option>
+                    <option value="bimestral">Bimestral</option>
+                    <option value="trimestral">Trimestral</option>
+                    <option value="semestral">Semestral</option>
+                    <option value="anual">Anual</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="filtroObservacao">Observações</label>
+                  <input id="filtroObservacao" type="text" placeholder="Ex: Conta do mês..." oninput="aplicarFiltros()" />
+                </div>
+
+                <div class="form-field">
+                  <label for="filtroVencimento">Data de Vencimento</label>
+                  <input id="filtroVencimento" type="date" oninput="aplicarFiltros()" />
+                </div>
+
+                <div class="form-field">
+                  <label for="filtroQuitacao">Data de Quitação</label>
+                  <input id="filtroQuitacao" type="date" oninput="aplicarFiltros()" />
+                </div>
+
+                <div class="form-field">
+                  <label for="filtroDiasRestantes">Dias Restantes menores que</label>
+                  <input id="filtroDiasRestantes" type="number" min="0" placeholder="Ex: 7" oninput="aplicarFiltros()" />
+                </div>
+
+                <select id="ordenacaoDespesas" hidden>
+                  <option value=""></option>
+                  <option value="id">ID</option>
+                  <option value="tipo">Tipo</option>
+                  <option value="valor">Valor</option>
+                  <option value="dtVencimento">Vencimento</option>
+                  <option value="dtQuitacao">Quitação</option>
+                  <option value="observacoes">Observações</option>
+                </select>
+
+                <div class="form-actions form-actions-between">
+                  <button type="button" class="secondary-panel-btn" onclick="limparFiltros()">
+                    <span class="material-symbols-outlined">cleaning_services</span>
+                    Limpar Filtros
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <div class="table-card">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th id="th-id" class="sortable" onclick="definirOrdenacao('id')">ID <span id="sort-id" class="sort-indicator"></span></th>
+                      <th id="th-tipo" class="sortable" onclick="definirOrdenacao('tipo')">Tipo <span id="sort-tipo" class="sort-indicator"></span></th>
+                      <th>Status</th>
+                      <th id="th-valor" class="sortable" onclick="definirOrdenacao('valor')">Valor <span id="sort-valor" class="sort-indicator"></span></th>
+                      <th>Fixa</th>
+                      <th>Periodicidade</th>
+                      <th id="th-dtVencimento" class="sortable" onclick="definirOrdenacao('dtVencimento')">Vencimento <span id="sort-dtVencimento" class="sort-indicator"></span></th>
+                      <th>Dias Restantes</th>
+                      <th id="th-dtQuitacao" class="sortable" onclick="definirOrdenacao('dtQuitacao')">Quitação <span id="sort-dtQuitacao" class="sort-indicator"></span></th>
+                      <th id="th-observacoes" class="sortable" onclick="definirOrdenacao('observacoes')">Observações <span id="sort-observacoes" class="sort-indicator"></span></th>
+                      <th class="text-right">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="listaDespesas"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="mensagem-feedback" class="popup-msg"></div>
+
+  <script src="js/despesaController.js"></script>
+</body>
+</html>

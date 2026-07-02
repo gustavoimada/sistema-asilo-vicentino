@@ -1,0 +1,239 @@
+@import url('cadastroFuncionario.css');
+
+.medicamento-form .span-2 {
+    grid-column: span 2;
+}
+
+.medicamento-form .span-3 {
+    grid-column: 1 / -1;
+}
+
+.form-field textarea {
+    border: 1px solid #dbe3f1;
+    background: #f8fbff;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 14px;
+    outline: none;
+    resize: vertical;
+    min-height: 90px;
+}
+
+.form-field textarea:focus {
+    border-color: #8aa8df;
+    box-shadow: 0 0 0 3px rgba(11, 78, 162, 0.12);
+}
+
+.moradores-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+}
+
+.contador-moradores {
+    font-size: 12px;
+    font-weight: 800;
+    color: #5f6f8d;
+    background: #edf3ff;
+    border-radius: 999px;
+    padding: 7px 12px;
+    white-space: nowrap;
+}
+
+.moradores-list {
+    border: 1px solid #dbe3f1;
+    background: #f8fbff;
+    border-radius: 12px;
+    max-height: 250px;
+    overflow: auto;
+}
+
+.morador-item {
+    border-top: 1px solid #e7edf8;
+}
+
+.morador-item:first-child {
+    border-top: 0;
+}
+
+.morador-item label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    cursor: pointer;
+}
+
+.morador-item label:hover {
+    background: #f0f6ff;
+}
+
+.morador-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.morador-info strong {
+    font-size: 14px;
+    color: #1f2a44;
+}
+
+.morador-info span {
+    font-size: 12px;
+    color: #7f8ba3;
+}
+
+.morador-checkbox {
+    width: 18px;
+    height: 18px;
+    accent-color: #0b4ea2;
+}
+
+.participantes-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.participante-tag {
+    display: inline-flex;
+    align-items: center;
+    max-width: 220px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #0b4ea2;
+    background: #e8f0ff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.action-icon-btn.view {
+    color: #0b4ea2;
+}
+
+.participantes-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 24, 48, 0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
+    padding: 16px;
+}
+
+.participantes-modal-overlay.show {
+    display: flex;
+}
+
+.participantes-modal-box {
+    width: min(620px, 100%);
+    max-height: 80vh;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 24px 60px rgba(5, 26, 57, 0.22);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.participantes-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.participantes-modal-header h4 {
+    margin: 0;
+    font-size: 18px;
+    color: #1f2a44;
+}
+
+.participantes-modal-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    color: #dc2626;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.participantes-modal-close:hover {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.participantes-modal-subtitle {
+    margin: 0;
+    font-size: 13px;
+    color: #6c7a95;
+}
+
+.participantes-modal-list {
+    border: 1px solid #e1e9f7;
+    border-radius: 12px;
+    overflow: auto;
+    max-height: 56vh;
+}
+
+.participante-modal-item {
+    padding: 10px 12px;
+    border-top: 1px solid #edf1fa;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.participante-modal-item:first-child {
+    border-top: 0;
+}
+
+.participante-modal-item strong {
+    font-size: 14px;
+    color: #1f2a44;
+}
+
+.participante-modal-item span {
+    font-size: 12px;
+    color: #6c7a95;
+}
+
+.participante-modal-empty {
+    padding: 16px;
+    text-align: center;
+    color: #6c7a95;
+    font-size: 13px;
+}
+
+@media (max-width: 960px) {
+    .medicamento-form .span-2,
+    .medicamento-form .span-3 {
+        grid-column: span 1;
+    }
+
+    .moradores-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .contador-moradores {
+        text-align: center;
+    }
+
+    .participantes-modal-box {
+        max-height: 85vh;
+        padding: 14px;
+    }
+}

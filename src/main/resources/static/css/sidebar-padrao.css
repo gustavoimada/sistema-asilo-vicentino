@@ -1,0 +1,267 @@
+html,
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.sidebar {
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: var(--sidebar-width, 256px) !important;
+  min-width: var(--sidebar-width, 256px) !important;
+  height: 100vh !important;
+  background: #ffffff !important;
+  border-right: 1px solid #f1f5f9 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 24px 16px !important;
+  gap: 8px !important;
+  z-index: 50 !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.sidebar-brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 0 16px !important;
+  margin: 0 0 24px !important;
+}
+
+.sidebar-brand-main,
+.sidebar-brand-logo,
+.sidebar-brand-text {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 0 !important;
+}
+
+.sidebar-brand-logo {
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.sidebar-brand img,
+.sidebar-brand-main img,
+.sidebar-brand-logo img {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  border-radius: 999px !important;
+  object-fit: cover !important;
+  box-shadow: 0 0 12px rgba(0, 53, 127, 0.22) !important;
+}
+
+.sidebar-brand h1,
+.sidebar-brand-main h1,
+.sidebar-brand-text h1 {
+  font-family: 'Manrope', sans-serif !important;
+  font-size: 28px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  color: #1e3a8a !important;
+  margin: 0 !important;
+  letter-spacing: 0 !important;
+}
+
+.sidebar-brand p,
+.sidebar-brand-text p {
+  display: none !important;
+}
+
+.sidebar-nav {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  padding: 0 !important;
+}
+
+.sidebar-link,
+.sidebar .nav-link,
+.sidebar .footer-link {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 14px 16px !important;
+  color: #64748b !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  font-family: 'Manrope', sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+  text-decoration: none !important;
+  transition: color 0.2s ease, background 0.2s ease !important;
+}
+
+.sidebar-link:hover,
+.sidebar .nav-link:hover,
+.sidebar .footer-link:hover {
+  color: #1d4ed8 !important;
+  background: #f8fafc !important;
+}
+
+.sidebar-link.active,
+.sidebar .nav-link.active,
+.sidebar .footer-link.active {
+  color: #1e40af !important;
+  font-weight: 800 !important;
+  background: rgba(239, 246, 255, 0.8) !important;
+}
+
+.sidebar-link .material-symbols-outlined,
+.sidebar .nav-link .material-symbols-outlined,
+.sidebar .footer-link .material-symbols-outlined {
+  width: 24px !important;
+  min-width: 24px !important;
+  font-size: 24px !important;
+  line-height: 1 !important;
+  color: currentColor !important;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24 !important;
+}
+
+.sidebar-group {
+  border: 0 !important;
+}
+
+.sidebar-group summary {
+  list-style: none !important;
+  cursor: pointer !important;
+}
+
+.sidebar-group summary::-webkit-details-marker {
+  display: none !important;
+}
+
+.sidebar-group-toggle {
+  justify-content: space-between !important;
+}
+
+.sidebar-group-toggle > span:nth-child(2) {
+  flex: 1 !important;
+}
+
+.sidebar-group-arrow {
+  transition: transform 0.2s ease !important;
+}
+
+.sidebar-group[open] .sidebar-group-arrow {
+  transform: rotate(180deg) !important;
+}
+
+.sidebar-submenu {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  margin-top: 4px !important;
+  margin-left: 16px !important;
+  padding-left: 10px !important;
+}
+
+.sidebar-submenu::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 8px !important;
+  bottom: 8px !important;
+  width: 1px !important;
+  background: #cbd5e1 !important;
+}
+
+.sidebar-sublink {
+  margin-left: 0 !important;
+  padding-left: 12px !important;
+  border-radius: 16px !important;
+}
+
+.sidebar-sublink > span:not(.material-symbols-outlined) {
+  max-width: 122px !important;
+  white-space: normal !important;
+  line-height: 1.15 !important;
+}
+
+.sidebar-footer {
+  margin-top: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  padding: 0 !important;
+  border-top: 0 !important;
+}
+
+.sidebar-footer .secretaria-panel-link {
+  color: #047857 !important;
+  background: #ecfdf5 !important;
+}
+
+.sidebar-footer .secretaria-panel-link:hover {
+  color: #065f46 !important;
+  background: #d1fae5 !important;
+}
+
+.sidebar-footer .logout,
+.sidebar-footer a[href="login.html"],
+.sidebar-footer a[href$="/login.html"] {
+  color: #dc2626 !important;
+  background: #fef2f2 !important;
+}
+
+.sidebar-footer .logout:hover,
+.sidebar-footer a[href="login.html"]:hover,
+.sidebar-footer a[href$="/login.html"]:hover {
+  color: #b91c1c !important;
+  background: #fee2e2 !important;
+}
+
+.close-panel-btn,
+.participantes-modal-close {
+  color: #dc2626 !important;
+  background: #fef2f2 !important;
+  border-color: #fecaca !important;
+}
+
+.close-panel-btn:hover,
+.participantes-modal-close:hover {
+  color: #b91c1c !important;
+  background: #fee2e2 !important;
+}
+
+.modal-close {
+  color: #dc2626 !important;
+}
+
+.modal-close:hover {
+  color: #b91c1c !important;
+}
+
+.sidebar .new-shift-btn {
+  display: none !important;
+}

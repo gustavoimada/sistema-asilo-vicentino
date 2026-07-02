@@ -1,0 +1,320 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gerenciar Escalas - SGAV</title>
+
+  <link rel="stylesheet" href="css/funcionario.css" />
+  <link rel="stylesheet" href="css/escalas.css?v=2" />
+  <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="page">
+
+        <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-main">
+          <img src="assets/logo.png" alt="Logo Asilo Vicentino" />
+          <h1>SGAV</h1>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="coordenador.html" class="sidebar-link">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span>Painel</span>
+        </a>
+
+        <a href="escalas.html" class="sidebar-link active">
+          <span class="material-symbols-outlined">calendar_month</span>
+          <span>Escalas</span>
+        </a>
+
+        <a href="transparencia.html" class="sidebar-link">
+          <span class="material-symbols-outlined">folder</span>
+          <span>Transparência</span>
+        </a>
+
+        <details class="sidebar-group">
+          <summary class="sidebar-link sidebar-group-toggle">
+            <span class="material-symbols-outlined">analytics</span>
+            <span>Relatórios</span>
+            <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+          </summary>
+          <div class="sidebar-submenu">
+        <a href="relatorioDoacoes.html" class="sidebar-link sidebar-sublink">
+          <span class="material-symbols-outlined">volunteer_activism</span>
+          <span>Relatório de Doações</span>
+        </a>
+
+        <a href="relatorioOcorrencias.html" class="sidebar-link sidebar-sublink">
+          <span class="material-symbols-outlined">assignment_late</span>
+          <span>Relatório de Ocorrências</span>
+        </a>
+
+        <a href="relatorioFuncionarios.html" class="sidebar-link sidebar-sublink">
+          <span class="material-symbols-outlined">badge</span>
+          <span>Relatório de Funcionários</span>
+        </a>
+        <a href="relatorioDespesas.html" class="sidebar-link sidebar-sublink">
+          <span class="material-symbols-outlined">receipt_long</span>
+          <span>Relatório de Despesas</span>
+        </a>
+          </div>
+        </details>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="secretaria.html" class="sidebar-link secretaria-panel-link">
+          <span class="material-symbols-outlined">admin_panel_settings</span>
+          <span>Painel de Secretaria</span>
+        </a>
+
+        <a href="login.html" class="sidebar-link">
+          <span class="material-symbols-outlined">logout</span>
+          <span>Sair</span>
+        </a>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="topbar-left"></div>
+
+        <div class="topbar-right">
+          <div class="profile-chip">
+            <div class="profile-text">
+              <p id="perfilNome">Usuário</p>
+              <span id="perfilCargo">Acesso</span>
+            </div>
+            <img
+              class="profile-avatar"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMnCZatRqhMPYMimzdsueWsf9hewDk4CzXRSoKzqCI53EnJ-SJnhpYNFgBLlGo0JNBE1rcwns3-_KBqtO5yXKGtn-twLp7iJPg4iugcNDrIqys6ffRRzpMnw4OCbCTiz0_O8GBr1K_yCr-zYYvdyGUOdRu8uunPvFNb2YmPhbjv3EnN4Kecalwq3FS9RaTTeZs0640gJDs6ENRFZ8rvsJuLQivoIBWp6FqXRnIr7zo0N2rvYTkSKBOjtK7cXdggYxs44IN5cv5xxaH"
+              alt="Perfil funcionário"
+            />
+          </div>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="escalas-container">
+          <!-- SEMANA -->
+          <div class="week-selector">
+            <div class="week-main">
+              <button id="prevWeekBtn" class="week-nav-btn">
+                <span class="material-symbols-outlined">chevron_left</span>
+              </button>
+              <div id="weekInfo" class="week-info">
+                Semana de 19 a 25 de abril
+              </div>
+              <button id="nextWeekBtn" class="week-nav-btn">
+                <span class="material-symbols-outlined">chevron_right</span>
+              </button>
+            </div>
+            <div class="week-actions">
+              <button id="salvarEscalasBtn" class="primary-btn">
+                <span class="material-symbols-outlined">check_circle</span>
+                Salvar Escalas da Semana
+              </button>
+            </div>
+          </div>
+
+          <!-- GRADE DE ESCALAS -->
+          <div class="escalas-grid">
+            <!-- Segunda -->
+            <div class="dia-card" data-dia="seg">
+              <h3>Segunda-feira <span id="seg-data"></span></h3>
+              
+              <div class="turno-section">
+                <h4>Turno Manhã (07:00 - 19:00)</h4>
+                <div class="turno-list" id="seg-manha"></div>
+                <button class="add-btn" onclick="abrirSelectorCuidador('seg', 1)">
+                  <span class="material-symbols-outlined">add</span>
+                  Adicionar Cuidador(a)
+                </button>
+              </div>
+
+              <div class="turno-section">
+                <h4>Turno Noite (19:00 - 07:00)</h4>
+                <div class="turno-list" id="seg-noite"></div>
+                <button class="add-btn" onclick="abrirSelectorCuidador('seg', 2)">
+                  <span class="material-symbols-outlined">add</span>
+                  Adicionar Cuidador(a)
+                </button>
+              </div>
+            </div>
+
+            <!-- Terça -->
+            <div class="dia-card" data-dia="ter">
+              <h3>Terça-feira <span id="ter-data"></span></h3>
+              
+              <div class="turno-section">
+                <h4>Turno Manhã (07:00 - 19:00)</h4>
+                <div class="turno-list" id="ter-manha"></div>
+                <button class="add-btn" onclick="abrirSelectorCuidador('ter', 1)">
+                  <span class="material-symbols-outlined">add</span>
+                  Adicionar Cuidador(a)
+                </button>
+              </div>
+
+              <div class="turno-section">
+                <h4>Turno Noite (19:00 - 07:00)</h4>
+                <div class="turno-list" id="ter-noite"></div>
+                <button class="add-btn" onclick="abrirSelectorCuidador('ter', 2)">
+                  <span class="material-symbols-outlined">add</span>
+                  Adicionar Cuidador(a)
+                </button>
+              </div>
+            </div>
+
+            <!-- Quarta -->
+            <div class="dia-card" data-dia="qua">
+              <h3>Quarta-feira <span id="qua-data"></span></h3>
+              
+              <div class="turno-section">
+                <h4>Turno Manhã (07:00 - 19:00)</h4>
+                <div class="turno-list" id="qua-manha"></div>
+                <button class="add-btn" onclick="abrirSelectorCuidador('qua', 1)">
+                  <span class="material-symbols-outlined">add</span>
+                  Adicionar Cuidador(a)
+                </button>
+              </div>
+
+              <div class="turno-section">
+                <h4>Turno Noite (19:00 - 07:00)</h4>
+                <div class="turno-list" id="qua-noite"></div>
+                <button class="add-btn" onclick="abrirSelectorCuidador('qua', 2)">
+                  <span class="material-symbols-outlined">add</span>
+                  Adicionar Cuidador(a)
+                </button>
+              </div>
+            </div>
+
+            <!-- Quinta -->
+            <div class="dia-card" data-dia="qui">
+              <h3>Quinta-feira <span id="qui-data"></span></h3>
+              
+              <div class="turno-section">
+                <h4>Turno Manhã (07:00 - 19:00)</h4>
+                <div class="turno-list" id="qui-manha"></div>
+                <button class="add-btn" onclick="abrirSelectorCuidador('qui', 1)">
+                  <span class="material-symbols-outlined">add</span>
+                  Adicionar Cuidador(a)
+                </button>
+              </div>
+
+              <div class="turno-section">
+                <h4>Turno Noite (19:00 - 07:00)</h4>
+                <div class="turno-list" id="qui-noite"></div>
+                <button class="add-btn" onclick="abrirSelectorCuidador('qui', 2)">
+                  <span class="material-symbols-outlined">add</span>
+                  Adicionar Cuidador(a)
+                </button>
+              </div>
+            </div>
+
+            <!-- Sexta -->
+            <div class="dia-card" data-dia="sex">
+              <h3>Sexta-feira <span id="sex-data"></span></h3>
+              
+              <div class="turno-section">
+                <h4>Turno Manhã (07:00 - 19:00)</h4>
+                <div class="turno-list" id="sex-manha"></div>
+                <button class="add-btn" onclick="abrirSelectorCuidador('sex', 1)">
+                  <span class="material-symbols-outlined">add</span>
+                  Adicionar Cuidador(a)
+                </button>
+              </div>
+
+              <div class="turno-section">
+                <h4>Turno Noite (19:00 - 07:00)</h4>
+                <div class="turno-list" id="sex-noite"></div>
+                <button class="add-btn" onclick="abrirSelectorCuidador('sex', 2)">
+                  <span class="material-symbols-outlined">add</span>
+                  Adicionar Cuidador(a)
+                </button>
+              </div>
+            </div>
+
+            <!-- Sábado -->
+            <div class="dia-card" data-dia="sab">
+              <h3>Sábado <span id="sab-data"></span></h3>
+              
+              <div class="turno-section">
+                <h4>Turno Manhã (07:00 - 19:00)</h4>
+                <div class="turno-list" id="sab-manha"></div>
+                <button class="add-btn" onclick="abrirSelectorCuidador('sab', 1)">
+                  <span class="material-symbols-outlined">add</span>
+                  Adicionar Cuidador(a)
+                </button>
+              </div>
+
+              <div class="turno-section">
+                <h4>Turno Noite (19:00 - 07:00)</h4>
+                <div class="turno-list" id="sab-noite"></div>
+                <button class="add-btn" onclick="abrirSelectorCuidador('sab', 2)">
+                  <span class="material-symbols-outlined">add</span>
+                  Adicionar Cuidador(a)
+                </button>
+              </div>
+            </div>
+
+            <!-- Domingo -->
+            <div class="dia-card" data-dia="dom">
+              <h3>Domingo <span id="dom-data"></span></h3>
+              
+              <div class="turno-section">
+                <h4>Turno Manhã (07:00 - 19:00)</h4>
+                <div class="turno-list" id="dom-manha"></div>
+                <button class="add-btn" onclick="abrirSelectorCuidador('dom', 1)">
+                  <span class="material-symbols-outlined">add</span>
+                  Adicionar Cuidador(a)
+                </button>
+              </div>
+
+              <div class="turno-section">
+                <h4>Turno Noite (19:00 - 07:00)</h4>
+                <div class="turno-list" id="dom-noite"></div>
+                <button class="add-btn" onclick="abrirSelectorCuidador('dom', 2)">
+                  <span class="material-symbols-outlined">add</span>
+                  Adicionar Cuidador(a)
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL SELETOR CUIDADOR -->
+  <div id="selectorModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Selecione um Cuidador(a)</h2>
+        <button class="modal-close" onclick="fecharSelectorModal()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="cuidadores-list" id="cuidadoresList">
+          <p>Carregando cuidadores...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="mensagem-feedback" class="popup-msg"></div>
+
+  <script src="js/escalasController.js?v=20260524-3"></script>
+</body>
+</html>
+
+
+
+

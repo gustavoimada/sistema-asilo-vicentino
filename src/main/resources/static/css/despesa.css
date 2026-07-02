@@ -1,0 +1,167 @@
+.despesa-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.despesa-status.pago {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.despesa-status.pendente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.despesa-status.vencido {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.despesa-pay-btn {
+  color: #166534;
+}
+
+.morador-row-btn.danger {
+  color: #b91c1c;
+}
+
+.content-wrap {
+  max-width: none;
+}
+
+.table-wrap table {
+  width: 100%;
+  min-width: 1650px;
+}
+
+.dias-restantes-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.dias-restantes-verde {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.dias-restantes-amarelo {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.dias-restantes-vermelho {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+th.sortable:hover {
+  color: var(--primary);
+}
+
+th.sortable.is-active {
+  color: var(--primary);
+}
+
+.sort-indicator {
+  display: inline-block;
+  margin-left: 4px;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.form-field.is-disabled label {
+  opacity: 0.55;
+}
+
+.form-field.is-disabled select,
+.form-field.is-disabled input {
+  background: var(--surface-container);
+  color: var(--on-surface-variant);
+  cursor: not-allowed;
+}
+
+.form-row-inline {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.form-field select,
+#tipo,
+#fixa,
+#periodicidade,
+#filtroTipo,
+#filtroStatus,
+#filtroFixa,
+#filtroPeriodicidade {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 42px;
+  border: 1px solid #d0d7de;
+  background-color: var(--surface-container-highest);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 14px;
+  box-shadow: none;
+}
+
+.form-field select:hover,
+#tipo:hover,
+#fixa:hover,
+#periodicidade:hover,
+#filtroTipo:hover,
+#filtroStatus:hover,
+#filtroFixa:hover,
+#filtroPeriodicidade:hover {
+  border-color: #b8c2cc;
+  background-color: #dfe4ea;
+}
+
+.form-field select:focus,
+#tipo:focus,
+#fixa:focus,
+#periodicidade:focus,
+#filtroTipo:focus,
+#filtroStatus:focus,
+#filtroFixa:focus,
+#filtroPeriodicidade:focus {
+  border-color: #94a3b8;
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.18);
+}
+
+@media (max-width: 700px) {
+  .form-row-inline {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .form-row-inline {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}

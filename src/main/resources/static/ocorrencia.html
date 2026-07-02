@@ -1,0 +1,239 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR" class="ocorrencia-page-root">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lista Ocorrências</title>
+
+  <link rel="stylesheet" href="css/funcionario.css" />
+  <link rel="stylesheet" href="css/cadastroOcorrencia.css?v=11" />
+  <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+</head>
+<body class="ocorrencia-page">
+  <div class="page">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-main">
+          <img src="assets/logo.png" alt="Logo Asilo Vicentino" />
+          <h1>SGAV</h1>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="cuidador.html" class="sidebar-link">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span>Painel</span>
+        </a>
+
+        <a href="ocorrencia.html" class="sidebar-link active">
+          <span class="material-symbols-outlined">assignment_late</span>
+          <span>Registrar Ocorrência</span>
+        </a>
+        <a href="registrarUsoMedicacao.html" class="sidebar-link">
+          <span class="material-symbols-outlined fill">medication</span>
+          <span>Registrar Uso Medicação</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="login.html" class="sidebar-link">
+          <span class="material-symbols-outlined">logout</span>
+          <span>Sair</span>
+        </a>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="topbar-left"></div>
+        <div class="topbar-right">
+          <div class="profile-chip">
+            <div class="profile-text">
+              <p id="perfilNome">Usuário</p>
+              <span id="perfilCargo">Acesso</span>
+            </div>
+            <img
+              class="profile-avatar"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCodmM9L3Lxp3TOXze0s5ng6gdLuL6UAVgjli-uCdXTzEkbUGW02Hheh8ViQ9IWJQngxEVmN3PkjBy4wDQUFq6-YEiM2_0THjjLcJGGCmoOip-JxgrwZ8717px25oL1Jay3FWpfa0rFtZIWUl4ziBAV-Brk_KrPNka1CMvjgOj2VkctGNpmZeuD-h9E384DdNtUi5QYhfnBKjlzWndJCqrgrkoxZL2DwUV0yeu9VbpJ1wqJosFaUFqLa-oW-OzQ9gsKgXSN3d_IyOx1"
+              alt="Perfil funcionario"
+            />
+          </div>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="content-wrap">
+          <div class="list-header">
+            <div class="list-header-left">
+              <h2>Lista Ocorrências</h2>
+              <p>Visualização das ocorrências cadastradas no funcionário.</p>
+            </div>
+            <div class="list-header-actions">
+              <button type="button" id="abrirCadastroOcorrencia" class="primary-action">
+                <span class="material-symbols-outlined">add</span>
+                Cadastrar Novo
+              </button>
+              <button type="button" id="abrirFiltrosOcorrencia" class="filter-open-btn">
+                <span class="material-symbols-outlined">filter_list</span>
+                Filtros
+              </button>
+            </div>
+          </div>
+
+          <section class="card" id="cadastroOcorrencia" hidden>
+            <div class="section-header section-header-inline">
+              <div>
+                <h2>Registrar Nova Ocorrência</h2>
+                <p>Insira os dados da ocorrência para manter o controle correto.</p>
+              </div>
+              <button type="button" id="fecharCadastroOcorrencia" class="close-panel-btn" aria-label="Fechar cadastro">
+                <span class="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <form id="ocorrenciaForm" class="registro-form">
+              <div class="form-field">
+                <label for="tipoOcorrencia">Tipo de Ocorrência</label>
+                <select id="tipoOcorrencia" required>
+                  <option value="">Selecione</option>
+                </select>
+              </div>
+
+              <div class="form-field moradores-field">
+                <label>Moradores envolvidos (opcional)</label>
+                <div class="moradores-table-wrap">
+                  <table class="moradores-table">
+                    <thead>
+                      <tr>
+                        <th>Selecionar</th>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                      </tr>
+                    </thead>
+                    <tbody id="listaMoradores"></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label for="observacoes">Observações</label>
+                <input id="observacoes" type="text" maxlength="45" placeholder="Detalhes curtos da ocorrência" required />
+              </div>
+
+              <div class="registro-actions">
+                <button type="submit" class="primary-action" id="registrarOcorrenciaBtn">
+                  <span class="material-symbols-outlined">save</span>
+                  Registrar Ocorrência
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <section class="card" id="filtroOcorrencia" hidden>
+            <div class="section-header section-header-inline">
+              <div>
+                <h2>Filtrar Ocorrências</h2>
+                <p>Pesquise por tipo, cuidador(a), gravidade e período.</p>
+              </div>
+              <button type="button" id="fecharFiltrosOcorrencia" class="close-panel-btn">
+                <span class="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div class="ocorrencia-form filtro-form">
+              <div class="form-field">
+                <label for="filtroTipo">Tipo de Ocorrência</label>
+                <select id="filtroTipo">
+                  <option value="">Todos</option>
+                </select>
+              </div>
+
+              <div class="form-field">
+                <label for="filtroMorador">Morador envolvido</label>
+                <select id="filtroMorador">
+                  <option value="">Todos</option>
+                </select>
+              </div>
+
+              <div class="form-field">
+                <label for="filtroCuidador">Cuidador(a)</label>
+                <select id="filtroCuidador">
+                  <option value="">Todos</option>
+                </select>
+              </div>
+
+              <div class="form-field">
+                <label for="filtroData">Data/Período</label>
+                <input id="filtroData" type="date" />
+              </div>
+
+              <div class="form-field">
+                <label for="filtroGravidade">Gravidade</label>
+                <select id="filtroGravidade">
+                  <option value="">Todas</option>
+                  <option value="1">Baixa (Verde)</option>
+                  <option value="2">Média (Amarelo)</option>
+                  <option value="3">Alta (Vermelho)</option>
+                </select>
+              </div>
+
+              <div class="form-actions form-actions-between">
+                <button type="button" id="limparFiltros" class="secondary-panel-btn">
+                  <span class="material-symbols-outlined">cleaning_services</span>
+                  Limpar Filtros
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <div class="table-card">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="sortable" data-sort-key="data" tabindex="0">
+                      Data <span class="sort-indicator"></span>
+                    </th>
+                    <th class="sortable" data-sort-key="hora" tabindex="0">
+                      Horário <span class="sort-indicator"></span>
+                    </th>
+                    <th>Funcionário</th>
+                    <th class="sortable" data-sort-key="tipo" tabindex="0">
+                      Tipo <span class="sort-indicator"></span>
+                    </th>
+                    <th>Moradores envolvidos</th>
+                    <th>Observações</th>
+                    <th class="text-right">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="tabelaOcorrenciasCadastro">
+                  <tr><td colspan="7" class="empty-row">Sem ocorrências cadastradas.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <section class="confirm-overlay" id="painelConfirmacaoOcorrencia">
+    <div class="confirm-box">
+      <h4>Confirmar exclusão</h4>
+      <p id="textoConfirmacaoOcorrencia">Deseja realmente excluir esta ocorrência?</p>
+      <div class="confirm-actions">
+        <button class="btn btn-secondary" type="button" id="cancelarExclusaoOcorrencia">Cancelar</button>
+        <button class="btn btn-danger" type="button" id="confirmarExclusaoOcorrencia">Excluir</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="mensagem-feedback" class="popup-msg"></div>
+  <script src="js/ocorrenciaController.js?v=20260524-1"></script>
+</body>
+</html>
+
+
+

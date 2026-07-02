@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestão de Funcionários - SGAV</title>
+  <link rel="stylesheet" href="css/funcionario.css" />
+  <link rel="stylesheet" href="css/cadastroFuncionario.css?v=1" />
+  <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+</head>
+<body onload="carregarFuncionarios()">
+  <div class="page">
+        <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-main">
+          <img src="assets/logo.png" alt="Logo Asilo Vicentino" />
+          <h1>SGAV</h1>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="secretaria.html" class="sidebar-link">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span>Painel</span>
+        </a>
+
+        <details class="sidebar-group">
+          <summary class="sidebar-link sidebar-group-toggle">
+            <span class="material-symbols-outlined">groups</span>
+            <span>Moradores e Família</span>
+            <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+          </summary>
+          <div class="sidebar-submenu">
+            <a href="morador.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">elderly</span>
+              <span>Cadastro de Morador</span>
+            </a>
+            <a href="composicaofamiliar.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">family_restroom</span>
+              <span>Composição Familiar</span>
+            </a>
+            <a href="historico.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">history</span>
+              <span>Histórico</span>
+            </a>
+          </div>
+        </details>
+
+        <a href="funcionario.html" class="sidebar-link active">
+          <span class="material-symbols-outlined">badge</span>
+          <span>Funcionários</span>
+        </a>
+
+        <a href="medicamentos.html" class="sidebar-link">
+          <span class="material-symbols-outlined">medical_services</span>
+          <span>Medicamentos</span>
+        </a>
+
+        <a href="cadastrarPrescricao.html" class="sidebar-link">
+          <span class="material-symbols-outlined">medical_services</span>
+          <span>Prescrições</span>
+        </a>
+
+        <a href="tipoOcorrencia.html" class="sidebar-link">
+          <span class="material-symbols-outlined">assignment_late</span>
+          <span>Tipo de Ocorrência</span>
+        </a>
+
+        <a href="doacao.html" class="sidebar-link">
+          <span class="material-symbols-outlined">volunteer_activism</span>
+          <span>Doações</span>
+        </a>
+
+        <a href="noticias.html" class="sidebar-link">
+          <span class="material-symbols-outlined">newspaper</span>
+          <span>Notícias</span>
+        </a>
+
+        <a href="quartos.html" class="sidebar-link">
+          <span class="material-symbols-outlined">bed</span>
+          <span>Quartos</span>
+        </a>
+
+        <details class="sidebar-group">
+          <summary class="sidebar-link sidebar-group-toggle">
+            <span class="material-symbols-outlined">event</span>
+            <span>Atividades</span>
+            <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+          </summary>
+          <div class="sidebar-submenu">
+            <a href="tipoAtividades.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">category</span>
+              <span>Tipos de Atividades</span>
+            </a>
+            <a href="atividades.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">event_note</span>
+              <span>Atividades</span>
+            </a>
+          </div>
+        </details>
+
+        <details class="sidebar-group">
+          <summary class="sidebar-link sidebar-group-toggle">
+            <span class="material-symbols-outlined">payments</span>
+            <span>Despesas</span>
+            <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+          </summary>
+          <div class="sidebar-submenu">
+            <a href="tiposDespesas.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">receipt_long</span>
+              <span>Tipos de Despesas</span>
+            </a>
+            <a href="despesa.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">request_quote</span>
+              <span>Pagamento de Despesas</span>
+            </a>
+          </div>
+        </details>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="login.html" class="sidebar-link">
+          <span class="material-symbols-outlined">logout</span>
+          <span>Sair</span>
+        </a>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="topbar-left"></div>
+        <div class="topbar-right">
+          <div class="profile-chip">
+            <div class="profile-text">
+              <p id="perfilNome">Usuário</p>
+              <span id="perfilCargo">Acesso</span>
+            </div>
+            <img
+              class="profile-avatar"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCodmM9L3Lxp3TOXze0s5ng6gdLuL6UAVgjli-uCdXTzEkbUGW02Hheh8ViQ9IWJQngxEVmN3PkjBy4wDQUFq6-YEiM2_0THjjLcJGGCmoOip-JxgrwZ8717px25oL1Jay3FWpfa0rFtZIWUl4ziBAV-Brk_KrPNka1CMvjgOj2VkctGNpmZeuD-h9E384DdNtUi5QYhfnBKjlzWndJCqrgrkoxZL2DwUV0yeu9VbpJ1wqJosFaUFqLa-oW-OzQ9gsKgXSN3d_IyOx1"
+              alt="Secretaria"
+            />
+          </div>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="content-wrap">
+          <section>
+            <div class="list-header">
+              <div class="list-header-left">
+                <h2>Lista de Funcionários</h2>
+                <p>Visualização dos funcionários registrados no sistema.</p>
+              </div>
+              <div class="list-header-actions">
+                <button type="button" id="abrirCadastroFuncionario" class="primary-action secondary-open-btn">
+                  <span class="material-symbols-outlined">add</span>
+                  Cadastrar Novo
+                </button>
+                <button type="button" id="abrirFiltrosFuncionario" class="filter-open-btn">
+                  <span class="material-symbols-outlined">filter_list</span>
+                  Filtros
+                </button>
+              </div>
+            </div>
+
+            <section class="card" id="cadastroFuncionario" hidden>
+              <div class="section-header section-header-inline">
+                <div>
+                  <h2 id="formTitulo">Cadastrar Novo Funcionário</h2>
+                  <p>Insira os dados do funcionário para manter o controle correto no sistema.</p>
+                </div>
+                <button type="button" id="fecharCadastroFuncionario" class="close-panel-btn">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+
+              <form class="funcionario-form" id="funcionarioForm">
+                <input type="hidden" id="funcionarioId" />
+
+                <div class="form-field">
+                  <label for="nome">Nome do Funcionário</label>
+                  <input id="nome" type="text" maxlength="120" placeholder="Ex: Maria Oliveira Silva" />
+                </div>
+
+                <div class="form-field">
+                  <label for="categoria">Categoria</label>
+                  <select id="categoria">
+                    <option value="">Selecione</option>
+                    <option value="Coordenador">Coordenador(a)</option>
+                    <option value="Cuidador">Cuidador(a)</option>
+                    <option value="Secretaria">Secretaria</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="username">Usuário de acesso</label>
+                  <input id="username" type="text" maxlength="60" placeholder="Ex: maria.silva" />
+                </div>
+
+                <div class="form-field">
+                  <label for="senhaUsuario">Senha de acesso</label>
+                  <input id="senhaUsuario" type="password" maxlength="60" placeholder="Defina uma senha" />
+                </div>
+
+                <div class="form-field">
+                  <label for="cpf">CPF</label>
+                  <input id="cpf" type="text" maxlength="14" placeholder="000.000.000-00" />
+                </div>
+
+                <div class="form-field">
+                  <label for="ctps">CTPS</label>
+                  <input id="ctps" type="text" maxlength="12" placeholder="12345/6789" />
+                </div>
+
+                <div class="form-field">
+                  <label for="telefone">Telefone</label>
+                  <input id="telefone" type="text" maxlength="15" placeholder="(18) 99999-9999" />
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="primary-action" id="salvarBtn">
+                    <span class="material-symbols-outlined">save</span>
+                    Salvar Funcionário
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            <section class="card" id="filtroFuncionario" hidden>
+              <div class="section-header section-header-inline">
+                <div>
+                  <h2>Filtrar Funcionários</h2>
+                  <p>Pesquise por nome, categoria, CPF e CTPS.</p>
+                </div>
+                <button type="button" id="fecharFiltrosFuncionario" class="close-panel-btn">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+
+              <div class="funcionario-form filtro-form">
+                <div class="form-field">
+                  <label for="filtroNome">Nome do Funcionário</label>
+                  <input id="filtroNome" type="text" placeholder="Ex: Maria" />
+                </div>
+
+                <div class="form-field">
+                  <label for="filtroCategoria">Categoria</label>
+                  <select id="filtroCategoria">
+                    <option value="">Todas</option>
+                    <option value="Coordenador">Coordenador(a)</option>
+                    <option value="Cuidador">Cuidador(a)</option>
+                    <option value="Secretaria">Secretaria</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="filtroCpf">CPF</label>
+                  <input id="filtroCpf" type="text" placeholder="000.000.000-00" />
+                </div>
+
+                <div class="form-field">
+                  <label for="filtroCtps">CTPS</label>
+                  <input id="filtroCtps" type="text" placeholder="12345/6789" />
+                </div>
+
+                <div class="form-actions form-actions-between">
+                  <button type="button" id="limparFiltros" class="secondary-panel-btn">
+                    <span class="material-symbols-outlined">cleaning_services</span>
+                    Limpar Filtros
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <div class="table-card">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th class="sortable" data-sort-key="nome" tabindex="0">Nome <span class="sort-indicator"></span></th>
+                      <th class="sortable" data-sort-key="categoria" tabindex="0">Categoria <span class="sort-indicator"></span></th>
+                      <th class="sortable" data-sort-key="cpf" tabindex="0">CPF <span class="sort-indicator"></span></th>
+                      <th class="sortable" data-sort-key="ctps" tabindex="0">CTPS <span class="sort-indicator"></span></th>
+                      <th class="sortable" data-sort-key="telefone" tabindex="0">Telefone <span class="sort-indicator"></span></th>
+                      <th class="text-right">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tabelaFuncionarios">
+                    <tr>
+                      <td colspan="6" class="empty-row">Carregando funcionários...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <section class="confirm-overlay" id="painelConfirmacao">
+    <div class="confirm-box">
+      <h4>Confirmar exclusão</h4>
+      <p id="textoConfirmacao">Deseja realmente excluir este funcionário?</p>
+      <div class="confirm-actions">
+        <button class="btn btn-secondary" type="button" id="cancelarExclusao">Cancelar</button>
+        <button class="btn btn-danger" type="button" id="confirmarExclusao">Excluir</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="mensagem-feedback" class="popup-msg"></div>
+
+  <script src="js/funcionarioController.js"></script>
+</body>
+</html>

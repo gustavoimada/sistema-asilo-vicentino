@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SGAV - Tipos de Atividades</title>
+
+  <link rel="stylesheet" href="css/stylesTiposAtividades.css" />
+  <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1" />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="page">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-main">
+          <img src="assets/logo.png" alt="Logo Asilo Vicentino" />
+          <h1>SGAV</h1>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="secretaria.html" class="sidebar-link">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span>Painel</span>
+        </a>
+
+        <details class="sidebar-group">
+          <summary class="sidebar-link sidebar-group-toggle">
+            <span class="material-symbols-outlined">groups</span>
+            <span>Moradores e Família</span>
+            <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+          </summary>
+          <div class="sidebar-submenu">
+            <a href="morador.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">elderly</span>
+              <span>Cadastro de Morador</span>
+            </a>
+            <a href="composicaofamiliar.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">family_restroom</span>
+              <span>Composição Familiar</span>
+            </a>
+            <a href="historico.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">history</span>
+              <span>Histórico</span>
+            </a>
+          </div>
+        </details>
+
+        <a href="funcionario.html" class="sidebar-link">
+          <span class="material-symbols-outlined">badge</span>
+          <span>Funcionários</span>
+        </a>
+
+        <a href="medicamentos.html" class="sidebar-link">
+          <span class="material-symbols-outlined">medical_services</span>
+          <span>Medicamentos</span>
+        </a>
+
+        <a href="cadastrarPrescricao.html" class="sidebar-link">
+          <span class="material-symbols-outlined">medical_services</span>
+          <span>Prescrições</span>
+        </a>
+
+        <a href="tipoOcorrencia.html" class="sidebar-link">
+          <span class="material-symbols-outlined">assignment_late</span>
+          <span>Tipo de Ocorrência</span>
+        </a>
+
+        <a href="doacao.html" class="sidebar-link">
+          <span class="material-symbols-outlined">volunteer_activism</span>
+          <span>Doações</span>
+        </a>
+
+        <a href="noticias.html" class="sidebar-link">
+          <span class="material-symbols-outlined">newspaper</span>
+          <span>Notícias</span>
+        </a>
+
+        <a href="quartos.html" class="sidebar-link">
+          <span class="material-symbols-outlined">bed</span>
+          <span>Quartos</span>
+        </a>
+
+        <details class="sidebar-group" open>
+          <summary class="sidebar-link sidebar-group-toggle active">
+            <span class="material-symbols-outlined">event</span>
+            <span>Atividades</span>
+            <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+          </summary>
+          <div class="sidebar-submenu">
+            <a href="tipoAtividades.html" class="sidebar-link sidebar-sublink active">
+              <span class="material-symbols-outlined">category</span>
+              <span>Tipos de Atividades</span>
+            </a>
+            <a href="atividades.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">event_note</span>
+              <span>Atividades</span>
+            </a>
+          </div>
+        </details>
+
+        <details class="sidebar-group">
+          <summary class="sidebar-link sidebar-group-toggle">
+            <span class="material-symbols-outlined">payments</span>
+            <span>Despesas</span>
+            <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+          </summary>
+          <div class="sidebar-submenu">
+            <a href="tiposDespesas.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">receipt_long</span>
+              <span>Tipos de Despesas</span>
+            </a>
+            <a href="despesa.html" class="sidebar-link sidebar-sublink">
+              <span class="material-symbols-outlined">request_quote</span>
+              <span>Pagamento de Despesas</span>
+            </a>
+          </div>
+        </details>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="login.html" class="sidebar-link">
+          <span class="material-symbols-outlined">logout</span>
+          <span>Sair</span>
+        </a>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="top-header">
+        <div class="top-header-inner">
+          <div class="top-header-left">
+            <h2 class="top-header-title">Tipos de Atividades</h2>
+          </div>
+        </div>
+      </header>
+
+      <div class="content">
+        <section class="card" id="tipoAtividadeFormCard" style="display: none;">
+          <div class="section-header-inline">
+            <div class="section-header" style="margin-bottom:0;">
+              <h2 id="tipoAtividadeFormTitulo">Cadastrar tipo de atividade</h2>
+              <p>Preencha os dados para salvar no sistema.</p>
+            </div>
+            <button type="button" id="cancelarTipoAtividadeBtn" class="close-panel-btn" aria-label="Fechar cadastro">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+
+          <form id="tipoAtividadeForm" class="medicamento-form" style="margin-top:24px;">
+            <input type="hidden" id="idtipoatividades" name="idtipoatividades" />
+
+            <div class="form-field">
+              <label for="tipo">Tipo</label>
+              <input id="tipo" name="tipo" type="text" placeholder="Ex.: Bingo" required />
+            </div>
+
+            <div class="form-field">
+              <label for="org">Organização</label>
+              <input id="org" name="org" type="text" placeholder="Ex.: Equipe interna" required />
+            </div>
+
+            <div class="form-actions form-actions-between">
+              <button type="submit" class="primary-action">
+                <span class="material-symbols-outlined">save</span>
+                Salvar
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <section class="card" id="painelFiltroTipoAtividade" hidden>
+          <div class="section-header-inline">
+            <div class="section-header" style="margin-bottom:0;">
+              <h2>Filtros</h2>
+            </div>
+            <button type="button" id="fecharFiltrosTipoAtividade" class="close-panel-btn" aria-label="Fechar filtros">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+
+          <div class="medicamento-form" style="margin-top:24px;">
+            <div class="form-field">
+              <label for="filtroCampoTipoAtividade">Filtrar por</label>
+              <select id="filtroCampoTipoAtividade">
+                <option value="idtipoatividades">ID</option>
+                <option value="tipo">Tipo</option>
+                <option value="org">Organização</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="filtroBuscaTipoAtividade">Busca</label>
+              <input id="filtroBuscaTipoAtividade" type="text" placeholder="Digite para buscar" />
+            </div>
+
+          </div>
+        </section>
+
+        <section class="table-card">
+          <div class="card" style="box-shadow:none; padding:0; border-radius:0;">
+            <div class="list-header" style="padding:32px 32px 0;">
+              <div class="list-header-left">
+                <h2>Lista de Tipos de Atividades</h2>
+                <p>Visualização dos tipos de atividades cadastrados no sistema.</p>
+              </div>
+              <div class="list-header-actions">
+                <button id="novoTipoAtividadeBtn" type="button" class="primary-action secondary-open-btn">
+                  <span class="material-symbols-outlined">add</span>
+                  Cadastrar Novo
+                </button>
+                <button id="abrirFiltrosTipoAtividade" type="button" class="filter-open-btn">
+                  <span class="material-symbols-outlined">filter_list</span>
+                  Filtros
+                </button>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th data-sort="idtipoatividade">ID</th>
+                    <th data-sort="tipo">Tipo</th>
+                    <th data-sort="org">Organização</th>
+                    <th class="text-right">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="tabelaTiposAtividades">
+                  <tr>
+                    <td colspan="4">
+                      <div class="placeholder-table">Carregando tipos de atividades...</div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/tiposAtividadesController.js"></script>
+</body>
+</html>
