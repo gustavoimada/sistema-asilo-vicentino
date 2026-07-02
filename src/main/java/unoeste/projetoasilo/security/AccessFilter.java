@@ -38,6 +38,8 @@ public class AccessFilter implements Filter
             "/escalas.html",
             "/transparencia.html",
             "/relatorioDoacoes.html",
+            "/relatorioOcorrencias.html",
+            "/relatorioFuncionarios.html",
             "/relatorioDespesas.html",
             "/defineTurno.html"
     );
@@ -197,19 +199,25 @@ public class AccessFilter implements Filter
             return ehSecretaria(categoria) || ehCoordenador(categoria) || ehCuidador(categoria);
         }
         if (rotaMin.startsWith("/funcionario/")
+                || rotaMin.startsWith("/funcionarios/")
                 || rotaMin.startsWith("/morador/")
                 || rotaMin.startsWith("/composicaofamiliar/")
                 || rotaMin.startsWith("/historicomorador/")
                 || rotaMin.startsWith("/medicamento/")
+                || rotaMin.startsWith("/medicamentos/")
                 || rotaMin.startsWith("/prescricao/")
                 || rotaMin.startsWith("/quarto/")
                 || rotaMin.startsWith("/tipoocorrencia/")
+                || rotaMin.startsWith("/tipoatividade/")
+                || rotaMin.startsWith("/tipoatividades/")
                 || rotaMin.startsWith("/tiposatividades/")
+                || rotaMin.startsWith("/tipodespesas/")
                 || rotaMin.startsWith("/atividades/")
                 || rotaMin.startsWith("/atividadesmorador/")
                 || rotaMin.startsWith("/tiposdespesas/")
                 || rotaMin.startsWith("/despesa/")
-                || rotaMin.startsWith("/doacao/"))
+                || rotaMin.startsWith("/doacao/")
+                || rotaMin.startsWith("/doacoes/"))
         {
             return ehSecretaria(categoria) || ehCoordenador(categoria);
         }
@@ -238,13 +246,6 @@ public class AccessFilter implements Filter
 
     private void mostrarTelaAcessoNegado(HttpServletRequest request, HttpServletResponse response, String mensagem, int status) throws IOException
     {
-        HttpSession session = request.getSession(false);
-        if (session != null)
-        {
-            session.invalidate();
-        }
-
-        String loginUrl = request.getContextPath() + "/login.html";
         response.setStatus(status);
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/html; charset=UTF-8");
@@ -254,7 +255,6 @@ public class AccessFilter implements Filter
                 <head>
                     <meta charset="UTF-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <meta http-equiv="refresh" content="3;url=%s">
                     <title>Acesso negado - SGAV</title>
                     <style>
                         :root {
@@ -342,18 +342,12 @@ public class AccessFilter implements Filter
                         <div class="marca">SGAV</div>
                         <div class="alerta">!</div>
                         <h1>Acesso negado</h1>
-                        <p>%s. Voce sera redirecionado para o login.</p>
-                        <a href="%s">Voltar para o login</a>
+                        <p>%s.</p>
+                        <a href="#" onclick="history.back(); return false;">Voltar</a>
                     </main>
-                    <script>
-                        localStorage.clear();
-                        window.setTimeout(function () {
-                            window.location.replace("%s");
-                        }, 3000);
-                    </script>
                 </body>
                 </html>
-                """.formatted(loginUrl, mensagem, loginUrl, loginUrl));
+                """.formatted(mensagem));
     }
 
     private boolean ehSecretaria(String categoria)

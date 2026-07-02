@@ -77,6 +77,9 @@ public class NoticiaDAO {
         String sql = "SELECT * FROM noticia WHERE idnoticia = " + id;
         ResultSet rs = conexao.consultar(sql);
 
+        if (rs == null) {
+            throw new SQLException(conexao.getMensagemErro());
+        }
         if (rs != null && rs.next()) {
             return montarNoticia(rs);
         }
@@ -88,6 +91,9 @@ public class NoticiaDAO {
         ResultSet rs = conexao.consultar(sql);
         List<Noticia> noticias = new ArrayList<>();
 
+        if (rs == null) {
+            throw new SQLException(conexao.getMensagemErro());
+        }
         if (rs != null) {
             while (rs.next()) {
                 noticias.add(montarNoticia(rs));

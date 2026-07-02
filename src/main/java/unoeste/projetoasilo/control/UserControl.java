@@ -88,16 +88,13 @@ public class UserControl
         {
             String usernameLimpo = padronizarTexto(username);
             String senhaLimpa = padronizarTexto(password);
-            User usuario = new User().buscarPorNomeExato(usernameLimpo, conexao);
+            User usuario = new User().buscarPorNome(usernameLimpo, conexao);
             if (usuario == null || !senhaConfere(senhaLimpa, usuario.getSenha()))
             {
                 return ResponseEntity.status(401).body(new Error("Erro", "Usuario ou senha invalidos"));
             }
 
-            if (!senhaCriptografada(usuario.getSenha()))
-            {
-                usuario.atualizarSenha(passwordEncoder.encode(senhaLimpa), conexao);
-            }
+            migrarSenhaLegada(usuario, senhaLimpa, conexao);
 
             Funcionario funcionario = new Funcionario().buscarPorUsuario(usuario.getIdUser(), conexao);
             if (funcionario == null)
@@ -241,6 +238,24 @@ public class UserControl
     {
         return senha != null
                 && (senha.startsWith("$2a$") || senha.startsWith("$2b$") || senha.startsWith("$2y$"));
+    }
+
+    private void migrarSenhaLegada(User usuario, String senhaLimpa, Banco conexao)
+    {
+        if (usuario == null || senhaCriptografada(usuario.getSenha()))
+        {
+            return;
+        }
+
+        try
+        {
+            usuario.atualizarSenha(passwordEncoder.encode(senhaLimpa), conexao);
+        }
+        catch (SQLException ignored)
+        {
+            // A migracao nao pode impedir o login de usuarios legados.
+            // Em bancos antigos, rode atualizacao-producao.sql para aumentar usuario.senha.
+        }
     }
 
     private Funcionario buscarFuncionarioDaSessao(HttpSession session, Banco conexao) throws SQLException
