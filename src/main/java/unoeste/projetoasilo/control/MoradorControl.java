@@ -133,10 +133,8 @@ public class MoradorControl {
 
             if (morador != null) {
                 Integer quartoId = morador.getQuartoId();
-                List<ComposicaoFamiliarMorador> familiaresVinculados = new ComposicaoFamiliar().listarPorMorador(id, conexao);
 
-                if (familiaresVinculados != null && !familiaresVinculados.isEmpty())
-                    return ResponseEntity.badRequest().body(new Error("Erro", "Nao e possivel excluir o morador porque ele possui familiar vinculado. Desvincule os parentes antes de excluir."));
+                new ComposicaoFamiliar().desvincularTodosPorMorador(id, conexao);
 
                 if (morador.deletar(conexao)) {
                     if (quartoId != null)
@@ -347,6 +345,15 @@ public class MoradorControl {
             }
         } else {
             familiarFinal = new ComposicaoFamiliar().buscarPorId(familiar.getIdComposicaoFamiliar(), conexao);
+
+            if (familiarFinal != null) {
+                familiarFinal.setNome(familiar.getNome());
+                familiarFinal.setTelefone(familiar.getTelefone());
+                familiarFinal.setCpf(familiar.getCpf());
+
+                if (!familiarFinal.editar(conexao))
+                    familiarFinal = null;
+            }
         }
 
         return familiarFinal;

@@ -19,8 +19,6 @@ public class AccessFilter implements Filter
             "/secretaria.html",
             "/funcionario.html",
             "/morador.html",
-            "/composicaofamiliar.html",
-            "/historico.html",
             "/medicamentos.html",
             "/cadastrarPrescricao.html",
             "/tipoOcorrencia.html",
@@ -202,7 +200,6 @@ public class AccessFilter implements Filter
                 || rotaMin.startsWith("/funcionarios/")
                 || rotaMin.startsWith("/morador/")
                 || rotaMin.startsWith("/composicaofamiliar/")
-                || rotaMin.startsWith("/historicomorador/")
                 || rotaMin.startsWith("/medicamento/")
                 || rotaMin.startsWith("/medicamentos/")
                 || rotaMin.startsWith("/prescricao/")

@@ -14,9 +14,9 @@ public class ComposicaoFamiliarDAO {
 
     public boolean gravar(ComposicaoFamiliar fam, Banco conexao) throws SQLException {
         String sql = "INSERT INTO composicaofamiliar(nome, telefone, cpf) VALUES ('#1', '#2', '#3')";
-        sql = sql.replace("#1", fam.getNome().replace("'", "''"));
-        sql = sql.replace("#2", fam.getTelefone().replace("'", "''"));
-        sql = sql.replace("#3", fam.getCpf().replace("'", "''"));
+        sql = sql.replace("#1", escapar(fam.getNome()));
+        sql = sql.replace("#2", escapar(fam.getTelefone()));
+        sql = sql.replace("#3", escapar(fam.getCpf()));
 
         if (conexao.manipular(sql)) {
             int novoId = conexao.getMaxPK("composicaofamiliar", "idcomposicaofamiliar");
@@ -26,6 +26,16 @@ public class ComposicaoFamiliarDAO {
             }
         }
         return false;
+    }
+
+    public boolean editar(ComposicaoFamiliar fam, Banco conexao) {
+        String sql = "UPDATE composicaofamiliar SET nome = '#1', telefone = '#2', cpf = '#3' WHERE idcomposicaofamiliar = #4";
+        sql = sql.replace("#1", escapar(fam.getNome()));
+        sql = sql.replace("#2", escapar(fam.getTelefone()));
+        sql = sql.replace("#3", escapar(fam.getCpf()));
+        sql = sql.replace("#4", String.valueOf(fam.getIdComposicaoFamiliar()));
+
+        return conexao.manipular(sql);
     }
 
     public boolean vincular(ComposicaoFamiliarMorador cfm, Banco conexao) throws SQLException {
@@ -259,5 +269,12 @@ public class ComposicaoFamiliarDAO {
             return " ORDER BY cf.cpf " + direcaoFinal + ", cf.nome " + direcaoFinal;
         else
             return " ORDER BY m.nome " + direcaoFinal + ", cf.nome " + direcaoFinal;
+    }
+
+    private String escapar(String valor) {
+        if (valor == null)
+            return "";
+
+        return valor.replace("'", "''");
     }
 }

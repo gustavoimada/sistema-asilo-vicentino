@@ -33,18 +33,6 @@ CREATE TABLE morador (
 );
 
 -- =========================================
--- historicomorador
--- =========================================
-CREATE TABLE historicomorador (
-                                  idHistoricoMorador SERIAL PRIMARY KEY,
-                                  dtEntrada DATE,
-                                  dtSaida DATE,
-                                  Morador_idMorador INTEGER,
-                                  FOREIGN KEY (Morador_idMorador)
-                                      REFERENCES morador(idMorador)
-);
-
--- =========================================
 -- composicaofamiliar
 -- =========================================
 CREATE TABLE composicaofamiliar (

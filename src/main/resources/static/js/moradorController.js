@@ -3,8 +3,6 @@ const URL_FAMILIAR = '/composicaoFamiliar';
 const URL_QUARTO = '/quarto';
 
 let moradores = [];
-let familiaresDisponiveis = [];
-let familiaresDoFormulario = [];
 let quartosDisponiveis = [];
 let ordenacaoMoradores = '';
 let direcaoOrdenacaoMoradores = 'asc';
@@ -156,24 +154,6 @@ function validarIdadeMinima(dtNascimento) {
     return idade >= 60;
 }
 
-function carregarFamiliaresDisponiveis() {
-    fetch(`${URL_FAMILIAR}/listarTodos`)
-        .then(response => {
-            if (!response.ok)
-                throw new Error('Nao foi possivel carregar familiares.');
-
-            return response.json();
-        })
-        .then(lista => {
-            familiaresDisponiveis = [];
-
-            if (Array.isArray(lista))
-                familiaresDisponiveis = lista;
-            preencherSelectFamiliares();
-        })
-        .catch(error => console.error('Erro ao carregar familiares:', error));
-}
-
 function carregarQuartosDisponiveis(quartoAtualId = '') {
     let url = `${URL_QUARTO}/listarDisponiveis`;
 
@@ -218,47 +198,6 @@ function preencherSelectQuartos(quartoSelecionado = '') {
 
             select.appendChild(option);
         });
-    }
-}
-
-function preencherSelectFamiliares() {
-    const select = document.getElementById('familiarExistente');
-
-    if (select) {
-        select.innerHTML = '<option value="">Selecione um familiar...</option>';
-
-        familiaresDisponiveis.forEach(familiar => {
-            const option = document.createElement('option');
-            let descricao = familiar.nome;
-
-            if (familiar.cpf)
-                descricao += ` - ${familiar.cpf}`;
-            else
-                descricao += ' - CPF nao informado';
-
-            option.value = familiar.idComposicaoFamiliar;
-            option.textContent = descricao;
-            select.appendChild(option);
-        });
-    }
-}
-
-function alternarModoFamiliar() {
-    const modoExistente = document.getElementById('modoFamiliarExistente').checked;
-    const blocoExistente = document.getElementById('familiaresExistenteFields');
-    const blocoNovo = document.getElementById('familiaresNovoFields');
-
-    if (modoExistente) {
-        blocoExistente.hidden = false;
-        blocoNovo.hidden = true;
-        blocoExistente.style.display = 'flex';
-        blocoNovo.style.display = 'none';
-    }
-    else {
-        blocoExistente.hidden = true;
-        blocoNovo.hidden = false;
-        blocoExistente.style.display = 'none';
-        blocoNovo.style.display = 'block';
     }
 }
 
@@ -378,9 +317,7 @@ function carregarMoradores() {
 
 function inicializarPaginaMorador() {
     carregarMoradores();
-    carregarFamiliaresDisponiveis();
     carregarQuartosDisponiveis();
-    alternarModoFamiliar();
 
     const generoSelect = document.getElementById('genero');
 
@@ -407,36 +344,34 @@ function inicializarPaginaMorador() {
     }, 400);
 }
 
-function carregarFamiliaresDoMorador(idMorador) {
+function carregarContatoResponsavelMorador(idMorador) {
     fetch(`${URL_FAMILIAR}/listar?moradorId=${idMorador}`)
         .then(response => {
             if (!response.ok)
-                throw new Error('Nao foi possivel carregar os familiares do morador.');
+                throw new Error('Nao foi possivel carregar o contato responsavel.');
 
             return response.json();
         })
         .then(lista => {
-            familiaresDoFormulario = [];
+            limparContatoResponsavel();
 
-            if (Array.isArray(lista))
-                lista.forEach(item => {
-                familiaresDoFormulario.push({
-                    vinculo: item.vinculo,
-                    composicaoFamiliar: {
-                        idComposicaoFamiliar: item.composicaoFamiliar.idComposicaoFamiliar,
-                        nome: item.composicaoFamiliar.nome,
-                        telefone: item.composicaoFamiliar.telefone,
-                        cpf: item.composicaoFamiliar.cpf
-                    }
-                });
-                });
-
-            renderizarFamiliaresDoFormulario();
+            if (Array.isArray(lista) && lista.length > 0)
+                preencherContatoResponsavel(lista[0]);
         })
         .catch(error => {
-            console.error('Erro ao carregar familiares do morador:', error);
-            exibirMensagem('error', 'Nao foi possivel carregar os familiares do morador.');
+            console.error('Erro ao carregar contato responsavel:', error);
+            exibirMensagem('error', 'Nao foi possivel carregar o contato responsavel.');
         });
+}
+
+function preencherContatoResponsavel(vinculo) {
+    const familiar = vinculo.composicaoFamiliar || {};
+
+    document.getElementById('responsavelId').value = familiar.idComposicaoFamiliar || 0;
+    document.getElementById('responsavelNome').value = familiar.nome || '';
+    document.getElementById('responsavelTelefone').value = familiar.telefone || '';
+    document.getElementById('responsavelCpf').value = familiar.cpf || '';
+    document.getElementById('responsavelVinculo').value = vinculo.vinculo || '';
 }
 
 function renderizarMoradores(moradores) {
@@ -517,126 +452,40 @@ function limparFiltros() {
     carregarMoradores();
 }
 
-function renderizarFamiliaresDoFormulario() {
-    const tbody = document.getElementById('listaFamiliaresMorador');
-
-    if (!tbody)
-        return;
-
-    tbody.innerHTML = '';
-
-    familiaresDoFormulario.forEach(function (item, indice) {
-        const row = tbody.insertRow();
-        const nome = item.composicaoFamiliar.nome || '-';
-        const vinculo = item.vinculo || '-';
-        const telefone = item.composicaoFamiliar.telefone || '-';
-        const cpf = item.composicaoFamiliar.cpf || '-';
-
-        row.insertCell(0).textContent = nome;
-        row.insertCell(1).textContent = vinculo;
-        row.insertCell(2).textContent = telefone;
-        row.insertCell(3).textContent = cpf;
-
-        const acoes = row.insertCell(4);
-
-        const btnExcluir = document.createElement('button');
-        btnExcluir.type = 'button';
-        btnExcluir.classList.add('morador-row-btn', 'danger');
-        btnExcluir.innerHTML = '<span class="material-symbols-outlined">delete</span>';
-        btnExcluir.onclick = () => {
-            familiaresDoFormulario.splice(indice, 1);
-            renderizarFamiliaresDoFormulario();
-        };
-
-        acoes.classList.add('morador-actions-cell');
-        acoes.appendChild(btnExcluir);
-    });
+function limparContatoResponsavel() {
+    document.getElementById('responsavelId').value = '';
+    document.getElementById('responsavelNome').value = '';
+    document.getElementById('responsavelTelefone').value = '';
+    document.getElementById('responsavelCpf').value = '';
+    document.getElementById('responsavelVinculo').value = '';
 }
 
-function adicionarFamiliarAoFormulario() {
-    const modoExistente = document.getElementById('modoFamiliarExistente').checked;
-    const vinculo = document.getElementById('familiarVinculo').value.trim();
-    let familiar = null;
+function montarContatoResponsavel() {
+    const id = Number(document.getElementById('responsavelId').value || 0);
+    const nome = document.getElementById('responsavelNome').value.trim();
+    const telefone = formatarTelefone(document.getElementById('responsavelTelefone').value);
+    const cpf = formatarCpf(document.getElementById('responsavelCpf').value);
+    const vinculo = document.getElementById('responsavelVinculo').value.trim();
+    const temContato = nome !== '' || telefone !== '' || cpf !== '' || vinculo !== '';
 
-    if (vinculo === '')
-        exibirMensagem('error', 'Informe o vinculo do familiar.');
-    else {
-        if (modoExistente) {
-            const familiarId = Number(document.getElementById('familiarExistente').value);
+    document.getElementById('responsavelTelefone').value = telefone;
+    document.getElementById('responsavelCpf').value = cpf;
 
-            familiaresDisponiveis.forEach(function (item) {
-                if (item.idComposicaoFamiliar === familiarId)
-                    familiar = item;
-            });
+    if (!temContato)
+        return { valido: true, valor: '' };
+    else if (nome === '')
+        return { valido: false, mensagem: 'Informe o nome do contato responsavel.' };
+    else if (telefone !== '' && !validarTelefone(telefone))
+        return { valido: false, mensagem: 'Telefone do contato responsavel invalido.' };
+    else if (cpf !== '' && !validarCpf(cpf))
+        return { valido: false, mensagem: 'CPF do contato responsavel invalido.' };
+    else if (vinculo === '')
+        return { valido: false, mensagem: 'Informe o vinculo do contato responsavel.' };
 
-            if (familiar == null)
-                exibirMensagem('error', 'Selecione um familiar existente.');
-        }
-        else {
-            const nome = document.getElementById('familiarNome').value.trim();
-            const telefone = formatarTelefone(document.getElementById('familiarTelefone').value);
-            const cpf = formatarCpf(document.getElementById('familiarCpf').value);
-
-            document.getElementById('familiarTelefone').value = telefone;
-            document.getElementById('familiarCpf').value = cpf;
-
-            if (nome === '')
-                exibirMensagem('error', 'Informe o nome do familiar.');
-            else if (telefone !== '' && !validarTelefone(telefone))
-                exibirMensagem('error', 'Telefone do familiar invalido.');
-            else if (cpf !== '' && !validarCpf(cpf))
-                exibirMensagem('error', 'CPF do familiar invalido.');
-            else
-                familiar = {
-                    idComposicaoFamiliar: 0,
-                    nome: nome,
-                    telefone: telefone,
-                    cpf: cpf
-                };
-        }
-
-        if (familiar != null) {
-            const duplicado = verificarFamiliarDuplicado(familiar);
-
-            if (duplicado)
-                exibirMensagem('error', 'Este familiar ja foi adicionado ao morador.');
-            else {
-                familiaresDoFormulario.push({
-                    vinculo: vinculo,
-                    composicaoFamiliar: familiar
-                });
-
-                limparFormularioFamiliar();
-                renderizarFamiliaresDoFormulario();
-            }
-        }
-    }
-}
-
-function verificarFamiliarDuplicado(familiar) {
-    const idFamiliar = Number(familiar.idComposicaoFamiliar || 0);
-    let duplicado = false;
-
-    familiaresDoFormulario.forEach(function (item) {
-        const idAtual = Number(item.composicaoFamiliar.idComposicaoFamiliar || 0);
-        const cpfAtual = item.composicaoFamiliar.cpf || '';
-        const cpfNovo = familiar.cpf || '';
-
-        if (idFamiliar > 0 && idAtual === idFamiliar)
-            duplicado = true;
-        else if (cpfNovo !== '' && cpfAtual !== '' && cpfAtual === cpfNovo)
-            duplicado = true;
-    });
-
-    return duplicado;
-}
-
-function limparFormularioFamiliar() {
-    document.getElementById('familiarExistente').value = '';
-    document.getElementById('familiarNome').value = '';
-    document.getElementById('familiarTelefone').value = '';
-    document.getElementById('familiarCpf').value = '';
-    document.getElementById('familiarVinculo').value = '';
+    return {
+        valido: true,
+        valor: `${id};;${nome};;${telefone};;${cpf};;${vinculo}`
+    };
 }
 
 function salvarMorador(event) {
@@ -674,21 +523,12 @@ function salvarMorador(event) {
     else {
         let url;
         let method;
-        let familiares = '';
+        const contatoResponsavel = montarContatoResponsavel();
 
-        familiaresDoFormulario.forEach(function (item, indice) {
-            const familiar = item.composicaoFamiliar;
-            const idComposicaoFamiliar = familiar.idComposicaoFamiliar || 0;
-            const nomeFamiliar = familiar.nome || '';
-            const telefoneFamiliar = familiar.telefone || '';
-            const cpfFamiliar = familiar.cpf || '';
-            const vinculoFamiliar = item.vinculo || '';
-
-            if (indice > 0)
-                familiares += '||';
-
-            familiares += `${idComposicaoFamiliar};;${nomeFamiliar};;${telefoneFamiliar};;${cpfFamiliar};;${vinculoFamiliar}`;
-        });
+        if (!contatoResponsavel.valido) {
+            exibirMensagem('error', contatoResponsavel.mensagem);
+            return;
+        }
 
         if (id) {
             url = `${URL}/editarCompleto/${id}?nome=${encodeURIComponent(nome)}&cpf=${encodeURIComponent(cpf)}&genero=${encodeURIComponent(genero)}&dtNascimento=${dtNascimento}&endereco=${encodeURIComponent(endereco)}&numero=${numero}&cidade=${encodeURIComponent(cidade)}&estado=${estado}&cep=${encodeURIComponent(cep)}&telefone=${encodeURIComponent(telefone)}&quartoId=${quartoId}`;
@@ -698,8 +538,8 @@ function salvarMorador(event) {
             method = 'POST';
         }
 
-        if (familiares !== '')
-            url += `&familiares=${encodeURIComponent(familiares)}`;
+        if (contatoResponsavel.valor !== '')
+            url += `&familiares=${encodeURIComponent(contatoResponsavel.valor)}`;
 
         fetch(url, { method })
             .then(response => response.json())
@@ -717,7 +557,6 @@ function salvarMorador(event) {
                         exibirMensagem('success', 'Morador cadastrado com sucesso!');
 
                     carregarMoradores();
-                    carregarFamiliaresDisponiveis();
                     carregarQuartosDisponiveis();
                     esconderFormulario();
                 }
@@ -739,11 +578,10 @@ function editarMorador(morador) {
     document.getElementById('cep').value = morador.cep;
     document.getElementById('telefone').value = morador.telefone;
     carregarQuartosDisponiveis(morador.quartoId || '');
-    familiaresDoFormulario = [];
-    renderizarFamiliaresDoFormulario();
+    limparContatoResponsavel();
 
     mostrarFormulario('Editar Morador');
-    carregarFamiliaresDoMorador(morador.idMorador);
+    carregarContatoResponsavelMorador(morador.idMorador);
 }
 
 function deletarMorador(id) {
@@ -781,11 +619,7 @@ function esconderFormulario() {
     document.getElementById('formContainer').style.display = 'none';
     document.getElementById('moradorForm').reset();
     document.getElementById('id').value = '';
-    familiaresDoFormulario = [];
-    renderizarFamiliaresDoFormulario();
-    limparFormularioFamiliar();
-    document.getElementById('modoFamiliarExistente').checked = true;
-    alternarModoFamiliar();
+    limparContatoResponsavel();
     carregarQuartosDisponiveis();
 }
 

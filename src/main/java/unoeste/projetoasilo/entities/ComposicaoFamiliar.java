@@ -104,9 +104,18 @@ public class ComposicaoFamiliar implements Serializable
 
     public boolean gravar(Banco conexao) throws SQLException
     {
-        if (nome != null && telefone != null && cpf != null && validarCpf()) {
+        if (nome != null && !nome.isBlank() && (cpf == null || cpf.isBlank() || validarCpf())) {
             ComposicaoFamiliarDAO dao = new ComposicaoFamiliarDAO();
             return dao.gravar(this, conexao);
+        }
+        return false;
+    }
+
+    public boolean editar(Banco conexao) throws SQLException
+    {
+        if (idComposicaoFamiliar > 0 && nome != null && !nome.isBlank() && (cpf == null || cpf.isBlank() || validarCpf())) {
+            ComposicaoFamiliarDAO dao = new ComposicaoFamiliarDAO();
+            return dao.editar(this, conexao);
         }
         return false;
     }

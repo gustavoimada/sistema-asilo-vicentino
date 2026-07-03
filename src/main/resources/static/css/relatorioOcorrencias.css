@@ -3,7 +3,7 @@ body {
 }
 
 :root {
-    --sidebar-width: 288px;
+    --sidebar-width: 256px;
 }
 
 .page {

@@ -30,21 +30,13 @@
         <details class="sidebar-group" open>
           <summary class="sidebar-link sidebar-group-toggle">
             <span class="material-symbols-outlined">groups</span>
-            <span>Moradores e Família</span>
+            <span>Moradores</span>
             <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
           </summary>
           <div class="sidebar-submenu">
             <a href="morador.html" class="sidebar-link sidebar-sublink active">
               <span class="material-symbols-outlined">elderly</span>
               <span>Cadastro de Morador</span>
-            </a>
-            <a href="composicaofamiliar.html" class="sidebar-link sidebar-sublink">
-              <span class="material-symbols-outlined">family_restroom</span>
-              <span>Composição Familiar</span>
-            </a>
-            <a href="historico.html" class="sidebar-link sidebar-sublink">
-              <span class="material-symbols-outlined">history</span>
-              <span>Histórico</span>
             </a>
           </div>
         </details>
@@ -172,7 +164,7 @@
               <div class="section-header section-header-inline">
                 <div>
                   <h2 id="formTitle">Cadastrar Novo Morador</h2>
-                  <p>Informe os dados do morador e, se necessário, vincule familiares.</p>
+                  <p>Informe os dados do morador e o contato responsavel.</p>
                 </div>
                 <button type="button" class="close-panel-btn" onclick="esconderFormulario()">
                   <span class="material-symbols-outlined">close</span>
@@ -272,91 +264,40 @@
                   </select>
                 </div>
 
-                <div class="form-field form-field-wide modo-familiar-field">
-                  <label>Familiares vinculados</label>
-                  <div class="modo-familiar-switch">
-                    <label class="modo-familiar-option">
-                      <input id="modoFamiliarExistente" type="radio" name="modoFamiliar" value="existente" checked onchange="alternarModoFamiliar()" />
-                      <span>Selecionar existente</span>
-                    </label>
-                    <label class="modo-familiar-option">
-                      <input type="radio" name="modoFamiliar" value="novo" onchange="alternarModoFamiliar()" />
-                      <span>Cadastrar novo</span>
-                    </label>
-                  </div>
-                </div>
-
-                <div id="familiaresExistenteFields" class="form-field form-field-wide familiar-bloco familiar-select-bloco">
-                  <label for="familiarExistente">Familiar existente</label>
-                  <select id="familiarExistente">
-                    <option value="">Selecione um familiar...</option>
-                  </select>
-                </div>
-
-                <div id="familiaresNovoFields" class="form-field form-field-wide familiares-novo-fields familiar-bloco" hidden>
-                  <div class="familiares-grid">
-                    <div class="form-field">
-                      <label for="familiarNome">Nome do Familiar</label>
-                      <input id="familiarNome" type="text" placeholder="Ex: Maria Silva" />
-                    </div>
-
-                    <div class="form-field">
-                      <label for="familiarTelefone">Telefone do Familiar</label>
-                      <input id="familiarTelefone" type="tel" placeholder="(00) 00000-0000" oninput="this.value = formatarTelefone(this.value)" />
-                    </div>
-
-                    <div class="form-field">
-                      <label for="familiarCpf">CPF do Familiar</label>
-                      <input id="familiarCpf" type="text" placeholder="000.000.000-00" oninput="this.value = formatarCpf(this.value)" />
-                    </div>
-                  </div>
+                <div class="form-field form-field-wide contato-responsavel-title">
+                  <h3>Contato responsavel</h3>
+                  <input id="responsavelId" type="hidden" />
                 </div>
 
                 <div class="form-field">
-                  <label for="familiarVinculo">Vínculo</label>
-                  <select id="familiarVinculo">
+                  <label for="responsavelNome">Nome</label>
+                  <input id="responsavelNome" type="text" placeholder="Ex: Maria Silva" />
+                </div>
+
+                <div class="form-field">
+                  <label for="responsavelTelefone">Telefone</label>
+                  <input id="responsavelTelefone" type="tel" placeholder="(00) 00000-0000" oninput="this.value = formatarTelefone(this.value)" />
+                </div>
+
+                <div class="form-field">
+                  <label for="responsavelCpf">CPF</label>
+                  <input id="responsavelCpf" type="text" placeholder="000.000.000-00" oninput="this.value = formatarCpf(this.value)" />
+                </div>
+
+                <div class="form-field">
+                  <label for="responsavelVinculo">Vinculo</label>
+                  <select id="responsavelVinculo">
                     <option value="">Selecione</option>
                     <option value="Filho(a)">Filho(a)</option>
                     <option value="Pai">Pai</option>
-                    <option value="Mãe">Mãe</option>
-                    <option value="Irmão(ã)">Irmão(ã)</option>
-                    <option value="Avô(ó)">Avô(ó)</option>
-                    <option value="Tio(a)">Tio(a)</option>
-                    <option value="Sobrinho(a)">Sobrinho(a)</option>
-                    <option value="Primo(a)">Primo(a)</option>
-                    <option value="Cônjuge">Cônjuge</option>
-                    <option value="Genro">Genro</option>
-                    <option value="Nora">Nora</option>
+                    <option value="Mae">Mae</option>
+                    <option value="Irmao(a)">Irmao(a)</option>
+                    <option value="Conjuge">Conjuge</option>
                     <option value="Neto(a)">Neto(a)</option>
-                    <option value="Responsável">Responsável</option>
+                    <option value="Responsavel">Responsavel</option>
                     <option value="Outro">Outro</option>
                   </select>
                 </div>
-
-                <div class="form-field form-field-action">
-                  <button type="button" class="secondary-panel-btn" onclick="adicionarFamiliarAoFormulario()">
-                    <span class="material-symbols-outlined">group_add</span>
-                    Adicionar Familiar
-                  </button>
-                </div>
-
-                <div class="form-field form-field-wide familiar-table-field">
-                  <div class="table-wrap">
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Familiar</th>
-                          <th>Vínculo</th>
-                          <th id="th-telefone" class="sortable" onclick="definirOrdenacaoMoradores('telefone')">Telefone <span id="sort-telefone" class="sort-indicator"></span></th>
-                          <th>CPF</th>
-                          <th class="text-right">Ações</th>
-                        </tr>
-                      </thead>
-                      <tbody id="listaFamiliaresMorador"></tbody>
-                    </table>
-                  </div>
-                </div>
-
                 <div class="form-actions form-actions-between">
                   <button type="button" class="secondary-panel-btn" onclick="esconderFormulario()">
                     <span class="material-symbols-outlined">close</span>

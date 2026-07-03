@@ -28,10 +28,9 @@ O projeto foi estruturado para demonstrar dominio de desenvolvimento web complet
 - Painel de coordenador para acompanhamento e relatorios.
 - Painel de cuidador para registros operacionais.
 - Cadastro, edicao, listagem e exclusao de funcionarios.
-- Cadastro e acompanhamento de moradores.
+- Cadastro e acompanhamento de moradores com contato responsavel.
 - Controle de quartos e disponibilidade.
-- Cadastro de familiares e vinculo com moradores.
-- Historico de moradores.
+- Cadastro simplificado de contato responsavel vinculado ao morador.
 - Cadastro de medicamentos e prescricoes.
 - Registro de uso de medicacao.
 - Cadastro de tipos de ocorrencia.
@@ -138,14 +137,14 @@ src/
 - `PUT /funcionario/{id}` edita funcionario.
 - `DELETE /funcionario/{id}` remove funcionario e usuario vinculado.
 
-### Moradores e Familiares
+### Moradores e Contato Responsavel
 
 - `GET /morador/listar` lista moradores.
 - `POST /morador/cadastrar` cadastra morador.
 - `POST /morador/cadastrarCompleto` cadastra morador com dados completos.
-- `GET /composicaoFamiliar/listarTodos` lista familiares.
-- `POST /composicaoFamiliar/cadastrar` cadastra familiar.
-- `POST /composicaoFamiliar/relacionar` vincula familiar a morador.
+- `PUT /morador/editarCompleto/{id}` edita morador e contato responsavel.
+- `DELETE /morador/{id}` remove morador e desvincula o contato responsavel.
+- `GET /composicaoFamiliar/listar` recupera o contato vinculado ao morador.
 
 ### Medicamentos e Prescricoes
 
@@ -280,4 +279,3 @@ O arquivo `.env.example` permanece versionado apenas como modelo de configuracao
 ## Status
 
 O sistema esta em fase de ajustes finais, testes gerais e preparacao para deploy. A base ja possui configuracao de ambiente, seguranca inicial, documentacao de deploy e repositorio pronto para evolucao continua.
-

@@ -6,102 +6,17 @@
   align-self: end;
 }
 
-.modo-familiar-field .modo-familiar-switch {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  background: var(--surface-container-low);
-  padding: 10px;
-  border-radius: 14px;
-}
-
-.modo-familiar-option {
-  flex: 1 1 200px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  background: #ffffff;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 700;
-  color: #475569;
-  cursor: pointer;
-  border: 1px solid transparent;
-  transition: all 0.2s ease;
-}
-
-.modo-familiar-option:hover {
-  border-color: #cbd5e1;
-}
-
-.modo-familiar-option input[type="radio"] {
-  accent-color: var(--primary);
-  width: 16px;
-  height: 16px;
-}
-
-.modo-familiar-option:has(input:checked) {
-  border-color: var(--primary);
-  color: var(--primary);
-  background: #eff6ff;
-}
-
-.familiares-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px 24px;
-}
-
-.familiar-bloco {
-  background: var(--surface-container-low);
-  padding: 18px;
-  border-radius: 18px;
-}
-
-.familiar-select-bloco {
-  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-  padding: 16px 18px;
-  border-radius: 16px;
-  border: 1px solid #e2e8f0;
-}
-
-.familiares-novo-fields.familiar-bloco {
-  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-  padding: 16px 18px;
-  border-radius: 16px;
-  border: 1px solid #e2e8f0;
-}
-
-.familiar-table-field .table-wrap {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 18px;
-  overflow: hidden;
-}
-
-.familiar-table-field table {
-  min-width: 0;
-}
-
-.familiar-table-field thead tr {
-  background: #eef2f7;
-}
-
-.familiar-table-field tbody tr {
+.contato-responsavel-title {
+  margin-top: 8px;
+  padding-top: 18px;
   border-top: 1px solid var(--surface-container);
 }
 
-.familiar-table-field th {
-  color: #475569;
-}
-
-.familiar-table-field td {
-  background: #ffffff;
-}
-
-.familiar-table-field tbody tr:hover td {
-  background: #f8fbff;
+.contato-responsavel-title h3 {
+  margin: 0;
+  color: var(--on-surface);
+  font-size: 16px;
+  font-weight: 800;
 }
 
 .content-wrap {
@@ -123,28 +38,22 @@
 .section-header-inline,
 .form-actions,
 .list-header-left,
-.section-header-inline > div,
-.familiar-table-field,
-.familiar-table-field .table-wrap {
+.section-header-inline > div {
   min-width: 0;
 }
 
 .table-card .table-wrap th,
-.table-card .table-wrap td,
-.familiar-table-field th,
-.familiar-table-field td {
+.table-card .table-wrap td {
   overflow-wrap: normal;
   word-break: normal;
 }
 
-.table-card .table-wrap th,
-.familiar-table-field th {
+.table-card .table-wrap th {
   white-space: nowrap;
   line-height: 1.35;
 }
 
-.table-card .table-wrap td,
-.familiar-table-field td {
+.table-card .table-wrap td {
   white-space: nowrap;
   line-height: 1.5;
 }
@@ -182,12 +91,11 @@
 }
 
 .form-field select,
-#familiarExistente,
 #quartoId,
 #genero,
 #estado,
 #filtroEstado,
-#familiarVinculo {
+#responsavelVinculo {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -203,41 +111,26 @@
 }
 
 .form-field select:hover,
-#familiarExistente:hover,
 #quartoId:hover,
 #genero:hover,
 #estado:hover,
 #filtroEstado:hover,
-#familiarVinculo:hover {
+#responsavelVinculo:hover {
   border-color: #b8c2cc;
   background-color: #dfe4ea;
 }
 
 .form-field select:focus,
-#familiarExistente:focus,
 #quartoId:focus,
 #genero:focus,
 #estado:focus,
 #filtroEstado:focus,
-#familiarVinculo:focus {
+#responsavelVinculo:focus {
   border-color: #94a3b8;
   box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.18);
 }
 
-#familiaresExistenteFields label {
-  color: var(--outline);
-}
-
-#familiarExistente {
-  background-color: #e7edf3;
-  box-shadow: none;
-}
-
 @media (max-width: 900px) {
-  .familiares-grid {
-    grid-template-columns: 1fr;
-  }
-
   .table-card .table-wrap table {
     table-layout: auto;
   }
@@ -258,9 +151,7 @@
   }
 
   .table-card .table-wrap th,
-  .table-card .table-wrap td,
-  .familiar-table-field th,
-  .familiar-table-field td {
+  .table-card .table-wrap td {
     padding-left: 16px;
     padding-right: 16px;
   }
@@ -290,19 +181,12 @@
 }
 
 @media (max-width: 700px) {
-  .modo-familiar-option {
-    flex: 1 1 100%;
-  }
-
-  .table-card .table-wrap table,
-  .familiar-table-field table {
+  .table-card .table-wrap table {
     table-layout: auto;
   }
 
   .table-card .table-wrap th,
-  .table-card .table-wrap td,
-  .familiar-table-field th,
-  .familiar-table-field td {
+  .table-card .table-wrap td {
     padding: 14px 12px;
     font-size: 13px;
   }
