@@ -24,7 +24,6 @@ public class AccessFilter implements Filter
             "/tipoOcorrencia.html",
             "/doacao.html",
             "/quartos.html",
-            "/cadastroQuartos.html",
             "/tipoAtividades.html",
             "/atividades.html",
             "/tiposDespesas.html",
@@ -38,8 +37,7 @@ public class AccessFilter implements Filter
             "/relatorioDoacoes.html",
             "/relatorioOcorrencias.html",
             "/relatorioFuncionarios.html",
-            "/relatorioDespesas.html",
-            "/defineTurno.html"
+            "/relatorioDespesas.html"
     );
 
     private static final Set<String> PAGINAS_COORDENADOR_E_SECRETARIA = Set.of(
