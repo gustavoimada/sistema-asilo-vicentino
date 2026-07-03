@@ -67,15 +67,7 @@ function montarQueryContexto() {
 }
 
 function ajustarMenuPorPerfil() {
-    const categoria = removerAcentos(localStorage.getItem("funcionarioCategoria") || "").trim().toLowerCase();
-    const ehCoordenador = categoria === "coordenador";
     const query = montarQueryContexto();
-    const sufixo = query ? `?${query}` : "";
-
-    const linkPainel = document.querySelector('.sidebar-nav a.sidebar-link[href*="secretaria.html"]');
-    if (linkPainel && ehCoordenador) {
-        linkPainel.setAttribute("href", `coordenador.html${sufixo}`);
-    }
 
     document.querySelectorAll(".sidebar-nav a.sidebar-link").forEach((link) => {
         const href = link.getAttribute("href") || "";
