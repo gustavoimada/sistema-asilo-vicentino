@@ -1,13 +1,20 @@
 let relogioIniciadoRegistroMedicacao = false;
 
 document.addEventListener("DOMContentLoaded", async function () {
-    const contextoRegistroMedicacao = await carregarContextoRegistroMedicacao();
+    definirVisibilidadeConteudoRegistroMedicacao(false);
 
     const temTurnoAtivo = await garantirTurnoAtivoNoCarregamentoRegistroMedicacao();
     if (!temTurnoAtivo) {
         return;
     }
 
+    let contextoRegistroMedicacao = null;
+    try {
+        contextoRegistroMedicacao = await carregarContextoRegistroMedicacao();
+    } catch (e) {
+        contextoRegistroMedicacao = null;
+    }
+    definirVisibilidadeConteudoRegistroMedicacao(true);
     configurarFiltrosPrescricaoDose();
     configurarPainelAtrasados();
     atualizarNomeCuidadorNaTela(contextoRegistroMedicacao);
@@ -16,6 +23,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     listarUso();
     iniciarRelogio();
 });
+
+function definirVisibilidadeConteudoRegistroMedicacao(visivel) {
+    const conteudo = document.querySelector(".registro-medicacao-page .content");
+    if (conteudo != null) {
+        conteudo.hidden = !visivel;
+    }
+}
 
 async function carregarContextoRegistroMedicacao() {
     const response = await fetch("/login/sessao");
@@ -118,8 +132,24 @@ async function garantirTurnoAtivoNoCarregamentoRegistroMedicacao() {
 }
 
 function cargoPerfilRegistroMedicacao(categoria) {
-    if (categoria)
-        return categoria;
+    const valor = String(categoria || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim()
+        .toLowerCase();
+
+    if (valor === "coordenador") {
+        return "Coordenador(a)";
+    }
+    if (valor === "cuidador") {
+        return "Cuidador(a)";
+    }
+    if (valor === "secretaria") {
+        return "Secretaria(o)";
+    }
+    if (categoria) {
+        return String(categoria).trim();
+    }
     return "Acesso";
 }
 
