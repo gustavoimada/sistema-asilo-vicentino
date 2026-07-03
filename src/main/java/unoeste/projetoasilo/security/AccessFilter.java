@@ -20,6 +20,7 @@ public class AccessFilter implements Filter
             "/funcionario.html",
             "/morador.html",
             "/medicamentos.html",
+            "/caixinhas.html",
             "/cadastrarPrescricao.html",
             "/tipoOcorrencia.html",
             "/doacao.html",
@@ -186,6 +187,7 @@ public class AccessFilter implements Filter
         }
         if (rotaMin.startsWith("/ocorrencia/")
                 || rotaMin.startsWith("/registrarusomedicacao/")
+                || rotaMin.startsWith("/caixinhadose/")
                 || rotaMin.startsWith("/prescricaodose/"))
         {
             return ehCuidador(categoria) || ehCoordenador(categoria);
@@ -200,6 +202,7 @@ public class AccessFilter implements Filter
                 || rotaMin.startsWith("/composicaofamiliar/")
                 || rotaMin.startsWith("/medicamento/")
                 || rotaMin.startsWith("/medicamentos/")
+                || rotaMin.startsWith("/caixinha/")
                 || rotaMin.startsWith("/prescricao/")
                 || rotaMin.startsWith("/quarto/")
                 || rotaMin.startsWith("/tipoocorrencia/")

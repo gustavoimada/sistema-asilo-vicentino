@@ -104,13 +104,13 @@ public class PrescricaoDAO {
     }
 
     public boolean deletar(int id, Banco conexao) throws SQLException{
-        String sql = "DELETE FROM prescricao WHERE idprescricao = "+id;
-        boolean deletou = false;
-        if (conexao.manipular(sql))
-        {
-            deletou = true;
+        PrescricaoDoseDAO prescricaoDoseDAO = new PrescricaoDoseDAO();
+        if (!prescricaoDoseDAO.deletarPorPrescricao(id, conexao)) {
+            return false;
         }
-        return deletou;
+
+        String sql = "DELETE FROM prescricao WHERE idprescricao = "+id;
+        return conexao.manipular(sql);
     }
 
     public boolean editar(Prescricao prescricao, Banco conexao) throws SQLException{
@@ -220,15 +220,18 @@ public class PrescricaoDAO {
     }
 
     private long calcularIntervaloEmSegundos(int frequenciaValor, String frequenciaUnidade) {
-        long segundosDaUnidade = obterSegundosDaUnidade(frequenciaUnidade);
-        return Math.max(1L, Math.round((double) segundosDaUnidade / frequenciaValor));
+        String unidade = normalizarUnidadeFrequencia(frequenciaUnidade);
+        long segundosDaUnidade = obterSegundosDaUnidade(unidade);
+
+        if (unidade.startsWith("dia")) {
+            return Math.max(1L, Math.round((double) segundosDaUnidade / frequenciaValor));
+        }
+
+        return Math.max(1L, segundosDaUnidade * frequenciaValor);
     }
 
     private long obterSegundosDaUnidade(String frequenciaUnidade) {
-        String unidade = "";
-        if (frequenciaUnidade != null) {
-            unidade = frequenciaUnidade.trim().toLowerCase();
-        }
+        String unidade = normalizarUnidadeFrequencia(frequenciaUnidade);
 
         if (unidade.startsWith("hora")) {
             return 60L * 60L;
@@ -241,5 +244,12 @@ public class PrescricaoDAO {
         }
 
         return -1L;
+    }
+
+    private String normalizarUnidadeFrequencia(String frequenciaUnidade) {
+        if (frequenciaUnidade == null) {
+            return "";
+        }
+        return frequenciaUnidade.trim().toLowerCase();
     }
 }

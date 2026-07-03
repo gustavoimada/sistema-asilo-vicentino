@@ -20,7 +20,7 @@ function formatarCargoInclusivo(categoria) {
     const valor = removerAcentos(String(categoria || "").trim()).toLowerCase();
     if (valor === "coordenador") return "Coordenador(a)";
     if (valor === "cuidador") return "Cuidador(a)";
-    if (valor === "secretaria") return "Secretária(o)";
+    if (valor === "secretaria") return "Secretaria(o)";
     return String(categoria || "").trim();
 }
 
@@ -68,6 +68,7 @@ function montarQueryContexto() {
 
 function ajustarMenuPorPerfil() {
     const query = montarQueryContexto();
+    const sufixo = `?${query}`;
 
     document.querySelectorAll(".sidebar-nav a.sidebar-link").forEach((link) => {
         const href = link.getAttribute("href") || "";
@@ -99,7 +100,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    // Carregar listas de moradores e medicamentos para ambos os formulários
+    // Carrega listas de moradores e medicamentos para os formularios.
     carregarMedicamentos();
     carregarMorador();
     carregarMedicamentos("idMedicamentoEditar");
@@ -385,7 +386,7 @@ function carregarTabela(moradorFiltro, medicamentoFiltro) {
         estadoListaPrescricao.filtros.medicamento = medicamentoFiltro;
     }
 
-    fetch(`/prescricao/listarOrdenado?valor=${estadoOrdenacaoPrescricao.valor}&ordem=${estadoOrdenacaoPrescricao.ordem}`)
+    fetch(`/caixinha/listarOrdenado?valor=${estadoOrdenacaoPrescricao.valor}&ordem=${estadoOrdenacaoPrescricao.ordem}`)
         .then(resp => resp.json())
         .then(prescricao => {
             let moradorBusca = "";
@@ -512,7 +513,7 @@ function carregarTabela(moradorFiltro, medicamentoFiltro) {
             if (linhas === "") {
                 tabela.innerHTML = `
                         <tr>
-                            <td colSpan="8">Nenhuma prescrição encontrada.</td>
+                            <td colSpan="8">Nenhum medicamento encontrado nas caixinhas.</td>
                         </tr>
                     `;
             } else {
@@ -522,10 +523,10 @@ function carregarTabela(moradorFiltro, medicamentoFiltro) {
         .catch(error => {
             tabela.innerHTML = `
                 <tr>
-                    <td colSpan="8">Erro ao carregar prescrições.</td>
+                    <td colSpan="8">Erro ao carregar caixinhas.</td>
                 </tr>
             `;
-            mostrarPopup("Erro ao listar prescrições: " + error.message, "error");
+            mostrarPopup("Erro ao listar caixinhas: " + error.message, "error");
         });
 }
 
@@ -591,7 +592,7 @@ function validarCamposCadastroPrescricao(form) {
     }
 
     if (idMorador === "") {
-        mostrarPopup("Morador é obrigatório", "error");
+        mostrarPopup("Morador e obrigatorio", "error");
         return false;
     }
 
@@ -601,7 +602,7 @@ function validarCamposCadastroPrescricao(form) {
     }
 
     if (idMedicamento === "") {
-        mostrarPopup("Medicamento é obrigatório", "error");
+        mostrarPopup("Medicamento e obrigatorio", "error");
         return false;
     }
 
@@ -611,23 +612,23 @@ function validarCamposCadastroPrescricao(form) {
     }
 
     if (frequenciaValor === "") {
-        mostrarPopup("Frequência é obrigatória", "error");
+        mostrarPopup("Frequencia e obrigatoria", "error");
         return false;
     }
 
     if (Number(frequenciaValor) <= 0) {
-        mostrarPopup("Frequência deve ser maior que zero", "error");
+        mostrarPopup("Frequencia deve ser maior que zero", "error");
         return false;
     }
 
     if (frequenciaUnidade === "") {
-        mostrarPopup("Unidade da frequência é obrigatória", "error");
+        mostrarPopup("Periodo da frequencia e obrigatorio", "error");
         return false;
     }
 
     if (tipoMedicamentoSelecionado !== "pomada") {
         if (qtdDose === "") {
-            mostrarPopup("Quantidade da dose é obrigatória", "error");
+            mostrarPopup("Quantidade da dose e obrigatoria", "error");
             return false;
         }
 
@@ -637,22 +638,22 @@ function validarCamposCadastroPrescricao(form) {
         }
     }
     if (primeiraDose === "") {
-        mostrarPopup("Horário da primeira dose é obrigatório", "error");
+        mostrarPopup("Primeiro horario e obrigatorio", "error");
         return false;
     }
 
     if (dtInicio === "") {
-        mostrarPopup("Data de início é obrigatória", "error");
+        mostrarPopup("Data de inicio e obrigatoria", "error");
         return false;
     }
 
     if (dtFim === "") {
-        mostrarPopup("Data de fim é obrigatória", "error");
+        mostrarPopup("Data de fim e obrigatoria", "error");
         return false;
     }
 
     if (dtFim < dtInicio) {
-        mostrarPopup("Data de fim não pode ser menor que a data de início", "error");
+        mostrarPopup("Data de fim nao pode ser menor que a data de inicio", "error");
         return false;
     }
 
@@ -666,12 +667,12 @@ function cadastrar(){
             method: "POST",
             body: new FormData(prescricao)
         };
-        fetch("/prescricao/cadastrar", requestOptions)
+        fetch("/caixinha/cadastrar", requestOptions)
             .then(resp =>{
                 if(resp.status === 200){
                     return resp.json()
                     .then(prescricaoCadastrada =>{
-                        mostrarPopup("Prescrição cadastrada", "success");
+                        mostrarPopup("Medicamento adicionado a caixinha", "success");
                         carregarTabela();
                         document.forms[0].reset();
                         document.getElementById("cadastroPrescricao").hidden = true;
@@ -727,21 +728,21 @@ function confirmarAcao(mensagem) {
 }
 
 async function deletarPrescricao(id) {
-    const confirmado = await confirmarAcao("Tem certeza que deseja deletar a Prescrição?");
+    const confirmado = await confirmarAcao("Tem certeza que deseja remover este medicamento da caixinha?");
     if (confirmado) {
-        fetch("/prescricao/" + id, {
+        fetch("/caixinha/" + id, {
             method: "DELETE"
         })
             .then(response => {
                 if (response.status === 200) {
-                    mostrarPopup("Prescrição deletada com sucesso!", "success");
+                    mostrarPopup("Medicamento removido da caixinha", "success");
                     carregarTabela();
                 } else {
-                    mostrarPopup("Nao foi possivel deletar a prescrição.", "error");
+                    mostrarPopup("Nao foi possivel remover o medicamento da caixinha.", "error");
                 }
             })
             .catch(error => {
-                mostrarPopup("Erro ao deletar prescrição: " + error.message, "error");
+                mostrarPopup("Erro ao remover medicamento da caixinha: " + error.message, "error");
             });
     }
 }
@@ -791,7 +792,7 @@ function salvarEdicaoPrescricao(id) {
     params.append("dtInicio", document.getElementById("dtInicioEditar").value);
     params.append("dtFim", document.getElementById("dtFimEditar").value);
 
-    fetch("/prescricao/" + id, {
+    fetch("/caixinha/" + id, {
         method: "PUT",
         headers: {
             "Content-Type": "application/x-www-form-urlencoded"
@@ -801,7 +802,7 @@ function salvarEdicaoPrescricao(id) {
     .then(response => {
         if (response.status === 200) {
             return response.json().then(editada => {
-                mostrarPopup("Prescricao editada com sucesso", "success");
+                mostrarPopup("Medicamento da caixinha atualizado", "success");
                 document.getElementById("editorPrescricao").hidden = true;
                 carregarTabela();
             });
@@ -811,7 +812,7 @@ function salvarEdicaoPrescricao(id) {
         });
     })
     .catch(error => {
-        mostrarPopup("Erro ao editar prescricao: " + error.message, "error");
+        mostrarPopup("Erro ao editar medicamento da caixinha: " + error.message, "error");
     });
 }
 

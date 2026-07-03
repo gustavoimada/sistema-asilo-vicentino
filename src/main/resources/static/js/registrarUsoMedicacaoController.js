@@ -427,7 +427,7 @@ function renderizarPrescricoesPendentes(listaPrescricoes) {
                                         <span class="material-symbols-outlined small-icon">pill</span>
                                         <p>${medicamentoTexto}</p>
                                     </div>
-                                    <p class="schedule-text">Horario Prescrito: <strong>${horarioPrescrito}</strong></p>
+                                    <p class="schedule-text">Horario Programado: <strong>${horarioPrescrito}</strong></p>
                                 </div>
                             </div>
 
@@ -557,7 +557,7 @@ function carregarPrescricoes() {
             }
         }
 
-        fetch("/prescricaodose/listarHoje?" + params)
+        fetch("/caixinhadose/listarHoje?" + params)
             .then(resp => resp.json())
             .then(prescricaoDose => {
                 let lista = [];
@@ -570,7 +570,7 @@ function carregarPrescricoes() {
             .catch(error => {
                 atualizarContadorPendentes(0);
                 html.innerHTML = "<p>Erro ao carregar pendencias.</p>";
-                mostrarPopup("Erro ao listar prescricoes: " + error.message, "error");
+                mostrarPopup("Erro ao listar medicamentos: " + error.message, "error");
             });
     }
 }
@@ -596,7 +596,7 @@ function carregarPrescricoesAtrasadas() {
             }
         }
 
-        fetch("/prescricaodose/listarAtrasadasDiasAnteriores?" + params)
+        fetch("/caixinhadose/listarAtrasadasDiasAnteriores?" + params)
             .then(resp => resp.json())
             .then(prescricaoDose => {
                 let lista = [];
@@ -786,7 +786,7 @@ async function deletarRegistroUso(idRegistroUso) {
 }
 
 function atualizar(id) {
-    return fetch("/prescricaodose/" + id, {
+    return fetch("/caixinhadose/" + id, {
         method: "PUT"
     })
         .then(response => {

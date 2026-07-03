@@ -12,7 +12,7 @@ Este projeto tambem esta sendo preparado para deploy real em producao, com banco
 
 ## Objetivo
 
-A proposta do sistema e organizar processos essenciais do Asilo Vicentino em uma plataforma unica. A parte publica apresenta informacoes institucionais, noticias, documentos de transparencia e canal de doacoes. A parte administrativa permite que a equipe interna gerencie moradores, funcionarios, atividades, medicamentos, prescricoes, ocorrencias, turnos, despesas e relatorios.
+A proposta do sistema e organizar processos essenciais do Asilo Vicentino em uma plataforma unica. A parte publica apresenta informacoes institucionais, noticias, documentos de transparencia e canal de doacoes. A parte administrativa permite que a equipe interna gerencie moradores, funcionarios, atividades, medicamentos, caixinhas de medicamentos, ocorrencias, turnos, despesas e relatorios.
 
 O projeto foi estruturado para demonstrar dominio de desenvolvimento web completo com Java, Spring Boot, PostgreSQL, controle de acesso, uploads de arquivos, integracao com banco relacional e preparacao para deploy em servidor real.
 
@@ -31,7 +31,7 @@ O projeto foi estruturado para demonstrar dominio de desenvolvimento web complet
 - Cadastro e acompanhamento de moradores com contato responsavel.
 - Controle de quartos e disponibilidade.
 - Cadastro simplificado de contato responsavel vinculado ao morador.
-- Cadastro de medicamentos e prescricoes.
+- Cadastro de medicamentos e caixinhas por morador.
 - Registro de uso de medicacao.
 - Cadastro de tipos de ocorrencia.
 - Registro e consulta de ocorrencias.
@@ -146,14 +146,16 @@ src/
 - `DELETE /morador/{id}` remove morador e desvincula o contato responsavel.
 - `GET /composicaoFamiliar/listar` recupera o contato vinculado ao morador.
 
-### Medicamentos e Prescricoes
+### Medicamentos e Caixinhas
 
 - `GET /medicamentos/listar` lista medicamentos.
 - `POST /medicamentos/cadastrar` cadastra medicamento.
-- `GET /prescricao/listar` lista prescricoes.
-- `POST /prescricao/cadastrar` cadastra prescricao.
-- `GET /prescricaodose/listarHoje` lista doses do dia.
+- `GET /caixinha/listar` lista medicamentos organizados nas caixinhas dos moradores.
+- `POST /caixinha/cadastrar` adiciona medicamento a caixinha de um morador.
+- `GET /caixinhadose/listarHoje` lista doses programadas do dia.
 - `GET /registrarusomedicacao/listar` lista registros de uso.
+
+As rotas antigas de prescricao foram mantidas como compatibilidade interna para bancos ja existentes, mas o fluxo administrativo atual usa caixinhas de medicamentos.
 
 ### Ocorrencias e Turnos
 

@@ -10,7 +10,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @RestController
-@RequestMapping("prescricaodose")
+@RequestMapping({"prescricaodose", "caixinhadose"})
 public class PrescricaoDoseControl {
     @GetMapping("listarHoje")
     public ResponseEntity<Object> listarHoje(
