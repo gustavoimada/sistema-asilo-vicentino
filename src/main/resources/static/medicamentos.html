@@ -7,7 +7,7 @@
 
   <link rel="stylesheet" href="css/funcionario.css" />
   <link rel="stylesheet" href="css/cadastroMedicamento.css?v=2" />
-  <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1" />
+  <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260705-2" />
 
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap"
         rel="stylesheet" />
@@ -18,115 +18,80 @@
 <body onload="listarMedicamentos()">
 
 <div class="page">
-
-  <aside class="sidebar">
-    <div class="sidebar-brand">
-      <div class="sidebar-brand-main">
-        <img src="assets/logo.png" alt="Logo Asilo Vicentino" />
-        <h1>SGAV</h1>
+    <aside class="sidebar" data-secretaria-sidebar="true">
+      <div class="sidebar-brand">
+        <div class="sidebar-brand-main">
+          <img src="assets/logo.png" alt="Logo Asilo Vicentino" />
+          <h1>SGAV</h1>
+        </div>
       </div>
-    </div>
 
-    <nav class="sidebar-nav">
-      <a href="secretaria.html" class="sidebar-link">
-        <span class="material-symbols-outlined">dashboard</span>
-        <span>Painel</span>
-      </a>
+      <nav class="sidebar-nav">
+        <a href="secretaria.html" class="sidebar-link">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span>Painel</span>
+        </a>
 
-      <details class="sidebar-group">
-        <summary class="sidebar-link sidebar-group-toggle">
-          <span class="material-symbols-outlined">groups</span>
+        <a href="morador.html" class="sidebar-link">
+          <span class="material-symbols-outlined">elderly</span>
           <span>Moradores</span>
-          <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
-        </summary>
-        <div class="sidebar-submenu">
-          <a href="morador.html" class="sidebar-link sidebar-sublink">
-            <span class="material-symbols-outlined">elderly</span>
-            <span>Cadastro de Morador</span>
-          </a>
-        </div>
-      </details>
+        </a>
 
-      <a href="funcionario.html" class="sidebar-link">
-        <span class="material-symbols-outlined">badge</span>
-        <span>Funcionarios</span>
-      </a>
+        <a href="quartos.html" class="sidebar-link">
+          <span class="material-symbols-outlined">bed</span>
+          <span>Quartos</span>
+        </a>
 
-      <a href="medicamentos.html" class="sidebar-link active">
-        <span class="material-symbols-outlined">medical_services</span>
-        <span>Medicamentos</span>
-      </a>
+        <a href="funcionario.html" class="sidebar-link">
+          <span class="material-symbols-outlined">badge</span>
+          <span>Funcionarios</span>
+        </a>
 
-      <a href="caixinhas.html" class="sidebar-link">
-        <span class="material-symbols-outlined">inventory_2</span>
-        <span>Caixinhas</span>
-      </a>
+        <a href="medicamentos.html" class="sidebar-link active">
+          <span class="material-symbols-outlined">medical_services</span>
+          <span>Medicamentos</span>
+        </a>
 
-      <a href="tipoOcorrencia.html" class="sidebar-link">
-        <span class="material-symbols-outlined">assignment_late</span>
-        <span>Tipo de Ocorrencia</span>
-      </a>
+        <a href="caixinhas.html" class="sidebar-link">
+          <span class="material-symbols-outlined">inventory_2</span>
+          <span>Caixinhas</span>
+        </a>
 
-      <a href="doacao.html" class="sidebar-link">
-        <span class="material-symbols-outlined">volunteer_activism</span>
-        <span>Doacoes</span>
-      </a>
-      <a href="noticias.html" class="sidebar-link">
-        <span class="material-symbols-outlined">newspaper</span>
-        <span>Noticias</span>
-      </a>
-
-      <a href="quartos.html" class="sidebar-link">
-        <span class="material-symbols-outlined">bed</span>
-        <span>Quartos</span>
-      </a>
-
-      <details class="sidebar-group">
-        <summary class="sidebar-link sidebar-group-toggle">
-          <span class="material-symbols-outlined">event</span>
+        <a href="atividades.html" class="sidebar-link">
+          <span class="material-symbols-outlined">event_note</span>
           <span>Atividades</span>
-          <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
-        </summary>
-        <div class="sidebar-submenu">
-          <a href="tipoAtividades.html" class="sidebar-link sidebar-sublink">
-            <span class="material-symbols-outlined">category</span>
-            <span>Tipos de Atividades</span>
-          </a>
-          <a href="atividades.html" class="sidebar-link sidebar-sublink">
-            <span class="material-symbols-outlined">event_note</span>
-            <span>Atividades</span>
-          </a>
-        </div>
-      </details>
+        </a>
 
-      <details class="sidebar-group">
-        <summary class="sidebar-link sidebar-group-toggle">
-          <span class="material-symbols-outlined">payments</span>
+        <a href="doacao.html" class="sidebar-link">
+          <span class="material-symbols-outlined">volunteer_activism</span>
+          <span>Doacoes</span>
+        </a>
+
+        <a href="despesa.html" class="sidebar-link">
+          <span class="material-symbols-outlined">request_quote</span>
           <span>Despesas</span>
-          <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
-        </summary>
-        <div class="sidebar-submenu">
-          <a href="tiposDespesas.html" class="sidebar-link sidebar-sublink">
-            <span class="material-symbols-outlined">receipt_long</span>
-            <span>Tipos de Despesas</span>
-          </a>
-          <a href="despesa.html" class="sidebar-link sidebar-sublink">
-            <span class="material-symbols-outlined">request_quote</span>
-            <span>Pagamento de Despesas</span>
-          </a>
-        </div>
-      </details>
-    </nav>
+        </a>
 
-    <div class="sidebar-footer">
-      <a href="login.html" class="sidebar-link logout">
-        <span class="material-symbols-outlined">logout</span>
-        <span>Sair</span>
-      </a>
-    </div>
-  </aside>
+        <a href="noticias.html" class="sidebar-link">
+          <span class="material-symbols-outlined">newspaper</span>
+          <span>Noticias</span>
+        </a>
+      </nav>
 
-  <main class="main-area">
+      <div class="sidebar-footer">
+        <a href="coordenador.html" class="sidebar-link secretaria-panel-link" id="linkPainelCoordenador" style="display: none;">
+          <span class="material-symbols-outlined">admin_panel_settings</span>
+          <span>Painel do Coordenador</span>
+        </a>
+
+        <a href="login.html" class="sidebar-link logout">
+          <span class="material-symbols-outlined">logout</span>
+          <span>Sair</span>
+        </a>
+      </div>
+    </aside>
+
+<main class="main-area">
     <header class="topbar">
       <div class="topbar-left"></div>
       <div class="topbar-right">
@@ -334,6 +299,7 @@
 </div>
 
 <script src="js/medicamentoController.js"></script>
+  <script src="js/sidebarSecretaria.js?v=20260705-1"></script>
 </body>
 
 </html>

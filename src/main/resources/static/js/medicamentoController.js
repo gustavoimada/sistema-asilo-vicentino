@@ -719,7 +719,7 @@ function salvarEdicaoMedicamento(id) {
 }
 
 async function deletarMedicamento(id) {
-    const confirmado = await confirmarAcao("Tem certeza que deseja deletar o medicamento ID " + id + "?");
+    const confirmado = await confirmarAcao("Tem certeza que deseja deletar este medicamento?");
     if (confirmado) {
         fetch("/medicamentos/" + id, {
             method: "DELETE"

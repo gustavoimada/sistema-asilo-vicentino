@@ -8,6 +8,8 @@ var escalasOriginais = {};
 var escalasRemovidas = {};
 var datasSemana = {};
 var escalasConflitoExternas = [];
+var STORAGE_MODELO_ESCALA = "sgav.modeloEscalaSemanal.v1";
+var planoPreviewAtual = null;
 
 function preencherPerfilTopo()
 {
@@ -220,6 +222,408 @@ function validarRegrasEscalasAtuais()
     }
 
     return "";
+}
+
+function obterCuidadorPorId(idFuncionario)
+{
+    for (var i = 0; i < cuidadores.length; i++)
+    {
+        if (Number(cuidadores[i].idFuncionario) === Number(idFuncionario))
+        {
+            return cuidadores[i];
+        }
+    }
+    return null;
+}
+
+function obterNomeCuidador(idFuncionario)
+{
+    var cuidador = obterCuidadorPorId(idFuncionario);
+    return cuidador ? cuidador.nome || "Sem nome" : "Cuidador(a) nao encontrado(a)";
+}
+
+function escapeHtml(valor)
+{
+    return String(valor == null ? "" : valor)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+function obterNomeDia(dia)
+{
+    var nomes = {
+        dom: "Domingo",
+        seg: "Segunda-feira",
+        ter: "Terca-feira",
+        qua: "Quarta-feira",
+        qui: "Quinta-feira",
+        sex: "Sexta-feira",
+        sab: "Sabado"
+    };
+    return nomes[dia] || dia;
+}
+
+function obterDetalhesTurno(turnoId)
+{
+    return Number(turnoId) === 2
+        ? { nome: "Noite", horario: "19:00 - 07:00" }
+        : { nome: "Manha", horario: "07:00 - 19:00" };
+}
+
+function obterNomeTurno(turnoId)
+{
+    var turno = obterDetalhesTurno(turnoId);
+    return turno.nome + " (" + turno.horario + ")";
+}
+
+function montarItemPlano(dia, turnoId, cuidadorId, origem)
+{
+    return {
+        dia: dia,
+        turnoId: Number(turnoId),
+        cuidadorId: Number(cuidadorId),
+        dataEscala: datasSemana[dia],
+        origem: origem || ""
+    };
+}
+
+function validarPlanoEscala(plano)
+{
+    var itensValidados = [];
+    var itensComparacao = [];
+    var alertas = [];
+
+    for (var i = 0; i < plano.length; i++)
+    {
+        var item = Object.assign({}, plano[i]);
+        item.conflito = "";
+
+        if (!item.dataEscala)
+        {
+            item.conflito = "Data da escala nao encontrada.";
+        }
+        else if (diaPassado(item.dia))
+        {
+            item.conflito = "Este dia ja passou.";
+        }
+        else if (!obterCuidadorPorId(item.cuidadorId))
+        {
+            item.conflito = "Cuidador(a) nao encontrado(a).";
+        }
+
+        for (var j = 0; !item.conflito && j < itensComparacao.length; j++)
+        {
+            var comparada = itensComparacao[j];
+            if (Number(comparada.cuidadorId) !== Number(item.cuidadorId))
+            {
+                continue;
+            }
+
+            var mesmoTurno = comparada.dia === item.dia && Number(comparada.turnoId) === Number(item.turnoId);
+            item.conflito = obterMensagemConflitoDescanso(item, comparada, mesmoTurno);
+        }
+
+        for (var e = 0; !item.conflito && e < escalasConflitoExternas.length; e++)
+        {
+            var externa = escalasConflitoExternas[e];
+            if (Number(externa.cuidadorId) !== Number(item.cuidadorId))
+            {
+                continue;
+            }
+            item.conflito = obterMensagemConflitoDescanso(item, externa, false);
+        }
+
+        if (item.conflito)
+        {
+            alertas.push(obterNomeDia(item.dia) + " - " + obterNomeTurno(item.turnoId) + ": " + item.conflito);
+        }
+        else
+        {
+            itensComparacao.push(item);
+        }
+
+        itensValidados.push(item);
+    }
+
+    return {
+        itens: itensValidados,
+        alertas: alertas,
+        temConflitos: alertas.length > 0
+    };
+}
+
+function fecharPreviewEscala()
+{
+    planoPreviewAtual = null;
+    var modal = document.getElementById("previewEscalaModal");
+    if (modal) modal.style.display = "none";
+}
+
+function mostrarPreviewEscala(titulo, plano)
+{
+    var modal = document.getElementById("previewEscalaModal");
+    var tituloEl = document.getElementById("previewEscalaTitulo");
+    var resumoEl = document.getElementById("previewEscalaResumo");
+    var listaEl = document.getElementById("previewEscalaLista");
+    var alertasEl = document.getElementById("previewEscalaAlertas");
+    var confirmarBtn = document.getElementById("confirmarPreviewEscalaBtn");
+
+    if (!modal || !tituloEl || !resumoEl || !listaEl || !alertasEl || !confirmarBtn)
+    {
+        return;
+    }
+
+    if (!plano.length)
+    {
+        showToast("error", "Nao ha escalas para aplicar nesta semana.");
+        return;
+    }
+
+    var resultado = validarPlanoEscala(plano);
+    planoPreviewAtual = resultado.temConflitos ? null : resultado.itens;
+
+    tituloEl.textContent = titulo;
+    resumoEl.textContent = resultado.itens.length + " escala(s) para preencher na semana atual.";
+    confirmarBtn.disabled = resultado.temConflitos;
+
+    alertasEl.innerHTML = resultado.alertas.map(function(alerta)
+    {
+        return '<div class="preview-alert">' + escapeHtml(alerta) + "</div>";
+    }).join("");
+
+    var linhasPreview = resultado.itens.map(function(item)
+    {
+        var classe = item.conflito ? "preview-item is-conflict" : "preview-item";
+        var turno = obterDetalhesTurno(item.turnoId);
+        var statusClasse = item.conflito ? "preview-status is-conflict" : "preview-status";
+        var statusTexto = item.conflito || "Pronto para aplicar";
+
+        return '' +
+            '<div class="' + classe + '">' +
+                '<div class="preview-cell preview-day">' +
+                    '<span class="preview-label">Dia da semana</span>' +
+                    "<strong>" + escapeHtml(obterNomeDia(item.dia)) + "</strong>" +
+                "</div>" +
+                '<div class="preview-cell preview-shift">' +
+                    '<span class="preview-label">Turno</span>' +
+                    "<strong>" + escapeHtml(turno.nome) + "</strong>" +
+                    "<small>" + escapeHtml(turno.horario) + "</small>" +
+                "</div>" +
+                '<div class="preview-cell preview-worker">' +
+                    '<span class="preview-label">Funcionario</span>' +
+                    "<span>" + escapeHtml(obterNomeCuidador(item.cuidadorId)) + "</span>" +
+                "</div>" +
+                '<div class="preview-cell">' +
+                    '<span class="preview-label">Status</span>' +
+                    '<span class="' + statusClasse + '">' + escapeHtml(statusTexto) + "</span>" +
+                "</div>" +
+            "</div>";
+    }).join("");
+
+    listaEl.innerHTML = '' +
+        '<div class="preview-grid-header">' +
+            "<span>Dia da semana</span>" +
+            "<span>Turno</span>" +
+            "<span>Funcionario</span>" +
+            "<span>Status</span>" +
+        "</div>" +
+        linhasPreview;
+
+    modal.style.display = "flex";
+}
+
+function removerEscalasEditaveisDaSemana()
+{
+    var atuais = Object.keys(escalasController).map(function(key)
+    {
+        return escalasController[key];
+    });
+
+    for (var i = 0; i < atuais.length; i++)
+    {
+        var escala = atuais[i];
+        if (!escala || diaPassado(escala.dia))
+        {
+            continue;
+        }
+        removerCuidador(escala.dia, escala.turnoId, escala.cuidadorId, escala.dataEscala);
+    }
+}
+
+function adicionarItemPlanoNaTela(item)
+{
+    var cuidador = obterCuidadorPorId(item.cuidadorId);
+    if (!cuidador || !item.dataEscala || diaPassado(item.dia))
+    {
+        return false;
+    }
+
+    var turnoNome = Number(item.turnoId) === 1 ? "manha" : "noite";
+    var elem = document.getElementById(item.dia + "-" + turnoNome);
+    if (!elem)
+    {
+        return false;
+    }
+
+    var key = item.dia + "_" + item.turnoId + "_" + item.cuidadorId;
+    if (escalasController[key])
+    {
+        return false;
+    }
+
+    var conflito = encontrarConflitoEscala(item.cuidadorId, item.dia, item.turnoId, item.dataEscala);
+    if (conflito)
+    {
+        return false;
+    }
+
+    var chip = montarChip(cuidador, item.dia, item.turnoId, item.dataEscala, false);
+    elem.appendChild(chip);
+    escalasController[key] = {
+        dia: item.dia,
+        turnoId: item.turnoId,
+        cuidadorId: item.cuidadorId,
+        dataEscala: item.dataEscala
+    };
+
+    if (escalasRemovidas[key])
+    {
+        delete escalasRemovidas[key];
+    }
+
+    return true;
+}
+
+function aplicarPlanoPreview()
+{
+    if (!planoPreviewAtual || !planoPreviewAtual.length)
+    {
+        showToast("error", "Revise os conflitos antes de aplicar.");
+        return;
+    }
+
+    removerEscalasEditaveisDaSemana();
+
+    var aplicadas = 0;
+    for (var i = 0; i < planoPreviewAtual.length; i++)
+    {
+        if (adicionarItemPlanoNaTela(planoPreviewAtual[i]))
+        {
+            aplicadas++;
+        }
+    }
+
+    fecharPreviewEscala();
+    showToast("success", aplicadas + " escala(s) aplicada(s) na tela. Clique em salvar para gravar.");
+}
+
+function obterModeloAtualDaTela()
+{
+    return Object.keys(escalasController)
+        .map(function(key)
+        {
+            var escala = escalasController[key];
+            return {
+                dia: escala.dia,
+                turnoId: Number(escala.turnoId),
+                cuidadorId: Number(escala.cuidadorId)
+            };
+        })
+        .sort(function(a, b)
+        {
+            var diaA = diasSemana.indexOf(a.dia);
+            var diaB = diasSemana.indexOf(b.dia);
+            if (diaA !== diaB) return diaA - diaB;
+            if (a.turnoId !== b.turnoId) return a.turnoId - b.turnoId;
+            return a.cuidadorId - b.cuidadorId;
+        });
+}
+
+function salvarModeloSemanal()
+{
+    var modelo = obterModeloAtualDaTela();
+    if (!modelo.length)
+    {
+        showToast("error", "Monte uma semana antes de salvar como modelo.");
+        return;
+    }
+
+    localStorage.setItem(STORAGE_MODELO_ESCALA, JSON.stringify({
+        criadoEm: new Date().toISOString(),
+        itens: modelo
+    }));
+    showToast("success", "Modelo semanal salvo para este navegador.");
+}
+
+function aplicarModeloSemanal()
+{
+    var salvo = localStorage.getItem(STORAGE_MODELO_ESCALA);
+    if (!salvo)
+    {
+        showToast("error", "Nenhum modelo semanal salvo ainda.");
+        return;
+    }
+
+    try
+    {
+        var modelo = JSON.parse(salvo);
+        var itens = Array.isArray(modelo.itens) ? modelo.itens : [];
+        var plano = itens.map(function(item)
+        {
+            return montarItemPlano(item.dia, item.turnoId, item.cuidadorId, "modelo");
+        });
+        mostrarPreviewEscala("Aplicar modelo semanal", plano);
+    }
+    catch (e)
+    {
+        showToast("error", "Modelo salvo esta invalido. Salve um novo modelo.");
+    }
+}
+
+function buscarEscalasPeriodo(inicio, fim)
+{
+    return fetch("/funcionarioTurnos/listarPeriodo?inicio=" + inicio + "&fim=" + fim)
+        .then(function(response)
+        {
+            return response.json();
+        })
+        .then(function(body)
+        {
+            if (Array.isArray(body)) return body;
+            if (body && Array.isArray(body.escalas)) return body.escalas;
+            return [];
+        });
+}
+
+function copiarSemanaAnterior()
+{
+    var semana = obterSemana(semanaAtual);
+    var inicioAnterior = new Date(semana.inicio);
+    inicioAnterior.setDate(inicioAnterior.getDate() - 7);
+    var fimAnterior = new Date(semana.fim);
+    fimAnterior.setDate(fimAnterior.getDate() - 7);
+
+    buscarEscalasPeriodo(formatDateIso(inicioAnterior), formatDateIso(fimAnterior))
+        .then(function(lista)
+        {
+            var plano = [];
+            for (var i = 0; i < lista.length; i++)
+            {
+                var item = lista[i];
+                if (!item.dataEscala) continue;
+                var dataRef = new Date(item.dataEscala + "T00:00:00");
+                var dia = diasSemana[dataRef.getDay()];
+                plano.push(montarItemPlano(dia, Number(item.idTurno), Number(item.idFuncionario), "semana-anterior"));
+            }
+            mostrarPreviewEscala("Copiar semana anterior", plano);
+        })
+        .catch(function()
+        {
+            showToast("error", "Nao foi possivel carregar a semana anterior.");
+        });
 }
 
 function aplicarEstadoDiasPassados()
@@ -732,6 +1136,18 @@ function setupEventListeners()
     });
 
     document.getElementById("salvarEscalasBtn").addEventListener("click", salvarEscalas);
+
+    var copiarBtn = document.getElementById("copiarSemanaBtn");
+    var salvarModeloBtn = document.getElementById("salvarModeloBtn");
+    var aplicarModeloBtn = document.getElementById("aplicarModeloBtn");
+    var cancelarPreviewBtn = document.getElementById("cancelarPreviewEscalaBtn");
+    var confirmarPreviewBtn = document.getElementById("confirmarPreviewEscalaBtn");
+
+    if (copiarBtn) copiarBtn.addEventListener("click", copiarSemanaAnterior);
+    if (salvarModeloBtn) salvarModeloBtn.addEventListener("click", salvarModeloSemanal);
+    if (aplicarModeloBtn) aplicarModeloBtn.addEventListener("click", aplicarModeloSemanal);
+    if (cancelarPreviewBtn) cancelarPreviewBtn.addEventListener("click", fecharPreviewEscala);
+    if (confirmarPreviewBtn) confirmarPreviewBtn.addEventListener("click", aplicarPlanoPreview);
 }
 
 document.addEventListener("click", function(e)
@@ -740,5 +1156,11 @@ document.addEventListener("click", function(e)
     if (modal && e.target === modal)
     {
         fecharSelectorModal();
+    }
+
+    var previewModal = document.getElementById("previewEscalaModal");
+    if (previewModal && e.target === previewModal)
+    {
+        fecharPreviewEscala();
     }
 });

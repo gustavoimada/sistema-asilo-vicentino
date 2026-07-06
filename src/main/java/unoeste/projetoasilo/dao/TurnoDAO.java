@@ -7,7 +7,6 @@ import unoeste.projetoasilo.entities.Turno;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -17,13 +16,19 @@ import java.util.List;
 
 public class TurnoDAO
 {
+    private static final String SQL_HORA_INICIO_PREVISTA = " CASE WHEN ft.Turnos_idTurnos = 2 THEN TIME '19:00' ELSE TIME '07:00' END ";
+    private static final String SQL_HORA_FIM_PREVISTA = " CASE WHEN ft.Turnos_idTurnos = 2 THEN TIME '07:00' ELSE TIME '19:00' END ";
+    private static final String SQL_HORA_INICIO_EFETIVA = " COALESCE(NULLIF(ft.horaInicio, '')::time, " + SQL_HORA_INICIO_PREVISTA + ") ";
+    private static final String SQL_HORA_FIM_EFETIVA = " COALESCE(NULLIF(ft.horaFim, '')::time, " + SQL_HORA_FIM_PREVISTA + ") ";
     private static final String SQL_SELECT_RESUMO_TURNO = """
             SELECT ft.idFuncionarioTurnos,
                    ft.Funcionario_idFuncionario,
                    f.nome AS nomeFuncionario,
                    ft.Turnos_idTurnos,
-                   t.horaIni AS horaPrevistaInicio,
-                   t.horaFim AS horaPrevistaFim,
+                   """ + SQL_HORA_INICIO_PREVISTA + """
+                   AS horaPrevistaInicio,
+                   """ + SQL_HORA_FIM_PREVISTA + """
+                   AS horaPrevistaFim,
                    ft.dataEscala,
                    ft.horaInicio,
                    ft.horaFim,
@@ -31,7 +36,6 @@ public class TurnoDAO
                    ft.descricao
             FROM funcionarioturnos ft
             INNER JOIN funcionario f ON f.idFuncionario = ft.Funcionario_idFuncionario
-            INNER JOIN turnos t ON t.idTurnos = ft.Turnos_idTurnos
             """;
     private static final String SQL_ORDER_FIM_REAL_TURNO = """
             ORDER BY
@@ -39,15 +43,16 @@ public class TurnoDAO
                     ft.dataEscala
                     + CASE
                         WHEN ft.Turnos_idTurnos = 2
-                             AND COALESCE(ft.horaFim, t.horaFim) IS NOT NULL
-                             AND COALESCE(ft.horaInicio, t.horaIni) IS NOT NULL
-                             AND COALESCE(ft.horaFim, t.horaFim) <= COALESCE(ft.horaInicio, t.horaIni)
+                             AND """ + SQL_HORA_FIM_EFETIVA + """
+                             <= """ + SQL_HORA_INICIO_EFETIVA + """
                         THEN INTERVAL '1 day'
                         ELSE INTERVAL '0 day'
                       END
                 ) DESC,
-                COALESCE(ft.horaFim, t.horaFim) DESC NULLS LAST,
-                COALESCE(ft.horaInicio, t.horaIni) DESC NULLS LAST,
+                """ + SQL_HORA_FIM_EFETIVA + """
+                DESC NULLS LAST,
+                """ + SQL_HORA_INICIO_EFETIVA + """
+                DESC NULLS LAST,
                 ft.idFuncionarioTurnos DESC
             """;
     private static final String SQL_ESCALA_VENCIDA_SEM_INICIO = """
@@ -56,21 +61,22 @@ public class TurnoDAO
             AND (
                 ft.dataEscala
                 + CASE WHEN ft.Turnos_idTurnos = 2 THEN INTERVAL '1 day' ELSE INTERVAL '0 day' END
-                + COALESCE(NULLIF(t.horaFim, '')::time, TIME '23:59:59')
+                + """ + SQL_HORA_FIM_PREVISTA + """
             ) < CURRENT_TIMESTAMP
             """;
 
     public Turno buscarTurnoAtivoPorFuncionario(int idFuncionario, Banco conexao) throws SQLException
     {
         String sql = """
-                SELECT t.idTurnos,
-                       COALESCE(ft.horaInicio, t.horaIni) AS horaIni,
-                       COALESCE(ft.horaFim, t.horaFim) AS horaFim
+                SELECT ft.Turnos_idTurnos,
+                       """ + SQL_HORA_INICIO_EFETIVA + """
+                       AS horaIni,
+                       """ + SQL_HORA_FIM_EFETIVA + """
+                       AS horaFim
                 FROM funcionarioturnos ft
-                INNER JOIN turnos t ON t.idTurnos = ft.Turnos_idTurnos
                 WHERE ft.Funcionario_idFuncionario = #1
                 AND ft.status = 'ativo'
-                ORDER BY ft.dataEscala DESC, t.idTurnos DESC
+                ORDER BY ft.dataEscala DESC, ft.Turnos_idTurnos DESC
                 LIMIT 1
                 """;
         sql = sql.replace("#1", String.valueOf(idFuncionario));
@@ -78,7 +84,7 @@ public class TurnoDAO
 
         if (rs != null && rs.next())
         {
-            return popularTurno(rs, "idTurnos");
+            return popularTurno(rs, "Turnos_idTurnos");
         }
 
         return null;
@@ -107,10 +113,11 @@ public class TurnoDAO
         String dataHoje = new SimpleDateFormat("yyyy-MM-dd").format(new Timestamp(System.currentTimeMillis()));
         String sql = """
                 SELECT ft.Turnos_idTurnos,
-                       COALESCE(ft.horaInicio, t.horaIni) AS horaIni,
-                       COALESCE(ft.horaFim, t.horaFim) AS horaFim
+                       """ + SQL_HORA_INICIO_EFETIVA + """
+                       AS horaIni,
+                       """ + SQL_HORA_FIM_EFETIVA + """
+                       AS horaFim
                 FROM funcionarioturnos ft
-                INNER JOIN turnos t ON t.idTurnos = ft.Turnos_idTurnos
                 WHERE ft.Funcionario_idFuncionario = #1
                 AND ft.dataEscala = '#2'
                 AND ft.status = 'pendente'
@@ -428,11 +435,11 @@ public class TurnoDAO
         Turno turno = new Turno();
         turno.setIdTurnos(rs.getInt(colunaId));
 
-        Time horaIni = rs.getTime("horaIni");
-        Time horaFim = rs.getTime("horaFim");
+        LocalTime horaIni = horaResultado(rs, "horaIni");
+        LocalTime horaFim = horaResultado(rs, "horaFim");
         if (horaIni != null)
         {
-            turno.setHoraIni(horaIni.toLocalTime());
+            turno.setHoraIni(horaIni);
         }
         else
         {
@@ -441,7 +448,7 @@ public class TurnoDAO
 
         if (horaFim != null)
         {
-            turno.setHoraFim(horaFim.toLocalTime());
+            turno.setHoraFim(horaFim);
         }
         else
         {
@@ -459,11 +466,11 @@ public class TurnoDAO
         Turno turno = new Turno();
         turno.setIdTurnos(rs.getInt("Turnos_idTurnos"));
 
-        Time horaPrevistaInicio = rs.getTime("horaPrevistaInicio");
-        Time horaPrevistaFim = rs.getTime("horaPrevistaFim");
+        LocalTime horaPrevistaInicio = horaResultado(rs, "horaPrevistaInicio");
+        LocalTime horaPrevistaFim = horaResultado(rs, "horaPrevistaFim");
         if (horaPrevistaInicio != null)
         {
-            turno.setHoraIni(horaPrevistaInicio.toLocalTime());
+            turno.setHoraIni(horaPrevistaInicio);
         }
         else
         {
@@ -472,7 +479,7 @@ public class TurnoDAO
 
         if (horaPrevistaFim != null)
         {
-            turno.setHoraFim(horaPrevistaFim.toLocalTime());
+            turno.setHoraFim(horaPrevistaFim);
         }
         else
         {
@@ -486,21 +493,37 @@ public class TurnoDAO
         escala.setStatus(rs.getString("status"));
         escala.setDescricao(rs.getString("descricao"));
 
-        Time horaInicio = rs.getTime("horaInicio");
-        Time horaFim = rs.getTime("horaFim");
+        LocalTime horaInicio = horaResultado(rs, "horaInicio");
+        LocalTime horaFim = horaResultado(rs, "horaFim");
         if (horaInicio != null)
         {
-            escala.setHoraInicio(horaInicio.toLocalTime());
+            escala.setHoraInicio(horaInicio);
         }
         if (horaFim != null)
         {
-            escala.setHoraFim(horaFim.toLocalTime());
+            escala.setHoraFim(horaFim);
         }
         if (rs.getDate("dataEscala") != null)
         {
             escala.setDataEscala(rs.getDate("dataEscala").toLocalDate());
         }
         return escala;
+    }
+
+    private LocalTime horaResultado(ResultSet rs, String coluna) throws SQLException
+    {
+        String valor = rs.getString(coluna);
+        if (valor == null || valor.isBlank())
+        {
+            return null;
+        }
+
+        String texto = valor.trim();
+        if (texto.length() == 5)
+        {
+            texto += ":00";
+        }
+        return LocalTime.parse(texto);
     }
 
     private String textoSql(String valor)

@@ -7,9 +7,9 @@ import unoeste.projetoasilo.entities.Morador;
 import unoeste.projetoasilo.entities.Ocorrencia;
 import unoeste.projetoasilo.entities.TipoOcorrencia;
 import unoeste.projetoasilo.entities.Turno;
+import unoeste.projetoasilo.util.TurnosPadrao;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -57,11 +57,10 @@ public class OcorrenciaDAO
                 SELECT o.idOcorrencia, o.observacoes, o.dtOcorrencia,
                        tpo.idOcorrencias, tpo.descricao, tpo.gravidade,
                        f.idfuncionario, f.nome,
-                       t.idTurnos, t.horaIni, t.horaFim
+                       o.Turnos_idTurnos AS idTurnos
                 FROM ocorrencias o
                 INNER JOIN tiposocorrencias tpo ON tpo.idOcorrencias = o.Ocorrencias_idOcorrencias
                 INNER JOIN funcionario f ON f.idfuncionario = o.Funcionario_idFuncionario
-                LEFT JOIN turnos t ON t.idTurnos = o.Turnos_idTurnos
                 ORDER BY o.idOcorrencia DESC
                 """;
         List<Ocorrencia> ocorrencias = new ArrayList<>();
@@ -95,25 +94,8 @@ public class OcorrenciaDAO
         {
             turno = new Turno();
             turno.setIdTurnos(idTurno);
-            Time horaIni = rs.getTime("horaIni");
-            Time horaFim = rs.getTime("horaFim");
-            if (horaIni != null)
-            {
-                turno.setHoraIni(horaIni.toLocalTime());
-            }
-            else
-            {
-                turno.setHoraIni(null);
-            }
-
-            if (horaFim != null)
-            {
-                turno.setHoraFim(horaFim.toLocalTime());
-            }
-            else
-            {
-                turno.setHoraFim(null);
-            }
+            turno.setHoraIni(TurnosPadrao.horaInicio(idTurno));
+            turno.setHoraFim(TurnosPadrao.horaFim(idTurno));
         }
 
         Ocorrencia ocorrencia = new Ocorrencia();
@@ -132,11 +114,10 @@ public class OcorrenciaDAO
                 SELECT o.idOcorrencia, o.observacoes, o.dtOcorrencia,
                        tpo.idOcorrencias, tpo.descricao, tpo.gravidade,
                        f.idfuncionario, f.nome,
-                       t.idTurnos, t.horaIni, t.horaFim
+                       o.Turnos_idTurnos AS idTurnos
                 FROM ocorrencias o
                 INNER JOIN tiposocorrencias tpo ON tpo.idOcorrencias = o.Ocorrencias_idOcorrencias
                 INNER JOIN funcionario f ON f.idfuncionario = o.Funcionario_idFuncionario
-                LEFT JOIN turnos t ON t.idTurnos = o.Turnos_idTurnos
                 WHERE o.idOcorrencia = #1
                 LIMIT 1
                 """;
@@ -162,12 +143,11 @@ public class OcorrenciaDAO
                 SELECT o.idOcorrencia, o.observacoes, o.dtOcorrencia,
                        tpo.idOcorrencias, tpo.descricao, tpo.gravidade,
                        f.idfuncionario, f.nome,
-                       t.idTurnos, t.horaIni, t.horaFim,
+                       o.Turnos_idTurnos AS idTurnos,
                        m.idMorador, m.nome AS nomeMorador
                 FROM ocorrencias o
                 INNER JOIN tiposocorrencias tpo ON tpo.idOcorrencias = o.Ocorrencias_idOcorrencias
                 INNER JOIN funcionario f ON f.idfuncionario = o.Funcionario_idFuncionario
-                LEFT JOIN turnos t ON t.idTurnos = o.Turnos_idTurnos
                 LEFT JOIN moradorocorrencia mo ON mo.MoradorOcorrencias_idOcorrencia = o.idOcorrencia
                 LEFT JOIN morador m ON m.idMorador = mo.Morador_idMorador
                 WHERE o.Funcionario_idFuncionario = #1

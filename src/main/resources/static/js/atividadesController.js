@@ -10,7 +10,7 @@ let tiposAtividadesCarregados = [];
 let moradoresCarregados = [];
 let moradoresSelecionados = new Set();
 let popupTimer;
-let ordenacaoAtualAtividades = "idatividade";
+let ordenacaoAtualAtividades = "date";
 let ordemAtualAtividades = "asc";
 
 function extrairRespostaJson(response) {
@@ -150,7 +150,7 @@ function renderizarModalParticipantes(idAtividade, idsMoradores) {
     if (Array.isArray(idsMoradores)) {
         total = idsMoradores.length;
     }
-    subtitulo.textContent = "Atividade ID " + idAtividade + " • " + total + " participante(s)";
+    subtitulo.textContent = total + " participante(s)";
 
     if (total === 0) {
         lista.innerHTML = `<div class="participante-modal-empty">Nenhum morador vinculado a esta atividade.</div>`;
@@ -167,7 +167,7 @@ function renderizarModalParticipantes(idAtividade, idsMoradores) {
         if (!morador) {
             linhas += `
                 <div class="participante-modal-item">
-                    <strong>Morador ID ${idMorador}</strong>
+                    <strong>Morador nao encontrado</strong>
                     <span>Dados do morador nao encontrados na lista atual.</span>
                 </div>
             `;
@@ -177,19 +177,16 @@ function renderizarModalParticipantes(idAtividade, idsMoradores) {
         const nome = escaparHtml(morador.nome || "Sem nome");
         const cpf = escaparHtml(morador.cpf || "");
         const cidade = escaparHtml(morador.cidade || "");
-        let cpfTexto = "";
+        const detalhes = [];
         if (cpf) {
-            cpfTexto = " | CPF: " + cpf;
+            detalhes.push("CPF: " + cpf);
         }
-        let cidadeTexto = "";
-        if (cidade) {
-            cidadeTexto = " | " + cidade;
-        }
+        if (cidade) detalhes.push(cidade);
 
         linhas += `
             <div class="participante-modal-item">
                 <strong>${nome}</strong>
-                <span>ID: ${idMorador}${cpfTexto}${cidadeTexto}</span>
+                <span>${detalhes.join(" | ") || "Sem dados complementares"}</span>
             </div>
         `;
     });
@@ -462,19 +459,20 @@ function renderizarListaMoradores() {
         }
         let cpfTexto = "";
         if (cpf) {
-            cpfTexto = "| CPF: " + cpf;
+            cpfTexto = "CPF: " + cpf;
         }
         let cidadeTexto = "";
         if (cidade) {
-            cidadeTexto = "| " + cidade;
+            cidadeTexto = cidade;
         }
+        const detalhes = [cpfTexto, cidadeTexto].filter(Boolean).join(" | ") || "Sem dados complementares";
 
         linhas += `
             <div class="morador-item">
                 <label>
                     <div class="morador-info">
                         <strong>${nomeMorador}</strong>
-                        <span>ID: ${idMorador} ${cpfTexto} ${cidadeTexto}</span>
+                        <span>${detalhes}</span>
                     </div>
                     <input class="morador-checkbox" type="checkbox" ${checked} onchange="alternarMoradorSelecionado(${idMorador}, this.checked)" />
                 </label>
@@ -539,7 +537,7 @@ function renderizarTabela(atividades) {
     if (atividades.length === 0) {
         linhas = `
             <tr>
-                <td colspan="6">
+                <td colspan="5">
                     <div class="placeholder-table">Nenhuma atividade agendada.</div>
                 </td>
             </tr>
@@ -551,7 +549,6 @@ function renderizarTabela(atividades) {
 
             linhas += `
                 <tr>
-                    <td class="strong">${atividade.idatividade}</td>
                     <td>${atividade.nome || ""}</td>
                     <td>${formatarData(atividade.date)}</td>
                     <td>${horario}</td>
@@ -578,7 +575,7 @@ function renderizarTabela(atividades) {
 }
 
 function obterCampoOrdenacaoAtividades() {
-    return ordenacaoAtualAtividades || "idatividade";
+    return ordenacaoAtualAtividades || "date";
 }
 
 function obterOrdemOrdenacaoAtividades() {
@@ -782,7 +779,7 @@ async function carregarAtividades() {
 
     tabela.innerHTML = `
         <tr>
-            <td colspan="6">
+            <td colspan="5">
                 <div class="placeholder-table">Carregando atividades...</div>
             </td>
         </tr>
@@ -799,7 +796,7 @@ async function carregarAtividades() {
         }
         tabela.innerHTML = `
             <tr>
-                <td colspan="6">
+                <td colspan="5">
                     <div class="placeholder-table">Erro ao carregar atividades.</div>
                 </td>
             </tr>
@@ -1123,7 +1120,7 @@ async function salvarAtividade(event) {
 }
 
 async function deletarAtividade(idAtividade) {
-    const confirmado = await confirmarAcao("Tem certeza que deseja excluir a atividade ID " + idAtividade + "?");
+    const confirmado = await confirmarAcao("Tem certeza que deseja excluir esta atividade?");
     if (!confirmado) {
         return;
     }
@@ -1206,10 +1203,6 @@ async function buscarAtividades() {
     }
 
     const atividadesFiltradas = atividadesBase.filter(function (atividade) {
-        if (tipoFiltro === "idatividade") {
-            return String(atividade.idatividade).toLowerCase().includes(texto);
-        }
-
         if (tipoFiltro === "date") {
             return formatarData(atividade.date).toLowerCase().includes(texto) || String(atividade.date || "").toLowerCase().includes(texto);
         }
@@ -1245,13 +1238,8 @@ function alterarTipoBuscaAtividade() {
 
     busca.disabled = false;
 
-    if (campo.value === "idatividade") {
-        busca.type = "number";
-        busca.placeholder = "Digite o ID";
-    } else {
-        busca.type = "text";
-        busca.placeholder = "Digite para buscar";
-    }
+    busca.type = "text";
+    busca.placeholder = "Digite para buscar";
 
     busca.value = "";
     buscarAtividades();

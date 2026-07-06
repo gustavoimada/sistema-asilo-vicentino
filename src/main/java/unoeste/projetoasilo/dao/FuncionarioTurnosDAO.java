@@ -2,10 +2,10 @@ package unoeste.projetoasilo.dao;
 
 import unoeste.projetoasilo.db.util.Banco;
 import unoeste.projetoasilo.entities.FuncionarioTurnos;
+import unoeste.projetoasilo.util.TurnosPadrao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -81,15 +81,12 @@ public class FuncionarioTurnosDAO
             dataEscala = LocalDate.now();
         }
 
-        JanelaEscala janelaNova = montarJanelaEscala(dataEscala, escala.getIdTurno(), conexao);
+        JanelaEscala janelaNova = montarJanelaEscala(dataEscala, escala.getIdTurno());
         String sql = """
                 SELECT ft.idfuncionarioturnos,
                        ft.Turnos_idTurnos,
-                       ft.dataEscala,
-                       t.horaIni,
-                       t.horaFim
+                       ft.dataEscala
                 FROM funcionarioturnos ft
-                INNER JOIN turnos t ON t.idTurnos = ft.Turnos_idTurnos
                 WHERE ft.Funcionario_idFuncionario = #1
                 AND dataEscala >= '#2'
                 AND dataEscala <= '#3'
@@ -108,13 +105,9 @@ public class FuncionarioTurnosDAO
         {
             LocalDate dataExistente = rs.getDate("dataEscala").toLocalDate();
             int idTurnoExistente = rs.getInt("Turnos_idTurnos");
-            Time inicioExistente = rs.getTime("horaIni");
-            Time fimExistente = rs.getTime("horaFim");
             JanelaEscala janelaExistente = montarJanelaEscala(
                     dataExistente,
-                    idTurnoExistente,
-                    inicioExistente != null ? inicioExistente.toLocalTime() : null,
-                    fimExistente != null ? fimExistente.toLocalTime() : null
+                    idTurnoExistente
             );
 
             if (temConflitoDescanso(janelaNova, janelaExistente))
@@ -126,35 +119,10 @@ public class FuncionarioTurnosDAO
         return false;
     }
 
-    private JanelaEscala montarJanelaEscala(LocalDate dataEscala, int idTurno, Banco conexao) throws SQLException
+    private JanelaEscala montarJanelaEscala(LocalDate dataEscala, int idTurno)
     {
-        String sql = """
-                SELECT horaIni, horaFim
-                FROM turnos
-                WHERE idTurnos = #1
-                """;
-        sql = sql.replace("#1", String.valueOf(idTurno));
-
-        ResultSet rs = conexao.consultar(sql);
-        if (rs != null && rs.next())
-        {
-            Time horaIni = rs.getTime("horaIni");
-            Time horaFim = rs.getTime("horaFim");
-            return montarJanelaEscala(
-                    dataEscala,
-                    idTurno,
-                    horaIni != null ? horaIni.toLocalTime() : null,
-                    horaFim != null ? horaFim.toLocalTime() : null
-            );
-        }
-
-        return montarJanelaEscala(dataEscala, idTurno, null, null);
-    }
-
-    private JanelaEscala montarJanelaEscala(LocalDate dataEscala, int idTurno, LocalTime horaInicio, LocalTime horaFim)
-    {
-        LocalTime inicio = horaInicio != null ? horaInicio : horaInicioPadrao(idTurno);
-        LocalTime fim = horaFim != null ? horaFim : horaFimPadrao(idTurno);
+        LocalTime inicio = TurnosPadrao.horaInicio(idTurno);
+        LocalTime fim = TurnosPadrao.horaFim(idTurno);
         LocalDateTime inicioDataHora = LocalDateTime.of(dataEscala, inicio);
         LocalDateTime fimDataHora = LocalDateTime.of(dataEscala, fim);
 
@@ -184,16 +152,6 @@ public class FuncionarioTurnosDAO
         }
 
         return horasDescanso < 36;
-    }
-
-    private LocalTime horaInicioPadrao(int idTurno)
-    {
-        return idTurno == 2 ? LocalTime.of(19, 0) : LocalTime.of(7, 0);
-    }
-
-    private LocalTime horaFimPadrao(int idTurno)
-    {
-        return idTurno == 2 ? LocalTime.of(7, 0) : LocalTime.of(19, 0);
     }
 
     public List<FuncionarioTurnos> listarTodas(Banco conexao) throws SQLException
@@ -310,16 +268,16 @@ public class FuncionarioTurnosDAO
         escala.setStatus(rs.getString("status"));
         escala.setDescricao(rs.getString("descricao"));
 
-        Time horaInicio = rs.getTime("horaInicio");
-        Time horaFim = rs.getTime("horaFim");
+        LocalTime horaInicio = horaResultado(rs, "horaInicio");
+        LocalTime horaFim = horaResultado(rs, "horaFim");
         if (horaInicio != null)
         {
-            escala.setHoraInicio(horaInicio.toLocalTime());
+            escala.setHoraInicio(horaInicio);
         }
 
         if (horaFim != null)
         {
-            escala.setHoraFim(horaFim.toLocalTime());
+            escala.setHoraFim(horaFim);
         }
 
         if (rs.getDate("dataEscala") != null)
@@ -328,6 +286,22 @@ public class FuncionarioTurnosDAO
         }
 
         return escala;
+    }
+
+    private LocalTime horaResultado(ResultSet rs, String coluna) throws SQLException
+    {
+        String valor = rs.getString(coluna);
+        if (valor == null || valor.isBlank())
+        {
+            return null;
+        }
+
+        String texto = valor.trim();
+        if (texto.length() == 5)
+        {
+            texto += ":00";
+        }
+        return LocalTime.parse(texto);
     }
 
     private String textoSql(String valor)

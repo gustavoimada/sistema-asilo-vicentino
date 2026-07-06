@@ -513,6 +513,60 @@ input {
   color: #2563eb;
 }
 
+.quick-config-card {
+  margin-top: -16px;
+  margin-bottom: 40px;
+  padding: 24px;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid #e8eef8;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.quick-config-card h2 {
+  margin: 0 0 6px;
+  color: var(--primary);
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.quick-config-card p {
+  margin: 0;
+  color: var(--on-surface-variant);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.quick-config-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.quick-config-actions a {
+  min-height: 42px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid #dbe7fb;
+  background: #f8fbff;
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.quick-config-actions a:hover {
+  background: #eef6ff;
+  border-color: #b8d3f8;
+}
+
 .stat-card.verde-fundido {
   background: linear-gradient(135deg, #ffffff 0%, #ecfff3 100%);
   border-bottom-color: #16a34a;
@@ -947,6 +1001,20 @@ input {
   .stats-grid,
   .quick-actions {
     grid-template-columns: 1fr;
+  }
+
+  .quick-config-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .quick-config-actions {
+    justify-content: stretch;
+  }
+
+  .quick-config-actions a {
+    width: 100%;
+    justify-content: center;
   }
 
   .funcionario-stats {

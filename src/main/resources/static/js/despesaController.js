@@ -240,8 +240,8 @@ function atualizarCamposDespesaFixa() {
 }
 
 function limparIndicadoresOrdenacao() {
-    const idsIndicadores = ['sort-id', 'sort-tipo', 'sort-valor', 'sort-dtVencimento', 'sort-dtQuitacao', 'sort-observacoes'];
-    const idsCabecalho = ['th-id', 'th-tipo', 'th-valor', 'th-dtVencimento', 'th-dtQuitacao', 'th-observacoes'];
+    const idsIndicadores = ['sort-tipo', 'sort-valor', 'sort-dtVencimento', 'sort-dtQuitacao', 'sort-observacoes'];
+    const idsCabecalho = ['th-tipo', 'th-valor', 'th-dtVencimento', 'th-dtQuitacao', 'th-observacoes'];
 
     idsIndicadores.forEach(id => {
         const elemento = document.getElementById(id);
@@ -388,16 +388,15 @@ function renderizarDespesas(listaDespesas) {
 
     listaRenderizacao.forEach(d => {
         const row = tbody.insertRow();
-        row.insertCell(0).textContent = d.idDespesa;
         let tipoDespesa = '';
 
         if (d.tipoDespesa && d.tipoDespesa.tipo)
             tipoDespesa = d.tipoDespesa.tipo;
 
-        row.insertCell(1).textContent = tipoDespesa;
+        row.insertCell(0).textContent = tipoDespesa;
 
         //status da despesa
-        const statusCell = row.insertCell(2);
+        const statusCell = row.insertCell(1);
         const statusSpan = document.createElement('span');
         statusSpan.textContent = obterStatusDespesa(d);
         statusSpan.classList.add('despesa-status');
@@ -409,21 +408,21 @@ function renderizarDespesas(listaDespesas) {
             statusSpan.classList.add('pendente');
         statusCell.appendChild(statusSpan);
 
-        row.insertCell(3).textContent = formatarMoeda(d.valor);
+        row.insertCell(2).textContent = formatarMoeda(d.valor);
 
         if (d.fixa)
-            row.insertCell(4).textContent = 'Sim';
+            row.insertCell(3).textContent = 'Sim';
         else
-            row.insertCell(4).textContent = 'Não';
+            row.insertCell(3).textContent = 'Não';
 
         if (d.fixa && d.periodicidade)
-            row.insertCell(5).textContent = d.periodicidade;
+            row.insertCell(4).textContent = d.periodicidade;
         else
-            row.insertCell(5).textContent = '-';
+            row.insertCell(4).textContent = '-';
 
-        row.insertCell(6).textContent = formatarData(d.dtVencimento);
+        row.insertCell(5).textContent = formatarData(d.dtVencimento);
 
-        const diasRestantesCell = row.insertCell(7);
+        const diasRestantesCell = row.insertCell(6);
         const diasRestantesSpan = document.createElement('span');
         diasRestantesSpan.textContent = calcularDiasRestantes(d);
         const classeDiasRestantes = corDiasRestantes(d);
@@ -434,13 +433,13 @@ function renderizarDespesas(listaDespesas) {
         diasRestantesCell.appendChild(diasRestantesSpan);
 
         if (d.dtQuitacao)
-            row.insertCell(8).textContent = formatarData(d.dtQuitacao);
+            row.insertCell(7).textContent = formatarData(d.dtQuitacao);
         else
-            row.insertCell(8).textContent = '-';
+            row.insertCell(7).textContent = '-';
 
-        row.insertCell(9).textContent = d.observacoes || '';
+        row.insertCell(8).textContent = d.observacoes || '';
 
-        const acoes = row.insertCell(10);
+        const acoes = row.insertCell(9);
         acoes.classList.add('morador-actions-cell');
 
         if (!d.dtQuitacao) {

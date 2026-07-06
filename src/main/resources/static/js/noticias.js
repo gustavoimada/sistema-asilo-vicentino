@@ -50,7 +50,7 @@ function renderizarNoticias(lista = noticias) {
     if (!container) return;
 
     if (!lista.length) {
-        container.innerHTML = '<tr><td colspan="5" class="empty-text" style="text-align: center; padding: 2rem;">Nenhuma notícia publicada.</td></tr>';
+        container.innerHTML = '<tr><td colspan="4" class="empty-text" style="text-align: center; padding: 2rem;">Nenhuma notícia publicada.</td></tr>';
         return;
     }
 
@@ -65,7 +65,6 @@ function renderizarNoticias(lista = noticias) {
         
         return `
             <tr>
-                <td><strong>#${idNoticia}</strong></td>
                 <td><strong style="color: var(--on-surface);">${noticia.titulo || "Sem Título"}</strong></td>
                 <td><span style="background: #e2e8f0; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 800;">${noticia.categoria || ""}</span></td>
                 <td style="color: var(--on-surface-variant); font-size: 12px;">${dataStr}</td>

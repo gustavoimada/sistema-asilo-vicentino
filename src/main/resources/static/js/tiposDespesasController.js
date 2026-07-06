@@ -2,7 +2,7 @@ const API_BASE = "";
 const API_TIPOS_DESPESAS = `${API_BASE}/tipodespesas`;
 let tiposDespesasCarregados = [];
 let popupTimer;
-let ordenacaoAtualTiposDespesas = "idtipodespesas";
+let ordenacaoAtualTiposDespesas = "tipo";
 let ordemAtualTiposDespesas = "asc";
 
 function escaparApostrofo(valor) {
@@ -96,7 +96,7 @@ function confirmarAcao(mensagem) {
 }
 
 function obterCampoOrdenacaoTiposDespesas() {
-    return ordenacaoAtualTiposDespesas || "idtipodespesas";
+    return ordenacaoAtualTiposDespesas || "tipo";
 }
 
 function obterOrdemOrdenacaoTiposDespesas() {
@@ -158,7 +158,7 @@ function renderizarTabela(tiposDespesas) {
     if (tiposDespesas.length === 0) {
         linhas = `
             <tr>
-                <td colspan="3">
+                <td colspan="2">
                     <div class="placeholder-table">Nenhum tipo de despesa cadastrado.</div>
                 </td>
             </tr>
@@ -167,7 +167,6 @@ function renderizarTabela(tiposDespesas) {
         tiposDespesas.forEach(tipoDespesa => {
             linhas += `
                 <tr>
-                    <td class="strong">${tipoDespesa.idtiposDespesas}</td>
                     <td>${tipoDespesa.tipo || ""}</td>
                     <td class="text-right">
                         <div style="display:inline-flex; gap:8px;">
@@ -242,7 +241,7 @@ function carregarTiposDespesas() {
 
     tabela.innerHTML = `
         <tr>
-            <td colspan="3">
+            <td colspan="2">
                 <div class="placeholder-table">Carregando tipos de despesas...</div>
             </td>
         </tr>
@@ -262,7 +261,7 @@ function carregarTiposDespesas() {
                 const msg = body && body.descricao ? body.descricao : "Nao foi possivel listar os tipos de despesas.";
                 tabela.innerHTML = `
                     <tr>
-                        <td colspan="3">
+                        <td colspan="2">
                             <div class="placeholder-table">Erro ao carregar tipos de despesas.</div>
                         </td>
                     </tr>
@@ -279,7 +278,7 @@ function carregarTiposDespesas() {
         .catch(error => {
             tabela.innerHTML = `
                 <tr>
-                    <td colspan="3">
+                    <td colspan="2">
                         <div class="placeholder-table">Erro ao carregar tipos de despesas.</div>
                     </td>
                 </tr>
@@ -397,7 +396,7 @@ function salvarTipoDespesa(event) {
 }
 
 async function deletarTipoDespesa(id) {
-    const confirmado = await confirmarAcao("Tem certeza que deseja excluir o tipo de despesa ID " + id + "?");
+    const confirmado = await confirmarAcao("Tem certeza que deseja excluir este tipo de despesa?");
 
     if (!confirmado) {
         return;
@@ -446,10 +445,6 @@ function buscarTiposDespesas() {
     }
 
     const tiposFiltrados = tiposDespesasCarregados.filter(tipoDespesa => {
-        if (tipoFiltro === "idtipodespesas") {
-            return String(tipoDespesa.idtiposDespesas).toLowerCase().includes(texto);
-        }
-
         return String(tipoDespesa.tipo || "").toLowerCase().includes(texto);
     });
 
@@ -465,13 +460,8 @@ function alterarTipoBusca() {
         return;
     }
 
-    if (campo.value === "idtipodespesas") {
-        busca.type = "number";
-        busca.placeholder = "Digite o ID";
-    } else {
-        busca.type = "text";
-        busca.placeholder = "Digite para buscar";
-    }
+    busca.type = "text";
+    busca.placeholder = "Digite para buscar";
 
     busca.value = "";
     renderizarTabela(tiposDespesasCarregados);

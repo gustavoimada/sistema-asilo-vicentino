@@ -440,7 +440,7 @@ function salvarQuarto(event) {
 }
 
 async function deletarQuarto(id) {
-    const confirmado = await confirmarAcao("Tem certeza que deseja excluir o quarto ID " + id + "?");
+    const confirmado = await confirmarAcao("Tem certeza que deseja excluir este quarto?");
 
     if (!confirmado) {
         return;

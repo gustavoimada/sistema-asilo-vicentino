@@ -6,7 +6,7 @@
   <title>Painel Coordenador(a)</title>
 
   <link rel="stylesheet" href="css/funcionario.css" />
-  <link rel="stylesheet" href="css/coordenador.css?v=9" />
+  <link rel="stylesheet" href="css/coordenador.css?v=20260705-1" />
   <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
@@ -105,10 +105,13 @@
           </section>
 
           <section class="dashboard-grid bloco-turnos">
-            <section class="escala-card">
+            <section class="escala-card turnos-monitor-card">
               <div class="section-title">
                 <span class="section-title-bar primary"></span>
-                <span>Turnos</span>
+                <span>Acompanhamento de Turnos</span>
+              </div>
+              <div id="turnosStatusResumo" class="turnos-status-resumo">
+                <div class="turnos-status-placeholder">Carregando status...</div>
               </div>
               <div id="historicoTurnosLista" class="historico-turnos-lista">
                 <p class="empty-text">Carregando turnos...</p>
@@ -118,7 +121,7 @@
             <section class="escala-card turno-detalhe-card">
               <div class="section-title">
                 <span class="section-title-bar primary"></span>
-                <span>Detalhes do Turno</span>
+                <span>Turno Selecionado</span>
               </div>
               <div id="detalhesTurnoCoordenador" class="turno-detalhes coordenador-turno-detalhes">
                 <p class="empty-text">Selecione um turno para ver os detalhes.</p>
@@ -170,7 +173,7 @@
     </div>
   </div>
 
-  <script src="js/coordenadorEscala.js?v=20260514-6"></script>
+  <script src="js/coordenadorEscala.js?v=20260705-1"></script>
 </body>
 </html>
 

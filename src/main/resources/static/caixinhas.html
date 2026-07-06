@@ -5,118 +5,84 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Caixinhas de Medicamentos - SGAV</title>
 
-    <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1" />
+    <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260705-2" />
     <link rel="stylesheet" href="css/caixinhas.css"/>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 </head>
 <body>
-<aside class="sidebar">
-    <div class="sidebar-brand">
+    <aside class="sidebar" data-secretaria-sidebar="true">
+      <div class="sidebar-brand">
         <div class="sidebar-brand-main">
-            <img src="assets/logo.png" alt="Logo Asilo Vicentino" />
-            <h1>SGAV</h1>
+          <img src="assets/logo.png" alt="Logo Asilo Vicentino" />
+          <h1>SGAV</h1>
         </div>
-    </div>
+      </div>
 
-    <nav class="sidebar-nav">
+      <nav class="sidebar-nav">
         <a href="secretaria.html" class="sidebar-link">
-            <span class="material-symbols-outlined">dashboard</span>
-            <span>Painel</span>
+          <span class="material-symbols-outlined">dashboard</span>
+          <span>Painel</span>
         </a>
 
-        <details class="sidebar-group">
-            <summary class="sidebar-link sidebar-group-toggle">
-                <span class="material-symbols-outlined">groups</span>
-                <span>Moradores</span>
-                <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
-            </summary>
-            <div class="sidebar-submenu">
-                <a href="morador.html" class="sidebar-link sidebar-sublink">
-                    <span class="material-symbols-outlined">elderly</span>
-                    <span>Cadastro de Morador</span>
-                </a>
-            </div>
-        </details>
+        <a href="morador.html" class="sidebar-link">
+          <span class="material-symbols-outlined">elderly</span>
+          <span>Moradores</span>
+        </a>
+
+        <a href="quartos.html" class="sidebar-link">
+          <span class="material-symbols-outlined">bed</span>
+          <span>Quartos</span>
+        </a>
 
         <a href="funcionario.html" class="sidebar-link">
-            <span class="material-symbols-outlined">badge</span>
-            <span>Funcionarios</span>
+          <span class="material-symbols-outlined">badge</span>
+          <span>Funcionarios</span>
         </a>
 
         <a href="medicamentos.html" class="sidebar-link">
-            <span class="material-symbols-outlined">medical_services</span>
-            <span>Medicamentos</span>
+          <span class="material-symbols-outlined">medical_services</span>
+          <span>Medicamentos</span>
         </a>
 
         <a href="caixinhas.html" class="sidebar-link active">
-            <span class="material-symbols-outlined">inventory_2</span>
-            <span>Caixinhas</span>
+          <span class="material-symbols-outlined">inventory_2</span>
+          <span>Caixinhas</span>
         </a>
 
-        <a href="tipoOcorrencia.html" class="sidebar-link">
-            <span class="material-symbols-outlined">assignment_late</span>
-            <span>Tipo de Ocorrencia</span>
+        <a href="atividades.html" class="sidebar-link">
+          <span class="material-symbols-outlined">event_note</span>
+          <span>Atividades</span>
         </a>
 
         <a href="doacao.html" class="sidebar-link">
-            <span class="material-symbols-outlined">volunteer_activism</span>
-            <span>Doacoes</span>
+          <span class="material-symbols-outlined">volunteer_activism</span>
+          <span>Doacoes</span>
         </a>
+
+        <a href="despesa.html" class="sidebar-link">
+          <span class="material-symbols-outlined">request_quote</span>
+          <span>Despesas</span>
+        </a>
+
         <a href="noticias.html" class="sidebar-link">
           <span class="material-symbols-outlined">newspaper</span>
           <span>Noticias</span>
         </a>
+      </nav>
 
-        <a href="quartos.html" class="sidebar-link">
-            <span class="material-symbols-outlined">bed</span>
-            <span>Quartos</span>
+      <div class="sidebar-footer">
+        <a href="coordenador.html" class="sidebar-link secretaria-panel-link" id="linkPainelCoordenador" style="display: none;">
+          <span class="material-symbols-outlined">admin_panel_settings</span>
+          <span>Painel do Coordenador</span>
         </a>
 
-        <details class="sidebar-group">
-            <summary class="sidebar-link sidebar-group-toggle">
-                <span class="material-symbols-outlined">event</span>
-                <span>Atividades</span>
-                <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
-            </summary>
-            <div class="sidebar-submenu">
-                <a href="tipoAtividades.html" class="sidebar-link sidebar-sublink">
-                    <span class="material-symbols-outlined">category</span>
-                    <span>Tipos de Atividades</span>
-                </a>
-                <a href="atividades.html" class="sidebar-link sidebar-sublink">
-                    <span class="material-symbols-outlined">event_note</span>
-                    <span>Atividades</span>
-                </a>
-            </div>
-        </details>
-
-        <details class="sidebar-group">
-            <summary class="sidebar-link sidebar-group-toggle">
-                <span class="material-symbols-outlined">payments</span>
-                <span>Despesas</span>
-                <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
-            </summary>
-            <div class="sidebar-submenu">
-                <a href="tiposDespesas.html" class="sidebar-link sidebar-sublink">
-                    <span class="material-symbols-outlined">receipt_long</span>
-                    <span>Tipos de Despesas</span>
-                </a>
-                <a href="pagamentoDespesas.html" class="sidebar-link sidebar-sublink">
-                    <span class="material-symbols-outlined">request_quote</span>
-                    <span>Pagamento de Despesas</span>
-                </a>
-            </div>
-        </details>
-    </nav>
-
-    <div class="sidebar-footer">
         <a href="login.html" class="sidebar-link logout">
-            <span class="material-symbols-outlined">logout</span>
-            <span>Sair</span>
+          <span class="material-symbols-outlined">logout</span>
+          <span>Sair</span>
         </a>
-    </div>
-</aside>
+      </div>
+    </aside>
 
 <header class="topbar">
     <div class="topbar-left"></div>
@@ -379,6 +345,7 @@
         <span>Mais</span>
     </a>
 </nav>
+  <script src="js/sidebarSecretaria.js?v=20260705-1"></script>
+  <script src="js/caixinhaMedicamentosController.js"></script>
 </body>
-<script src="js/caixinhaMedicamentosController.js"></script>
 </html>

@@ -458,6 +458,13 @@ function nomeTurnoCurto(idTurno)
     return Number(idTurno) === 1 ? "Manha" : "Noite";
 }
 
+function obterHorarioTurnoCurto(idTurno)
+{
+    const turno = estadoCoordenadorEscala.turnos.find((t) => Number(t.idTurnos) === Number(idTurno));
+    if (!turno) return "-";
+    return `${turno.horaIni} - ${turno.horaFim}`;
+}
+
 function obterFimEscala(escala)
 {
     const dataEscala = escala?.dataEscala;
@@ -497,36 +504,67 @@ function statusExibicaoEscala(escala)
     if (escalaPendenteVencidaSemInicio(escala))
     {
         return {
+            classe: "sem-inicio",
+            texto: "Finalizado sem in\u00edcio",
+            titulo: "Escala vencida sem registro de in\u00edcio.",
+            descricao: "N\u00e3o iniciou"
+        };
+    }
+
+    const valor = String(escala?.status || "").toLowerCase();
+    if (valor === "ativo")
+    {
+        return {
+            classe: "andamento",
+            texto: "Em andamento",
+            titulo: "Turno iniciado e ainda nao encerrado.",
+            descricao: "Turno ativo"
+        };
+    }
+    if (valor === "pendente")
+    {
+        return {
+            classe: "pendente",
+            texto: "Pendente",
+            titulo: "Cuidador(a) escalado(a), aguardando in\u00edcio do turno.",
+            descricao: "Aguardando in\u00edcio"
+        };
+    }
+    if (valor === "finalizado")
+    {
+        return {
             classe: "finalizado",
-            texto: "Finalizado sem início",
-            titulo: "Escala finalizada automaticamente porque o cuidador nao iniciou o turno."
+            texto: "Finalizado",
+            titulo: "Turno encerrado pelo cuidador.",
+            descricao: "Encerrado"
         };
     }
 
     return {
-        classe: classeStatus(escala?.status || ""),
-        texto: textoStatus(escala?.status || "-"),
-        titulo: ""
+        classe: "indefinido",
+        texto: escala?.status || "-",
+        titulo: "",
+        descricao: "Sem status"
     };
 }
 
 function classeStatus(status)
 {
     const valor = String(status || "").toLowerCase();
-    if (valor === "ativo") return "ativo";
+    if (valor === "ativo") return "andamento";
     if (valor === "pendente") return "pendente";
+    if (valor === "finalizado") return "finalizado";
     return "finalizado";
 }
 
 function textoStatus(status)
 {
     const valor = String(status || "").toLowerCase();
-    if (valor === "ativo") return "Ativo";
+    if (valor === "ativo") return "Em andamento";
     if (valor === "pendente") return "Pendente";
     if (valor === "finalizado") return "Finalizado";
     return status || "-";
 }
-
 function obterNomeTurno(idTurno)
 {
     const turno = estadoCoordenadorEscala.turnos.find((t) => Number(t.idTurnos) === Number(idTurno));
@@ -595,6 +633,40 @@ function obterTurnosFiltrados()
     return estadoCoordenadorEscala.historicoTurnos;
 }
 
+function atualizarResumoStatusTurnos(turnos)
+{
+    const container = document.getElementById("turnosStatusResumo");
+    if (!container) return;
+
+    const ordem = [
+        { classe: "pendente", texto: "Pendentes" },
+        { classe: "andamento", texto: "Em andamento" },
+        { classe: "finalizado", texto: "Finalizados" },
+        { classe: "sem-inicio", texto: "Sem in\u00edcio" }
+    ];
+    const totais = ordem.reduce((acc, item) =>
+    {
+        acc[item.classe] = 0;
+        return acc;
+    }, {});
+
+    turnos.forEach((turno) =>
+    {
+        const status = statusExibicaoEscala(turno);
+        if (Object.prototype.hasOwnProperty.call(totais, status.classe))
+        {
+            totais[status.classe] += 1;
+        }
+    });
+
+    container.innerHTML = ordem.map((item) => `
+        <div class="turnos-status-card ${item.classe}">
+            <strong>${totais[item.classe]}</strong>
+            <span>${item.texto}</span>
+        </div>
+    `).join("");
+}
+
 function obterIdTurnoEscalaCoordenador(escala)
 {
     return Number(escala?.idTurno || escala?.turno?.idTurnos || escala?.Turnos_idTurnos || 0);
@@ -627,6 +699,7 @@ function renderizarHistoricoTurnos()
     if (!container) return;
 
     const turnos = obterTurnosFiltrados();
+    atualizarResumoStatusTurnos(turnos);
     if (!turnos.length)
     {
         container.innerHTML = '<p class="empty-text">Nenhum turno encontrado.</p>';
@@ -637,13 +710,18 @@ function renderizarHistoricoTurnos()
     {
         const ativo = estadoCoordenadorEscala.turnoSelecionado && Number(estadoCoordenadorEscala.turnoSelecionado.idFuncionarioTurnos) === Number(turno.idFuncionarioTurnos);
         const statusExibicao = statusExibicaoEscala(turno);
+        const idTurno = obterIdTurnoEscalaCoordenador(turno);
         return `
-            <button type="button" class="turno-historico-item ${ativo ? "active" : ""}" data-id-turno="${turno.idFuncionarioTurnos}">
-                <span>
+            <button type="button" class="turno-historico-item status-${statusExibicao.classe} ${ativo ? "active" : ""}" data-id-turno="${turno.idFuncionarioTurnos}">
+                <span class="turno-historico-main">
                     <strong>${escaparHtmlCoordenador(obterNomeFuncionarioEscalaCoordenador(turno))}</strong>
-                    <small>${nomeTurnoCurto(obterIdTurnoEscalaCoordenador(turno))} - ${formatarDataEscala(turno.dataEscala)}</small>
+                    <small>
+                        <span>${nomeTurnoCurto(idTurno)}</span>
+                        <span>${formatarDataEscala(turno.dataEscala)}</span>
+                        <span>${obterHorarioTurnoCurto(idTurno)}</span>
+                    </small>
                 </span>
-                <span class="status-chip ${statusExibicao.classe}">${statusExibicao.texto}</span>
+                <span class="status-chip ${statusExibicao.classe}" title="${statusExibicao.titulo}">${statusExibicao.texto}</span>
             </button>
         `;
     }).join("");
@@ -709,27 +787,37 @@ function renderizarDetalhesTurnoCoordenador()
     }
     const statusExibicao = statusExibicaoEscala(turno);
     const podeExcluir = Number(turno.idFuncionarioTurnos || 0) > 0;
+    const idTurno = obterIdTurnoEscalaCoordenador(turno);
+    const nomeFuncionario = obterNomeFuncionarioEscalaCoordenador(turno);
+    const totalOcorrencias = (turno.ocorrencias || []).length;
+    const totalMedicacoes = (turno.medicacoes || []).length;
+    const totalRegistros = totalOcorrencias + totalMedicacoes;
 
     container.innerHTML = `
-        <div class="turno-detail-toolbar">
-            <div>
-                <strong>${escaparHtmlCoordenador(obterNomeFuncionarioEscalaCoordenador(turno))}</strong>
-                <span>${nomeTurnoCurto(obterIdTurnoEscalaCoordenador(turno))} - ${formatarDataEscala(turno.dataEscala)}</span>
+        <div class="turno-detail-hero status-${statusExibicao.classe}">
+            <div class="turno-detail-main">
+                <span class="turno-detail-eyebrow">${statusExibicao.descricao}</span>
+                <h3>${escaparHtmlCoordenador(nomeFuncionario)}</h3>
+                <div class="turno-detail-tags">
+                    <span>${nomeTurnoCurto(idTurno)}</span>
+                    <span>${formatarDataEscala(turno.dataEscala)}</span>
+                    <span>${obterHorarioTurnoCurto(idTurno)}</span>
+                </div>
             </div>
-            <button type="button" class="turno-detail-delete-btn" data-id-escala="${turno.idFuncionarioTurnos}" ${podeExcluir ? "" : "disabled"} title="Excluir escala">
-                <span class="material-symbols-outlined">delete</span>
-            </button>
+            <div class="turno-detail-actions">
+                <span class="status-chip ${statusExibicao.classe}" title="${statusExibicao.titulo}">${statusExibicao.texto}</span>
+                <button type="button" class="turno-detail-delete-btn" data-id-escala="${turno.idFuncionarioTurnos}" ${podeExcluir ? "" : "disabled"} title="Excluir escala">
+                    <span class="material-symbols-outlined">delete</span>
+                </button>
+            </div>
         </div>
         <div class="turno-resumo-grid">
-            <div><span>Cuidador(a)</span><strong>${escaparHtmlCoordenador(obterNomeFuncionarioEscalaCoordenador(turno))}</strong></div>
-            <div><span>Turno</span><strong>${nomeTurnoCurto(obterIdTurnoEscalaCoordenador(turno))} - ${formatarDataEscala(turno.dataEscala)}</strong></div>
-            <div><span>Inicio</span><strong>${formatarDataHoraRealCoordenador(turno.dataEscala, turno.horaInicio)}</strong></div>
-            <div><span>Fim</span><strong>${formatarDataHoraRealCoordenador(turno.dataEscala, turno.horaFim)}</strong></div>
-            <div><span>Status</span><strong>${statusExibicao.texto}</strong></div>
-            <div><span>Registros</span><strong>${(turno.ocorrencias || []).length + (turno.medicacoes || []).length}</strong></div>
+            <div><span>In\u00edcio real</span><strong>${formatarDataHoraRealCoordenador(turno.dataEscala, turno.horaInicio)}</strong></div>
+            <div><span>Fim real</span><strong>${formatarDataHoraRealCoordenador(turno.dataEscala, turno.horaFim)}</strong></div>
+            <div><span>Registros</span><strong>${totalRegistros}</strong><small>${totalOcorrencias} ocorr\u00eancia(s) / ${totalMedicacoes} uso(s) de medica\u00e7\u00e3o</small></div>
         </div>
         <div class="turno-descricao-box">
-            <span>Descricao de encerramento</span>
+            <span>Observa\u00e7\u00e3o do encerramento</span>
             <p>${escaparHtmlCoordenador(turno.descricao || "Nenhuma descricao informada.")}</p>
         </div>
         ${montarEventosTurnoCoordenador(turno)}

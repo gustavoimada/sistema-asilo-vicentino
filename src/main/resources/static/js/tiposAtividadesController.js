@@ -2,7 +2,7 @@ const API_BASE = "";
 const API_TIPOS_ATIVIDADES = `${API_BASE}/tipoatividades`;
 let tiposAtividadesCarregados = [];
 let popupTimer;
-let ordenacaoAtualTiposAtividades = "idtipoatividade";
+let ordenacaoAtualTiposAtividades = "tipo";
 let ordemAtualTiposAtividades = "asc";
 
 function escaparApostrofo(valor) {
@@ -96,7 +96,7 @@ function confirmarAcao(mensagem) {
 }
 
 function obterCampoOrdenacaoTiposAtividades() {
-    return ordenacaoAtualTiposAtividades || "idtipoatividade";
+    return ordenacaoAtualTiposAtividades || "tipo";
 }
 
 function obterOrdemOrdenacaoTiposAtividades() {
@@ -158,7 +158,7 @@ function renderizarTabela(tiposAtividades) {
     if (tiposAtividades.length === 0) {
         linhas = `
             <tr>
-                <td colspan="4">
+                <td colspan="3">
                     <div class="placeholder-table">Nenhum tipo de atividade cadastrado.</div>
                 </td>
             </tr>
@@ -167,7 +167,6 @@ function renderizarTabela(tiposAtividades) {
         tiposAtividades.forEach(tipoAtividade => {
             linhas += `
                 <tr>
-                    <td class="strong">${tipoAtividade.idtipoatividades}</td>
                     <td>${tipoAtividade.tipo || ""}</td>
                     <td>${tipoAtividade.org || ""}</td>
                     <td class="text-right">
@@ -243,7 +242,7 @@ function carregarTiposAtividades() {
 
     tabela.innerHTML = `
         <tr>
-            <td colspan="4">
+            <td colspan="3">
                 <div class="placeholder-table">Carregando tipos de atividades...</div>
             </td>
         </tr>
@@ -263,7 +262,7 @@ function carregarTiposAtividades() {
                 const msg = body && body.descricao ? body.descricao : "Nao foi possivel listar os tipos de atividades.";
                 tabela.innerHTML = `
                     <tr>
-                        <td colspan="4">
+                        <td colspan="3">
                             <div class="placeholder-table">Erro ao carregar tipos de atividades.</div>
                         </td>
                     </tr>
@@ -280,7 +279,7 @@ function carregarTiposAtividades() {
         .catch(error => {
             tabela.innerHTML = `
                 <tr>
-                    <td colspan="4">
+                    <td colspan="3">
                         <div class="placeholder-table">Erro ao carregar tipos de atividades.</div>
                     </td>
                 </tr>
@@ -405,7 +404,7 @@ function salvarTipoAtividade(event) {
 }
 
 async function deletarTipoAtividade(id) {
-    const confirmado = await confirmarAcao("Tem certeza que deseja excluir o tipo de atividade ID " + id + "?");
+    const confirmado = await confirmarAcao("Tem certeza que deseja excluir este tipo de atividade?");
 
     if (!confirmado) {
         return;
@@ -454,10 +453,6 @@ function buscarTiposAtividades() {
     }
 
     const tiposFiltrados = tiposAtividadesCarregados.filter(tipoAtividade => {
-        if (tipoFiltro === "idtipoatividades") {
-            return String(tipoAtividade.idtipoatividades).toLowerCase().includes(texto);
-        }
-
         if (tipoFiltro === "org") {
             return String(tipoAtividade.org || "").toLowerCase().includes(texto);
         }
@@ -477,13 +472,8 @@ function alterarTipoBusca() {
         return;
     }
 
-    if (campo.value === "idtipoatividades") {
-        busca.type = "number";
-        busca.placeholder = "Digite o ID";
-    } else {
-        busca.type = "text";
-        busca.placeholder = "Digite para buscar";
-    }
+    busca.type = "text";
+    busca.placeholder = "Digite para buscar";
 
     busca.value = "";
     renderizarTabela(tiposAtividadesCarregados);

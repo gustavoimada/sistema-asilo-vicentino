@@ -94,15 +94,6 @@ CREATE TABLE tiposocorrencias (
 );
 
 -- =========================================
--- turnos
--- =========================================
-CREATE TABLE turnos (
-                        idTurnos SERIAL PRIMARY KEY,
-                        horaIni VARCHAR(45),
-                        horaFim VARCHAR(45)
-);
-
--- =========================================
 -- ocorrencias
 -- =========================================
 CREATE TABLE ocorrencias (
@@ -116,8 +107,8 @@ CREATE TABLE ocorrencias (
                                  REFERENCES tiposocorrencias(idOcorrencias),
                              FOREIGN KEY (Funcionario_idFuncionario)
                                  REFERENCES funcionario(idFuncionario),
-                             FOREIGN KEY (Turnos_idTurnos)
-                                 REFERENCES turnos(idTurnos)
+                             CONSTRAINT ck_ocorrencias_turno_padrao
+                                 CHECK (Turnos_idTurnos IS NULL OR Turnos_idTurnos IN (1, 2))
 );
 
 -- =========================================
@@ -148,9 +139,8 @@ CREATE TABLE funcionarioturnos (
                                    CONSTRAINT fk_funcionarioturnos_funcionario
                                        FOREIGN KEY (Funcionario_idFuncionario)
                                            REFERENCES funcionario(idFuncionario),
-                                   CONSTRAINT fk_funcionarioturnos_turnos
-                                       FOREIGN KEY (Turnos_idTurnos)
-                                           REFERENCES turnos(idTurnos),
+                                   CONSTRAINT ck_funcionarioturnos_turno_padrao
+                                       CHECK (Turnos_idTurnos IN (1, 2)),
                                    CONSTRAINT uq_funcionarioturnos_escala
                                        UNIQUE (Funcionario_idFuncionario, Turnos_idTurnos, dataEscala)
 );

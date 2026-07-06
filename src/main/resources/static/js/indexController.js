@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function ()
   iniciarEntradaInicial();
   iniciarMenu();
   iniciarCarrossel();
+  iniciarRotinaAsilo();
   iniciarNoticias();
   iniciarBotoesFinais();
   iniciarTransparencia();
@@ -67,6 +68,9 @@ function iniciarCarrossel()
 {
   const opcoes = document.querySelectorAll(".life-option");
   const imagem = document.getElementById("lifeShowcaseImage");
+  const tag = document.getElementById("lifeShowcaseTag");
+  const titulo = document.getElementById("lifeShowcaseTitle");
+  const texto = document.getElementById("lifeShowcaseText");
   let timerAutomatico = null;
   let indiceAtual = 0;
   if (!opcoes.length || !imagem)
@@ -84,6 +88,9 @@ function iniciarCarrossel()
     window.setTimeout(function () {
       imagem.src = opcao.getAttribute("data-image") || imagem.src;
       imagem.alt = opcao.getAttribute("data-alt") || "";
+      if (tag) tag.textContent = opcao.getAttribute("data-tag") || tag.textContent;
+      if (titulo) titulo.textContent = opcao.getAttribute("data-title") || titulo.textContent;
+      if (texto) texto.textContent = opcao.getAttribute("data-text") || texto.textContent;
       imagem.classList.remove("is-changing");
     }, 140);
 
@@ -106,6 +113,60 @@ function iniciarCarrossel()
   {
     opcoes[i].addEventListener("click", function () {
       ativarOpcao(this, true);
+    });
+  }
+
+  iniciarTimer();
+}
+
+function iniciarRotinaAsilo()
+{
+  const passos = document.querySelectorAll(".dayflow-step");
+  const imagem = document.getElementById("dayflowImage");
+  const horario = document.getElementById("dayflowTime");
+  let timerAutomatico = null;
+  let indiceAtual = 0;
+
+  if (!passos.length || !imagem || !horario)
+    return;
+
+  function ativarPasso(passo, reiniciarTimer)
+  {
+    for (let i = 0; i < passos.length; i += 1)
+    {
+      passos[i].classList.toggle("is-active", passos[i] === passo);
+      if (passos[i] === passo) indiceAtual = i;
+    }
+
+    imagem.classList.add("is-changing");
+    window.setTimeout(function ()
+    {
+      imagem.src = passo.getAttribute("data-image") || imagem.src;
+      imagem.alt = passo.getAttribute("data-title") || "Rotina do asilo";
+      horario.textContent = passo.getAttribute("data-time") || horario.textContent;
+      imagem.classList.remove("is-changing");
+    }, 150);
+
+    if (reiniciarTimer) iniciarTimer();
+  }
+
+  function avancarAutomatico()
+  {
+    const proximoIndice = (indiceAtual + 1) % passos.length;
+    ativarPasso(passos[proximoIndice], false);
+  }
+
+  function iniciarTimer()
+  {
+    if (timerAutomatico) window.clearInterval(timerAutomatico);
+    timerAutomatico = window.setInterval(avancarAutomatico, 5600);
+  }
+
+  for (let i = 0; i < passos.length; i += 1)
+  {
+    passos[i].addEventListener("click", function ()
+    {
+      ativarPasso(this, true);
     });
   }
 
@@ -221,38 +282,81 @@ function iniciarBotoesFinais() {
   const painelDoacao = document.getElementById("painelDoacao");
   const inputValorDoacao = document.getElementById("doacaoValor");
   const chipsValorDoacao = document.querySelectorAll(".js-doacao-valor");
+  const impactoDoacao = document.getElementById("doacaoImpacto");
   const campoChavePix = document.getElementById("chavePixDoacao");
   const botaoCopiarPix = document.getElementById("copiarPix");
   const formDoacaoPublica = document.getElementById("formDoacaoPublica");
   const inputCpfDoacao = document.getElementById("doacaoCpf");
 
-  console.log("iniciarBotoesFinais - Elementos encontrados:", {
-    botaoDoacao: !!botaoDoacao,
-    painelDoacao: !!painelDoacao,
-    formDoacaoPublica: !!formDoacaoPublica,
-    inputCpfDoacao: !!inputCpfDoacao
-  });
-
   if (!botaoDoacao || !painelDoacao) return;
 
+  function atualizarImpactoDoacao(valor)
+  {
+    if (!impactoDoacao) return;
+
+    let dados = {
+      icone: "volunteer_activism",
+      titulo: "Sua ajuda vira cuidado direto",
+      texto: "Escolha um valor para ver uma ideia de como a contribuicao pode apoiar a rotina do asilo."
+    };
+
+    if (valor >= 200) {
+      dados = {
+        icone: "construction",
+        titulo: "Ajuda em melhorias do asilo",
+        texto: "Pode reforcar reparos, manutencao e melhorias de conforto para os residentes."
+      };
+    } else if (valor >= 100) {
+      dados = {
+        icone: "local_hospital",
+        titulo: "Fortalece saude e seguranca",
+        texto: "Apoia itens de cuidado, higiene e organizacao usados no acompanhamento diario."
+      };
+    } else if (valor >= 60) {
+      dados = {
+        icone: "restaurant",
+        titulo: "Apoia alimentacao e rotina",
+        texto: "Contribui com necessidades do dia a dia, alimentacao e pequenos materiais de cuidado."
+      };
+    } else if (valor >= 30) {
+      dados = {
+        icone: "diversity_1",
+        titulo: "Cria momentos de convivencia",
+        texto: "Ajuda em atividades, encontros e detalhes que deixam a rotina mais leve."
+      };
+    }
+
+    impactoDoacao.innerHTML = `
+      <span class="material-symbols-outlined">${dados.icone}</span>
+      <div>
+        <strong>${dados.titulo}</strong>
+        <p>${dados.texto}</p>
+      </div>
+    `;
+  }
+
+  function prepararPainelDoacao()
+  {
+    const formPublica = document.getElementById("formDoacaoPublica");
+    const sucessoMsg = document.getElementById("doacaoSucessoMsg");
+    if (formPublica) formPublica.hidden = false;
+    if (sucessoMsg) sucessoMsg.classList.remove("is-visible");
+    atualizarImpactoDoacao(Number((inputValorDoacao?.value || "0").replace(",", ".")) || 0);
+  }
+
   function abrirDoacao() {
-    const secaoContato = document.getElementById("contato");
-    if (secaoContato) {
-      secaoContato.scrollIntoView({ behavior: "smooth", block: "start" });
+    const secaoDoacao = document.getElementById("doacao");
+    if (secaoDoacao) {
+      secaoDoacao.scrollIntoView({ behavior: "smooth", block: "start" });
     }
     painelDoacao.hidden = false;
+    prepararPainelDoacao();
   }
 
   botaoDoacao.addEventListener("click", function () {
     const abrir = painelDoacao.hidden;
     painelDoacao.hidden = !abrir;
-    // Ao abrir, garante que o formulário esteja visível e mensagem de sucesso oculta
-    if (abrir) {
-      var formPublica = document.getElementById("formDoacaoPublica");
-      var sucessoMsg = document.getElementById("doacaoSucessoMsg");
-      if (formPublica) formPublica.hidden = false;
-      if (sucessoMsg) sucessoMsg.classList.remove("is-visible");
-    }
+    if (abrir) prepararPainelDoacao();
   });
 
   for (let i = 0; i < chipsValorDoacao.length; i += 1) {
@@ -260,14 +364,29 @@ function iniciarBotoesFinais() {
       if (!inputValorDoacao) return;
       const valor = this.getAttribute("data-value");
       if (!valor) return;
+
       inputValorDoacao.value = valor;
+      for (let j = 0; j < chipsValorDoacao.length; j += 1) {
+        chipsValorDoacao[j].classList.toggle("is-active", chipsValorDoacao[j] === this);
+      }
+      atualizarImpactoDoacao(Number(valor));
       inputValorDoacao.focus();
+    });
+  }
+
+  if (inputValorDoacao) {
+    inputValorDoacao.addEventListener("input", function () {
+      const valorDigitado = Number((inputValorDoacao.value || "0").replace(",", ".")) || 0;
+      atualizarImpactoDoacao(valorDigitado);
+      for (let i = 0; i < chipsValorDoacao.length; i += 1) {
+        chipsValorDoacao[i].classList.toggle("is-active", Number(chipsValorDoacao[i].getAttribute("data-value")) === valorDigitado);
+      }
     });
   }
 
   if (botaoCopiarPix && campoChavePix) {
     function feedbackBotaoCopiar(sucesso) {
-      botaoCopiarPix.textContent = sucesso ? "Copiado!" : "Não foi possível copiar";
+      botaoCopiarPix.textContent = sucesso ? "Copiado!" : "Nao foi possivel copiar";
       window.setTimeout(function () {
         botaoCopiarPix.textContent = "Copiar chave";
       }, 1400);
@@ -300,20 +419,17 @@ function iniciarBotoesFinais() {
     botaoDoarTopo.addEventListener("click", abrirDoacao);
   }
 
-  // Configurar formulário de doação do público
   if (formDoacaoPublica) {
-    console.log("Adicionando listener ao formulário de doação pública");
     formDoacaoPublica.addEventListener("submit", enviarFormularioDoacaoDoador);
-  } else {
-    console.error("Formulário de doação pública não encontrado!");
   }
 
-  // Formatar CPF enquanto digita
   if (inputCpfDoacao) {
     inputCpfDoacao.addEventListener("input", function (event) {
       event.target.value = formatarCpfDoacao(event.target.value);
     });
   }
+
+  atualizarImpactoDoacao(0);
 }
 
 let transparenciaPastas = [];

@@ -202,14 +202,12 @@ function preencherSelectQuartos(quartoSelecionado = '') {
 }
 
 function limparIndicadoresOrdenacaoMoradores() {
-    document.getElementById('sort-id').textContent = '';
     document.getElementById('sort-nome').textContent = '';
     document.getElementById('sort-cpf').textContent = '';
     document.getElementById('sort-dtNascimento').textContent = '';
     document.getElementById('sort-endereco').textContent = '';
     document.getElementById('sort-cidade').textContent = '';
 
-    document.getElementById('th-id').classList.remove('is-active');
     document.getElementById('th-nome').classList.remove('is-active');
     document.getElementById('th-cpf').classList.remove('is-active');
     document.getElementById('th-dtNascimento').classList.remove('is-active');
@@ -390,17 +388,16 @@ function renderizarMoradores(moradores) {
 
     listaMoradores.forEach(m => {
         const row = tbody.insertRow();
-        row.insertCell(0).textContent = m.idMorador;
-        row.insertCell(1).textContent = m.nome;
-        row.insertCell(2).textContent = formatarGenero(m.genero);
-        row.insertCell(3).textContent = m.cpf;
-        row.insertCell(4).textContent = formatarData(m.dtNascimento);
-        row.insertCell(5).textContent = formatarAlaQuarto(m);
-        row.insertCell(6).textContent = `${m.endereco}, ${m.numero}`;
-        row.insertCell(7).textContent = `${m.cidade}/${m.estado}`;
-        row.insertCell(8).textContent = m.telefone;
+        row.insertCell(0).textContent = m.nome;
+        row.insertCell(1).textContent = formatarGenero(m.genero);
+        row.insertCell(2).textContent = m.cpf;
+        row.insertCell(3).textContent = formatarData(m.dtNascimento);
+        row.insertCell(4).textContent = formatarAlaQuarto(m);
+        row.insertCell(5).textContent = `${m.endereco}, ${m.numero}`;
+        row.insertCell(6).textContent = `${m.cidade}/${m.estado}`;
+        row.insertCell(7).textContent = m.telefone;
 
-        const acoes = row.insertCell(9);
+        const acoes = row.insertCell(8);
 
         const btnEditar = document.createElement('button');
         btnEditar.type = 'button';
