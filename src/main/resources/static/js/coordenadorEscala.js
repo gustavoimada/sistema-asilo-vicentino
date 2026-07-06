@@ -385,7 +385,7 @@ async function carregarTurnosEscala()
         idTurnos: 1,
         horaIni: "07:00",
         horaFim: "19:00",
-        descricao: "Turno Manha"
+        descricao: "Turno Manhã"
     },
     {
         idTurnos: 2,
@@ -455,7 +455,7 @@ function formatarDataHoraRealCoordenador(dataEscala, hora)
 
 function nomeTurnoCurto(idTurno)
 {
-    return Number(idTurno) === 1 ? "Manha" : "Noite";
+    return Number(idTurno) === 1 ? "Manhã" : "Noite";
 }
 
 function obterHorarioTurnoCurto(idTurno)

@@ -104,6 +104,29 @@
       </header>
 
       <div class="content">
+        <div class="content-wrap">
+          <section>
+            <div class="list-header">
+              <div class="list-header-left">
+                <h2>Lista de Atividades</h2>
+                <p>Visualização das atividades cadastradas no sistema.</p>
+              </div>
+              <div class="list-header-actions">
+                <button id="novoAtividadeBtn" type="button" class="primary-action secondary-open-btn">
+                  <span class="material-symbols-outlined">add</span>
+                  Agendar Nova
+                </button>
+                <button type="button" class="filter-open-btn" onclick="window.location.href='tipoAtividades.html'">
+                  <span class="material-symbols-outlined">category</span>
+                  Tipos
+                </button>
+                <button id="abrirFiltrosAtividade" type="button" class="filter-open-btn">
+                  <span class="material-symbols-outlined">filter_list</span>
+                  Filtros
+                </button>
+              </div>
+            </div>
+
         <section class="card" id="atividadeFormCard" style="display: none;">
           <div class="section-header-inline">
             <div class="section-header" style="margin-bottom:0;">
@@ -197,29 +220,7 @@
           </div>
         </section>
 
-        <section class="table-card">
-          <div class="card" style="box-shadow:none; padding:0; border-radius:0;">
-            <div class="list-header" style="padding:32px 32px 0;">
-              <div class="list-header-left">
-                <h2>Atividades Agendadas</h2>
-                <p>Visualização das atividades cadastradas no sistema.</p>
-              </div>
-              <div class="list-header-actions">
-                <button id="novoAtividadeBtn" type="button" class="primary-action secondary-open-btn">
-                  <span class="material-symbols-outlined">add</span>
-                  Agendar Nova
-                </button>
-                <button type="button" class="filter-open-btn" onclick="window.location.href='tipoAtividades.html'">
-                  <span class="material-symbols-outlined">category</span>
-                  Tipos
-                </button>
-                <button id="abrirFiltrosAtividade" type="button" class="filter-open-btn">
-                  <span class="material-symbols-outlined">filter_list</span>
-                  Filtros
-                </button>
-              </div>
-            </div>
-
+        <div class="table-card">
             <div class="table-wrap">
               <table>
                 <thead>
@@ -240,8 +241,9 @@
                 </tbody>
               </table>
             </div>
-          </div>
-        </section>
+        </div>
+          </section>
+        </div>
       </div>
     </main>
   </div>

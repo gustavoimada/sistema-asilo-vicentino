@@ -176,8 +176,8 @@ body {
 
 .main-content {
     margin-left: 256px;
-    max-width: 1280px;
-    padding: 96px 24px 48px;
+    max-width: 1600px;
+    padding: 96px 32px 32px;
 }
 
 .page-header {
@@ -200,13 +200,13 @@ body {
 .content-stack {
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    gap: 24px;
 }
 
 .card {
     background: var(--surface);
     border: 1px solid #f8fafc;
-    border-radius: 24px;
+    border-radius: 28px;
     padding: 32px;
     box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 }
@@ -368,7 +368,7 @@ body {
 
 .table-card {
     background: white;
-    border-radius: 24px;
+    border-radius: 28px;
     overflow: hidden;
     border: 1px solid #f1f5f9;
     box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
@@ -535,7 +535,7 @@ tbody tr:hover {
 }
 
 .list-header-left h2 {
-    font-size: 34px;
+    font-size: 48px;
     font-weight: 800;
     color: #00357f;
     letter-spacing: -0.02em;
@@ -624,8 +624,8 @@ tbody tr:hover {
     width: 42px;
     height: 42px;
     border: none;
-    background: #f1f5f9;
-    color: #64748b;
+    background: #fef2f2;
+    color: #dc2626;
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -635,8 +635,8 @@ tbody tr:hover {
 }
 
 .close-panel-btn:hover {
-    background: #e2e8f0;
-    color: #0f172a;
+    background: #fee2e2;
+    color: #b91c1c;
 }
 
 .section-header {

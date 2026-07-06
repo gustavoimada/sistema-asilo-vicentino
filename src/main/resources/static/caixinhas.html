@@ -105,12 +105,12 @@
 
     <div class="content-stack">
         <section class="card form-card" id="cadastroPrescricao" hidden>
-            <div class="card-title-row">
-                <div class="card-icon-box">
-                    <span class="material-symbols-outlined">edit_note</span>
+            <div class="section-header section-header-inline">
+                <div>
+                    <h2>Adicionar Medicamento</h2>
+                    <p>Inclua medicamento, dose e frequência na caixinha do morador.</p>
                 </div>
-                <h3>Adicionar Medicamento</h3>
-                <button type="button" id="fecharCadastroPrescricao" class="action-btn" style="margin-left: auto;">
+                <button type="button" id="fecharCadastroPrescricao" class="close-panel-btn">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
@@ -135,7 +135,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Repeticao</label>
+                    <label>Repetição</label>
                     <input type="number" min="1" placeholder="Ex: 8" id="frequenciaValor" name="frequenciaValor"/>
                 </div>
 
@@ -158,12 +158,12 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Primeiro horario</label>
+                    <label>Primeiro horário</label>
                     <input type="time" id="primeiraDose" name="primeiraDose"/>
                 </div>
 
                 <div class="form-group">
-                    <label>Data de inicio</label>
+                    <label>Data de início</label>
                     <input type="date" id="dtInicio" name="dtInicio"/>
                 </div>
 
@@ -173,7 +173,10 @@
                 </div>
 
                 <div class="form-actions">
-                    <button type="submit" class="save-btn">Salvar Medicamento</button>
+                    <button type="submit" class="primary-action">
+                        <span class="material-symbols-outlined">save</span>
+                        Salvar Medicamento
+                    </button>
                 </div>
             </form>
         </section>
@@ -182,7 +185,7 @@
             <div class="list-header">
                 <div class="list-header-left">
                     <h2>Caixinhas de Medicamentos</h2>
-                    <p>Medicamentos organizados por morador, dose e horario.</p>
+                    <p>Medicamentos organizados por morador, dose e horário.</p>
                 </div>
                 <div class="list-header-actions">
                     <button type="button" id="abrirCadastroPrescricao" class="primary-action secondary-open-btn">
@@ -258,7 +261,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="frequenciaValorEditar">Repeticao</label>
+                        <label for="frequenciaValorEditar">Repetição</label>
                         <input type="number" min="1" placeholder="Ex: 8" id="frequenciaValorEditar"/>
                     </div>
 
@@ -281,12 +284,12 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="primeiraDoseEditar">Primeiro horario</label>
+                        <label for="primeiraDoseEditar">Primeiro horário</label>
                         <input type="time" id="primeiraDoseEditar"/>
                     </div>
 
                     <div class="form-group">
-                        <label for="dtInicioEditar">Data de inicio</label>
+                        <label for="dtInicioEditar">Data de início</label>
                         <input type="date" id="dtInicioEditar"/>
                     </div>
 
@@ -298,7 +301,7 @@
                     <div class="form-actions">
                         <button type="button" id="salvarEdicaoPrescricao" class="primary-action">
                             <span class="material-symbols-outlined">save</span>
-                            Salvar Alteracao
+                            Salvar Alteração
                         </button>
                     </div>
                 </div>
@@ -311,12 +314,12 @@
                         <tr>
                             <th data-col="morador_idmorador">Morador</th>
                             <th data-col="medicamento_idmedicamento">Medicamento</th>
-                            <th data-col="frequenciavalor">Frequencia</th>
+                            <th data-col="frequenciavalor">Frequência</th>
                             <th data-col="qtddose">Qtd. Dose</th>
-                            <th data-col="primeiradose">Primeiro Horario</th>
-                            <th data-col="dtinicio">Inicio</th>
+                            <th data-col="primeiradose">Primeiro Horário</th>
+                            <th data-col="dtinicio">Início</th>
                             <th data-col="dtfim">Fim</th>
-                            <th>Acoes</th>
+                            <th>Ações</th>
                         </tr>
                         </thead>
                         <tbody id="tbodyPrescricao"></tbody>

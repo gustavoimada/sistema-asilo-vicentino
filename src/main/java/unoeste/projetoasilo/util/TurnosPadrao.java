@@ -28,6 +28,6 @@ public final class TurnosPadrao
 
     public static String nome(int idTurno)
     {
-        return idTurno == NOITE ? "Noite" : "Manha";
+        return idTurno == NOITE ? "Noite" : "Manhã";
     }
 }

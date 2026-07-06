@@ -270,7 +270,7 @@ function obterDetalhesTurno(turnoId)
 {
     return Number(turnoId) === 2
         ? { nome: "Noite", horario: "19:00 - 07:00" }
-        : { nome: "Manha", horario: "07:00 - 19:00" };
+        : { nome: "Manhã", horario: "07:00 - 19:00" };
 }
 
 function obterNomeTurno(turnoId)

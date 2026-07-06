@@ -188,7 +188,7 @@ function formatarDataTurno(valor)
 
 function textoTurnoNome(idTurno)
 {
-    return Number(idTurno) === 1 ? "Manha" : "Noite";
+    return Number(idTurno) === 1 ? "Manhã" : "Noite";
 }
 
 function textoStatusTurno(status)
