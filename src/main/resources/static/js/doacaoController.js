@@ -14,6 +14,15 @@ function normalizarTexto(valor) {
     .toLowerCase();
 }
 
+function escaparHtml(valor) {
+  return String(valor == null ? "" : valor)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function formatarCpf(valor) {
   const numeros = somenteDigitos(valor).slice(0, 11);
   return numeros
@@ -200,7 +209,7 @@ function renderizarTabela() {
   });
   dados = dados.sort((a, b) => comparar(a, b, ordenacaoAtual.chave, ordenacaoAtual.direcao));
   if (dados.length === 0) {
-    corpo.innerHTML = '<tr><td colspan="8" class="empty-row">Nenhuma doação encontrada.</td></tr>';
+    corpo.innerHTML = '<tr><td colspan="9" class="empty-row">Nenhuma doação encontrada.</td></tr>';
     return;
   }
   var html = "";
@@ -210,13 +219,14 @@ function renderizarTabela() {
     const estaConcluida = doacao.status === "Concluida";
     html += `
       <tr>
-        <td>${formatarValorDoacao(doacao)}</td>
-        <td>${doacao.tipoDoacaoNome || ""}</td>
-        <td>${nomeDoador}</td>
-        <td>${formatarCpf(doacao.cpfDoador || "")}</td>
-        <td>${formatarDataDoacao(doacao.dtDoacao)}</td>
-        <td>${formatarStatus(doacao.status)}</td>
-        <td>${doacao.observacoes || ""}</td>
+        <td>${escaparHtml(formatarValorDoacao(doacao))}</td>
+        <td>${escaparHtml(doacao.tipoDoacaoNome || "")}</td>
+        <td>${escaparHtml(nomeDoador)}</td>
+        <td>${escaparHtml(doacao.pagEmail || "")}</td>
+        <td>${escaparHtml(formatarCpf(doacao.cpfDoador || ""))}</td>
+        <td>${escaparHtml(formatarDataDoacao(doacao.dtDoacao))}</td>
+        <td>${escaparHtml(formatarStatus(doacao.status))}</td>
+        <td>${escaparHtml(doacao.observacoes || "")}</td>
         <td class="text-right">
           <div class="acoes">
             ${estaConcluida ? `
@@ -242,7 +252,7 @@ function renderizarTabela() {
 
 function carregarDoacoes() {
   const corpo = el("tabelaDoacoes");
-  if (corpo) corpo.innerHTML = '<tr><td colspan="8" class="empty-row">Carregando doações...</td></tr>';
+  if (corpo) corpo.innerHTML = '<tr><td colspan="9" class="empty-row">Carregando doações...</td></tr>';
   return fetch("/doacao/listar")
     .then(function (response) {
       return parseJsonSegura(response).then(function (body) {
@@ -270,6 +280,7 @@ function carregarDoacoes() {
           tipoDoacaoNome: d.tipo || "",
           nomeDoador: d.nomeDoador || "",
           cpfDoador: d.cpfDoador,
+          pagEmail: d.pag_email || d.pagEmail || "",
           dtDoacao: d.dtDoacao,
           observacoes: d.observacoes,
           status: d.status
@@ -278,7 +289,7 @@ function carregarDoacoes() {
       renderizarTabela();
     })
     .catch(function () {
-      if (corpo) corpo.innerHTML = '<tr><td colspan="8" class="empty-row">Nenhuma doação encontrada.</td></tr>';
+      if (corpo) corpo.innerHTML = '<tr><td colspan="9" class="empty-row">Nenhuma doação encontrada.</td></tr>';
     });
 }
 

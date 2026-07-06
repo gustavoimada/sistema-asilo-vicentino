@@ -8,7 +8,8 @@ var escalasOriginais = {};
 var escalasRemovidas = {};
 var datasSemana = {};
 var escalasConflitoExternas = [];
-var STORAGE_MODELO_ESCALA = "sgav.modeloEscalaSemanal.v1";
+var STORAGE_MODELO_ESCALA_LEGADO = "sgav.modeloEscalaSemanal.v1";
+var STORAGE_MODELOS_ESCALA = "sgav.modelosEscalaSemanal.v2";
 var planoPreviewAtual = null;
 
 function preencherPerfilTopo()
@@ -542,6 +543,99 @@ function obterModeloAtualDaTela()
         });
 }
 
+function gerarIdModeloEscala()
+{
+    return "modelo-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
+}
+
+function salvarModelosEscala(modelos)
+{
+    localStorage.setItem(STORAGE_MODELOS_ESCALA, JSON.stringify(modelos));
+}
+
+function normalizarModelosEscala(modelos)
+{
+    if (!Array.isArray(modelos))
+    {
+        return [];
+    }
+
+    return modelos
+        .filter(function(modelo)
+        {
+            return modelo && Array.isArray(modelo.itens) && modelo.itens.length > 0;
+        })
+        .map(function(modelo, index)
+        {
+            return {
+                id: modelo.id || gerarIdModeloEscala(),
+                nome: modelo.nome || "Modelo " + (index + 1),
+                criadoEm: modelo.criadoEm || new Date().toISOString(),
+                itens: modelo.itens
+            };
+        });
+}
+
+function carregarModelosEscala()
+{
+    var modelos = [];
+    var salvos = localStorage.getItem(STORAGE_MODELOS_ESCALA);
+
+    if (salvos)
+    {
+        try
+        {
+            modelos = normalizarModelosEscala(JSON.parse(salvos));
+        }
+        catch (e)
+        {
+            modelos = [];
+        }
+    }
+
+    if (!salvos)
+    {
+        var legado = localStorage.getItem(STORAGE_MODELO_ESCALA_LEGADO);
+        if (legado)
+        {
+            try
+            {
+                var modeloLegado = JSON.parse(legado);
+                var itensLegado = Array.isArray(modeloLegado.itens) ? modeloLegado.itens : [];
+                if (itensLegado.length)
+                {
+                    modelos.push({
+                        id: gerarIdModeloEscala(),
+                        nome: "Modelo 1",
+                        criadoEm: modeloLegado.criadoEm || new Date().toISOString(),
+                        itens: itensLegado
+                    });
+                    salvarModelosEscala(modelos);
+                }
+            }
+            catch (e)
+            {
+                modelos = [];
+            }
+        }
+    }
+
+    return modelos;
+}
+
+function obterNomeProximoModelo(modelos)
+{
+    var numero = 1;
+    while (modelos.some(function(modelo)
+    {
+        return modelo.nome === "Modelo " + numero;
+    }))
+    {
+        numero++;
+    }
+    return "Modelo " + numero;
+}
+
 function salvarModeloSemanal()
 {
     var modelo = obterModeloAtualDaTela();
@@ -551,36 +645,146 @@ function salvarModeloSemanal()
         return;
     }
 
-    localStorage.setItem(STORAGE_MODELO_ESCALA, JSON.stringify({
+    var modelos = carregarModelosEscala();
+    var novoModelo = {
+        id: gerarIdModeloEscala(),
+        nome: obterNomeProximoModelo(modelos),
         criadoEm: new Date().toISOString(),
         itens: modelo
-    }));
-    showToast("success", "Modelo semanal salvo para este navegador.");
+    };
+
+    modelos.push(novoModelo);
+    salvarModelosEscala(modelos);
+    showToast("success", novoModelo.nome + " salvo com " + modelo.length + " escala(s).");
 }
 
 function aplicarModeloSemanal()
 {
-    var salvo = localStorage.getItem(STORAGE_MODELO_ESCALA);
-    if (!salvo)
+    abrirModelosEscala();
+}
+
+function fecharModelosEscala()
+{
+    var modal = document.getElementById("modelosEscalaModal");
+    if (modal) modal.style.display = "none";
+}
+
+function obterResumoModeloEscala(itens)
+{
+    var resumo = itens.slice(0, 3).map(function(item)
     {
-        showToast("error", "Nenhum modelo semanal salvo ainda.");
+        return obterNomeDia(item.dia) + " " + obterNomeTurno(item.turnoId);
+    }).join(", ");
+
+    if (itens.length > 3)
+    {
+        resumo += " +" + (itens.length - 3);
+    }
+
+    return resumo || "Sem escalas";
+}
+
+function renderizarModelosEscala()
+{
+    var listaEl = document.getElementById("modelosEscalaLista");
+    if (!listaEl) return;
+
+    var modelos = carregarModelosEscala();
+    if (!modelos.length)
+    {
+        listaEl.innerHTML = '<div class="modelos-empty">Nenhum modelo semanal salvo ainda.</div>';
         return;
     }
 
-    try
+    listaEl.innerHTML = modelos.map(function(modelo, index)
     {
-        var modelo = JSON.parse(salvo);
         var itens = Array.isArray(modelo.itens) ? modelo.itens : [];
-        var plano = itens.map(function(item)
-        {
-            return montarItemPlano(item.dia, item.turnoId, item.cuidadorId, "modelo");
-        });
-        mostrarPreviewEscala("Aplicar modelo semanal", plano);
-    }
-    catch (e)
+        var criadoEm = modelo.criadoEm ? new Date(modelo.criadoEm) : null;
+        var criadoTexto = criadoEm && !Number.isNaN(criadoEm.getTime()) ? criadoEm.toLocaleDateString("pt-BR") : "sem data";
+
+        return '' +
+            '<article class="modelo-card">' +
+                '<div class="modelo-card-main">' +
+                    '<span class="modelo-kicker">Modelo ' + (index + 1) + "</span>" +
+                    "<h3>" + escapeHtml(modelo.nome || ("Modelo " + (index + 1))) + "</h3>" +
+                    "<p>" + itens.length + " escala(s) - " + escapeHtml(obterResumoModeloEscala(itens)) + "</p>" +
+                "</div>" +
+                '<div class="modelo-card-meta">' +
+                    '<span class="modelo-date">Salvo em ' + escapeHtml(criadoTexto) + "</span>" +
+                    '<div class="modelo-card-actions">' +
+                        '<button type="button" class="secondary-btn modelo-delete-btn" data-acao="excluir" data-modelo-id="' + escapeHtml(modelo.id) + '">' +
+                            '<span class="material-symbols-outlined">delete</span>' +
+                            "Excluir" +
+                        "</button>" +
+                        '<button type="button" class="primary-btn modelo-apply-btn" data-acao="aplicar" data-modelo-id="' + escapeHtml(modelo.id) + '">' +
+                            '<span class="material-symbols-outlined">event_repeat</span>' +
+                            "Aplicar" +
+                        "</button>" +
+                    "</div>" +
+                "</div>" +
+            "</article>";
+    }).join("");
+}
+
+function abrirModelosEscala()
+{
+    var modal = document.getElementById("modelosEscalaModal");
+    if (!modal)
     {
-        showToast("error", "Modelo salvo esta invalido. Salve um novo modelo.");
+        showToast("error", "Nao foi possivel abrir os modelos semanais.");
+        return;
     }
+
+    renderizarModelosEscala();
+    modal.style.display = "flex";
+}
+
+function aplicarModeloEscala(modeloId)
+{
+    var modelos = carregarModelosEscala();
+    var modelo = modelos.find(function(item)
+    {
+        return item.id === modeloId;
+    });
+
+    if (!modelo)
+    {
+        showToast("error", "Modelo semanal nao encontrado.");
+        renderizarModelosEscala();
+        return;
+    }
+
+    var plano = modelo.itens.map(function(item)
+    {
+        return montarItemPlano(item.dia, item.turnoId, item.cuidadorId, "modelo");
+    });
+
+    fecharModelosEscala();
+    mostrarPreviewEscala("Aplicar " + (modelo.nome || "modelo semanal"), plano);
+}
+
+function excluirModeloEscala(modeloId)
+{
+    var modelos = carregarModelosEscala();
+    var modelo = modelos.find(function(item)
+    {
+        return item.id === modeloId;
+    });
+
+    if (!modelo) return;
+
+    if (!confirm("Excluir " + modelo.nome + "?"))
+    {
+        return;
+    }
+
+    modelos = modelos.filter(function(item)
+    {
+        return item.id !== modeloId;
+    });
+    salvarModelosEscala(modelos);
+    renderizarModelosEscala();
+    showToast("success", modelo.nome + " excluido.");
 }
 
 function buscarEscalasPeriodo(inicio, fim)
@@ -1142,12 +1346,34 @@ function setupEventListeners()
     var aplicarModeloBtn = document.getElementById("aplicarModeloBtn");
     var cancelarPreviewBtn = document.getElementById("cancelarPreviewEscalaBtn");
     var confirmarPreviewBtn = document.getElementById("confirmarPreviewEscalaBtn");
+    var listaModelos = document.getElementById("modelosEscalaLista");
 
     if (copiarBtn) copiarBtn.addEventListener("click", copiarSemanaAnterior);
     if (salvarModeloBtn) salvarModeloBtn.addEventListener("click", salvarModeloSemanal);
     if (aplicarModeloBtn) aplicarModeloBtn.addEventListener("click", aplicarModeloSemanal);
     if (cancelarPreviewBtn) cancelarPreviewBtn.addEventListener("click", fecharPreviewEscala);
     if (confirmarPreviewBtn) confirmarPreviewBtn.addEventListener("click", aplicarPlanoPreview);
+    if (listaModelos)
+    {
+        listaModelos.addEventListener("click", function(e)
+        {
+            var botao = e.target.closest("button[data-acao]");
+            if (!botao) return;
+
+            var acao = botao.getAttribute("data-acao");
+            var modeloId = botao.getAttribute("data-modelo-id");
+
+            if (acao === "aplicar")
+            {
+                aplicarModeloEscala(modeloId);
+            }
+
+            if (acao === "excluir")
+            {
+                excluirModeloEscala(modeloId);
+            }
+        });
+    }
 }
 
 document.addEventListener("click", function(e)
@@ -1162,5 +1388,11 @@ document.addEventListener("click", function(e)
     if (previewModal && e.target === previewModal)
     {
         fecharPreviewEscala();
+    }
+
+    var modelosModal = document.getElementById("modelosEscalaModal");
+    if (modelosModal && e.target === modelosModal)
+    {
+        fecharModelosEscala();
     }
 });

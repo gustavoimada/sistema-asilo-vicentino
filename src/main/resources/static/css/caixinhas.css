@@ -44,6 +44,114 @@
   text-align: right;
 }
 
+.caixinha-table-row > td {
+  padding: 14px 18px;
+  background: #ffffff;
+  text-align: left;
+}
+
+.caixinha-group {
+  border: 1px solid #dbe8f7;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+}
+
+.caixinha-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  border-bottom: 1px solid #e7eef8;
+}
+
+.caixinha-label {
+  display: block;
+  color: var(--outline);
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.caixinha-group-header h3 {
+  margin: 4px 0 0;
+  color: var(--primary);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.caixinha-count {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #edf5ff;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.caixinha-meds {
+  display: grid;
+}
+
+.caixinha-med-item {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.2fr) minmax(360px, 2fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.caixinha-med-item:last-child {
+  border-bottom: 0;
+}
+
+.caixinha-med-main span {
+  display: block;
+  margin-top: 4px;
+  color: var(--outline);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.caixinha-med-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.caixinha-med-meta > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.caixinha-med-meta .material-symbols-outlined {
+  color: var(--primary);
+  font-size: 17px;
+}
+
+.caixinha-med-actions {
+  display: inline-flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 @media (max-width: 700px) {
   #tabelaPrescricao {
     min-width: 980px;

@@ -7,7 +7,7 @@
 
   <link rel="stylesheet" href="css/funcionario.css" />
   <link rel="stylesheet" href="css/cadastroMedicamento.css?v=2" />
-  <link rel="stylesheet" href="css/caixinhas.css?v=3" />
+  <link rel="stylesheet" href="css/caixinhas.css?v=20260706-2" />
   <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260705-2" />
 
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -111,13 +111,13 @@
           <div class="list-header">
             <div class="list-header-left">
               <h2>Caixinhas de Medicamentos</h2>
-              <p>Medicamentos organizados por morador, dose e horário.</p>
+              <p>Uma caixinha por morador, com todos os medicamentos, doses e horários.</p>
             </div>
 
             <div class="list-header-actions">
               <button type="button" id="abrirCadastroPrescricao" class="primary-action secondary-open-btn">
                 <span class="material-symbols-outlined">add</span>
-                Cadastrar Novo
+                Adicionar Medicamento
               </button>
 
               <button type="button" id="abrirFiltrosPrescricao" class="filter-open-btn">
@@ -130,8 +130,8 @@
           <section class="card" id="cadastroPrescricao" hidden>
             <div class="section-header section-header-inline">
               <div>
-                <h2>Cadastrar Medicamento na Caixinha</h2>
-                <p>Inclua medicamento, dose e frequência na caixinha do morador.</p>
+                <h2>Adicionar Medicamento à Caixinha</h2>
+                <p>Escolha o morador e inclua mais um medicamento na caixinha dele.</p>
               </div>
 
               <button type="button" id="fecharCadastroPrescricao" class="close-panel-btn">
@@ -190,7 +190,7 @@
               <div class="form-actions">
                 <button type="submit" class="primary-action">
                   <span class="material-symbols-outlined">save</span>
-                  Salvar Medicamento
+                  Salvar na Caixinha
                 </button>
               </div>
             </form>
@@ -319,7 +319,7 @@
     </main>
   </div>
 
-  <script src="js/caixinhaMedicamentosController.js"></script>
+  <script src="js/caixinhaMedicamentosController.js?v=20260706-2"></script>
   <script src="js/sidebarSecretaria.js?v=20260705-1"></script>
 </body>
 </html>

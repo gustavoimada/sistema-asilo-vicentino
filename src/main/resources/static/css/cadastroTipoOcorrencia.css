@@ -352,6 +352,18 @@ select {
   color: #334155;
 }
 
+.back-main-btn {
+  background: #ffffff;
+  color: var(--primary);
+  border: 1px solid #dbeafe;
+  text-decoration: none;
+}
+
+.back-main-btn:hover {
+  background: #eff6ff;
+  color: var(--primary-container);
+}
+
 .secondary-panel-btn {
   background: #f8fafc;
   color: #475569;

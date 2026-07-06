@@ -20,7 +20,7 @@ public class DoacaoControl
         Banco conexao = Banco.getConnection();
         try
         {
-            ResponseEntity<Object> erroValidacao = validarDados(valor, observacoes, cpfDoador, nomeDoador, tipo);
+            ResponseEntity<Object> erroValidacao = validarDados(valor, observacoes, cpfDoador, nomeDoador, tipo, pagEmail);
             if (erroValidacao != null)
             {
                 return erroValidacao;
@@ -94,7 +94,7 @@ public class DoacaoControl
                 return ResponseEntity.badRequest().body(new Error("Erro", "Esta doação já foi concluída e não pode ser alterada."));
             }
 
-            ResponseEntity<Object> erroValidacao = validarDados(valor, observacoes, cpfDoador, nomeDoador, tipo);
+            ResponseEntity<Object> erroValidacao = validarDados(valor, observacoes, cpfDoador, nomeDoador, tipo, null);
             if (erroValidacao != null)
             {
                 return erroValidacao;
@@ -276,7 +276,7 @@ public class DoacaoControl
         }
     }
 
-    private ResponseEntity<Object> validarDados(double valor, String observacoes, String cpfDoador, String nomeDoador, String tipo)
+    private ResponseEntity<Object> validarDados(double valor, String observacoes, String cpfDoador, String nomeDoador, String tipo, String pagEmail)
     {
         if (!"Patrimônio".equalsIgnoreCase(tipo) && valor <= 0)
         {
@@ -297,6 +297,18 @@ public class DoacaoControl
         if (nomeDoador != null && nomeDoador.length() > 45)
         {
             return ResponseEntity.badRequest().body(new Error("Erro", "O nome do doador é muito longo. Use no máximo 45 caracteres."));
+        }
+        if (pagEmail != null && !pagEmail.trim().isEmpty())
+        {
+            String email = pagEmail.trim();
+            if (email.length() > 45)
+            {
+                return ResponseEntity.badRequest().body(new Error("Erro", "O e-mail informado é muito longo. Use no máximo 45 caracteres."));
+            }
+            if (!email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"))
+            {
+                return ResponseEntity.badRequest().body(new Error("Erro", "O e-mail informado é inválido. Verifique e tente novamente."));
+            }
         }
         return null;
     }

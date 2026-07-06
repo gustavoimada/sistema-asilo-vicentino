@@ -145,6 +145,7 @@ function iniciarRotinaAsilo()
     {
       imagem.src = passo.getAttribute("data-image") || imagem.src;
       imagem.alt = passo.getAttribute("data-title") || "Rotina do asilo";
+      imagem.classList.toggle("is-contain", passo.getAttribute("data-fit") === "contain");
       horario.textContent = passo.getAttribute("data-time") || horario.textContent;
       if (titulo) titulo.textContent = passo.getAttribute("data-title") || titulo.textContent;
       if (texto) texto.textContent = passo.getAttribute("data-text") || texto.textContent;
@@ -287,8 +288,6 @@ function iniciarBotoesFinais() {
   const inputValorDoacao = document.getElementById("doacaoValor");
   const chipsValorDoacao = document.querySelectorAll(".js-doacao-valor");
   const impactoDoacao = document.getElementById("doacaoImpacto");
-  const campoChavePix = document.getElementById("chavePixDoacao");
-  const botaoCopiarPix = document.getElementById("copiarPix");
   const formDoacaoPublica = document.getElementById("formDoacaoPublica");
   const inputCpfDoacao = document.getElementById("doacaoCpf");
 
@@ -385,37 +384,6 @@ function iniciarBotoesFinais() {
       for (let i = 0; i < chipsValorDoacao.length; i += 1) {
         chipsValorDoacao[i].classList.toggle("is-active", Number(chipsValorDoacao[i].getAttribute("data-value")) === valorDigitado);
       }
-    });
-  }
-
-  if (botaoCopiarPix && campoChavePix) {
-    function feedbackBotaoCopiar(sucesso) {
-      botaoCopiarPix.textContent = sucesso ? "Copiado!" : "Nao foi possivel copiar";
-      window.setTimeout(function () {
-        botaoCopiarPix.textContent = "Copiar chave";
-      }, 1400);
-    }
-
-    function copiarComSelecao() {
-      campoChavePix.focus();
-      campoChavePix.select();
-      campoChavePix.setSelectionRange(0, campoChavePix.value.length);
-      const copiou = document.execCommand("copy");
-      window.getSelection()?.removeAllRanges();
-      feedbackBotaoCopiar(copiou);
-    }
-
-    botaoCopiarPix.addEventListener("click", function () {
-      if (!campoChavePix.value) return;
-
-      if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(campoChavePix.value)
-          .then(function () { feedbackBotaoCopiar(true); })
-          .catch(function () { copiarComSelecao(); });
-        return;
-      }
-
-      copiarComSelecao();
     });
   }
 
@@ -860,15 +828,14 @@ function enviarFormularioDoacaoDoador(event) {
   const inputCpf = document.getElementById("doacaoCpf");
   const inputValor = document.getElementById("doacaoValor");
   const inputMsg = document.getElementById("doacaoMsg");
+  const botaoEnviar = document.getElementById("btnEnviarDoacao");
 
   // Validações
   const nome = (inputNome?.value || "").trim();
   const email = (inputEmail?.value || "").trim();
   const cpf = (inputCpf?.value || "").trim();
-  const valor = parseFloat(inputValor?.value || "0");
+  const valor = parseFloat(String(inputValor?.value || "0").replace(",", "."));
   const observacoes = (inputMsg?.value || "").trim();
-
-  console.log("Enviando doação:", { nome, email, cpf, valor, observacoes });
 
   if (!nome) {
     mostrarNotificacaoDoacaoDoador("error", "Nome é obrigatório.");
@@ -906,6 +873,12 @@ function enviarFormularioDoacaoDoador(event) {
     return;
   }
 
+  if (botaoEnviar) {
+    botaoEnviar.disabled = true;
+    botaoEnviar.dataset.originalText = botaoEnviar.innerHTML;
+    botaoEnviar.innerHTML = '<span class="material-symbols-outlined">hourglass_top</span>Registrando...';
+  }
+
   // Monta os dados
   const agora = new Date();
   const dataAtual = agora.getFullYear() + "-"
@@ -925,12 +898,14 @@ function enviarFormularioDoacaoDoador(event) {
     pagEmail: email
   });
 
-  console.log("URL:", `/doacao/cadastrar?${params.toString()}`);
-
-  // Envia a doação
-  fetch(`/doacao/cadastrar?${params.toString()}`, { method: "POST" })
+  fetch("/doacao/cadastrar", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+    },
+    body: params.toString()
+  })
     .then(function (response) {
-      console.log("Response status:", response.status, response.statusText);
       const contentType = response.headers.get("content-type");
 
       if (contentType && contentType.includes("application/json")) {
@@ -939,21 +914,18 @@ function enviarFormularioDoacaoDoador(event) {
         });
       } else {
         return response.text().then(text => {
-          console.log("Response text:", text);
           return { ok: response.ok, status: response.status, data: text };
         });
       }
     })
     .then(function (resultado) {
-      console.log("Resultado:", resultado);
-
       if (!resultado.ok) {
         const errorMsg = resultado.data?.descricao || resultado.data?.title || (typeof resultado.data === 'string' ? resultado.data : "Erro desconhecido");
         mostrarNotificacaoDoacaoDoador("error", "Erro: " + errorMsg);
         return;
       }
 
-      mostrarNotificacaoDoacaoDoador("success", "Doação cadastrada com sucesso! Obrigado por sua contribuição!");
+      mostrarNotificacaoDoacaoDoador("success", "Intenção de doação registrada. Obrigado pelo apoio!");
 
       // Limpa o formulário
       inputNome.value = "";
@@ -971,5 +943,11 @@ function enviarFormularioDoacaoDoador(event) {
     .catch(function (erro) {
       console.error("Erro na doação:", erro);
       mostrarNotificacaoDoacaoDoador("error", "Não foi possível processar a doação. Tente novamente.");
+    })
+    .finally(function () {
+      if (botaoEnviar) {
+        botaoEnviar.disabled = false;
+        botaoEnviar.innerHTML = botaoEnviar.dataset.originalText || '<span class="material-symbols-outlined">volunteer_activism</span>Registrar intenção';
+      }
     });
 }

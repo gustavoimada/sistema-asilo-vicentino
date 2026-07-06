@@ -10,6 +10,15 @@ function el(id) {
     return document.getElementById(id);
 }
 
+function escapeHtml(valor) {
+    return String(valor == null ? "" : valor)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
 function removerAcentos(texto) {
     return String(texto || "")
         .normalize("NFD")
@@ -355,6 +364,139 @@ function configurarOrdenacaoPrescricao() {
     });
 }
 
+function obterTextoMedicamentoCaixinha(prescricao) {
+    let medicamentoAtual = {};
+    if (prescricao.medicamento != null) {
+        medicamentoAtual = prescricao.medicamento;
+    }
+
+    let tipoMedicamento = "";
+    if (medicamentoAtual.tipoMedicamento != null) {
+        tipoMedicamento = String(medicamentoAtual.tipoMedicamento).toLowerCase();
+    }
+
+    let tipoMedicamentoTexto = "-";
+    if (medicamentoAtual.tipoMedicamento != null && String(medicamentoAtual.tipoMedicamento).trim() !== "") {
+        tipoMedicamentoTexto = medicamentoAtual.tipoMedicamento;
+    }
+
+    let medicamentoTexto = "-";
+    if (medicamentoAtual.nome != null && String(medicamentoAtual.nome).trim() !== "") {
+        medicamentoTexto = medicamentoAtual.nome;
+    }
+
+    if (tipoMedicamento !== "pomada" && tipoMedicamento !== "xarope") {
+        if (medicamentoAtual.dosagemValor != null && medicamentoAtual.dosagemUnidade != null && String(medicamentoAtual.dosagemUnidade).trim() !== "") {
+            medicamentoTexto += " " + medicamentoAtual.dosagemValor + " " + medicamentoAtual.dosagemUnidade;
+        }
+    }
+
+    return {
+        nome: medicamentoTexto,
+        tipo: tipoMedicamentoTexto
+    };
+}
+
+function agruparPrescricoesPorMorador(prescricoes) {
+    const grupos = [];
+    const indicePorMorador = {};
+
+    prescricoes.forEach((prescricao, index) => {
+        const morador = prescricao.morador || {};
+        const chave = morador.idMorador != null ? String(morador.idMorador) : "sem-id-" + index;
+
+        if (indicePorMorador[chave] == null) {
+            indicePorMorador[chave] = grupos.length;
+            grupos.push({
+                morador: morador,
+                itens: []
+            });
+        }
+
+        grupos[indicePorMorador[chave]].itens.push(prescricao);
+    });
+
+    return grupos;
+}
+
+function renderizarMedicamentoCaixinha(prescricao) {
+    const primeiraDoseFormatada = String(prescricao.primeiraDose || "").slice(0, 5) || "-";
+    const frequenciaTexto = formatarFrequencia(prescricao.frequenciaValor, prescricao.frequenciaUnidade);
+    const dtInicioFormatada = formatarData(prescricao.dtInicio);
+    const dtFimFormatada = formatarData(prescricao.dtFim);
+    const medicamento = obterTextoMedicamentoCaixinha(prescricao);
+    const prescricaoJson = escapeHtml(JSON.stringify(prescricao));
+
+    let qtdDoseTexto = "-";
+    if (prescricao.qtdDose != null) {
+        qtdDoseTexto = prescricao.qtdDose;
+    }
+
+    return `
+        <div class="caixinha-med-item">
+            <div class="caixinha-med-main">
+                <p class="med-name">${escapeHtml(medicamento.nome)}</p>
+                <span>${escapeHtml(medicamento.tipo)}</span>
+            </div>
+            <div class="caixinha-med-meta">
+                <span>
+                    <span class="material-symbols-outlined">schedule</span>
+                    ${escapeHtml(frequenciaTexto)}
+                </span>
+                <span>
+                    <span class="material-symbols-outlined">pill</span>
+                    ${escapeHtml(qtdDoseTexto)} dose(s)
+                </span>
+                <span>
+                    <span class="material-symbols-outlined">alarm</span>
+                    ${escapeHtml(primeiraDoseFormatada)}
+                </span>
+                <span>
+                    <span class="material-symbols-outlined">event</span>
+                    ${escapeHtml(dtInicioFormatada)} ate ${escapeHtml(dtFimFormatada)}
+                </span>
+            </div>
+            <div class="caixinha-med-actions">
+                <button type="button" class="action-icon-btn edit" title="Editar" aria-label="Editar"
+                  onclick='prepararEdicaoPrescricao(${prescricaoJson})'>
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+                <button type="button" class="action-icon-btn delete" title="Remover" aria-label="Remover"
+                  onclick="deletarPrescricao(${prescricao.idPrescricao})">
+                  <span class="material-symbols-outlined">delete</span>
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function renderizarGrupoCaixinha(grupo) {
+    const morador = grupo.morador || {};
+    const nomeMorador = morador.nome || "Morador sem nome";
+    const quantidade = grupo.itens.length;
+    const quantidadeTexto = quantidade === 1 ? "1 medicamento" : quantidade + " medicamentos";
+    const medicamentos = grupo.itens.map(renderizarMedicamentoCaixinha).join("");
+
+    return `
+        <tr class="caixinha-table-row">
+            <td colspan="8">
+                <article class="caixinha-group">
+                    <header class="caixinha-group-header">
+                        <div>
+                            <span class="caixinha-label">Caixinha do morador</span>
+                            <h3>${escapeHtml(nomeMorador)}</h3>
+                        </div>
+                        <span class="caixinha-count">${escapeHtml(quantidadeTexto)}</span>
+                    </header>
+                    <div class="caixinha-meds">
+                        ${medicamentos}
+                    </div>
+                </article>
+            </td>
+        </tr>
+    `;
+}
+
 function carregarTabela(moradorFiltro, medicamentoFiltro) {
     let linhas = "";
     const tabela = document.getElementById("tbodyPrescricao");
@@ -420,80 +562,13 @@ function carregarTabela(moradorFiltro, medicamentoFiltro) {
                 return false;
             });
 
-            prescricoesFiltradas.forEach(prescricao => {
-                const primeiraDoseFormatada = String(prescricao.primeiraDose).slice(0, 5);
-                const frequenciaTexto = formatarFrequencia(prescricao.frequenciaValor, prescricao.frequenciaUnidade);
-                const dtInicioFormatada = formatarData(prescricao.dtInicio);
-                const dtFimFormatada = formatarData(prescricao.dtFim);
-                let medicamentoAtual = {};
-                if (prescricao.medicamento != null) {
-                    medicamentoAtual = prescricao.medicamento;
-                }
+            const grupos = agruparPrescricoesPorMorador(prescricoesFiltradas);
+            linhas = grupos.map(renderizarGrupoCaixinha).join("");
 
-                let tipoMedicamento = "";
-                if (medicamentoAtual.tipoMedicamento != null) {
-                    tipoMedicamento = String(medicamentoAtual.tipoMedicamento).toLowerCase();
-                }
-                let tipoMedicamentoTexto = "-";
-                if (medicamentoAtual.tipoMedicamento != null && String(medicamentoAtual.tipoMedicamento).trim() !== "") {
-                    tipoMedicamentoTexto = medicamentoAtual.tipoMedicamento;
-                }
-
-                let medicamentoTexto = "-";
-                if (medicamentoAtual.nome != null && String(medicamentoAtual.nome).trim() !== "") {
-                    medicamentoTexto = medicamentoAtual.nome;
-                }
-
-                if (tipoMedicamento !== "pomada" && tipoMedicamento !== "xarope") {
-                    if (medicamentoAtual.dosagemValor != null && medicamentoAtual.dosagemUnidade != null && String(medicamentoAtual.dosagemUnidade).trim() !== "") {
-                        medicamentoTexto += " " + medicamentoAtual.dosagemValor + " " + medicamentoAtual.dosagemUnidade;
-                    }
-                }
-
-                let qtdDoseTexto = "-";
-                if (prescricao.qtdDose != null) {
-                    qtdDoseTexto = prescricao.qtdDose;
-                }
-                linhas +=`<tr>
-                            <td>
-                                <div class="resident-info">
-                                    <div>
-                                        <p class="resident-name">${prescricao.morador.nome}</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <div>
-                                    <p class="med-name">${medicamentoTexto}</p>
-                                    <p class="resident-room">${tipoMedicamentoTexto}</p>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="freq-box">
-                                    <span class="material-symbols-outlined">schedule</span>
-                                    <span>${frequenciaTexto}</span>
-                                </div>
-                            </td>
-                            <td>${qtdDoseTexto}</td>
-                            <td>${primeiraDoseFormatada} H</td>
-                            <td>${dtInicioFormatada}</td>
-                            <td>${dtFimFormatada}</td>
-                            <td style="text-align: right;">
-                                <div style="display: inline-flex; gap: 8px;">
-                                    <button type="button" class="action-icon-btn edit"
-                                      onclick='prepararEdicaoPrescricao(${JSON.stringify(prescricao)})'>
-                                      <span class="material-symbols-outlined">edit</span>
-                                    </button>
-                                    <button type="button" class="action-icon-btn delete" title="Deletar" aria-label="Deletar" onclick="deletarPrescricao(${prescricao.idPrescricao})"><span class="material-symbols-outlined">delete</span></button>
-                                </div>
-                            </td>
-                        </tr>
-                        `
-            })
             if (linhas === "") {
                 tabela.innerHTML = `
                         <tr>
-                            <td colSpan="8">Nenhum medicamento encontrado nas caixinhas.</td>
+                            <td colSpan="8">Nenhuma caixinha cadastrada. Adicione o primeiro medicamento de um morador.</td>
                         </tr>
                     `;
             } else {

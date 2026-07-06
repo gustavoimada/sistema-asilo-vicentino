@@ -6,7 +6,7 @@
   <title>Gerenciar Escalas - SGAV</title>
 
   <link rel="stylesheet" href="css/funcionario.css" />
-  <link rel="stylesheet" href="css/escalas.css?v=20260705-1" />
+  <link rel="stylesheet" href="css/escalas.css?v=20260706-2" />
   <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
@@ -321,6 +321,23 @@
     </div>
   </div>
 
+  <div id="modelosEscalaModal" class="modal escala-modelos-modal" style="display:none;">
+    <div class="modal-content escala-modelos-content">
+      <div class="modal-header">
+        <div>
+          <h2>Modelos semanais</h2>
+          <p class="preview-subtitle">Escolha um padrão salvo para preencher a semana atual.</p>
+        </div>
+        <button class="modal-close" type="button" onclick="fecharModelosEscala()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="modelosEscalaLista" class="modelos-list"></div>
+      </div>
+    </div>
+  </div>
+
   <div id="previewEscalaModal" class="modal escala-preview-modal" style="display:none;">
     <div class="modal-content escala-preview-content">
       <div class="modal-header">
@@ -348,7 +365,7 @@
 
   <div id="mensagem-feedback" class="popup-msg"></div>
 
-  <script src="js/escalasController.js?v=20260705-1"></script>
+  <script src="js/escalasController.js?v=20260706-2"></script>
 </body>
 </html>
 

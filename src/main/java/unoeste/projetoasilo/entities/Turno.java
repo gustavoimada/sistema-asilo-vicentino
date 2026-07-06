@@ -81,7 +81,7 @@ public class Turno
         Turno escala = dao.buscarEscalaPendenteHoje(idFuncionario, conexao);
         if (escala == null)
         {
-            return "Funcionário não está escalado para hoje";
+            return "Funcionário não está escalado para este turno";
         }
 
         LocalTime agora = LocalTime.now();

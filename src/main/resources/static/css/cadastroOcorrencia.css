@@ -971,3 +971,88 @@ select {
 .sidebar-submenu::before {
   background: #cbd5e1;
 }
+
+.ocorrencia-page .sidebar {
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: var(--sidebar-width, 256px) !important;
+  min-width: var(--sidebar-width, 256px) !important;
+  height: 100vh !important;
+  padding: 24px 16px !important;
+  gap: 8px !important;
+  background: #ffffff !important;
+  border-right: 1px solid #f1f5f9 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+.ocorrencia-page .sidebar-brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 0 16px !important;
+  margin: 0 0 24px !important;
+}
+
+.ocorrencia-page .sidebar-brand-main {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 0 !important;
+}
+
+.ocorrencia-page .sidebar-brand-main img {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  border-radius: 999px !important;
+  object-fit: cover !important;
+}
+
+.ocorrencia-page .sidebar-nav,
+.ocorrencia-page .sidebar-footer {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  padding: 0 !important;
+}
+
+.ocorrencia-page .sidebar-nav {
+  flex: 1 !important;
+}
+
+.ocorrencia-page .sidebar-footer {
+  margin-top: auto !important;
+  border-top: 0 !important;
+}
+
+.ocorrencia-page .sidebar-link {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 14px 16px !important;
+  border-radius: 999px !important;
+  color: #64748b !important;
+  background: transparent !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+}
+
+.ocorrencia-page .sidebar-link.active {
+  color: #1d4ed8 !important;
+  background: #eff6ff !important;
+}
+
+.ocorrencia-page .sidebar-footer a[href="login.html"] {
+  color: #dc2626 !important;
+  background: #fef2f2 !important;
+}
+
+.ocorrencia-page .sidebar-footer a[href="login.html"]:hover {
+  color: #b91c1c !important;
+  background: #fee2e2 !important;
+}
