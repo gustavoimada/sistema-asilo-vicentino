@@ -227,10 +227,7 @@
   border-radius: 12px;
   background: #ffffff;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  display: block;
   padding: 12px 12px 12px 16px;
   text-align: left;
   transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
@@ -305,6 +302,51 @@
   content: "•";
   margin-right: 5px;
   color: #94a3b8;
+}
+
+.turno-historico-main {
+  display: grid;
+  gap: 8px;
+}
+
+.turno-historico-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+.turno-historico-top .status-chip {
+  flex-shrink: 0;
+  min-height: 26px;
+  padding: 4px 9px;
+  font-size: 11px;
+}
+
+.turno-historico-main small.turno-historico-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 0;
+}
+
+.turno-historico-main small.turno-historico-meta span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  border: 1px solid #dbe7fb;
+  border-radius: 999px;
+  background: #f8fbff;
+  color: #475569;
+  padding: 3px 8px;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.turno-historico-main small.turno-historico-meta span + span::before {
+  content: none;
+  margin-right: 0;
 }
 
 .turno-detalhes {

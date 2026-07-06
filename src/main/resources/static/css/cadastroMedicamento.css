@@ -516,7 +516,7 @@ select {
 
 .primary-action {
   border: none;
-  background: linear-gradient(90deg, var(--primary), var(--primary-container));
+  background: #004aad;
   color: var(--on-primary);
   padding: 14px 28px;
   border-radius: 14px;
@@ -530,7 +530,8 @@ select {
 }
 
 .primary-action:hover {
-  box-shadow: 0 14px 28px rgba(0, 53, 127, 0.16);
+  background: #003f96;
+  box-shadow: 0 14px 28px rgba(0, 74, 173, 0.18);
   transform: translateY(-2px);
 }
 

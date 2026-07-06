@@ -62,7 +62,7 @@ function confirmarAcao(mensagem) {
             modal.className = "confirm-overlay";
             modal.innerHTML = `
                 <div class="confirm-box">
-                    <h4>Confirmar acao</h4>
+                    <h4>Confirmar ação</h4>
                     <p id="confirmacaoTexto"></p>
                     <div class="confirm-actions">
                         <button type="button" class="btn btn-secondary" id="confirmacaoCancelar">Cancelar</button>
@@ -158,8 +158,8 @@ function renderizarTabela(tiposAtividades) {
     if (tiposAtividades.length === 0) {
         linhas = `
             <tr>
-                <td colspan="3">
-                    <div class="placeholder-table">Nenhum tipo de atividade cadastrado.</div>
+                <td colspan="3" class="empty-row">
+                    Nenhum tipo de atividade cadastrado.
                 </td>
             </tr>
         `;
@@ -207,7 +207,7 @@ function exibirFormularioTipoAtividade(modo) {
         return;
     }
 
-    titulo.textContent = modo === "edicao" ? "Editar tipo de atividade" : "Cadastrar tipo de atividade";
+    titulo.textContent = modo === "edicao" ? "Editar Tipo de Atividade" : "Cadastrar Novo Tipo de Atividade";
     card.style.display = "block";
 
     if (novoTipoAtividadeBtn) {
@@ -242,8 +242,8 @@ function carregarTiposAtividades() {
 
     tabela.innerHTML = `
         <tr>
-            <td colspan="3">
-                <div class="placeholder-table">Carregando tipos de atividades...</div>
+            <td colspan="3" class="empty-row">
+                Carregando tipos de atividades...
             </td>
         </tr>
     `;
@@ -259,11 +259,11 @@ function carregarTiposAtividades() {
         )
         .then(({ok, body}) => {
             if (!ok) {
-                const msg = body && body.descricao ? body.descricao : "Nao foi possivel listar os tipos de atividades.";
+                const msg = body && body.descricao ? body.descricao : "Não foi possível listar os tipos de atividades.";
                 tabela.innerHTML = `
                     <tr>
-                        <td colspan="3">
-                            <div class="placeholder-table">Erro ao carregar tipos de atividades.</div>
+                        <td colspan="3" class="empty-row">
+                            Erro ao carregar tipos de atividades.
                         </td>
                     </tr>
                 `;
@@ -279,8 +279,8 @@ function carregarTiposAtividades() {
         .catch(error => {
             tabela.innerHTML = `
                 <tr>
-                    <td colspan="3">
-                        <div class="placeholder-table">Erro ao carregar tipos de atividades.</div>
+                    <td colspan="3" class="empty-row">
+                        Erro ao carregar tipos de atividades.
                     </td>
                 </tr>
             `;
@@ -302,7 +302,7 @@ function carregarTipoAtividade(id) {
         )
         .then(({ok, body}) => {
             if (!ok) {
-                mostrarPopup((body && body.descricao) || "Tipo de atividade nao encontrado.", "error");
+                mostrarPopup((body && body.descricao) || "Tipo de atividade não encontrado.", "error");
                 return;
             }
 
@@ -322,7 +322,7 @@ function cadastrarTipoAtividade() {
     const orgValor = String((form && form.org && form.org.value) ? form.org.value : "").trim();
 
     if (!tipoValor || !orgValor) {
-        mostrarPopup("Informe tipo e organizacao.", "error");
+        mostrarPopup("Informe tipo e organização.", "error");
         return;
     }
     const params = new URLSearchParams();
@@ -360,7 +360,7 @@ function editarTipoAtividade() {
     const orgValor = String((form && form.org && form.org.value) ? form.org.value : "").trim();
 
     if (!tipoValor || !orgValor) {
-        mostrarPopup("Informe tipo e organizacao.", "error");
+        mostrarPopup("Informe tipo e organização.", "error");
         return;
     }
     const params = new URLSearchParams();
@@ -413,7 +413,7 @@ async function deletarTipoAtividade(id) {
     fetch(`${API_TIPOS_ATIVIDADES}/deletar?id=${id}`, {method: "DELETE"})
         .then(response => {
             if (response.status === 200) {
-                mostrarPopup("Tipo de atividade excluido com sucesso!", "success");
+                mostrarPopup("Tipo de atividade excluído com sucesso!", "success");
                 carregarTiposAtividades();
             } else {
                 return extrairRespostaJson(response).then(erro => {

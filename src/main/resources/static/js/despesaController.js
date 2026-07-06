@@ -5,6 +5,8 @@ let direcaoOrdenacao = 'asc';
 
 function carregarContextoUrl() {
     const params = new URLSearchParams(window.location.search);
+    const parametrosContexto = ['idFuncionario', 'idUser', 'usuarioNome', 'funcionarioNome', 'categoria'];
+    const tinhaContexto = parametrosContexto.some((chave) => params.has(chave));
     const idFuncionario = Number(params.get('idFuncionario') || 0);
     const idUser = Number(params.get('idUser') || 0);
     const usuarioNome = String(params.get('usuarioNome') || '').trim();
@@ -25,6 +27,13 @@ function carregarContextoUrl() {
 
     if (categoria !== '')
         localStorage.setItem('funcionarioCategoria', categoria);
+
+    if (!tinhaContexto || !window.history || typeof window.history.replaceState !== 'function')
+        return;
+
+    parametrosContexto.forEach((chave) => params.delete(chave));
+    const queryRestante = params.toString();
+    window.history.replaceState({}, document.title, window.location.pathname + (queryRestante ? `?${queryRestante}` : '') + window.location.hash);
 }
 
 function formatarCargoInclusivo(categoria) {

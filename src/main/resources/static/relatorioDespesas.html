@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SGAV - Relatorio de Despesas</title>
+    <title>SGAV - Relatório de Despesas</title>
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/relatorioDespesas.css">
-    <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1">
+    <link rel="stylesheet" href="css/relatorioDespesas.css?v=20260706-1">
+    <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260705-2">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
@@ -31,7 +31,7 @@
     </script>
 </head>
 
-<body>
+<body class="bg-background text-on-surface">
 <div class="page">
 
 <aside class="sidebar">
@@ -114,7 +114,7 @@
                 <img
                     class="profile-avatar"
                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuCodmM9L3Lxp3TOXze0s5ng6gdLuL6UAVgjli-uCdXTzEkbUGW02Hheh8ViQ9IWJQngxEVmN3PkjBy4wDQUFq6-YEiM2_0THjjLcJGGCmoOip-JxgrwZ8717px25oL1Jay3FWpfa0rFtZIWUl4ziBAV-Brk_KrPNka1CMvjgOj2VkctGNpmZeuD-h9E384DdNtUi5QYhfnBKjlzWndJCqrgrkoxZL2DwUV0yeu9VbpJ1wqJosFaUFqLa-oW-OzQ9gsKgXSN3d_IyOx1"
-                    alt="Perfil funcionario"
+                    alt="Perfil funcionário"
                 />
             </div>
         </div>
@@ -124,15 +124,15 @@
 
         <div class="page-header">
             <div>
-                <h2 class="page-title">Relatorio de Despesas</h2>
+                <h2 class="page-title">Relatório de Despesas</h2>
                 <p class="page-subtitle">
-                    Visao analitica dos pagamentos, pendencias e categorias de despesas.
+                    Visão analítica dos pagamentos, pendências e categorias de despesas.
                 </p>
             </div>
 
             <button class="btn-pdf" id="btnGerarPdfDespesas" type="button">
                 <span class="material-symbols-outlined">picture_as_pdf</span>
-                <span>Gerar PDF de Despesas</span>
+                <span>Exportar PDF</span>
             </button>
         </div>
 
@@ -163,8 +163,8 @@
                 <section class="filter-panel" id="filtroDespesaRelatorio" hidden>
                     <div class="section-header section-header-inline">
                         <div>
-                            <h2>Filtrar Despesas</h2>
-                            <p>Pesquise por categoria, valor, status, datas e observacoes.</p>
+                            <h2>Filtros do Relatório</h2>
+                            <p>Pesquise por categoria, valor, status, datas e observações.</p>
                         </div>
                         <button type="button" id="fecharFiltrosDespesaRelatorio" class="close-panel-btn">
                             <span class="material-symbols-outlined">close</span>
@@ -180,12 +180,12 @@
                         </div>
 
                         <div class="form-field">
-                            <label for="filtroValorMinRelatorio">Valor Minimo</label>
+                            <label for="filtroValorMinRelatorio">Valor Mínimo</label>
                             <input type="number" id="filtroValorMinRelatorio" min="0" step="0.01" placeholder="Ex: 100.00">
                         </div>
 
                         <div class="form-field">
-                            <label for="filtroValorMaxRelatorio">Valor Maximo</label>
+                            <label for="filtroValorMaxRelatorio">Valor Máximo</label>
                             <input type="number" id="filtroValorMaxRelatorio" min="0" step="0.01" placeholder="Ex: 500.00">
                         </div>
 
@@ -200,13 +200,13 @@
                         </div>
 
                         <div class="form-field">
-                            <label for="filtroMesRelatorio">Mes de Vencimento</label>
+                            <label for="filtroMesRelatorio">Mês de Vencimento</label>
                             <input type="month" id="filtroMesRelatorio">
                         </div>
 
                         <div class="form-field">
-                            <label for="filtroObservacaoRelatorio">Observacoes</label>
-                            <input type="text" id="filtroObservacaoRelatorio" placeholder="Ex: Energia eletrica">
+                            <label for="filtroObservacaoRelatorio">Observações</label>
+                            <input type="text" id="filtroObservacaoRelatorio" placeholder="Ex: Energia elétrica">
                         </div>
 
                         <div class="form-field">
@@ -220,12 +220,12 @@
                         </div>
 
                         <div class="form-field">
-                            <label for="filtroQuitacaoInicioRelatorio">Quitacao Inicial</label>
+                            <label for="filtroQuitacaoInicioRelatorio">Quitação Inicial</label>
                             <input type="date" id="filtroQuitacaoInicioRelatorio">
                         </div>
 
                         <div class="form-field">
-                            <label for="filtroQuitacaoFimRelatorio">Quitacao Final</label>
+                            <label for="filtroQuitacaoFimRelatorio">Quitação Final</label>
                             <input type="date" id="filtroQuitacaoFimRelatorio">
                         </div>
 
@@ -249,15 +249,15 @@
                         </div>
                     </div>
 
-                    <table class="donation-table" id="despesas">
+                    <table class="relatorio-table" id="despesas">
                         <thead>
                         <tr>
                             <th>Valor</th>
                             <th>Categoria</th>
                             <th>Status</th>
                             <th>Vencimento</th>
-                            <th>Quitacao</th>
-                            <th>Observacoes</th>
+                            <th>Quitação</th>
+                            <th>Observações</th>
                         </tr>
                         </thead>
                         <tbody></tbody>
@@ -268,22 +268,22 @@
             <aside class="charts-column">
                 <section class="charts-grid">
                     <div class="chart-card">
-                        <h4>Valor por Mes de Vencimento (R$)</h4>
+                        <h4>Valor por Mês de Vencimento (R$)</h4>
                         <div id="graficoVencimento" class="apex-line-chart"></div>
                     </div>
 
                     <div class="chart-card">
-                        <h4>Valor Pago por Mes (R$)</h4>
+                        <h4>Valor Pago por Mês (R$)</h4>
                         <div id="graficoPago" class="apex-line-chart"></div>
                     </div>
 
                     <div class="chart-card">
-                        <h4>Valor Pendente por Mes (R$)</h4>
+                        <h4>Valor Pendente por Mês (R$)</h4>
                         <div id="graficoPendente" class="apex-line-chart"></div>
                     </div>
 
                     <div class="chart-card">
-                        <h4>Distribuicao por Categoria</h4>
+                        <h4>Distribuição por Categoria</h4>
                         <div id="graficoPizzaCategorias" class="apex-donut-chart"></div>
                     </div>
                 </section>

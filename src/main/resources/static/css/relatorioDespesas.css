@@ -1,8 +1,4 @@
-@import url("relatorioDoacoes.css");
-
-:root {
-    --sidebar-width: 256px;
-}
+@import url("relatorios.css?v=20260706-1");
 
 .filtro-grid-despesas {
     grid-template-columns: repeat(3, minmax(0, 1fr));

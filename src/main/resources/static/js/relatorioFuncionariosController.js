@@ -115,9 +115,9 @@ function obterResumoFiltrosRelatorioFuncionarios() {
     const ocorrencia = String(estadoFiltroFuncionarios.ocorrencia || "").trim();
     const medicamento = String(estadoFiltroFuncionarios.medicamento || "").trim();
 
-    if (funcionario !== "") filtros.push("Funcionario: " + funcionario);
+    if (funcionario !== "") filtros.push("Funcionário: " + funcionario);
     if (data !== "") filtros.push("Data: " + formatarDataFiltroRelatorio(data));
-    if (ocorrencia !== "") filtros.push("Ocorrencia: " + ocorrencia);
+    if (ocorrencia !== "") filtros.push("Ocorrência: " + ocorrencia);
     if (medicamento !== "") filtros.push("Medicamento: " + medicamento);
 
     if (filtros.length === 0) {
@@ -328,13 +328,13 @@ function atualizarGraficosRelatorioFuncionarios(listaRegistros) {
 
     graficoOcorrenciasMes = new ApexCharts(
         document.getElementById("graficoOcorrenciasMes"),
-        criarOpcoesLinhaApexRelatorio("Ocorrencias", ocorrenciasPorMes, "var(--bs-warning)", obterMaximoEscalaRelatorio(ocorrenciasPorMes))
+        criarOpcoesLinhaApexRelatorio("Ocorrências", ocorrenciasPorMes, "var(--bs-warning)", obterMaximoEscalaRelatorio(ocorrenciasPorMes))
     );
     graficoOcorrenciasMes.render();
 
     graficoMedicamentosMes = new ApexCharts(
         document.getElementById("graficoMedicamentosMes"),
-        criarOpcoesLinhaApexRelatorio("Medicacoes", medicacoesPorMes, "var(--bs-success)", obterMaximoEscalaRelatorio(medicacoesPorMes))
+        criarOpcoesLinhaApexRelatorio("Medicações", medicacoesPorMes, "var(--bs-success)", obterMaximoEscalaRelatorio(medicacoesPorMes))
     );
     graficoMedicamentosMes.render();
 
@@ -345,7 +345,7 @@ function atualizarGraficosRelatorioFuncionarios(listaRegistros) {
     }
 
     let dadosPizza = [qtdOcorrenciasTotal, qtdMedicacoesTotal];
-    let labelsPizza = ["Ocorrencias", "Medicacoes"];
+    let labelsPizza = ["Ocorrências", "Medicações"];
     let coresPizza = ["var(--bs-warning)", "var(--bs-success)"];
     let totalPizza = qtdOcorrenciasTotal + qtdMedicacoesTotal;
     let semDadosPizza = false;
@@ -810,7 +810,7 @@ function gerarPdfRelatorioFuncionarios() {
     const doc = new jsPDF("p", "pt", "a4");
 
     doc.setFontSize(14);
-    doc.text("Relatorio de Funcionarios", 40, 38);
+    doc.text("Relatório de Funcionários", 40, 38);
     doc.setFontSize(10);
     doc.text("Gerado em: " + new Date().toLocaleString("pt-BR"), 40, 54);
     const textoFiltros = "Filtros: " + obterResumoFiltrosRelatorioFuncionarios().join(" | ");
@@ -820,7 +820,7 @@ function gerarPdfRelatorioFuncionarios() {
 
     doc.autoTable({
         startY: inicioTabela,
-        head: [["Funcionario", "Data", "Ocorrencia", "Registro de Uso de Medicamento", "Observacoes"]],
+        head: [["Funcionário", "Data", "Ocorrência", "Registro de Uso de Medicamento", "Observações"]],
         body: body,
         headStyles: {
             fillColor: [0, 53, 127]

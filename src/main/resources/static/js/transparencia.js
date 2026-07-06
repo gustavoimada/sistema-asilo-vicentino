@@ -1,6 +1,13 @@
 const estadoTransparencia = {
     transparencia: [],
-    funcionario: null
+    funcionario: null,
+    contexto: {
+        idFuncionario: 0,
+        idUser: 0,
+        usuarioNome: "",
+        funcionarioNome: "",
+        categoria: ""
+    }
 };
 
 function parseJsonSeguro(response)
@@ -56,6 +63,8 @@ function preencherPerfilTopo()
 function carregarContextoUrlCoordenador()
 {
     const params = new URLSearchParams(window.location.search);
+    const parametrosContexto = ["idFuncionario", "idUser", "usuarioNome", "funcionarioNome", "categoria"];
+    const tinhaContexto = parametrosContexto.some((chave) => params.has(chave));
     const idFuncionario = Number(params.get("idFuncionario") || 0);
     const idUser = Number(params.get("idUser") || 0);
     const usuarioNome = String(params.get("usuarioNome") || "").trim();
@@ -87,6 +96,15 @@ function carregarContextoUrlCoordenador()
         estadoTransparencia.contexto.categoria = categoria;
         localStorage.setItem("funcionarioCategoria", categoria);
     }
+
+    if (!tinhaContexto || !window.history || typeof window.history.replaceState !== "function")
+    {
+        return;
+    }
+
+    parametrosContexto.forEach((chave) => params.delete(chave));
+    const queryRestante = params.toString();
+    window.history.replaceState({}, document.title, window.location.pathname + (queryRestante ? `?${queryRestante}` : "") + window.location.hash);
 }
 
 function formatarCargoInclusivo(categoria)
@@ -104,31 +122,12 @@ function formatarCargoInclusivo(categoria)
 
 function atualizarLinksContextoCoordenador()
 {
-    const params = new URLSearchParams();
-    const idFuncionario = estadoTransparencia.contexto.idFuncionario;
-    const idUser = estadoTransparencia.contexto.idUser;
-    const usuarioNome = estadoTransparencia.contexto.usuarioNome;
-    const funcionarioNome = estadoTransparencia.contexto.funcionarioNome;
-    const categoria = estadoTransparencia.contexto.categoria;
-
-    if (idFuncionario > 0) params.set("idFuncionario", String(idFuncionario));
-    if (idUser > 0) params.set("idUser", String(idUser));
-    if (usuarioNome) params.set("usuarioNome", usuarioNome);
-    if (funcionarioNome) params.set("funcionarioNome", funcionarioNome);
-    if (categoria) params.set("categoria", categoria);
-
-    const query = params.toString();
-    if (!query)
-    {
-        return;
-    }
-
     const linkPainel = document.querySelector('.sidebar-nav a.sidebar-link[href*="coordenador.html"]');
     const linkEscalas = document.querySelector('.sidebar-nav a.sidebar-link[href*="escalas.html"]');
     const linkTransparencia = document.querySelector('.sidebar-nav a.sidebar-link[href*="transparencia.html"]');
-    if (linkPainel) linkPainel.setAttribute("href", "coordenador.html?" + query);
-    if (linkEscalas) linkEscalas.setAttribute("href", "escalas.html?" + query);
-    if (linkTransparencia) linkTransparencia.setAttribute("href", "transparencia.html?" + query);
+    if (linkPainel) linkPainel.setAttribute("href", "coordenador.html");
+    if (linkEscalas) linkEscalas.setAttribute("href", "escalas.html");
+    if (linkTransparencia) linkTransparencia.setAttribute("href", "transparencia.html");
 }
 
 function mostrarMensagemTransparencia(mensagem, tipo = "info")
@@ -572,8 +571,10 @@ function adicionarEventListenersTransparencia()
 
 async function inicializarTransparencia()
 {
+    carregarContextoUrlCoordenador();
     await carregarFuncionarioSessaoTransparencia();
     preencherPerfilTopoSessaoTransparencia();
+    atualizarLinksContextoCoordenador();
     adicionarEventListenersTransparencia();
     await carregarTransparenciaCoordenador();
 }

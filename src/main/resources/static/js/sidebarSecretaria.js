@@ -3,14 +3,49 @@
         { href: "secretaria.html", icone: "dashboard", texto: "Painel", aliases: ["secretaria.html", "tipoOcorrencia.html"] },
         { href: "morador.html", icone: "elderly", texto: "Moradores" },
         { href: "quartos.html", icone: "bed", texto: "Quartos" },
-        { href: "funcionario.html", icone: "badge", texto: "Funcionarios" },
+        { href: "funcionario.html", icone: "badge", texto: "Funcionários" },
         { href: "medicamentos.html", icone: "medical_services", texto: "Medicamentos" },
         { href: "caixinhas.html", icone: "inventory_2", texto: "Caixinhas" },
         { href: "atividades.html", icone: "event_note", texto: "Atividades", aliases: ["atividades.html", "tipoAtividades.html"] },
-        { href: "doacao.html", icone: "volunteer_activism", texto: "Doacoes" },
+        { href: "doacao.html", icone: "volunteer_activism", texto: "Doações" },
         { href: "despesa.html", icone: "request_quote", texto: "Despesas", aliases: ["despesa.html", "tiposDespesas.html"] },
-        { href: "noticias.html", icone: "newspaper", texto: "Noticias" }
+        { href: "noticias.html", icone: "newspaper", texto: "Notícias" }
     ];
+
+    function salvarSeExistir(params, chaveUrl, chaveLocal) {
+        const valor = String(params.get(chaveUrl) || "").trim();
+        if (valor) {
+            localStorage.setItem(chaveLocal, valor);
+        }
+    }
+
+    function limparContextoDaUrl() {
+        const params = new URLSearchParams(window.location.search);
+        if (!params.size) return;
+
+        salvarSeExistir(params, "idFuncionario", "idFuncionario");
+        salvarSeExistir(params, "idUser", "usuarioId");
+        salvarSeExistir(params, "usuarioNome", "usuarioNome");
+        salvarSeExistir(params, "funcionarioNome", "funcionarioNome");
+        salvarSeExistir(params, "categoria", "funcionarioCategoria");
+
+        const parametrosContexto = ["idFuncionario", "idUser", "usuarioNome", "funcionarioNome", "categoria"];
+        const tinhaContexto = parametrosContexto.some(function (chave) {
+            return params.has(chave);
+        });
+
+        if (!tinhaContexto) return;
+
+        parametrosContexto.forEach(function (chave) {
+            params.delete(chave);
+        });
+
+        if (window.history && typeof window.history.replaceState === "function") {
+            const queryRestante = params.toString();
+            const urlLimpa = window.location.pathname + (queryRestante ? `?${queryRestante}` : "") + window.location.hash;
+            window.history.replaceState({}, document.title, urlLimpa);
+        }
+    }
 
     function paginaAtual() {
         const partes = String(window.location.pathname || "").split("/");
@@ -116,5 +151,6 @@
         link.style.display = normalizada.indexOf("coordenador") >= 0 ? "flex" : "none";
     }
 
+    limparContextoDaUrl();
     renderizarSidebarSecretaria();
 })();

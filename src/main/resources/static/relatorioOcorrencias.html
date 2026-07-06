@@ -7,8 +7,8 @@
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/relatorioOcorrencias.css">
-    <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1">
+    <link rel="stylesheet" href="css/relatorioOcorrencias.css?v=20260706-1">
+    <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260705-2">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
@@ -130,7 +130,7 @@
 
             <button class="btn-pdf" id="btnGerarPdfOcorrencias" type="button">
                 <span class="material-symbols-outlined">picture_as_pdf</span>
-                <span>Gerar PDF de Ocorrências</span>
+                <span>Exportar PDF</span>
             </button>
         </div>
 
@@ -161,7 +161,7 @@
                 <section class="filter-panel" id="filtroOcorrenciaRelatorio" hidden>
                     <div class="section-header section-header-inline">
                         <div>
-                            <h2>Filtrar Ocorrências</h2>
+                            <h2>Filtros do Relatório</h2>
                             <p>Pesquise por tipo, gravidade, funcionário, morador e período.</p>
                         </div>
                         <button type="button" id="fecharFiltrosOcorrenciaRelatorio" class="close-panel-btn">
@@ -227,7 +227,7 @@
                         </div>
                     </div>
 
-                    <table class="relatorio-table" id="ocorrenciasRelatorio">
+                    <table class="relatorio-table report-table-wide" id="ocorrenciasRelatorio">
                         <thead>
                         <tr>
                             <th id="th-ocorrencia-data" class="sortable" onclick="definirOrdenacaoOcorrencias('data')">Data <span id="sort-ocorrencia-data" class="sort-indicator"></span></th>

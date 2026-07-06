@@ -25,11 +25,26 @@ function elOcorrencia(id)
 function carregarContextoUrlOcorrencia()
 {
   const params = new URLSearchParams(window.location.search);
+  const parametrosContexto = ["idFuncionario", "idUser", "usuarioNome", "funcionarioNome", "categoria"];
+  const tinhaContexto = parametrosContexto.some(function (chave) {
+    return params.has(chave);
+  });
   estadoOcorrencia.idFuncionarioContexto = Number(params.get("idFuncionario") || 0);
   estadoOcorrencia.idUserContexto = Number(params.get("idUser") || 0);
   estadoOcorrencia.nomeUsuarioContexto = String(params.get("usuarioNome") || "").trim();
   estadoOcorrencia.nomeFuncionarioContexto = String(params.get("funcionarioNome") || "").trim();
   estadoOcorrencia.categoriaContexto = String(params.get("categoria") || "").trim();
+
+  if (!tinhaContexto || !window.history || typeof window.history.replaceState !== "function")
+{
+    return;
+  }
+
+  parametrosContexto.forEach(function (chave) {
+    params.delete(chave);
+  });
+  const queryRestante = params.toString();
+  window.history.replaceState({}, document.title, window.location.pathname + (queryRestante ? `?${queryRestante}` : "") + window.location.hash);
 }
 
 function parseJsonSeguroOcorrencia(response)
@@ -67,24 +82,6 @@ function obterIdUsuarioOcorrencia()
 function montarParamsOcorrencia()
 {
   return new URLSearchParams();
-}
-
-function montarQueryContextoOcorrencia()
-{
-  const params = new URLSearchParams();
-  const idFuncionario = obterIdFuncionarioOcorrencia();
-  const idUser = obterIdUsuarioOcorrencia();
-  const nomeUsuario = obterNomeUsuarioOcorrencia();
-  const nomeFuncionario = obterNomeFuncionarioOcorrencia();
-  const categoria = String(estadoOcorrencia.categoriaContexto || estadoOcorrencia.funcionario?.categoria || "").trim();
-
-  if (idFuncionario) params.set("idFuncionario", idFuncionario);
-  if (idUser) params.set("idUser", idUser);
-  if (nomeUsuario) params.set("usuarioNome", nomeUsuario);
-  if (nomeFuncionario) params.set("funcionarioNome", nomeFuncionario);
-  if (categoria) params.set("categoria", categoria);
-
-  return params.toString();
 }
 
 function atualizarLinksContextoOcorrencia()

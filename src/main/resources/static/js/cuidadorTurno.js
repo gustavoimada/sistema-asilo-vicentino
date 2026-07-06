@@ -14,6 +14,8 @@ const estadoCuidadorTurno = {
 function carregarContextoUrlTurno()
 {
     const params = new URLSearchParams(window.location.search);
+    const parametrosContexto = ["idFuncionario", "idUser", "usuarioNome", "funcionarioNome", "categoria"];
+    const tinhaContexto = parametrosContexto.some((chave) => params.has(chave));
     const idFuncionarioUrl = Number(params.get("idFuncionario") || 0);
     const idUserUrl = Number(params.get("idUser") || 0);
     const nomeUsuarioUrl = String(params.get("usuarioNome") || "").trim();
@@ -50,6 +52,14 @@ function carregarContextoUrlTurno()
         localStorage.setItem("funcionarioCategoria", categoriaUrl);
     }
 
+    if (!tinhaContexto || !window.history || typeof window.history.replaceState !== "function")
+    {
+        return;
+    }
+
+    parametrosContexto.forEach((chave) => params.delete(chave));
+    const queryRestante = params.toString();
+    window.history.replaceState({}, document.title, window.location.pathname + (queryRestante ? `?${queryRestante}` : "") + window.location.hash);
 }
 
 function obterIdFuncionarioLogadoTurno()
@@ -388,14 +398,14 @@ function montarResumoUltimoTurno(turno)
         <div class="turno-resumo-grid">
             <div><span>Cuidador(a)</span><strong>${escaparHtmlTurno(obterNomeFuncionarioEscala(turno, obterNomePerfilTurno()))}</strong></div>
             <div><span>Turno</span><strong>${textoTurnoNome(obterIdTurnoEscala(turno))} - ${formatarDataTurno(turno.dataEscala)}</strong></div>
-            <div><span>Inicio</span><strong>${formatarDataHoraRealTurno(turno.dataEscala, turno.horaInicio)}</strong></div>
+            <div><span>Início</span><strong>${formatarDataHoraRealTurno(turno.dataEscala, turno.horaInicio)}</strong></div>
             <div><span>Fim</span><strong>${formatarDataHoraRealTurno(turno.dataEscala, turno.horaFim)}</strong></div>
             <div><span>Status</span><strong>${textoStatusExibicaoTurno(turno)}</strong></div>
-            <div><span>Ocorrencias</span><strong>${(turno.ocorrencias || []).length}</strong></div>
+            <div><span>Ocorrências</span><strong>${(turno.ocorrencias || []).length}</strong></div>
         </div>
         <div class="turno-descricao-box">
-            <span>Descricao de encerramento</span>
-            <p>${escaparHtmlTurno(turno.descricao || "Nenhuma descricao informada no fechamento.")}</p>
+            <span>Descrição de encerramento</span>
+            <p>${escaparHtmlTurno(turno.descricao || "Nenhuma descrição informada no fechamento.")}</p>
         </div>
     `;
 }
@@ -405,16 +415,16 @@ function montarOcorrenciasTurno(turno)
     const ocorrencias = turno.ocorrencias || [];
     if (!ocorrencias.length)
     {
-        return '<p class="turno-empty">Nenhuma ocorrencia registrada nesse turno.</p>';
+        return '<p class="turno-empty">Nenhuma ocorrência registrada nesse turno.</p>';
     }
 
     return `<div class="turno-eventos-lista">${ocorrencias.map((ocorrencia) => `
         <article class="turno-evento">
             <div>
-                <strong>${escaparHtmlTurno(ocorrencia.tipoOcorrencia?.descricao || "Ocorrencia")}</strong>
+                <strong>${escaparHtmlTurno(ocorrencia.tipoOcorrencia?.descricao || "Ocorrência")}</strong>
                 <span>${formatarDataHoraTurno(ocorrencia.dtOcorrencia)} - Gravidade ${escaparHtmlTurno(ocorrencia.tipoOcorrencia?.gravidade || "-")}</span>
             </div>
-            <p>${escaparHtmlTurno(ocorrencia.observacoes || "Sem observacoes.")}</p>
+            <p>${escaparHtmlTurno(ocorrencia.observacoes || "Sem observações.")}</p>
             ${Array.isArray(ocorrencia.moradores) && ocorrencia.moradores.length ? `<small>Moradores: ${escaparHtmlTurno(ocorrencia.moradores.map((morador) => morador.nome).filter(Boolean).join(", "))}</small>` : ""}
         </article>
     `).join("")}</div>`;
@@ -425,16 +435,16 @@ function montarMedicacoesTurno(turno)
     const medicacoes = turno.medicacoes || [];
     if (!medicacoes.length)
     {
-        return '<p class="turno-empty">Nenhum uso de medicacao registrado nesse turno.</p>';
+        return '<p class="turno-empty">Nenhum uso de medicação registrado nesse turno.</p>';
     }
 
     return `<div class="turno-eventos-lista">${medicacoes.map((medicacao) => `
         <article class="turno-evento">
             <div>
-                <strong>${escaparHtmlTurno(medicacao.prescricaoDose?.prescricao?.medicamento?.nome || "Medicacao")}</strong>
+                <strong>${escaparHtmlTurno(medicacao.prescricaoDose?.prescricao?.medicamento?.nome || "Medicação")}</strong>
                 <span>${formatarDataHoraTurno(medicacao.dataRegistro)}</span>
             </div>
-            <p>${escaparHtmlTurno(medicacao.prescricaoDose?.prescricao?.morador?.nome || "Morador nao informado")}</p>
+            <p>${escaparHtmlTurno(medicacao.prescricaoDose?.prescricao?.morador?.nome || "Morador não informado")}</p>
         </article>
     `).join("")}</div>`;
 }
@@ -789,6 +799,7 @@ function adicionarEventListenersTurno()
 
 async function inicializarCuidadorTurno()
 {
+    carregarContextoUrlTurno();
     await carregarFuncionarioSessaoTurno();
     atualizarPerfilLogadoTurno();
     atualizarLinkCadastroOcorrenciaTurno();

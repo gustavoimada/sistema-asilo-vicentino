@@ -70,6 +70,8 @@ function preencherPerfilTopo()
 function carregarContextoUrlCoordenador()
 {
     const params = new URLSearchParams(window.location.search);
+    const parametrosContexto = ["idFuncionario", "idUser", "usuarioNome", "funcionarioNome", "categoria"];
+    const tinhaContexto = parametrosContexto.some((chave) => params.has(chave));
     const idFuncionario = Number(params.get("idFuncionario") || 0);
     const idUser = Number(params.get("idUser") || 0);
     const usuarioNome = String(params.get("usuarioNome") || "").trim();
@@ -101,6 +103,15 @@ function carregarContextoUrlCoordenador()
         estadoCoordenadorEscala.contexto.categoria = categoria;
         localStorage.setItem("funcionarioCategoria", categoria);
     }
+
+    if (!tinhaContexto || !window.history || typeof window.history.replaceState !== "function")
+    {
+        return;
+    }
+
+    parametrosContexto.forEach((chave) => params.delete(chave));
+    const queryRestante = params.toString();
+    window.history.replaceState({}, document.title, window.location.pathname + (queryRestante ? `?${queryRestante}` : "") + window.location.hash);
 }
 
 function formatarCargoInclusivo(categoria)
@@ -118,33 +129,14 @@ function formatarCargoInclusivo(categoria)
 
 function atualizarLinksContextoCoordenador()
 {
-    const params = new URLSearchParams();
-    const idFuncionario = estadoCoordenadorEscala.contexto.idFuncionario;
-    const idUser = estadoCoordenadorEscala.contexto.idUser;
-    const usuarioNome = estadoCoordenadorEscala.contexto.usuarioNome;
-    const funcionarioNome = estadoCoordenadorEscala.contexto.funcionarioNome;
-    const categoria = estadoCoordenadorEscala.contexto.categoria;
-
-    if (idFuncionario > 0) params.set("idFuncionario", String(idFuncionario));
-    if (idUser > 0) params.set("idUser", String(idUser));
-    if (usuarioNome) params.set("usuarioNome", usuarioNome);
-    if (funcionarioNome) params.set("funcionarioNome", funcionarioNome);
-    if (categoria) params.set("categoria", categoria);
-
-    const query = params.toString();
-    if (!query)
-    {
-        return;
-    }
-
     const linkPainel = document.querySelector('.sidebar-nav a.sidebar-link[href*="coordenador.html"]');
     const linkEscalas = document.querySelector('.sidebar-nav a.sidebar-link[href*="escalas.html"]');
     const linkTransparencia = document.querySelector('.sidebar-nav a.sidebar-link[href*="transparencia.html"]');
     const linkSecretaria = document.querySelector('.sidebar-footer a.sidebar-link[href*="secretaria.html"]');
-    if (linkPainel) linkPainel.setAttribute("href", "coordenador.html?" + query);
-    if (linkEscalas) linkEscalas.setAttribute("href", "escalas.html?" + query);
-    if (linkTransparencia) linkTransparencia.setAttribute("href", "transparencia.html?" + query);
-    if (linkSecretaria) linkSecretaria.setAttribute("href", "secretaria.html?" + query);
+    if (linkPainel) linkPainel.setAttribute("href", "coordenador.html");
+    if (linkEscalas) linkEscalas.setAttribute("href", "escalas.html");
+    if (linkTransparencia) linkTransparencia.setAttribute("href", "transparencia.html");
+    if (linkSecretaria) linkSecretaria.setAttribute("href", "secretaria.html");
 }
 
 function mostrarModalEscala()
@@ -714,14 +706,16 @@ function renderizarHistoricoTurnos()
         return `
             <button type="button" class="turno-historico-item status-${statusExibicao.classe} ${ativo ? "active" : ""}" data-id-turno="${turno.idFuncionarioTurnos}">
                 <span class="turno-historico-main">
-                    <strong>${escaparHtmlCoordenador(obterNomeFuncionarioEscalaCoordenador(turno))}</strong>
-                    <small>
+                    <span class="turno-historico-top">
+                        <strong>${escaparHtmlCoordenador(obterNomeFuncionarioEscalaCoordenador(turno))}</strong>
+                        <span class="status-chip ${statusExibicao.classe}" title="${statusExibicao.titulo}">${statusExibicao.texto}</span>
+                    </span>
+                    <small class="turno-historico-meta">
                         <span>${nomeTurnoCurto(idTurno)}</span>
                         <span>${formatarDataEscala(turno.dataEscala)}</span>
                         <span>${obterHorarioTurnoCurto(idTurno)}</span>
                     </small>
                 </span>
-                <span class="status-chip ${statusExibicao.classe}" title="${statusExibicao.titulo}">${statusExibicao.texto}</span>
             </button>
         `;
     }).join("");
@@ -737,14 +731,14 @@ function montarEventosTurnoCoordenador(turno)
     {
         blocos.push(`
             <div class="turno-eventos-bloco">
-                <h5>Ocorrencias</h5>
+                <h5>Ocorrências</h5>
                 ${ocorrencias.map((ocorrencia) => `
                     <article class="turno-evento">
                         <div>
-                            <strong>${escaparHtmlCoordenador(ocorrencia.tipoOcorrencia?.descricao || "Ocorrencia")}</strong>
+                            <strong>${escaparHtmlCoordenador(ocorrencia.tipoOcorrencia?.descricao || "Ocorrência")}</strong>
                             <span>${formatarDataHoraCoordenador(ocorrencia.dtOcorrencia)} - Gravidade ${escaparHtmlCoordenador(ocorrencia.tipoOcorrencia?.gravidade || "-")}</span>
                         </div>
-                        <p>${escaparHtmlCoordenador(ocorrencia.observacoes || "Sem observacoes.")}</p>
+                        <p>${escaparHtmlCoordenador(ocorrencia.observacoes || "Sem observações.")}</p>
                         ${Array.isArray(ocorrencia.moradores) && ocorrencia.moradores.length ? `<small>Moradores: ${escaparHtmlCoordenador(ocorrencia.moradores.map((morador) => morador.nome).filter(Boolean).join(", "))}</small>` : ""}
                     </article>
                 `).join("")}
@@ -756,21 +750,21 @@ function montarEventosTurnoCoordenador(turno)
     {
         blocos.push(`
             <div class="turno-eventos-bloco">
-                <h5>Medicacao</h5>
+                <h5>Medicação</h5>
                 ${medicacoes.map((medicacao) => `
                     <article class="turno-evento">
                         <div>
-                            <strong>${escaparHtmlCoordenador(medicacao.prescricaoDose?.prescricao?.medicamento?.nome || "Medicacao")}</strong>
+                            <strong>${escaparHtmlCoordenador(medicacao.prescricaoDose?.prescricao?.medicamento?.nome || "Medicação")}</strong>
                             <span>${formatarDataHoraCoordenador(medicacao.dataRegistro)}</span>
                         </div>
-                        <p>${escaparHtmlCoordenador(medicacao.prescricaoDose?.prescricao?.morador?.nome || "Morador nao informado")}</p>
+                        <p>${escaparHtmlCoordenador(medicacao.prescricaoDose?.prescricao?.morador?.nome || "Morador não informado")}</p>
                     </article>
                 `).join("")}
             </div>
         `);
     }
 
-    return blocos.length ? blocos.join("") : '<p class="empty-text">Nenhuma ocorrencia ou medicacao registrada nesse turno.</p>';
+    return blocos.length ? blocos.join("") : '<p class="empty-text">Nenhuma ocorrência ou medicação registrada nesse turno.</p>';
 }
 
 function renderizarDetalhesTurnoCoordenador()
@@ -818,7 +812,7 @@ function renderizarDetalhesTurnoCoordenador()
         </div>
         <div class="turno-descricao-box">
             <span>Observa\u00e7\u00e3o do encerramento</span>
-            <p>${escaparHtmlCoordenador(turno.descricao || "Nenhuma descricao informada.")}</p>
+            <p>${escaparHtmlCoordenador(turno.descricao || "Nenhuma descrição informada.")}</p>
         </div>
         ${montarEventosTurnoCoordenador(turno)}
     `;
@@ -1065,8 +1059,10 @@ function adicionarEventListenersEscala()
 
 async function inicializarCoordenadorEscala()
 {
+    carregarContextoUrlCoordenador();
     await carregarFuncionarioSessaoCoordenador();
     preencherPerfilTopoSessaoCoordenador();
+    atualizarLinksContextoCoordenador();
     adicionarEventListenersEscala();
     await carregarTurnosEscala();
     await carregarFuncionariosEscala();

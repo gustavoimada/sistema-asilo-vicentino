@@ -62,7 +62,7 @@ function confirmarAcao(mensagem) {
             modal.className = "confirm-overlay";
             modal.innerHTML = `
                 <div class="confirm-box">
-                    <h4>Confirmar acao</h4>
+                    <h4>Confirmar ação</h4>
                     <p id="confirmacaoTexto"></p>
                     <div class="confirm-actions">
                         <button type="button" class="btn btn-secondary" id="confirmacaoCancelar">Cancelar</button>
@@ -158,8 +158,8 @@ function renderizarTabela(tiposDespesas) {
     if (tiposDespesas.length === 0) {
         linhas = `
             <tr>
-                <td colspan="2">
-                    <div class="placeholder-table">Nenhum tipo de despesa cadastrado.</div>
+                <td colspan="2" class="empty-row">
+                    Nenhum tipo de despesa cadastrado.
                 </td>
             </tr>
         `;
@@ -206,7 +206,7 @@ function exibirFormularioTipoDespesa(modo) {
         return;
     }
 
-    titulo.textContent = modo === "edicao" ? "Editar tipo de despesa" : "Cadastrar tipo de despesa";
+    titulo.textContent = modo === "edicao" ? "Editar Tipo de Despesa" : "Cadastrar Novo Tipo de Despesa";
     card.style.display = "block";
 
     if (novoTipoDespesaBtn) {
@@ -241,8 +241,8 @@ function carregarTiposDespesas() {
 
     tabela.innerHTML = `
         <tr>
-            <td colspan="2">
-                <div class="placeholder-table">Carregando tipos de despesas...</div>
+            <td colspan="2" class="empty-row">
+                Carregando tipos de despesas...
             </td>
         </tr>
     `;
@@ -258,11 +258,11 @@ function carregarTiposDespesas() {
         )
         .then(({ok, body}) => {
             if (!ok) {
-                const msg = body && body.descricao ? body.descricao : "Nao foi possivel listar os tipos de despesas.";
+                const msg = body && body.descricao ? body.descricao : "Não foi possível listar os tipos de despesas.";
                 tabela.innerHTML = `
                     <tr>
-                        <td colspan="2">
-                            <div class="placeholder-table">Erro ao carregar tipos de despesas.</div>
+                        <td colspan="2" class="empty-row">
+                            Erro ao carregar tipos de despesas.
                         </td>
                     </tr>
                 `;
@@ -278,8 +278,8 @@ function carregarTiposDespesas() {
         .catch(error => {
             tabela.innerHTML = `
                 <tr>
-                    <td colspan="2">
-                        <div class="placeholder-table">Erro ao carregar tipos de despesas.</div>
+                    <td colspan="2" class="empty-row">
+                        Erro ao carregar tipos de despesas.
                     </td>
                 </tr>
             `;
@@ -301,7 +301,7 @@ function carregarTipoDespesa(id) {
         )
         .then(({ok, body}) => {
             if (!ok) {
-                mostrarPopup((body && body.descricao) || "Tipo de despesa nao encontrado.", "error");
+                mostrarPopup((body && body.descricao) || "Tipo de despesa não encontrado.", "error");
                 return;
             }
 
@@ -405,7 +405,7 @@ async function deletarTipoDespesa(id) {
     fetch(`${API_TIPOS_DESPESAS}/deletar?id=${id}`, {method: "DELETE"})
         .then(response => {
             if (response.status === 200) {
-                mostrarPopup("Tipo de despesa excluido com sucesso!", "success");
+                mostrarPopup("Tipo de despesa excluído com sucesso!", "success");
                 carregarTiposDespesas();
             } else {
                 return extrairRespostaJson(response).then(erro => {

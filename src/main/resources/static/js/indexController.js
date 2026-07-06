@@ -124,6 +124,8 @@ function iniciarRotinaAsilo()
   const passos = document.querySelectorAll(".dayflow-step");
   const imagem = document.getElementById("dayflowImage");
   const horario = document.getElementById("dayflowTime");
+  const titulo = document.getElementById("dayflowTitle");
+  const texto = document.getElementById("dayflowText");
   let timerAutomatico = null;
   let indiceAtual = 0;
 
@@ -144,6 +146,8 @@ function iniciarRotinaAsilo()
       imagem.src = passo.getAttribute("data-image") || imagem.src;
       imagem.alt = passo.getAttribute("data-title") || "Rotina do asilo";
       horario.textContent = passo.getAttribute("data-time") || horario.textContent;
+      if (titulo) titulo.textContent = passo.getAttribute("data-title") || titulo.textContent;
+      if (texto) texto.textContent = passo.getAttribute("data-text") || texto.textContent;
       imagem.classList.remove("is-changing");
     }, 150);
 

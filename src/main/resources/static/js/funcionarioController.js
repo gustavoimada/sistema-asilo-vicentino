@@ -25,6 +25,8 @@ function preencherPerfilTopo()
 function carregarContextoUrl()
 {
     const params = new URLSearchParams(window.location.search);
+    const parametrosContexto = ["idFuncionario", "idUser", "usuarioNome", "funcionarioNome", "categoria"];
+    const tinhaContexto = parametrosContexto.some((chave) => params.has(chave));
     const idFuncionario = Number(params.get("idFuncionario") || 0);
     const idUser = Number(params.get("idUser") || 0);
     const usuarioNome = String(params.get("usuarioNome") || "").trim();
@@ -36,6 +38,12 @@ function carregarContextoUrl()
     if (usuarioNome) localStorage.setItem("usuarioNome", usuarioNome);
     if (funcionarioNome) localStorage.setItem("funcionarioNome", funcionarioNome);
     if (categoria) localStorage.setItem("funcionarioCategoria", categoria);
+
+    if (!tinhaContexto || !window.history || typeof window.history.replaceState !== "function") return;
+
+    parametrosContexto.forEach((chave) => params.delete(chave));
+    const queryRestante = params.toString();
+    window.history.replaceState({}, document.title, window.location.pathname + (queryRestante ? `?${queryRestante}` : "") + window.location.hash);
 }
 
 function formatarCargoInclusivo(categoria)
@@ -45,39 +53,6 @@ function formatarCargoInclusivo(categoria)
     if (valor === "cuidador") return "Cuidador(a)";
     if (valor === "secretaria") return "Secretária(o)";
     return String(categoria || "").trim();
-}
-
-function montarQueryContexto()
-{
-    const params = new URLSearchParams();
-    const idFuncionario = localStorage.getItem("idFuncionario");
-    const idUser = localStorage.getItem("usuarioId");
-    const usuarioNome = localStorage.getItem("usuarioNome");
-    const funcionarioNome = localStorage.getItem("funcionarioNome");
-    const categoria = localStorage.getItem("funcionarioCategoria");
-
-    if (idFuncionario) params.set("idFuncionario", idFuncionario);
-    if (idUser) params.set("idUser", idUser);
-    if (usuarioNome) params.set("usuarioNome", usuarioNome);
-    if (funcionarioNome) params.set("funcionarioNome", funcionarioNome);
-    if (categoria) params.set("categoria", categoria);
-
-    return params.toString();
-}
-
-function ajustarMenuPorPerfil()
-{
-    const query = montarQueryContexto();
-    const sufixo = query ? `?${query}` : "";
-
-    document.querySelectorAll(".sidebar-nav a.sidebar-link").forEach((link) =>
-    {
-        const href = link.getAttribute("href") || "";
-        if (query && href.endsWith(".html"))
-        {
-            link.setAttribute("href", `${href}${sufixo}`);
-        }
-    });
 }
 
 function padronizarTexto(texto)
@@ -614,4 +589,3 @@ function configurarEventos()
 document.addEventListener("DOMContentLoaded", carregarContextoUrl);
 document.addEventListener("DOMContentLoaded", configurarEventos);
 document.addEventListener("DOMContentLoaded", preencherPerfilTopo);
-document.addEventListener("DOMContentLoaded", ajustarMenuPorPerfil);

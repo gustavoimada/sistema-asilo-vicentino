@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SGAV - Tipos de Despesas</title>
 
-  <link rel="stylesheet" href="css/stylesTiposDespesas.css" />
+  <link rel="stylesheet" href="css/cadastroTipoOcorrencia.css?v=12" />
+  <link rel="stylesheet" href="css/funcionario.css" />
   <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260705-2" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
@@ -91,76 +92,22 @@
         <div class="topbar-right">
           <div class="profile-chip">
             <div class="profile-text">
-              <p id="perfilNome">Usuario</p>
+              <p id="perfilNome">Usuário</p>
               <span id="perfilCargo">Acesso</span>
             </div>
             <img
               class="profile-avatar"
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuCodmM9L3Lxp3TOXze0s5ng6gdLuL6UAVgjli-uCdXTzEkbUGW02Hheh8ViQ9IWJQngxEVmN3PkjBy4wDQUFq6-YEiM2_0THjjLcJGGCmoOip-JxgrwZ8717px25oL1Jay3FWpfa0rFtZIWUl4ziBAV-Brk_KrPNka1CMvjgOj2VkctGNpmZeuD-h9E384DdNtUi5QYhfnBKjlzWndJCqrgrkoxZL2DwUV0yeu9VbpJ1wqJosFaUFqLa-oW-OzQ9gsKgXSN3d_IyOx1"
-              alt="Perfil funcionario"
+              alt="Perfil funcionário"
             />
           </div>
         </div>
       </header>
 
       <div class="content">
-        <section class="card" id="tipoDespesaFormCard" style="display: none;">
-          <div class="section-header-inline">
-            <div class="section-header" style="margin-bottom:0;">
-              <h2 id="tipoDespesaFormTitulo">Cadastrar tipo de despesa</h2>
-              <p>Preencha os dados para salvar no sistema.</p>
-            </div>
-            <button type="button" id="cancelarTipoDespesaBtn" class="close-panel-btn" aria-label="Fechar cadastro">
-              <span class="material-symbols-outlined">close</span>
-            </button>
-          </div>
-
-          <form id="tipoDespesaForm" class="medicamento-form" style="margin-top:24px;">
-            <input type="hidden" id="idtipodespesas" name="idtipodespesas" />
-
-            <div class="form-field">
-              <label for="tipo">Tipo</label>
-              <input id="tipo" name="tipo" type="text" placeholder="Ex.: Alimentação" required />
-            </div>
-
-            <div class="form-actions form-actions-between">
-              <button type="submit" class="primary-action">
-                <span class="material-symbols-outlined">save</span>
-                Salvar
-              </button>
-            </div>
-          </form>
-        </section>
-
-        <section class="card" id="painelFiltroTipoDespesa" hidden>
-          <div class="section-header-inline">
-            <div class="section-header" style="margin-bottom:0;">
-              <h2>Filtros</h2>
-            </div>
-            <button type="button" id="fecharFiltrosTipoDespesa" class="close-panel-btn" aria-label="Fechar filtros">
-              <span class="material-symbols-outlined">close</span>
-            </button>
-          </div>
-
-          <div class="medicamento-form" style="margin-top:24px;">
-            <div class="form-field">
-              <label for="filtroCampoTipoDespesa">Filtrar por</label>
-              <select id="filtroCampoTipoDespesa">
-                <option value="tipo">Tipo</option>
-              </select>
-            </div>
-
-            <div class="form-field">
-              <label for="filtroBuscaTipoDespesa">Busca</label>
-              <input id="filtroBuscaTipoDespesa" type="text" placeholder="Digite para buscar" />
-            </div>
-
-          </div>
-        </section>
-
-        <section class="table-card">
-          <div class="card" style="box-shadow:none; padding:0; border-radius:0;">
-            <div class="list-header" style="padding:32px 32px 0;">
+        <div class="content-wrap">
+          <section>
+            <div class="list-header">
               <div class="list-header-left">
                 <h2>Lista de Tipos de Despesas</h2>
                 <p>Visualização dos tipos de despesas cadastrados no sistema.</p>
@@ -177,25 +124,79 @@
               </div>
             </div>
 
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th data-sort="tipo">Tipo</th>
-                    <th class="text-right">Ações</th>
-                  </tr>
-                </thead>
-                <tbody id="tabelaTiposDespesas">
-                  <tr>
-                    <td colspan="2">
-                      <div class="placeholder-table">Carregando tipos de despesas...</div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+            <section class="card" id="tipoDespesaFormCard" style="display: none;">
+              <div class="section-header section-header-inline">
+                <div>
+                  <h2 id="tipoDespesaFormTitulo">Cadastrar Novo Tipo de Despesa</h2>
+                  <p>Preencha os dados para salvar o tipo de despesa no sistema.</p>
+                </div>
+                <button type="button" id="cancelarTipoDespesaBtn" class="close-panel-btn" aria-label="Fechar cadastro">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+
+              <form id="tipoDespesaForm" class="ocorrencia-form">
+                <input type="hidden" id="idtipodespesas" name="idtipodespesas" />
+
+                <div class="form-field">
+                  <label for="tipo">Nome do Tipo</label>
+                  <input id="tipo" name="tipo" type="text" placeholder="Ex.: Alimentação" required />
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="primary-action">
+                    <span class="material-symbols-outlined">save</span>
+                    Salvar Despesa
+                  </button>
+                </div>
+              </form>
+            </section>
+
+            <section class="card" id="painelFiltroTipoDespesa" hidden>
+              <div class="section-header section-header-inline">
+                <div>
+                  <h2>Filtrar Tipos de Despesa</h2>
+                  <p>Pesquise por nome do tipo de despesa.</p>
+                </div>
+                <button type="button" id="fecharFiltrosTipoDespesa" class="close-panel-btn" aria-label="Fechar filtros">
+                  <span class="material-symbols-outlined">close</span>
+                </button>
+              </div>
+
+              <div class="ocorrencia-form filtro-form">
+                <div class="form-field">
+                  <label for="filtroCampoTipoDespesa">Filtrar por</label>
+                  <select id="filtroCampoTipoDespesa">
+                    <option value="tipo">Tipo</option>
+                  </select>
+                </div>
+
+                <div class="form-field">
+                  <label for="filtroBuscaTipoDespesa">Busca</label>
+                  <input id="filtroBuscaTipoDespesa" type="text" placeholder="Digite para buscar" />
+                </div>
+              </div>
+            </section>
+
+            <div class="table-card">
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th data-sort="tipo">Tipo</th>
+                      <th class="text-right">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tabelaTiposDespesas">
+                    <tr>
+                      <td colspan="2" class="empty-row">Carregando tipos de despesas...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </div>
       </div>
     </main>
   </div>

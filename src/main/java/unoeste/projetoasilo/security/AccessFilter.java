@@ -79,13 +79,13 @@ public class AccessFilter implements Filter
         String categoria = categoriaDaSessao(session);
         if (categoria.isEmpty())
         {
-            negarAcesso(request, response, "Acesso nao autorizado", 401);
+            negarAcesso(request, response, "Usuário sem sessão ativa para acessar este recurso", 401);
             return;
         }
 
         if (!podeAcessar(rota, categoria))
         {
-            negarAcesso(request, response, "Usuario sem permissao para acessar este recurso", 403);
+            negarAcesso(request, response, "Usuário sem permissão para acessar este recurso", 403);
             return;
         }
 
@@ -227,11 +227,6 @@ public class AccessFilter implements Filter
     {
         if (request.getRequestURI().endsWith(".html"))
         {
-            if (status == 401)
-            {
-                response.sendRedirect(request.getContextPath() + "/login.html");
-                return;
-            }
             mostrarTelaAcessoNegado(request, response, mensagem, status);
             return;
         }

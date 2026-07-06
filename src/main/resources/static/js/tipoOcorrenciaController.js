@@ -322,7 +322,7 @@ function confirmarExclusao()
 
       document.getElementById("painelConfirmacao").classList.remove("show");
       tipoPendenteExclusao = null;
-      mostrarMensagem("success", "Tipo de ocorrencia excluido com sucesso.");
+      mostrarMensagem("success", "Tipo de ocorrência excluído com sucesso.");
       return carregarTipos();
     })
     .catch(function ()
