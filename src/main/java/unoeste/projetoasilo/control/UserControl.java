@@ -102,14 +102,16 @@ public class UserControl
                 funcionario = new Funcionario().buscarPorNome(usuario.getName(), conexao);
             }
 
+            if (funcionario == null || !funcionario.isAtivo())
+            {
+                return ResponseEntity.status(401).body(new Error("Erro", "Funcionario inativo ou nao encontrado"));
+            }
+
             session.setAttribute("idUser", usuario.getIdUser());
             session.setAttribute("usuarioNome", usuario.getName());
-            if (funcionario != null)
-            {
-                session.setAttribute("idFuncionario", funcionario.getIdFuncionario());
-                session.setAttribute("funcionarioNome", funcionario.getNome());
-                session.setAttribute("categoria", funcionario.getCategoria());
-            }
+            session.setAttribute("idFuncionario", funcionario.getIdFuncionario());
+            session.setAttribute("funcionarioNome", funcionario.getNome());
+            session.setAttribute("categoria", funcionario.getCategoria());
 
             return ResponseEntity.ok().body(usuario);
         }
@@ -272,7 +274,7 @@ public class UserControl
             if (idFuncionario > 0)
             {
                 Funcionario funcionario = new Funcionario().buscarId(idFuncionario, conexao);
-                if (funcionario != null)
+                if (funcionario != null && funcionario.isAtivo())
                 {
                     return funcionario;
                 }

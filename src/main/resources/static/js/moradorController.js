@@ -288,7 +288,8 @@ function definirOrdenacaoMoradores(campo) {
 function carregarMoradores() {
     const filtroNome = document.getElementById('filtroNome');
     const filtroCpf = document.getElementById('filtroCpf');
-    const filtroDtNascimento = document.getElementById('filtroDtNascimento');
+    const filtroDtNascimentoInicio = document.getElementById('filtroDtNascimentoInicio');
+    const filtroDtNascimentoFim = document.getElementById('filtroDtNascimentoFim');
     const filtroEndereco = document.getElementById('filtroEndereco');
     const filtroCidade = document.getElementById('filtroCidade');
     const filtroEstado = document.getElementById('filtroEstado');
@@ -304,8 +305,11 @@ function carregarMoradores() {
         if (filtroCpf.value.trim() !== '')
             params.append('cpf', filtroCpf.value.trim());
 
-        if (filtroDtNascimento.value !== '')
-            params.append('dtNascimento', filtroDtNascimento.value);
+        if (filtroDtNascimentoInicio.value !== '')
+            params.append('dtNascimentoInicio', filtroDtNascimentoInicio.value);
+
+        if (filtroDtNascimentoFim.value !== '')
+            params.append('dtNascimentoFim', filtroDtNascimentoFim.value);
 
         if (filtroEndereco.value.trim() !== '')
             params.append('endereco', filtroEndereco.value.trim());
@@ -631,7 +635,8 @@ function fecharFiltros() {
 function limparFiltros() {
     document.getElementById('filtroNome').value = '';
     document.getElementById('filtroCpf').value = '';
-    document.getElementById('filtroDtNascimento').value = '';
+    document.getElementById('filtroDtNascimentoInicio').value = '';
+    document.getElementById('filtroDtNascimentoFim').value = '';
     document.getElementById('filtroEndereco').value = '';
     document.getElementById('filtroCidade').value = '';
     document.getElementById('filtroEstado').value = '';

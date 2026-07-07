@@ -55,6 +55,13 @@ public class TipoOcorrenciaDAO
         return conexao.manipular(sql);
     }
 
+    public boolean desativar(int id, Banco conexao) throws SQLException
+    {
+        String sql = "UPDATE tiposocorrencias SET ativo = FALSE WHERE idOcorrencias = #1 AND ativo = TRUE";
+        sql = sql.replace("#1", String.valueOf(id));
+        return conexao.manipular(sql);
+    }
+
     public boolean possuiOcorrenciaVinculada(int id, Banco conexao) throws SQLException
     {
         String sql = """
@@ -71,7 +78,7 @@ public class TipoOcorrenciaDAO
 
     public List<TipoOcorrencia> listar(Banco conexao) throws SQLException
     {
-        String sql = "SELECT idOcorrencias, descricao, gravidade FROM tiposocorrencias ORDER BY idOcorrencias";
+        String sql = "SELECT idOcorrencias, descricao, gravidade, ativo FROM tiposocorrencias WHERE ativo = TRUE ORDER BY idOcorrencias";
         List<TipoOcorrencia> tipos = new ArrayList<>();
         ResultSet rs = conexao.consultar(sql);
 
@@ -87,7 +94,7 @@ public class TipoOcorrenciaDAO
 
     public TipoOcorrencia buscarPorId(int id, Banco conexao) throws SQLException
     {
-        String sql = "SELECT idOcorrencias, descricao, gravidade FROM tiposocorrencias WHERE idOcorrencias = #1";
+        String sql = "SELECT idOcorrencias, descricao, gravidade, ativo FROM tiposocorrencias WHERE idOcorrencias = #1";
         sql = sql.replace("#1", String.valueOf(id));
 
         ResultSet rs = conexao.consultar(sql);
@@ -105,6 +112,7 @@ public class TipoOcorrenciaDAO
         tipo.setIdOcorrencias(rs.getInt("idOcorrencias"));
         tipo.setDescricao(rs.getString("descricao"));
         tipo.setGravidade(rs.getInt("gravidade"));
+        tipo.setAtivo(rs.getBoolean("ativo"));
         return tipo;
     }
 

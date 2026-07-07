@@ -15,6 +15,7 @@ public class Funcionario
     private String ctps;
     private String telefone;
     private String categoria;
+    private boolean ativo = true;
 
     public Funcionario()
     {
@@ -93,6 +94,11 @@ public class Funcionario
         return categoria;
     }
 
+    public boolean isAtivo()
+    {
+        return ativo;
+    }
+
     public void setNome(String nome)
     {
         this.nome = nome;
@@ -118,6 +124,11 @@ public class Funcionario
         this.categoria = categoria;
     }
 
+    public void setAtivo(boolean ativo)
+    {
+        this.ativo = ativo;
+    }
+
     public boolean gravar(Banco conexao) throws SQLException
     {
         FuncionarioDAO dao = new FuncionarioDAO();
@@ -134,6 +145,24 @@ public class Funcionario
     {
         FuncionarioDAO dao = new FuncionarioDAO();
         return dao.deletar(this.idFuncionario, conexao);
+    }
+
+    public boolean desativar(Banco conexao) throws SQLException
+    {
+        FuncionarioDAO dao = new FuncionarioDAO();
+        return dao.desativar(this.idFuncionario, conexao);
+    }
+
+    public int contarEscalasFuturasOuAtivas(Banco conexao) throws SQLException
+    {
+        FuncionarioDAO dao = new FuncionarioDAO();
+        return dao.contarEscalasFuturasOuAtivas(this.idFuncionario, conexao);
+    }
+
+    public int contarAtivosPorCategoria(String categoria, Banco conexao) throws SQLException
+    {
+        FuncionarioDAO dao = new FuncionarioDAO();
+        return dao.contarAtivosPorCategoria(categoria, conexao);
     }
 
     public Funcionario buscarId(int id, Banco conexao) throws SQLException

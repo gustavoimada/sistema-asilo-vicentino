@@ -10,7 +10,7 @@ import java.util.List;
 
 public class TiposAtividadesDAO {
     private static final String SQL_BASE_SELECT = """
-            SELECT idtipoatividade AS idtipoatividades, tipo, org
+            SELECT idtipoatividade AS idtipoatividades, tipo, org, ativo
             FROM tipoatividade
             """;
 
@@ -58,6 +58,12 @@ public class TiposAtividadesDAO {
         return conexao.manipular(sql);
     }
 
+    public boolean desativar(int id, Banco conexao) throws SQLException {
+        String sql = "UPDATE tipoatividade SET ativo = FALSE WHERE idtipoatividade = #1 AND ativo = TRUE";
+        sql = sql.replace("#1", String.valueOf(id));
+        return conexao.manipular(sql);
+    }
+
     public TiposAtividades buscarPorId(int id, Banco conexao) throws SQLException {
         String sql = SQL_BASE_SELECT + " WHERE idtipoatividade = #1";
         sql = sql.replace("#1", String.valueOf(id));
@@ -67,13 +73,14 @@ public class TiposAtividadesDAO {
             tipoAtividade.setIdtipoatividades(rs.getInt("idtipoatividades"));
             tipoAtividade.setTipo(rs.getString("tipo"));
             tipoAtividade.setOrg(rs.getString("org"));
+            tipoAtividade.setAtivo(rs.getBoolean("ativo"));
             return tipoAtividade;
         }
         return null;
     }
 
     public List<TiposAtividades> listar(Banco conexao) throws SQLException {
-        String sql = SQL_BASE_SELECT + " ORDER BY idtipoatividade";
+        String sql = SQL_BASE_SELECT + " WHERE ativo = TRUE ORDER BY idtipoatividade";
         List<TiposAtividades> tiposAtividades = new ArrayList<>();
         ResultSet rs = conexao.consultar(sql);
 
@@ -83,6 +90,7 @@ public class TiposAtividadesDAO {
                 tipoAtividade.setIdtipoatividades(rs.getInt("idtipoatividades"));
                 tipoAtividade.setTipo(rs.getString("tipo"));
                 tipoAtividade.setOrg(rs.getString("org"));
+                tipoAtividade.setAtivo(rs.getBoolean("ativo"));
                 tiposAtividades.add(tipoAtividade);
             }
         }
@@ -90,7 +98,7 @@ public class TiposAtividadesDAO {
     }
 
     public List<TiposAtividades> listarOrdenado(String valor, String ordem, Banco conexao) throws SQLException {
-        String sql = SQL_BASE_SELECT + " ORDER BY " + colunaOrdenacao(valor) + " " + direcaoOrdenacao(ordem);
+        String sql = SQL_BASE_SELECT + " WHERE ativo = TRUE ORDER BY " + colunaOrdenacao(valor) + " " + direcaoOrdenacao(ordem);
         List<TiposAtividades> tiposAtividades = new ArrayList<>();
         ResultSet rs = conexao.consultar(sql);
 
@@ -100,6 +108,7 @@ public class TiposAtividadesDAO {
                 tipoAtividade.setIdtipoatividades(rs.getInt("idtipoatividades"));
                 tipoAtividade.setTipo(rs.getString("tipo"));
                 tipoAtividade.setOrg(rs.getString("org"));
+                tipoAtividade.setAtivo(rs.getBoolean("ativo"));
                 tiposAtividades.add(tipoAtividade);
             }
         }

@@ -1180,6 +1180,8 @@ function abrirCadastroAtividade() {
 async function buscarAtividades() {
     const campo = document.getElementById("filtroCampoAtividade");
     const busca = document.getElementById("filtroBuscaAtividade");
+    const dataInicio = document.getElementById("filtroDataInicioAtividade");
+    const dataFim = document.getElementById("filtroDataFimAtividade");
 
     if (!campo || !busca) {
         return;
@@ -1196,6 +1198,29 @@ async function buscarAtividades() {
         return;
     }
 
+    if (tipoFiltro === "date") {
+        const valorInicio = dataInicio ? dataInicio.value : "";
+        const valorFim = dataFim ? dataFim.value : "";
+
+        if (valorInicio === "" && valorFim === "") {
+            renderizarTabela(atividadesBase);
+            atualizarIndicadoresOrdenacaoAtividades();
+            return;
+        }
+
+        const atividadesFiltradasPorData = atividadesBase.filter(function (atividade) {
+            const dataAtividade = String(atividade.date || "").slice(0, 10);
+            if (!dataAtividade) {
+                return false;
+            }
+            return (!valorInicio || dataAtividade >= valorInicio) && (!valorFim || dataAtividade <= valorFim);
+        });
+
+        renderizarTabela(atividadesFiltradasPorData);
+        atualizarIndicadoresOrdenacaoAtividades();
+        return;
+    }
+
     if (texto === "") {
         renderizarTabela(atividadesBase);
         atualizarIndicadoresOrdenacaoAtividades();
@@ -1203,10 +1228,6 @@ async function buscarAtividades() {
     }
 
     const atividadesFiltradas = atividadesBase.filter(function (atividade) {
-        if (tipoFiltro === "date") {
-            return formatarData(atividade.date).toLowerCase().includes(texto) || String(atividade.date || "").toLowerCase().includes(texto);
-        }
-
         if (tipoFiltro === "tipo") {
             const idTipo = obterIdTipoAtividade(atividade);
             return obterDescricaoTipoAtividade(idTipo).toLowerCase().includes(texto);
@@ -1222,14 +1243,35 @@ async function buscarAtividades() {
 function alterarTipoBuscaAtividade() {
     const campo = document.getElementById("filtroCampoAtividade");
     const busca = document.getElementById("filtroBuscaAtividade");
+    const campoBusca = document.getElementById("campoBuscaAtividade");
+    const campoDataInicio = document.getElementById("campoDataInicioAtividade");
+    const campoDataFim = document.getElementById("campoDataFimAtividade");
+    const dataInicio = document.getElementById("filtroDataInicioAtividade");
+    const dataFim = document.getElementById("filtroDataFimAtividade");
 
     if (!campo || !busca) {
         return;
     }
 
+    if (campoDataInicio) campoDataInicio.hidden = true;
+    if (campoDataFim) campoDataFim.hidden = true;
+    if (dataInicio) dataInicio.value = "";
+    if (dataFim) dataFim.value = "";
+    if (campoBusca) campoBusca.hidden = false;
+
     if (campo.value === "antigas") {
         busca.type = "text";
         busca.placeholder = "Atividades antigas";
+        busca.value = "";
+        busca.disabled = true;
+        buscarAtividades();
+        return;
+    }
+
+    if (campo.value === "date") {
+        if (campoBusca) campoBusca.hidden = true;
+        if (campoDataInicio) campoDataInicio.hidden = false;
+        if (campoDataFim) campoDataFim.hidden = false;
         busca.value = "";
         busca.disabled = true;
         buscarAtividades();
@@ -1272,6 +1314,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.getElementById("filtroCampoAtividade").addEventListener("change", alterarTipoBuscaAtividade);
         document.getElementById("filtroBuscaAtividade").addEventListener("input", buscarAtividades);
+        document.getElementById("filtroDataInicioAtividade").addEventListener("input", buscarAtividades);
+        document.getElementById("filtroDataFimAtividade").addEventListener("input", buscarAtividades);
         document.getElementById("novoAtividadeBtn").addEventListener("click", abrirCadastroAtividade);
 
         if (botaoFiltros && filtroPainel) {

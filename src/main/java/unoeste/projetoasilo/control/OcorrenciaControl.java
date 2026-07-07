@@ -45,6 +45,10 @@ public class OcorrenciaControl
             {
                 return ResponseEntity.badRequest().body(new Error("Erro", "Tipo de ocorrencia nao encontrado"));
             }
+            if (!tipo.isAtivo())
+            {
+                return ResponseEntity.badRequest().body(new Error("Erro", "Tipo de ocorrencia inativo para novos registros"));
+            }
 
             // busco o funcionario com o id recebido do front
             Funcionario funcionario = buscarFuncionarioDaSessao(session, conexao);
@@ -127,6 +131,10 @@ public class OcorrenciaControl
             if (tipo == null)
             {
                 return ResponseEntity.badRequest().body(new Error("Erro", "Tipo de ocorrencia nao encontrado"));
+            }
+            if (!tipo.isAtivo())
+            {
+                return ResponseEntity.badRequest().body(new Error("Erro", "Tipo de ocorrencia inativo para novos registros"));
             }
 
             List<Morador> moradoresSelecionados = buscarMoradores(conexao, idsMoradores);

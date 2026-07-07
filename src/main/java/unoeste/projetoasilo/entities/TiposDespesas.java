@@ -10,6 +10,7 @@ public class TiposDespesas {
 
         private int idtiposDespesas;
         private String tipo;
+        private boolean ativo = true;
 
         public int getIdtiposDespesas() {
             return idtiposDespesas;
@@ -25,6 +26,14 @@ public class TiposDespesas {
 
         public void setTipo(String tipo) {
             this.tipo = tipo;
+        }
+
+        public boolean isAtivo() {
+            return ativo;
+        }
+
+        public void setAtivo(boolean ativo) {
+            this.ativo = ativo;
         }
 
         public TiposDespesas(int idtiposDespesas, String tipo) {
@@ -63,6 +72,31 @@ public class TiposDespesas {
             throw new SQLException("Nao foi possivel abrir conexao com banco de dados");
         }
         return tiposdespesasdao.deletar(this.idtiposDespesas, conexao);
+        }
+
+        public boolean desativar(Banco conexao) throws SQLException
+        {
+            TiposDespesasDAO tiposdespesasdao = new TiposDespesasDAO();
+            if (conexao == null)
+        {
+            throw new SQLException("Nao foi possivel abrir conexao com banco de dados");
+        }
+        boolean desativou = tiposdespesasdao.desativar(this.idtiposDespesas, conexao);
+        if (desativou)
+        {
+            this.ativo = false;
+        }
+        return desativou;
+        }
+
+        public boolean possuiDespesaVinculada(Banco conexao) throws SQLException
+        {
+            TiposDespesasDAO tiposdespesasdao = new TiposDespesasDAO();
+            if (conexao == null)
+        {
+            throw new SQLException("Nao foi possivel abrir conexao com banco de dados");
+        }
+        return tiposdespesasdao.possuiDespesaVinculada(this.idtiposDespesas, conexao);
         }
 
         public TiposDespesas buscarPorId(int id, Banco conexao) throws SQLException

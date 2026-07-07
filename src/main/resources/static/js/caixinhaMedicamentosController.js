@@ -801,17 +801,22 @@ function confirmarAcao(mensagem) {
 }
 
 async function deletarPrescricao(id) {
-    const confirmado = await confirmarAcao("Tem certeza que deseja remover este medicamento da caixinha?");
+    const confirmado = await confirmarAcao("Remover este medicamento da caixinha? Se ja existir historico de uso, o sistema vai encerrar apenas a rotina futura e preservar os registros antigos.");
     if (confirmado) {
         fetch("/caixinha/" + id, {
             method: "DELETE"
         })
             .then(response => {
-                if (response.status === 200) {
+                return response.json()
+                    .catch(() => ({}))
+                    .then(body => ({ response, body }));
+            })
+            .then(({ response, body }) => {
+                if (response.ok) {
                     mostrarPopup("Medicamento removido da caixinha", "success");
                     carregarTabela();
                 } else {
-                    mostrarPopup("Nao foi possivel remover o medicamento da caixinha.", "error");
+                    mostrarPopup(body.descricao || body.title || "Nao foi possivel remover o medicamento da caixinha.", "error");
                 }
             })
             .catch(error => {

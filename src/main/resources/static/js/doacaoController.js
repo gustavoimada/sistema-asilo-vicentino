@@ -192,7 +192,8 @@ function renderizarTabela() {
   const filtroTipo = normalizarTexto(el("filtroTipo")?.value);
   const filtroNome = normalizarTexto(el("filtroNome")?.value);
   const filtroCpf = somenteDigitos(el("filtroCpf")?.value || "");
-  const filtroData = el("filtroData")?.value;
+  const filtroDataInicio = el("filtroDataInicio")?.value;
+  const filtroDataFim = el("filtroDataFim")?.value;
   let dados = doacoes.filter((item) => {
     const tipoItem = normalizarTexto(item.tipo || item.tipoDoacaoNome);
     const nomeItem = normalizarTexto(obterNomeDoador(item));
@@ -201,9 +202,11 @@ function renderizarTabela() {
     let bateNome = !filtroNome || nomeItem.includes(filtroNome);
     let bateCpf = !filtroCpf || somenteDigitos(item.cpfDoador).includes(filtroCpf);
     let bateData = true;
-    if (filtroData && item.dtDoacao) {
+    if ((filtroDataInicio || filtroDataFim) && item.dtDoacao) {
       const dataItem = String(item.dtDoacao).slice(0, 10);
-      bateData = filtroData === dataItem;
+      bateData = (!filtroDataInicio || dataItem >= filtroDataInicio) && (!filtroDataFim || dataItem <= filtroDataFim);
+    } else if ((filtroDataInicio || filtroDataFim) && !item.dtDoacao) {
+      bateData = false;
     }
     return bateValor && bateTipo && bateNome && bateCpf && bateData;
   });
@@ -492,7 +495,8 @@ function configurarEventos() {
     el("filtroTipo").value = "";
     el("filtroNome").value = "";
     el("filtroCpf").value = "";
-    el("filtroData").value = "";
+    el("filtroDataInicio").value = "";
+    el("filtroDataFim").value = "";
     renderizarTabela();
   });
   el("filtroValor")?.addEventListener("input", renderizarTabela);
@@ -502,7 +506,8 @@ function configurarEventos() {
     event.target.value = formatarCpf(event.target.value);
     renderizarTabela();
   });
-  el("filtroData")?.addEventListener("input", renderizarTabela);
+  el("filtroDataInicio")?.addEventListener("input", renderizarTabela);
+  el("filtroDataFim")?.addEventListener("input", renderizarTabela);
   el("cpfDoador")?.addEventListener("input", (event) => {
     event.target.value = formatarCpf(event.target.value);
   });

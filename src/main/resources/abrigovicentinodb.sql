@@ -76,6 +76,7 @@ CREATE TABLE funcionario (
                              telefone VARCHAR(15),
                              categoria VARCHAR(45),
                              ctps_numero VARCHAR(11),
+                             ativo BOOLEAN NOT NULL DEFAULT TRUE,
                              User_idUser INTEGER NOT NULL UNIQUE,
                              CONSTRAINT fk_funcionario_user
                                  FOREIGN KEY (User_idUser)
@@ -90,7 +91,8 @@ CREATE TABLE funcionario (
 CREATE TABLE tiposocorrencias (
                                   idOcorrencias SERIAL PRIMARY KEY,
                                   descricao VARCHAR(45),
-                                  gravidade INTEGER
+                                  gravidade INTEGER,
+                                  ativo BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 -- =========================================
@@ -169,6 +171,7 @@ CREATE TABLE prescricao (
                             frequenciavalor INTEGER,
                             frequenciaunidade VARCHAR(10),
                             primeiradose TIME,
+                            ativo BOOLEAN NOT NULL DEFAULT TRUE,
                             FOREIGN KEY (morador_idmorador)
                                 REFERENCES morador(idMorador),
                             FOREIGN KEY (medicamento_idmedicamento)
@@ -219,7 +222,8 @@ CREATE TABLE registrarusomedicacao (
 -- =========================================
 CREATE TABLE tipodespesas (
                               idTipoDespesas SERIAL PRIMARY KEY,
-                              tipo VARCHAR(45)
+                              tipo VARCHAR(45),
+                              ativo BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 -- =========================================
@@ -262,7 +266,8 @@ CREATE TABLE doacao (
 CREATE TABLE tipoatividade (
                                idtipoatividade SERIAL PRIMARY KEY,
                                tipo VARCHAR(45) NOT NULL,
-                               org VARCHAR(45) NOT NULL
+                               org VARCHAR(45) NOT NULL,
+                               ativo BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 -- =========================================

@@ -40,10 +40,14 @@ public class MoradorControl {
     }
 
     @GetMapping("filtrar")
-    public ResponseEntity<Object> filtrarMoradores(@RequestParam(required = false) String nome, @RequestParam(required = false) String cpf, @RequestParam(required = false) LocalDate dtNascimento, @RequestParam(required = false) String endereco, @RequestParam(required = false) String cidade, @RequestParam(required = false) String estado, @RequestParam(required = false) String telefone, @RequestParam(required = false) String ordenacao, @RequestParam(required = false) String direcao) {
+    public ResponseEntity<Object> filtrarMoradores(@RequestParam(required = false) String nome, @RequestParam(required = false) String cpf, @RequestParam(required = false) LocalDate dtNascimento, @RequestParam(required = false) LocalDate dtNascimentoInicio, @RequestParam(required = false) LocalDate dtNascimentoFim, @RequestParam(required = false) String endereco, @RequestParam(required = false) String cidade, @RequestParam(required = false) String estado, @RequestParam(required = false) String telefone, @RequestParam(required = false) String ordenacao, @RequestParam(required = false) String direcao) {
         Banco conexao = Banco.getConnection();
         try {
-            List<Morador> moradores = new Morador().filtrar(nome, cpf, dtNascimento, endereco, cidade, estado, telefone, ordenacao, direcao, conexao);
+            if (dtNascimento != null && dtNascimentoInicio == null && dtNascimentoFim == null) {
+                dtNascimentoInicio = dtNascimento;
+                dtNascimentoFim = dtNascimento;
+            }
+            List<Morador> moradores = new Morador().filtrar(nome, cpf, dtNascimentoInicio, dtNascimentoFim, endereco, cidade, estado, telefone, ordenacao, direcao, conexao);
             return ResponseEntity.ok(moradores);
         } catch (SQLException e) {
             return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao acessar banco de dados"));

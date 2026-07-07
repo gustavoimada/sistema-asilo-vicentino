@@ -100,6 +100,11 @@ public class PrescricaoDose {
         return prescricaoDoseDAO.listarAtrasadasDiasAnterioresFiltrado(dia, morador, conexao);
     }
 
+    public List<PrescricaoDose> listarAtrasadasDiasAnterioresFiltrado(String diaInicio, String diaFim, String morador, Banco conexao) throws SQLException {
+        PrescricaoDoseDAO prescricaoDoseDAO = new PrescricaoDoseDAO();
+        return prescricaoDoseDAO.listarAtrasadasDiasAnterioresFiltrado(diaInicio, diaFim, morador, conexao);
+    }
+
     public PrescricaoDose buscarId(Long id, Banco conexao) throws SQLException {
         PrescricaoDoseDAO prescricaoDoseDAO = new PrescricaoDoseDAO();
         return prescricaoDoseDAO.buscarPorId(id, conexao);

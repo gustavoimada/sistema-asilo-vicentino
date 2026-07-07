@@ -47,12 +47,18 @@ public class PrescricaoDoseControl {
     @GetMapping("listarAtrasadasDiasAnteriores")
     public ResponseEntity<Object> listarAtrasadasDiasAnteriores(
             @RequestParam(required = false) String dia,
+            @RequestParam(required = false) String diaInicio,
+            @RequestParam(required = false) String diaFim,
             @RequestParam(required = false) String morador
     ) {
         PrescricaoDose prescricaoDose = new PrescricaoDose();
         Banco conexao = Banco.getConnection();
         try {
-            List<PrescricaoDose> lista = prescricaoDose.listarAtrasadasDiasAnterioresFiltrado(dia, morador, conexao);
+            if (dia != null && (diaInicio == null || diaInicio.isBlank()) && (diaFim == null || diaFim.isBlank())) {
+                diaInicio = dia;
+                diaFim = dia;
+            }
+            List<PrescricaoDose> lista = prescricaoDose.listarAtrasadasDiasAnterioresFiltrado(diaInicio, diaFim, morador, conexao);
             return ResponseEntity.ok(lista);
         } catch (SQLException e) {
             return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao acessar banco de dados"));

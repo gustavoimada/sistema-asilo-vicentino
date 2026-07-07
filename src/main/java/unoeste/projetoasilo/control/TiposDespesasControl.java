@@ -97,6 +97,10 @@ public class TiposDespesasControl
 			{
 				return ResponseEntity.badRequest().body(new Error("Erro", "Tipo de despesa nao encontrado ou ja cadastrado"));
 			}
+			if (!tipoDespesaEncontrado.isAtivo())
+			{
+				return ResponseEntity.badRequest().body(new Error("Erro", "Tipo de despesa inativo"));
+			}
 
 			tipoDespesaEncontrado.setTipo(tipoNormalizado);
 			if (tipoDespesaEncontrado.editar(conexao))
@@ -126,6 +130,19 @@ public class TiposDespesasControl
 			if (tipoDespesaEncontrado == null)
 			{
 				return ResponseEntity.badRequest().body(new Error("Erro", "Tipo de despesa nao encontrado"));
+			}
+			if (!tipoDespesaEncontrado.isAtivo())
+			{
+				return ResponseEntity.badRequest().body(new Error("Erro", "Tipo de despesa ja esta inativo"));
+			}
+
+			if (tipoDespesaEncontrado.possuiDespesaVinculada(conexao))
+			{
+				if (tipoDespesaEncontrado.desativar(conexao))
+				{
+					return ResponseEntity.ok(tipoDespesaEncontrado);
+				}
+				return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel desativar o tipo de despesa"));
 			}
 
 			if (tipoDespesaEncontrado.deletar(conexao))

@@ -1,4 +1,6 @@
 (function () {
+    const CHAVE_ROLAGEM_MENU = "sgav.sidebar.secretaria.scrollTop";
+
     const itensMenu = [
         { href: "secretaria.html", icone: "dashboard", texto: "Painel", aliases: ["secretaria.html", "tipoOcorrencia.html"] },
         { href: "morador.html", icone: "elderly", texto: "Moradores" },
@@ -123,6 +125,26 @@
         const nav = sidebar.querySelector(".sidebar-nav");
         if (!nav) return;
 
+        function lerRolagemSalva() {
+            try {
+                const valor = Number(sessionStorage.getItem(CHAVE_ROLAGEM_MENU) || 0);
+                return Number.isFinite(valor) && valor > 0 ? valor : 0;
+            } catch (e) {
+                return 0;
+            }
+        }
+
+        function salvarRolagemAtual() {
+            try {
+                sessionStorage.setItem(CHAVE_ROLAGEM_MENU, String(Math.round(nav.scrollTop)));
+            } catch (e) {}
+        }
+
+        function restaurarRolagem() {
+            const maximo = Math.max(0, nav.scrollHeight - nav.clientHeight);
+            nav.scrollTop = Math.min(lerRolagemSalva(), maximo);
+        }
+
         function atualizarEstado() {
             const scrollavel = nav.scrollHeight > nav.clientHeight + 1;
             const noTopo = nav.scrollTop <= 1;
@@ -133,9 +155,17 @@
             nav.classList.toggle("at-bottom", noFim);
         }
 
-        nav.addEventListener("scroll", atualizarEstado, { passive: true });
+        nav.addEventListener("scroll", function () {
+            salvarRolagemAtual();
+            atualizarEstado();
+        }, { passive: true });
+
+        nav.addEventListener("click", salvarRolagemAtual, true);
         window.addEventListener("resize", atualizarEstado);
-        requestAnimationFrame(atualizarEstado);
+        requestAnimationFrame(function () {
+            restaurarRolagem();
+            atualizarEstado();
+        });
     }
 
     function atualizarAtalhoCoordenador(categoria) {

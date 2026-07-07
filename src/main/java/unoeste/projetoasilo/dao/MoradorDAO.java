@@ -64,6 +64,10 @@ public class MoradorDAO {
     }
 
     public List<Morador> filtrar(String nome, String cpf, LocalDate dtNascimento, String endereco, String cidade, String estado, String telefone, String ordenacao, String direcao, Banco conexao) throws SQLException {
+        return filtrar(nome, cpf, dtNascimento, dtNascimento, endereco, cidade, estado, telefone, ordenacao, direcao, conexao);
+    }
+
+    public List<Morador> filtrar(String nome, String cpf, LocalDate dtNascimentoInicio, LocalDate dtNascimentoFim, String endereco, String cidade, String estado, String telefone, String ordenacao, String direcao, Banco conexao) throws SQLException {
         String sql = """
                 SELECT m.*, q.idquartos AS quarto_id, q.ala AS quarto_ala, q.idquartos AS quarto_numero
                 FROM morador m
@@ -79,8 +83,12 @@ public class MoradorDAO {
             sql += " AND cpf LIKE '%" + cpf + "%'";
         }
 
-        if (dtNascimento != null) {
-            sql += " AND dtnasc::date = '" + dtNascimento + "'";
+        if (dtNascimentoInicio != null) {
+            sql += " AND dtnasc::date >= '" + dtNascimentoInicio + "'";
+        }
+
+        if (dtNascimentoFim != null) {
+            sql += " AND dtnasc::date <= '" + dtNascimentoFim + "'";
         }
 
         if (endereco != null && !endereco.isBlank()) {

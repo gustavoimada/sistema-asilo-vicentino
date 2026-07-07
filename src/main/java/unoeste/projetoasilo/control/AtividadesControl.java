@@ -58,6 +58,11 @@ public class AtividadesControl
 				return ResponseEntity.badRequest()
 						.body(new Error("Erro", "Tipo de atividade não encontrado"));
 			}
+			if (!tipoAtividadeEncontrado.isAtivo())
+			{
+				return ResponseEntity.badRequest()
+						.body(new Error("Erro", "Tipo de atividade inativo para novos cadastros"));
+			}
 
 			if (atividade.existeNoMesmoHorario(date, horainicio, horafim, null, conexao))
 			{
@@ -165,6 +170,7 @@ public class AtividadesControl
 			Atividades atividadeEncontrada = atividade.buscarPorId(id, conexao);
 			TiposAtividades tipoAtividadeEncontrado = tipoAtividade.buscarPorId(idtipoatividade, conexao);
 			if (atividadeEncontrada == null || tipoAtividadeEncontrado == null
+				|| !tipoAtividadeEncontrado.isAtivo()
 				|| atividade.existeNoMesmoHorario(date, horainicio, horafim, id, conexao))
 			{
 				return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao acessar banco de dados"));

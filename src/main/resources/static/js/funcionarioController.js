@@ -204,6 +204,25 @@ function classeCategoria(categoria)
     return "categoria-secretaria";
 }
 
+function motivoBloqueioExclusao(funcionario)
+{
+    const idLogado = Number(localStorage.getItem("idFuncionario") || 0);
+    const categoriaLogada = padronizarCategoriaValor(localStorage.getItem("funcionarioCategoria") || "");
+    const categoriaAlvo = padronizarCategoriaValor(funcionario.categoria || "");
+
+    if (idLogado > 0 && Number(funcionario.idFuncionario) === idLogado)
+    {
+        return "Nao e permitido excluir o proprio usuario logado";
+    }
+
+    if (categoriaAlvo === "Coordenador" && categoriaLogada !== "Coordenador")
+    {
+        return "Apenas coordenadores podem excluir outro coordenador";
+    }
+
+    return "";
+}
+
 async function parseJsonSegura(response)
 {
     try
@@ -245,7 +264,13 @@ function renderizarTabela()
         return;
     }
 
-    corpo.innerHTML = dados.map((funcionario) => `
+    corpo.innerHTML = dados.map((funcionario) =>
+    {
+        const motivoBloqueio = motivoBloqueioExclusao(funcionario);
+        const deleteDisabled = motivoBloqueio ? "disabled" : "";
+        const deleteTitle = motivoBloqueio || "Excluir";
+
+        return `
     <tr>
       <td>${funcionario.nome || ""}</td>
       <td><span class="categoria-badge ${classeCategoria(funcionario.categoria)}">${formatarCargoInclusivo(funcionario.categoria) || ""}</span></td>
@@ -257,13 +282,14 @@ function renderizarTabela()
           <button type="button" class="action-icon-btn edit" data-action="editar" data-id="${funcionario.idFuncionario}" title="Editar">
             <span class="material-symbols-outlined">edit</span>
           </button>
-          <button type="button" class="action-icon-btn delete" data-action="deletar" data-id="${funcionario.idFuncionario}" title="Excluir">
+          <button type="button" class="action-icon-btn delete" data-action="deletar" data-id="${funcionario.idFuncionario}" title="${deleteTitle}" ${deleteDisabled}>
             <span class="material-symbols-outlined">delete</span>
           </button>
         </div>
       </td>
     </tr>
-  `).join("");
+  `;
+    }).join("");
 }
 
 async function carregarFuncionarios()

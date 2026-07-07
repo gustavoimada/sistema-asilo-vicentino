@@ -28,6 +28,8 @@ public class Prescricao {
 
     private String frequenciaUnidade;
 
+    private boolean ativo = true;
+
     public Prescricao() {
     }
 
@@ -114,6 +116,14 @@ public class Prescricao {
         this.dtFim = dtFim;
     }
 
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
     public boolean gravar(Banco conexao) throws SQLException {
         PrescricaoDAO prescricaoDAO = new PrescricaoDAO();
         return prescricaoDAO.gravar(this, conexao);
@@ -132,6 +142,11 @@ public class Prescricao {
     public boolean deletar(Banco conexao) throws SQLException{
         PrescricaoDAO prescricaoDAO = new PrescricaoDAO();
         return prescricaoDAO.deletar(this.idPrescricao, conexao);
+    }
+
+    public boolean removerDaCaixinha(Banco conexao) throws SQLException {
+        PrescricaoDAO prescricaoDAO = new PrescricaoDAO();
+        return prescricaoDAO.removerDaCaixinha(this.idPrescricao, conexao);
     }
 
     public boolean editar(Banco conexao) throws SQLException{

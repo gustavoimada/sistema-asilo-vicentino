@@ -240,7 +240,8 @@ function configurarPainelAtrasados() {
     const botaoFecharPainel = document.getElementById("btnFecharPainelAtrasados");
     const botaoLimparFiltro = document.getElementById("btnLimparFiltroAtrasados");
     const painelAtrasados = document.getElementById("painelAtrasadosDiasAnteriores");
-    const inputDia = document.getElementById("diaFiltroAtrasados");
+    const inputDiaInicio = document.getElementById("diaInicioFiltroAtrasados");
+    const inputDiaFim = document.getElementById("diaFimFiltroAtrasados");
     const inputMorador = document.getElementById("moradorFiltroAtrasados");
 
     if (painelAtrasados != null) {
@@ -266,8 +267,11 @@ function configurarPainelAtrasados() {
 
         if (botaoLimparFiltro != null) {
             botaoLimparFiltro.addEventListener("click", function () {
-                if (inputDia != null) {
-                    inputDia.value = "";
+                if (inputDiaInicio != null) {
+                    inputDiaInicio.value = "";
+                }
+                if (inputDiaFim != null) {
+                    inputDiaFim.value = "";
                 }
                 if (inputMorador != null) {
                     inputMorador.value = "";
@@ -277,11 +281,20 @@ function configurarPainelAtrasados() {
             });
         }
 
-        if (inputDia != null) {
-            inputDia.addEventListener("change", function () {
+        if (inputDiaInicio != null) {
+            inputDiaInicio.addEventListener("change", function () {
                 carregarPrescricoesAtrasadas();
             });
-            inputDia.addEventListener("input", function () {
+            inputDiaInicio.addEventListener("input", function () {
+                carregarPrescricoesAtrasadas();
+            });
+        }
+
+        if (inputDiaFim != null) {
+            inputDiaFim.addEventListener("change", function () {
+                carregarPrescricoesAtrasadas();
+            });
+            inputDiaFim.addEventListener("input", function () {
                 carregarPrescricoesAtrasadas();
             });
         }
@@ -333,16 +346,7 @@ function montarTextoMedicamento(medicamento) {
 }
 
 function obterHorarioPrescrito(dataHoraPrevista) {
-    if (dataHoraPrevista == null) {
-        return "";
-    }
-
-    const partes = String(dataHoraPrevista).split("T");
-    if (partes.length < 2) {
-        return "";
-    }
-
-    return String(partes[1]).slice(0, 5);
+    return formatarHorarioCurto(dataHoraPrevista);
 }
 
 function formatarData(dataHoraPrevista) {
@@ -362,6 +366,59 @@ function formatarData(dataHoraPrevista) {
     }
 
     return partesData[2] + "/" + partesData[1] + "/" + partesData[0];
+}
+
+function formatarHorarioCurto(dataHoraTexto) {
+    if (dataHoraTexto == null) {
+        return "";
+    }
+
+    const valor = String(dataHoraTexto).trim();
+    if (valor === "") {
+        return "";
+    }
+
+    let parteHora = valor;
+    if (valor.includes("T")) {
+        parteHora = valor.split("T")[1] || "";
+    } else if (valor.includes(" ")) {
+        parteHora = valor.split(" ")[1] || "";
+    }
+
+    const horario = parteHora.match(/(\d{2}):(\d{2})/);
+    if (horario == null) {
+        return valor;
+    }
+
+    return `${horario[1]}:${horario[2]}`;
+}
+
+function escaparHtml(valor) {
+    return String(valor || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function obterIniciais(nome) {
+    const partes = String(nome || "")
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+
+    if (partes.length === 0) {
+        return "--";
+    }
+
+    const primeira = partes[0].charAt(0);
+    const ultima = partes.length > 1 ? partes[partes.length - 1].charAt(0) : "";
+    return (primeira + ultima).toUpperCase();
+}
+
+function montarAvatarMorador(nome, classes) {
+    return `<div class="${classes}" aria-hidden="true">${escaparHtml(obterIniciais(nome))}</div>`;
 }
 
 function converterDataHora(dataHoraTexto) {
@@ -450,14 +507,14 @@ function renderizarPrescricoesPendentes(listaPrescricoes) {
             linhas += `<div class="pending-card">
                         <div class="pending-card-top">
                             <div class="resident-info">
-                                <div class="resident-photo resident-photo-man"></div>
+                                ${montarAvatarMorador(nomeMorador, "resident-photo resident-photo-man")}
                                 <div class="resident-text">
-                                    <h4>${nomeMorador}</h4>
+                                    <h4>${escaparHtml(nomeMorador)}</h4>
                                     <div class="med-name">
                                         <span class="material-symbols-outlined small-icon">pill</span>
-                                        <p>${medicamentoTexto}</p>
+                                        <p>${escaparHtml(medicamentoTexto)}</p>
                                     </div>
-                                    <p class="schedule-text">Horario Programado: <strong>${horarioPrescrito}</strong></p>
+                                    <p class="schedule-text">Horário Programado: <strong>${escaparHtml(horarioPrescrito)}</strong></p>
                                 </div>
                             </div>
 
@@ -529,14 +586,14 @@ function renderizarPrescricoesAtrasadas(listaPrescricoes) {
             linhas += `<div class="pending-card">
                         <div class="pending-card-top">
                             <div class="resident-info">
-                                <div class="resident-photo resident-photo-man"></div>
+                                ${montarAvatarMorador(nomeMorador, "resident-photo resident-photo-man")}
                                 <div class="resident-text">
-                                    <h4>${nomeMorador}</h4>
+                                    <h4>${escaparHtml(nomeMorador)}</h4>
                                     <div class="med-name">
                                         <span class="material-symbols-outlined small-icon">pill</span>
-                                        <p>${medicamentoTexto}</p>
+                                        <p>${escaparHtml(medicamentoTexto)}</p>
                                     </div>
-                                    <p class="schedule-text">Previsto: <strong>${dataPrevista} ${horarioPrescrito}</strong></p>
+                                    <p class="schedule-text">Previsto: <strong>${escaparHtml(dataPrevista)} ${escaparHtml(horarioPrescrito)}</strong></p>
                                 </div>
                             </div>
 
@@ -609,13 +666,21 @@ function carregarPrescricoesAtrasadas() {
     const html = document.getElementById("prescricaoDoseAtrasadas");
     if (html != null) {
         const params = new URLSearchParams();
-        const inputDia = document.getElementById("diaFiltroAtrasados");
+        const inputDiaInicio = document.getElementById("diaInicioFiltroAtrasados");
+        const inputDiaFim = document.getElementById("diaFimFiltroAtrasados");
         const inputMorador = document.getElementById("moradorFiltroAtrasados");
 
-        if (inputDia != null) {
-            const dia = inputDia.value.trim();
-            if (dia != "") {
-                params.append("dia", dia);
+        if (inputDiaInicio != null) {
+            const diaInicio = inputDiaInicio.value.trim();
+            if (diaInicio != "") {
+                params.append("diaInicio", diaInicio);
+            }
+        }
+
+        if (inputDiaFim != null) {
+            const diaFim = inputDiaFim.value.trim();
+            if (diaFim != "") {
+                params.append("diaFim", diaFim);
             }
         }
 
@@ -706,7 +771,8 @@ function listarUso() {
         .then(resp => resp.json())
         .then(registros => {
             registros.forEach(registro => {
-                const horarioCompleto = registro.dataRegistro.split("T")[1];
+                const horarioReal = formatarHorarioCurto(registro.dataRegistro);
+                const nomeMorador = registro.prescricaoDose.prescricao.morador.nome || "-";
                 let medicamentoTexto = registro.prescricaoDose.prescricao.medicamento.nome + " " + registro.prescricaoDose.prescricao.medicamento.tipoMedicamento;
                 if (registro.prescricaoDose.prescricao.medicamento.dosagemUnidade !== null) {
                     medicamentoTexto += " " + registro.prescricaoDose.prescricao.medicamento.dosagemValor + " " + registro.prescricaoDose.prescricao.medicamento.dosagemUnidade;
@@ -714,11 +780,11 @@ function listarUso() {
 
                 linhas += `<tr>
                                 <td class="resident-cell">
-                                    <div class="mini-avatar woman-mini"></div>
-                                    <span>${registro.prescricaoDose.prescricao.morador.nome}</span>
+                                    ${montarAvatarMorador(nomeMorador, "mini-avatar woman-mini")}
+                                    <span>${escaparHtml(nomeMorador)}</span>
                                 </td>
-                                <td>${medicamentoTexto}</td>
-                                <td>${horarioCompleto}</td>
+                                <td>${escaparHtml(medicamentoTexto)}</td>
+                                <td>${escaparHtml(horarioReal)}</td>
                                 <td>
                                     <span class="table-status">
                                         <span class="material-symbols-outlined tiny-icon">done_all</span>
@@ -839,7 +905,6 @@ function atualizarDataHoraAtual() {
         year: "numeric",
         hour: "2-digit",
         minute: "2-digit",
-        second: "2-digit",
         timeZone: "America/Sao_Paulo"
     });
 

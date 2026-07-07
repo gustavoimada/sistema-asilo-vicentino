@@ -41,12 +41,20 @@ public class DespesaControl {
     }
 
     @GetMapping("filtrar")
-    public ResponseEntity<Object> filtrarDespesas(@RequestParam(required = false) String tipo, @RequestParam(required = false) String status, @RequestParam(required = false) String observacoes, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtVencimento, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtQuitacao, @RequestParam(required = false) String fixa, @RequestParam(required = false) String periodicidade, @RequestParam(required = false) String ordenacao, @RequestParam(required = false) String direcao) {
+    public ResponseEntity<Object> filtrarDespesas(@RequestParam(required = false) String tipo, @RequestParam(required = false) String status, @RequestParam(required = false) String observacoes, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtVencimento, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtVencimentoInicio, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtVencimentoFim, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtQuitacao, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtQuitacaoInicio, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtQuitacaoFim, @RequestParam(required = false) String fixa, @RequestParam(required = false) String periodicidade, @RequestParam(required = false) String ordenacao, @RequestParam(required = false) String direcao) {
         Despesa despesaEntidade = new Despesa();
         Banco conexao = Banco.getConnection();
         try {
             atualizarDespesasFixas(despesaEntidade, conexao);
-            List<Despesa> despesas = despesaEntidade.filtrar(tipo, status, observacoes, dtVencimento, dtQuitacao, fixa, periodicidade, ordenacao, direcao, conexao);
+            if (dtVencimento != null && dtVencimentoInicio == null && dtVencimentoFim == null) {
+                dtVencimentoInicio = dtVencimento;
+                dtVencimentoFim = dtVencimento;
+            }
+            if (dtQuitacao != null && dtQuitacaoInicio == null && dtQuitacaoFim == null) {
+                dtQuitacaoInicio = dtQuitacao;
+                dtQuitacaoFim = dtQuitacao;
+            }
+            List<Despesa> despesas = despesaEntidade.filtrar(tipo, status, observacoes, dtVencimentoInicio, dtVencimentoFim, dtQuitacaoInicio, dtQuitacaoFim, fixa, periodicidade, ordenacao, direcao, conexao);
 
             return ResponseEntity.ok(despesas);
         } catch (SQLException e) {

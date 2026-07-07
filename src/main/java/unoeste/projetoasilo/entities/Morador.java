@@ -195,8 +195,14 @@ public class Morador {
 	public List<Morador> filtrar(String nome, String cpf, LocalDate dtNascimento, String endereco, String cidade,
 		String estado, String telefone, String ordenacao, String direcao, Banco conexao) throws SQLException
 	{
+		return filtrar(nome, cpf, dtNascimento, dtNascimento, endereco, cidade, estado, telefone, ordenacao, direcao, conexao);
+	}
+
+	public List<Morador> filtrar(String nome, String cpf, LocalDate dtNascimentoInicio, LocalDate dtNascimentoFim, String endereco, String cidade,
+		String estado, String telefone, String ordenacao, String direcao, Banco conexao) throws SQLException
+	{
 		MoradorDAO dao = new MoradorDAO();
-		return dao.filtrar(nome, cpf, dtNascimento, endereco, cidade, estado, telefone, ordenacao, direcao, conexao);
+		return dao.filtrar(nome, cpf, dtNascimentoInicio, dtNascimentoFim, endereco, cidade, estado, telefone, ordenacao, direcao, conexao);
 	}
 
 	public Morador buscarPorCpf(String cpf, Banco conexao) throws SQLException

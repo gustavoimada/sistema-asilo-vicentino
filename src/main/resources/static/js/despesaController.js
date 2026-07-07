@@ -316,8 +316,10 @@ function carregarDespesas() {
         const filtroFixa = document.getElementById('filtroFixa');
         const filtroPeriodicidade = document.getElementById('filtroPeriodicidade');
         const filtroObservacao = document.getElementById('filtroObservacao');
-        const filtroVencimento = document.getElementById('filtroVencimento');
-        const filtroQuitacao = document.getElementById('filtroQuitacao');
+        const filtroVencimentoInicio = document.getElementById('filtroVencimentoInicio');
+        const filtroVencimentoFim = document.getElementById('filtroVencimentoFim');
+        const filtroQuitacaoInicio = document.getElementById('filtroQuitacaoInicio');
+        const filtroQuitacaoFim = document.getElementById('filtroQuitacaoFim');
         const filtroDiasRestantes = document.getElementById('filtroDiasRestantes');
         const ordenacao = document.getElementById('ordenacaoDespesas');
         const params = new URLSearchParams();
@@ -337,11 +339,17 @@ function carregarDespesas() {
         if (filtroObservacao.value.trim() !== '')
             params.append('observacoes', filtroObservacao.value.trim());
 
-        if (filtroVencimento.value !== '')
-            params.append('dtVencimento', filtroVencimento.value);
+        if (filtroVencimentoInicio.value !== '')
+            params.append('dtVencimentoInicio', filtroVencimentoInicio.value);
 
-        if (filtroQuitacao.value !== '')
-            params.append('dtQuitacao', filtroQuitacao.value);
+        if (filtroVencimentoFim.value !== '')
+            params.append('dtVencimentoFim', filtroVencimentoFim.value);
+
+        if (filtroQuitacaoInicio.value !== '')
+            params.append('dtQuitacaoInicio', filtroQuitacaoInicio.value);
+
+        if (filtroQuitacaoFim.value !== '')
+            params.append('dtQuitacaoFim', filtroQuitacaoFim.value);
 
         if (ordenacao != null && ordenacao.value !== '')
             params.append('ordenacao', ordenacao.value);
@@ -514,8 +522,10 @@ function limparFiltros() {
     document.getElementById('filtroFixa').value = '';
     document.getElementById('filtroPeriodicidade').value = '';
     document.getElementById('filtroObservacao').value = '';
-    document.getElementById('filtroVencimento').value = '';
-    document.getElementById('filtroQuitacao').value = '';
+    document.getElementById('filtroVencimentoInicio').value = '';
+    document.getElementById('filtroVencimentoFim').value = '';
+    document.getElementById('filtroQuitacaoInicio').value = '';
+    document.getElementById('filtroQuitacaoFim').value = '';
     document.getElementById('filtroDiasRestantes').value = '';
 
     carregarDespesas();

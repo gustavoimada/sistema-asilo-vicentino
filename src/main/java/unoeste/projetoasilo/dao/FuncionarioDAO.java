@@ -61,11 +61,78 @@ public class FuncionarioDAO
         return conexao.manipular(sql);
     }
 
+    public boolean desativar(int id, Banco conexao) throws SQLException
+    {
+        String sql = """
+                UPDATE funcionario
+                SET ativo = FALSE
+                WHERE idfuncionario = #1
+                AND ativo = TRUE
+                """;
+        sql = sql.replace("#1", String.valueOf(id));
+        return conexao.manipular(sql);
+    }
+
+    public int contarEscalasFuturasOuAtivas(int id, Banco conexao) throws SQLException
+    {
+        String sql = """
+                SELECT COUNT(*)
+                FROM funcionarioturnos
+                WHERE Funcionario_idFuncionario = #1
+                  AND status IN ('pendente', 'ativo')
+                  AND (
+                        status = 'ativo'
+                        OR (
+                            dataEscala::timestamp
+                            + CASE
+                                WHEN Turnos_idTurnos = 2 THEN INTERVAL '1 day 7 hours'
+                                ELSE INTERVAL '19 hours'
+                              END
+                        ) >= CURRENT_TIMESTAMP
+                  )
+                """;
+        sql = sql.replace("#1", String.valueOf(id));
+
+        ResultSet rs = conexao.consultar(sql);
+        if (rs != null && rs.next())
+        {
+            return rs.getInt(1);
+        }
+
+        return 0;
+    }
+
+    public int contarAtivosPorCategoria(String categoria, Banco conexao) throws SQLException
+    {
+        String filtroCategoria = filtroSqlCategoria(categoria);
+        if (filtroCategoria.isBlank())
+        {
+            return 0;
+        }
+
+        String sql = """
+                SELECT COUNT(*)
+                FROM funcionario
+                WHERE ativo = TRUE
+                  AND #FILTRO_CATEGORIA
+                """;
+        sql = sql.replace("#FILTRO_CATEGORIA", filtroCategoria);
+
+        ResultSet rs = conexao.consultar(sql);
+        if (rs != null && rs.next())
+        {
+            return rs.getInt(1);
+        }
+
+        return 0;
+    }
+
     public List<Funcionario> listar(Banco conexao) throws SQLException
     {
         String sql = """
-                SELECT idfuncionario, nome, cpf, ctps_numero, telefone, categoria, User_idUser
+                SELECT idfuncionario, nome, cpf, ctps_numero, telefone, categoria, ativo, User_idUser
                 FROM funcionario
+                WHERE ativo = TRUE
                 ORDER BY idfuncionario
                 """;
         List<Funcionario> funcionarios = new ArrayList<>();
@@ -85,9 +152,10 @@ public class FuncionarioDAO
     public List<Funcionario> listarPorCategoria(String categoria, Banco conexao) throws SQLException
     {
         String sql = """
-                SELECT idfuncionario, nome, cpf, ctps_numero, telefone, categoria, User_idUser
+                SELECT idfuncionario, nome, cpf, ctps_numero, telefone, categoria, ativo, User_idUser
                 FROM funcionario
                 WHERE categoria = '#1'
+                AND ativo = TRUE
                 ORDER BY idfuncionario
                 """;
         sql = sql.replace("#1", escaparSql(categoria));
@@ -109,7 +177,7 @@ public class FuncionarioDAO
     public Funcionario buscarPorId(int id, Banco conexao) throws SQLException
     {
         String sql = """
-                SELECT idfuncionario, nome, cpf, ctps_numero, telefone, categoria, User_idUser
+                SELECT idfuncionario, nome, cpf, ctps_numero, telefone, categoria, ativo, User_idUser
                 FROM funcionario
                 WHERE idfuncionario = #1
                 """;
@@ -127,9 +195,10 @@ public class FuncionarioDAO
     public Funcionario buscarPorNome(String nome, Banco conexao) throws SQLException
     {
         String sql = """
-                SELECT idfuncionario, nome, cpf, ctps_numero, telefone, categoria, User_idUser
+                SELECT idfuncionario, nome, cpf, ctps_numero, telefone, categoria, ativo, User_idUser
                 FROM funcionario
                 WHERE LOWER(nome) = LOWER('#1')
+                AND ativo = TRUE
                 ORDER BY idfuncionario
                 LIMIT 1
                 """;
@@ -147,9 +216,10 @@ public class FuncionarioDAO
     public Funcionario buscarPorUsuarioId(int idUser, Banco conexao) throws SQLException
     {
         String sql = """
-                SELECT idfuncionario, nome, cpf, ctps_numero, telefone, categoria, User_idUser
+                SELECT idfuncionario, nome, cpf, ctps_numero, telefone, categoria, ativo, User_idUser
                 FROM funcionario
                 WHERE User_idUser = #1
+                AND ativo = TRUE
                 """;
         sql = sql.replace("#1", String.valueOf(idUser));
 
@@ -242,6 +312,7 @@ public class FuncionarioDAO
         funcionario.setCtps(rs.getString("ctps_numero"));
         funcionario.setTelefone(rs.getString("telefone"));
         funcionario.setCategoria(rs.getString("categoria"));
+        funcionario.setAtivo(rs.getBoolean("ativo"));
         return funcionario;
     }
 
@@ -254,4 +325,29 @@ public class FuncionarioDAO
 
         return valor.replace("'", "''");
     }
+
+    private String filtroSqlCategoria(String categoria)
+    {
+        if (categoria == null)
+        {
+            return "";
+        }
+
+        String valor = categoria.trim().toLowerCase();
+        if (valor.startsWith("coord"))
+        {
+            return "LOWER(categoria) LIKE 'coordenador%'";
+        }
+        if (valor.startsWith("cuidad"))
+        {
+            return "LOWER(categoria) LIKE 'cuidador%'";
+        }
+        if (valor.startsWith("secret"))
+        {
+            return "LOWER(categoria) LIKE 'secret%'";
+        }
+
+        return "";
+    }
+
 }

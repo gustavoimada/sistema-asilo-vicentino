@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TiposDespesasDAO {
-    private static final String SQL_BASE_SELECT = "SELECT idtipodespesas, tipo FROM tipodespesas";
+    private static final String SQL_BASE_SELECT = "SELECT idtipodespesas, tipo, ativo FROM tipodespesas";
 
     private String escaparSql(String valor) {
         if (valor == null) {
@@ -50,6 +50,24 @@ public class TiposDespesasDAO {
         return conexao.manipular(sql);
     }
 
+    public boolean desativar(int id, Banco conexao) throws SQLException {
+        String sql = "UPDATE tipodespesas SET ativo = FALSE WHERE idtipodespesas = #1 AND ativo = TRUE";
+        sql = sql.replace("#1", String.valueOf(id));
+        return conexao.manipular(sql);
+    }
+
+    public boolean possuiDespesaVinculada(int id, Banco conexao) throws SQLException {
+        String sql = """
+                SELECT 1
+                FROM despesas
+                WHERE tipodespesas_idtipodespesas = #1
+                LIMIT 1
+                """;
+        sql = sql.replace("#1", String.valueOf(id));
+        ResultSet rs = conexao.consultar(sql);
+        return rs != null && rs.next();
+    }
+
     public TiposDespesas buscarPorId(int id, Banco conexao) throws SQLException {
         String sql = SQL_BASE_SELECT + " WHERE idtipodespesas = #1";
         sql = sql.replace("#1", String.valueOf(id));
@@ -58,6 +76,7 @@ public class TiposDespesasDAO {
             TiposDespesas tipoDespesa = new TiposDespesas();
             tipoDespesa.setIdtiposDespesas(rs.getInt("idtipodespesas"));
             tipoDespesa.setTipo(rs.getString("tipo"));
+            tipoDespesa.setAtivo(rs.getBoolean("ativo"));
             return tipoDespesa;
         }
         return null;
@@ -65,9 +84,10 @@ public class TiposDespesasDAO {
 
     public TiposDespesas buscarPorTipo(String tipo, Banco conexao) throws SQLException {
         String sql = """
-                SELECT idtipodespesas, tipo
+                SELECT idtipodespesas, tipo, ativo
                 FROM tipodespesas
                 WHERE UPPER(tipo) = UPPER('#1')
+                  AND ativo = TRUE
                 ORDER BY idtipodespesas
                 LIMIT 1
                 """;
@@ -77,13 +97,14 @@ public class TiposDespesasDAO {
             TiposDespesas tipoDespesa = new TiposDespesas();
             tipoDespesa.setIdtiposDespesas(rs.getInt("idtipodespesas"));
             tipoDespesa.setTipo(rs.getString("tipo"));
+            tipoDespesa.setAtivo(rs.getBoolean("ativo"));
             return tipoDespesa;
         }
         return null;
     }
 
     public List<TiposDespesas> listar(Banco conexao) throws SQLException {
-        String sql = SQL_BASE_SELECT + " ORDER BY idtipodespesas";
+        String sql = SQL_BASE_SELECT + " WHERE ativo = TRUE ORDER BY idtipodespesas";
         List<TiposDespesas> tiposDespesas = new ArrayList<>();
         ResultSet rs = conexao.consultar(sql);
 
@@ -92,6 +113,7 @@ public class TiposDespesasDAO {
                 TiposDespesas tipoDespesa = new TiposDespesas();
                 tipoDespesa.setIdtiposDespesas(rs.getInt("idtipodespesas"));
                 tipoDespesa.setTipo(rs.getString("tipo"));
+                tipoDespesa.setAtivo(rs.getBoolean("ativo"));
                 tiposDespesas.add(tipoDespesa);
             }
         }
@@ -99,7 +121,7 @@ public class TiposDespesasDAO {
     }
 
     public List<TiposDespesas> listarOrdenado(String valor, String ordem, Banco conexao) throws SQLException {
-        String sql = SQL_BASE_SELECT + " ORDER BY " + colunaOrdenacao(valor) + " " + direcaoOrdenacao(ordem);
+        String sql = SQL_BASE_SELECT + " WHERE ativo = TRUE ORDER BY " + colunaOrdenacao(valor) + " " + direcaoOrdenacao(ordem);
         List<TiposDespesas> tiposDespesas = new ArrayList<>();
         ResultSet rs = conexao.consultar(sql);
 
@@ -108,6 +130,7 @@ public class TiposDespesasDAO {
                 TiposDespesas tipoDespesa = new TiposDespesas();
                 tipoDespesa.setIdtiposDespesas(rs.getInt("idtipodespesas"));
                 tipoDespesa.setTipo(rs.getString("tipo"));
+                tipoDespesa.setAtivo(rs.getBoolean("ativo"));
                 tiposDespesas.add(tipoDespesa);
             }
         }

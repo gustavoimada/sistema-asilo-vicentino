@@ -134,6 +134,11 @@ public class TiposAtividadesControl
 				return ResponseEntity.badRequest()
 						.body(new Error("Erro", "Tipo de atividade nao encontrado"));
 			}
+			if (!tipoAtividadeEncontrado.isAtivo())
+			{
+				return ResponseEntity.badRequest()
+						.body(new Error("Erro", "Tipo de atividade inativo"));
+			}
 
 			List<TiposAtividades> tiposAtividades = tipoAtividade.listar(conexao);
 			if (tiposAtividades != null)
@@ -200,13 +205,20 @@ public class TiposAtividadesControl
 				return ResponseEntity.badRequest()
 						.body(new Error("Erro", "Tipo de atividade nao encontrado"));
 			}
+			if (!tipoAtividadeEncontrado.isAtivo())
+			{
+				return ResponseEntity.badRequest()
+						.body(new Error("Erro", "Tipo de atividade ja esta inativo"));
+			}
 
 			if (atividade.existeParaTipoAtividade(id, conexao))
 			{
-				List<Integer> idsAtividades = atividade.listarIdsPorTipoAtividade(id, conexao);
-				String idsTexto = idsAtividades.isEmpty() ? "" : idsAtividades.toString();
+				if (tipoAtividadeEncontrado.desativar(conexao))
+				{
+					return ResponseEntity.ok(tipoAtividadeEncontrado);
+				}
 				return ResponseEntity.badRequest()
-						.body(new Error("Erro", "Nao e possivel excluir: existem atividades vinculadas a este tipo (ids=" + idsTexto + ")"));
+						.body(new Error("Erro", "Nao foi possivel desativar o tipo de atividade"));
 			}
 
 			if (tipoAtividadeEncontrado.deletar(conexao))

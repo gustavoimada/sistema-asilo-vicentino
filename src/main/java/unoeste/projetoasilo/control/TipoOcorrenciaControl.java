@@ -62,6 +62,10 @@ public class TipoOcorrenciaControl
             {
                 return ResponseEntity.badRequest().body(new Error("Erro", "Tipo de ocorrencia nao encontrado"));
             }
+            if (!tipoEncontrado.isAtivo())
+            {
+                return ResponseEntity.badRequest().body(new Error("Erro", "Tipo de ocorrencia inativo"));
+            }
 
             tipoEncontrado.setDescricao(descricao);
             tipoEncontrado.setGravidade(gravidade);
@@ -98,10 +102,18 @@ public class TipoOcorrenciaControl
             {
                 return ResponseEntity.badRequest().body(new Error("Erro", "Tipo de ocorrencia nao encontrado"));
             }
+            if (!tipoEncontrado.isAtivo())
+            {
+                return ResponseEntity.badRequest().body(new Error("Erro", "Tipo de ocorrencia ja esta inativo"));
+            }
 
             if (tipoEncontrado.possuiOcorrenciaVinculada(conexao))
             {
-                return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel excluir o tipo de ocorrencia porque existe uma ocorrencia cadastrada com ele."));
+                if (tipoEncontrado.desativar(conexao))
+                {
+                    return ResponseEntity.ok(tipoEncontrado);
+                }
+                return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel desativar o tipo de ocorrencia"));
             }
 
             if (tipoEncontrado.deletar(conexao))

@@ -42,29 +42,16 @@ public class PrescricaoDAO {
 
     public List<Prescricao> listar(Banco conexao) throws SQLException{
         String sql = """
-                SELECT idprescricao, morador_idmorador, medicamento_idmedicamento, qtddose, dtinicio, dtfim, frequenciavalor, frequenciaunidade, primeiradose
+                SELECT idprescricao, morador_idmorador, medicamento_idmedicamento, qtddose, dtinicio, dtfim, frequenciavalor, frequenciaunidade, primeiradose, ativo
                 FROM prescricao
+                WHERE ativo = TRUE
                 """;
         List<Prescricao> prescricaoList = new ArrayList<>();
         ResultSet rs = conexao.consultar(sql);
 
         if(rs != null){
             while(rs.next()){
-                Prescricao prescricao = new Prescricao();
-                Medicamento medicamento = new Medicamento();
-                Morador morador = new Morador();
-                int idmed = (rs.getInt("medicamento_idmedicamento"));
-                prescricao.setIdPrescricao(rs.getInt("idprescricao"));
-                int idmor = (rs.getInt("morador_idmorador"));
-                prescricao.setMorador(morador.buscarId(idmor, conexao));
-                prescricao.setMedicamento(medicamento.buscarId(idmed, conexao));
-                prescricao.setQtdDose(rs.getObject("qtddose", Integer.class));
-                prescricao.setFrequenciaValor(rs.getInt("frequenciavalor"));
-                prescricao.setFrequenciaUnidade(rs.getString("frequenciaunidade"));
-                prescricao.setDtInicio(rs.getDate("dtinicio").toLocalDate());
-                prescricao.setDtFim(rs.getDate("dtfim").toLocalDate());
-                prescricao.setPrimeiraDose(rs.getTime("primeiradose").toLocalTime());
-                prescricaoList.add(prescricao);
+                prescricaoList.add(popularPrescricao(rs, conexao));
             }
         }
         return prescricaoList;
@@ -72,7 +59,7 @@ public class PrescricaoDAO {
 
     public Prescricao bucarPorId(int id, Banco conexao) throws SQLException{
         String sql = """
-                SELECT idprescricao, morador_idmorador, medicamento_idmedicamento, qtddose, dtinicio, dtfim, frequenciavalor, frequenciaunidade, primeiradose
+                SELECT idprescricao, morador_idmorador, medicamento_idmedicamento, qtddose, dtinicio, dtfim, frequenciavalor, frequenciaunidade, primeiradose, ativo
                 	FROM prescricao WHERE idprescricao = #1;
                 """;
         ResultSet rs;
@@ -83,21 +70,7 @@ public class PrescricaoDAO {
         if (rs != null)
         {
             if (rs.next()) {
-                Prescricao prescricao = new Prescricao();
-                Medicamento medicamento = new Medicamento();
-                Morador morador = new Morador();
-                int idmed = (rs.getInt("medicamento_idmedicamento"));
-                prescricao.setIdPrescricao(rs.getInt("idprescricao"));
-                int idmor = (rs.getInt("morador_idmorador"));
-                prescricao.setMorador(morador.buscarId(idmor, conexao));
-                prescricao.setMedicamento(medicamento.buscarId(idmed, conexao));
-                prescricao.setQtdDose(rs.getObject("qtddose", Integer.class));
-                prescricao.setFrequenciaValor(rs.getInt("frequenciavalor"));
-                prescricao.setFrequenciaUnidade(rs.getString("frequenciaunidade"));
-                prescricao.setDtInicio(rs.getDate("dtinicio").toLocalDate());
-                prescricao.setDtFim(rs.getDate("dtfim").toLocalDate());
-                prescricao.setPrimeiraDose(rs.getTime("primeiradose").toLocalTime());
-                pre = prescricao;
+                pre = popularPrescricao(rs, conexao);
             }
         }
         return pre;
@@ -110,6 +83,30 @@ public class PrescricaoDAO {
         }
 
         String sql = "DELETE FROM prescricao WHERE idprescricao = "+id;
+        return conexao.manipular(sql);
+    }
+
+    public boolean removerDaCaixinha(int id, Banco conexao) throws SQLException {
+        PrescricaoDoseDAO prescricaoDoseDAO = new PrescricaoDoseDAO();
+        if (prescricaoDoseDAO.existeRegistroUsoPorPrescricao(id, conexao)) {
+            if (!prescricaoDoseDAO.deletarFuturasNaoRegistradasPorPrescricao(id, conexao)) {
+                return false;
+            }
+
+            return desativar(id, conexao);
+        }
+
+        return deletar(id, conexao);
+    }
+
+    public boolean desativar(int id, Banco conexao) throws SQLException {
+        String sql = """
+                UPDATE prescricao
+                SET ativo = FALSE
+                WHERE idprescricao = #1
+                  AND ativo = TRUE
+                """;
+        sql = sql.replace("#1", String.valueOf(id));
         return conexao.manipular(sql);
     }
 
@@ -150,27 +147,13 @@ public class PrescricaoDAO {
     }
 
     public List<Prescricao> listarOrdenado(String valor, String ordem, Banco conexao) throws SQLException{
-        String sql = "SELECT * FROM prescricao ORDER BY " + colunaOrdenacao(valor) + " " + direcaoOrdenacao(ordem);
+        String sql = "SELECT * FROM prescricao WHERE ativo = TRUE ORDER BY " + colunaOrdenacao(valor) + " " + direcaoOrdenacao(ordem);
         List<Prescricao> prescricaoList = new ArrayList<>();
         ResultSet rs = conexao.consultar(sql);
 
         if(rs != null){
             while(rs.next()){
-                Prescricao prescricao = new Prescricao();
-                Medicamento medicamento = new Medicamento();
-                Morador morador = new Morador();
-                int idmed = (rs.getInt("medicamento_idmedicamento"));
-                prescricao.setIdPrescricao(rs.getInt("idprescricao"));
-                int idmor = (rs.getInt("morador_idmorador"));
-                prescricao.setMorador(morador.buscarId(idmor, conexao));
-                prescricao.setMedicamento(medicamento.buscarId(idmed, conexao));
-                prescricao.setQtdDose(rs.getObject("qtddose", Integer.class));
-                prescricao.setFrequenciaValor(rs.getInt("frequenciavalor"));
-                prescricao.setFrequenciaUnidade(rs.getString("frequenciaunidade"));
-                prescricao.setDtInicio(rs.getDate("dtinicio").toLocalDate());
-                prescricao.setDtFim(rs.getDate("dtfim").toLocalDate());
-                prescricao.setPrimeiraDose(rs.getTime("primeiradose").toLocalTime());
-                prescricaoList.add(prescricao);
+                prescricaoList.add(popularPrescricao(rs, conexao));
             }
         }
         return prescricaoList;
@@ -251,5 +234,25 @@ public class PrescricaoDAO {
             return "";
         }
         return frequenciaUnidade.trim().toLowerCase();
+    }
+
+    private Prescricao popularPrescricao(ResultSet rs, Banco conexao) throws SQLException {
+        Prescricao prescricao = new Prescricao();
+        Medicamento medicamento = new Medicamento();
+        Morador morador = new Morador();
+        int idmed = rs.getInt("medicamento_idmedicamento");
+        int idmor = rs.getInt("morador_idmorador");
+
+        prescricao.setIdPrescricao(rs.getInt("idprescricao"));
+        prescricao.setMorador(morador.buscarId(idmor, conexao));
+        prescricao.setMedicamento(medicamento.buscarId(idmed, conexao));
+        prescricao.setQtdDose(rs.getObject("qtddose", Integer.class));
+        prescricao.setFrequenciaValor(rs.getInt("frequenciavalor"));
+        prescricao.setFrequenciaUnidade(rs.getString("frequenciaunidade"));
+        prescricao.setDtInicio(rs.getDate("dtinicio").toLocalDate());
+        prescricao.setDtFim(rs.getDate("dtfim").toLocalDate());
+        prescricao.setPrimeiraDose(rs.getTime("primeiradose").toLocalTime());
+        prescricao.setAtivo(rs.getBoolean("ativo"));
+        return prescricao;
     }
 }

@@ -10,6 +10,7 @@ public class TiposAtividades {
     private int idtipoatividades;
     private String tipo;
     private String org;
+    private boolean ativo = true;
 
     public TiposAtividades() {
 
@@ -45,6 +46,14 @@ public class TiposAtividades {
         this.org = org;
     }
 
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
     public boolean gravar(Banco conexao) throws SQLException
     {
         TiposAtividadesDAO tiposAtividadesDAO = new TiposAtividadesDAO();
@@ -73,6 +82,21 @@ public class TiposAtividades {
             throw new SQLException("Nao foi possivel abrir conexao com banco de dados");
         }
         return tiposAtividadesDAO.deletar(this.idtipoatividades, conexao);
+    }
+
+    public boolean desativar(Banco conexao) throws SQLException
+    {
+        TiposAtividadesDAO tiposAtividadesDAO = new TiposAtividadesDAO();
+        if (conexao == null)
+        {
+            throw new SQLException("Nao foi possivel abrir conexao com banco de dados");
+        }
+        boolean desativou = tiposAtividadesDAO.desativar(this.idtipoatividades, conexao);
+        if (desativou)
+        {
+            this.ativo = false;
+        }
+        return desativou;
     }
 
     public TiposAtividades buscarPorId(int id, Banco conexao) throws SQLException

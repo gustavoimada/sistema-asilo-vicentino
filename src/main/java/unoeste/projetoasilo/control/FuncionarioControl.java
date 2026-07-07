@@ -15,6 +15,8 @@ import unoeste.projetoasilo.entities.Error;
 import unoeste.projetoasilo.entities.Funcionario;
 import unoeste.projetoasilo.entities.User;
 
+import jakarta.servlet.http.HttpSession;
+import java.text.Normalizer;
 import java.util.List;
 
 @RestController
@@ -162,7 +164,7 @@ public class FuncionarioControl
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<Object> deletarFuncionario(@PathVariable int id)
+    public ResponseEntity<Object> deletarFuncionario(@PathVariable int id, HttpSession session)
     {
         Banco conexao = Banco.getConnection();
 
@@ -174,15 +176,25 @@ public class FuncionarioControl
                 return ResponseEntity.badRequest().body(new Error("Erro", "Funcionario nao encontrado"));
             }
 
-            User userVinculado = funcionarioEncontrado.getUser();
-            if (!funcionarioEncontrado.deletar(conexao))
+            if (!funcionarioEncontrado.isAtivo())
             {
-                return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel excluir o funcionario"));
+                return ResponseEntity.badRequest().body(new Error("Erro", "Funcionario ja esta inativo"));
             }
 
-            if (userVinculado != null && userVinculado.getIdUser() > 0 && !userVinculado.deletar(conexao))
+            ResponseEntity<Object> erroRegraExclusao = validarRegraExclusaoFuncionario(funcionarioEncontrado, session, conexao);
+            if (erroRegraExclusao != null)
             {
-                return ResponseEntity.badRequest().body(new Error("Erro", "Funcionario excluido, mas nao foi possivel excluir o usuario vinculado"));
+                return erroRegraExclusao;
+            }
+
+            if (!funcionarioEncontrado.desativar(conexao))
+            {
+                String detalheErro = conexao.getMensagemErro();
+                if (detalheErro != null && !detalheErro.isBlank())
+                {
+                    return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel excluir o funcionario: " + detalheErro));
+                }
+                return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel excluir o funcionario"));
             }
 
             return ResponseEntity.ok(funcionarioEncontrado);
@@ -298,6 +310,107 @@ public class FuncionarioControl
         }
 
         return null;
+    }
+
+    private ResponseEntity<Object> validarRegraExclusaoFuncionario(Funcionario funcionario, HttpSession session, Banco conexao) throws Exception
+    {
+        String categoriaAlvo = chaveCategoria(funcionario.getCategoria());
+        String categoriaLogada = chaveCategoria(obterCategoriaSessao(session));
+        int idFuncionarioLogado = obterIdFuncionarioSessao(session);
+
+        if (idFuncionarioLogado > 0 && idFuncionarioLogado == funcionario.getIdFuncionario())
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Nao e permitido excluir o proprio usuario logado. Entre com outra conta administrativa para fazer essa alteracao."));
+        }
+
+        if ("coordenador".equals(categoriaAlvo))
+        {
+            if (!"coordenador".equals(categoriaLogada))
+            {
+                return ResponseEntity.status(403).body(new Error("Erro", "Apenas coordenadores podem excluir outro coordenador."));
+            }
+
+            int coordenadoresAtivos = funcionario.contarAtivosPorCategoria("Coordenador", conexao);
+            if (coordenadoresAtivos <= 1)
+            {
+                return ResponseEntity.badRequest().body(new Error("Erro", "Nao e possivel excluir o ultimo coordenador ativo. Cadastre outro coordenador antes de remover este acesso."));
+            }
+        }
+
+        if ("cuidador".equals(categoriaAlvo))
+        {
+            int escalasFuturas = funcionario.contarEscalasFuturasOuAtivas(conexao);
+            if (escalasFuturas > 0)
+            {
+                return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel excluir: o cuidador possui " + escalasFuturas + " escala(s) futura(s) ou em andamento. Remova ou altere essas escalas antes de excluir."));
+            }
+        }
+
+        if (!"coordenador".equals(categoriaAlvo) && !"cuidador".equals(categoriaAlvo) && !"secretaria".equals(categoriaAlvo))
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Categoria do funcionario invalida para exclusao."));
+        }
+
+        return null;
+    }
+
+    private int obterIdFuncionarioSessao(HttpSession session)
+    {
+        if (session == null)
+        {
+            return 0;
+        }
+
+        Object valor = session.getAttribute("idFuncionario");
+        if (valor instanceof Number)
+        {
+            return ((Number) valor).intValue();
+        }
+
+        try
+        {
+            return Integer.parseInt(String.valueOf(valor));
+        }
+        catch (Exception e)
+        {
+            return 0;
+        }
+    }
+
+    private String obterCategoriaSessao(HttpSession session)
+    {
+        if (session == null || session.getAttribute("categoria") == null)
+        {
+            return "";
+        }
+
+        return String.valueOf(session.getAttribute("categoria"));
+    }
+
+    private String chaveCategoria(String categoria)
+    {
+        if (categoria == null)
+        {
+            return "";
+        }
+
+        String texto = Normalizer.normalize(categoria.trim().toLowerCase(), Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
+
+        if (texto.contains("coordenador"))
+        {
+            return "coordenador";
+        }
+        if (texto.contains("cuidador"))
+        {
+            return "cuidador";
+        }
+        if (texto.contains("secret"))
+        {
+            return "secretaria";
+        }
+
+        return "";
     }
 
     private User criarUsuario(String username, String senha, String categoria, Banco conexao) throws Exception

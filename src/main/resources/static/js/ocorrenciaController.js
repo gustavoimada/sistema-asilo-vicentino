@@ -15,7 +15,7 @@ const estadoOcorrencia = {
 };
 
 let ordenacaoOcorrencia = { chave: "data", direcao: "desc" };
-let filtrosOcorrencia = { tipo: "", morador: "", cuidador: "", data: "", gravidade: "" };
+let filtrosOcorrencia = { tipo: "", morador: "", cuidador: "", dataInicial: "", dataFinal: "", gravidade: "" };
 
 function elOcorrencia(id)
 {
@@ -633,9 +633,21 @@ function aplicarFiltrosEOrdenacaoOcorrencia()
       incluir = String(item.funcionario?.idFuncionario || "") === filtrosOcorrencia.cuidador;
     }
 
-    if (incluir && filtrosOcorrencia.data)
+    if (incluir && (filtrosOcorrencia.dataInicial || filtrosOcorrencia.dataFinal))
 {
-      incluir = obterChaveDataLocalOcorrencia(item.dtOcorrencia) === filtrosOcorrencia.data;
+      const dataItem = obterChaveDataLocalOcorrencia(item.dtOcorrencia);
+      if (!dataItem)
+{
+        incluir = false;
+      }
+      if (incluir && filtrosOcorrencia.dataInicial)
+{
+        incluir = dataItem >= filtrosOcorrencia.dataInicial;
+      }
+      if (incluir && filtrosOcorrencia.dataFinal)
+{
+        incluir = dataItem <= filtrosOcorrencia.dataFinal;
+      }
     }
 
     if (incluir && filtrosOcorrencia.gravidade)
@@ -906,11 +918,12 @@ function fecharFiltrosOcorrencia()
 
 function limparFiltrosOcorrencia()
 {
-  filtrosOcorrencia = { tipo: "", morador: "", cuidador: "", data: "", gravidade: "" };
+  filtrosOcorrencia = { tipo: "", morador: "", cuidador: "", dataInicial: "", dataFinal: "", gravidade: "" };
   if (elOcorrencia("filtroTipo")) elOcorrencia("filtroTipo").value = "";
   if (elOcorrencia("filtroMorador")) elOcorrencia("filtroMorador").value = "";
   if (elOcorrencia("filtroCuidador")) elOcorrencia("filtroCuidador").value = "";
-  if (elOcorrencia("filtroData")) elOcorrencia("filtroData").value = "";
+  if (elOcorrencia("filtroDataInicial")) elOcorrencia("filtroDataInicial").value = "";
+  if (elOcorrencia("filtroDataFinal")) elOcorrencia("filtroDataFinal").value = "";
   if (elOcorrencia("filtroGravidade")) elOcorrencia("filtroGravidade").value = "";
   aplicarFiltrosEOrdenacaoOcorrencia();
 }
@@ -1165,8 +1178,13 @@ function configurarEventosOcorrencia()
     aplicarFiltrosEOrdenacaoOcorrencia();
   });
 
-  elOcorrencia("filtroData")?.addEventListener("change", function () {
-    filtrosOcorrencia.data = elOcorrencia("filtroData").value;
+  elOcorrencia("filtroDataInicial")?.addEventListener("change", function () {
+    filtrosOcorrencia.dataInicial = elOcorrencia("filtroDataInicial").value;
+    aplicarFiltrosEOrdenacaoOcorrencia();
+  });
+
+  elOcorrencia("filtroDataFinal")?.addEventListener("change", function () {
+    filtrosOcorrencia.dataFinal = elOcorrencia("filtroDataFinal").value;
     aplicarFiltrosEOrdenacaoOcorrencia();
   });
 

@@ -118,6 +118,7 @@ public class PrescricaoDoseDAO {
                 INNER JOIN morador m ON m.idmorador = p.morador_idmorador
                 WHERE pd.datahoraprevista >= CURRENT_DATE
                   AND pd.datahoraprevista < CURRENT_DATE + INTERVAL '1 day'
+                  AND p.ativo = TRUE
                 """;
         sql = sql.replace("#APLICADO", selectAplicado);
 
@@ -154,6 +155,10 @@ public class PrescricaoDoseDAO {
     }
 
     public List<PrescricaoDose> listarAtrasadasDiasAnterioresFiltrado(String dia, String morador, Banco conexao) throws SQLException {
+        return listarAtrasadasDiasAnterioresFiltrado(dia, dia, morador, conexao);
+    }
+
+    public List<PrescricaoDose> listarAtrasadasDiasAnterioresFiltrado(String diaInicio, String diaFim, String morador, Banco conexao) throws SQLException {
         boolean usarColunaAplicado = colunaAplicadoExiste(conexao);
         String selectAplicado;
         if (usarColunaAplicado) {
@@ -178,6 +183,7 @@ public class PrescricaoDoseDAO {
                 INNER JOIN prescricao p ON p.idprescricao = pd.prescricao_idprescricao
                 INNER JOIN morador m ON m.idmorador = p.morador_idmorador
                 WHERE pd.datahoraprevista < CURRENT_DATE
+                  AND p.ativo = TRUE
                 """;
         sql = sql.replace("#APLICADO", selectAplicado);
 
@@ -193,10 +199,16 @@ public class PrescricaoDoseDAO {
                 """;
         }
 
-        String diaFiltro = padronizarTextoFiltro(dia);
-        LocalDate dataFiltro = converterDataFiltro(diaFiltro);
-        if (dataFiltro != null) {
-            sql += " AND CAST(pd.datahoraprevista AS DATE) = '" + dataFiltro + "'";
+        String diaInicioFiltro = padronizarTextoFiltro(diaInicio);
+        LocalDate dataInicioFiltro = converterDataFiltro(diaInicioFiltro);
+        if (dataInicioFiltro != null) {
+            sql += " AND CAST(pd.datahoraprevista AS DATE) >= '" + dataInicioFiltro + "'";
+        }
+
+        String diaFimFiltro = padronizarTextoFiltro(diaFim);
+        LocalDate dataFimFiltro = converterDataFiltro(diaFimFiltro);
+        if (dataFimFiltro != null) {
+            sql += " AND CAST(pd.datahoraprevista AS DATE) <= '" + dataFimFiltro + "'";
         }
 
         String moradorFiltro = padronizarTextoFiltro(morador);
@@ -330,6 +342,25 @@ public class PrescricaoDoseDAO {
         return conexao.manipular(sql);
     }
 
+    public boolean deletarFuturasNaoRegistradasPorPrescricao(int idPrescricao, Banco conexao) throws SQLException {
+        if (!existeDoseFuturaNaoRegistradaPorPrescricao(idPrescricao, conexao)) {
+            return true;
+        }
+
+        String sql = """
+                DELETE FROM prescricaodose pd
+                WHERE pd.prescricao_idprescricao = #1
+                  AND pd.datahoraprevista >= CURRENT_TIMESTAMP
+                  AND NOT EXISTS (
+                      SELECT 1
+                      FROM registrarusomedicacao rum
+                      WHERE rum.prescricaodose_idprescricaodose = pd.idprescricaodose
+                  )
+                """;
+        sql = sql.replace("#1", String.valueOf(idPrescricao));
+        return conexao.manipular(sql);
+    }
+
     public boolean atualizar(Long id, Banco conexao) throws SQLException{
         return atualizarAplicado(id, true, conexao);
     }
@@ -356,6 +387,24 @@ public class PrescricaoDoseDAO {
                 SELECT 1
                 FROM prescricaodose
                 WHERE prescricao_idprescricao = #1
+                LIMIT 1
+                """;
+        sql = sql.replace("#1", String.valueOf(idPrescricao));
+        ResultSet rs = conexao.consultar(sql);
+        return rs != null && rs.next();
+    }
+
+    private boolean existeDoseFuturaNaoRegistradaPorPrescricao(int idPrescricao, Banco conexao) throws SQLException {
+        String sql = """
+                SELECT 1
+                FROM prescricaodose pd
+                WHERE pd.prescricao_idprescricao = #1
+                  AND pd.datahoraprevista >= CURRENT_TIMESTAMP
+                  AND NOT EXISTS (
+                      SELECT 1
+                      FROM registrarusomedicacao rum
+                      WHERE rum.prescricaodose_idprescricaodose = pd.idprescricaodose
+                  )
                 LIMIT 1
                 """;
         sql = sql.replace("#1", String.valueOf(idPrescricao));

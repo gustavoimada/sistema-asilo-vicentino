@@ -52,6 +52,10 @@ public class DespesaDAO {
     }
 
     public List<Despesa> filtrar(String tipo, String status, String observacoes, LocalDate dtVencimento, LocalDate dtQuitacao, String fixa, String periodicidade, String ordenacao, String direcao, Banco conexao) throws SQLException {
+        return filtrar(tipo, status, observacoes, dtVencimento, dtVencimento, dtQuitacao, dtQuitacao, fixa, periodicidade, ordenacao, direcao, conexao);
+    }
+
+    public List<Despesa> filtrar(String tipo, String status, String observacoes, LocalDate dtVencimentoInicio, LocalDate dtVencimentoFim, LocalDate dtQuitacaoInicio, LocalDate dtQuitacaoFim, String fixa, String periodicidade, String ordenacao, String direcao, Banco conexao) throws SQLException {
         String sql = sqlBase() + " WHERE 1=1";
 
         if (tipo != null) {
@@ -72,12 +76,17 @@ public class DespesaDAO {
             sql += " AND LOWER(d.observacoes) LIKE '%" + observacoes.toLowerCase() + "%'";
 
 
-        if (dtVencimento != null)
-            sql += " AND d.dtvencimento::date = '" + dtVencimento + "'";
+        if (dtVencimentoInicio != null)
+            sql += " AND d.dtvencimento::date >= '" + dtVencimentoInicio + "'";
 
+        if (dtVencimentoFim != null)
+            sql += " AND d.dtvencimento::date <= '" + dtVencimentoFim + "'";
 
-        if (dtQuitacao != null)
-            sql += " AND d.dtquitacao::date = '" + dtQuitacao + "'";
+        if (dtQuitacaoInicio != null)
+            sql += " AND d.dtquitacao::date >= '" + dtQuitacaoInicio + "'";
+
+        if (dtQuitacaoFim != null)
+            sql += " AND d.dtquitacao::date <= '" + dtQuitacaoFim + "'";
 
         if (fixa != null && !fixa.isBlank()) {
             if (fixa.equalsIgnoreCase("true"))
@@ -155,7 +164,7 @@ public class DespesaDAO {
 
     public List<TipoDespesa> listarTipos(Banco conexao) throws SQLException {
         List<TipoDespesa> tipos = new ArrayList<>();
-        ResultSet rs = conexao.consultar("SELECT idtipodespesas, tipo FROM tipodespesas ORDER BY tipo");
+        ResultSet rs = conexao.consultar("SELECT idtipodespesas, tipo FROM tipodespesas WHERE ativo = TRUE ORDER BY tipo");
 
         if (rs != null) {
             while (rs.next()) {
@@ -233,7 +242,7 @@ public class DespesaDAO {
     private int garantirTipoDespesa(TipoDespesa tipoDespesa, Banco conexao) throws SQLException {
         int idTipo = -1;
         String tipo = tipoDespesa.getTipo();
-        String sqlBusca = "SELECT idtipodespesas FROM tipodespesas WHERE tipo = '" + tipo + "'";
+        String sqlBusca = "SELECT idtipodespesas FROM tipodespesas WHERE tipo = '" + tipo + "' AND ativo = TRUE ORDER BY idtipodespesas LIMIT 1";
         ResultSet rs = conexao.consultar(sqlBusca);
 
         if (rs != null && rs.next())

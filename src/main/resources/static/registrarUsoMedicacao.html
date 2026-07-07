@@ -6,7 +6,7 @@
     <title>SGAV - Uso de Medicamentos</title>
 
     <link rel="stylesheet" href="css/funcionario.css"/>
-    <link rel="stylesheet" href="css/registrarUsoMedicacao.css?v=2"/>
+    <link rel="stylesheet" href="css/registrarUsoMedicacao.css?v=20260707-1"/>
     <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1"/>
 
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -96,8 +96,8 @@
                             <section class="card" id="filtroPrescricaoDose" hidden>
                                 <div class="section-header-inline">
                                     <div>
-                                        <h2>Filtrar Pendencias</h2>
-                                        <p>Busque por morador, horario programado e atrasados.</p>
+                                        <h2>Filtrar Pendências</h2>
+                                        <p>Busque por morador, horário programado e atrasados.</p>
                                     </div>
 
                                     <button type="button" id="btnFecharFiltroPrescricaoDose" class="close-panel-btn">
@@ -112,7 +112,7 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="horarioFiltroPrescricaoDose">Horario</label>
+                                        <label for="horarioFiltroPrescricaoDose">Horário</label>
                                         <input type="time" id="horarioFiltroPrescricaoDose">
                                     </div>
 
@@ -156,7 +156,7 @@
                                     <div class="section-header-inline">
                                         <div>
                                             <h2>Filtrar Atrasados</h2>
-                                            <p>Busque por dia e nome do morador.</p>
+                                            <p>Busque por período e nome do morador.</p>
                                         </div>
                                         <button type="button" id="btnFecharPainelAtrasados" class="close-panel-btn">
                                             <span class="material-symbols-outlined">close</span>
@@ -165,8 +165,13 @@
 
                                     <div class="prescription-form">
                                         <div class="form-group">
-                                            <label for="diaFiltroAtrasados">Dia</label>
-                                            <input type="date" id="diaFiltroAtrasados">
+                                            <label for="diaInicioFiltroAtrasados">Data inicial</label>
+                                            <input type="date" id="diaInicioFiltroAtrasados">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="diaFimFiltroAtrasados">Data final</label>
+                                            <input type="date" id="diaFimFiltroAtrasados">
                                         </div>
 
                                         <div class="form-group">
@@ -190,7 +195,7 @@
                         <section class="section-block">
                             <h3 class="history-title">
                                 <span class="material-symbols-outlined secondary-icon">history</span>
-                                Historico do Turno (Hoje)
+                                Histórico do Turno (Hoje)
                             </h3>
 
                             <div class="table-wrapper">
@@ -199,9 +204,9 @@
                                     <tr>
                                         <th>Residente</th>
                                         <th>Medicamento</th>
-                                        <th>Horario Real</th>
+                                        <th>Horário Real</th>
                                         <th>Status</th>
-                                        <th style="text-align: right;">Acoes</th>
+                                        <th style="text-align: right;">Ações</th>
                                     </tr>
                                     </thead>
                                     <tbody id="listarUso"></tbody>
@@ -214,7 +219,7 @@
         </div>
     </main>
 </div>
-<script src="js/registrarUsoMedicacaoController.js?v=20260703-1"></script>
+<script src="js/registrarUsoMedicacaoController.js?v=20260707-2"></script>
 </body>
 </html>
 

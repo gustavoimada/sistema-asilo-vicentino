@@ -8,7 +8,8 @@ const labelsMesesRelatorio = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "
 
 const estadoFiltroFuncionarios = {
     funcionario: "",
-    data: "",
+    dataInicio: "",
+    dataFim: "",
     ocorrencia: "",
     medicamento: ""
 };
@@ -111,12 +112,14 @@ function formatarDataFiltroRelatorio(valor) {
 function obterResumoFiltrosRelatorioFuncionarios() {
     const filtros = [];
     const funcionario = String(estadoFiltroFuncionarios.funcionario || "").trim();
-    const data = String(estadoFiltroFuncionarios.data || "").trim();
+    const dataInicio = String(estadoFiltroFuncionarios.dataInicio || "").trim();
+    const dataFim = String(estadoFiltroFuncionarios.dataFim || "").trim();
     const ocorrencia = String(estadoFiltroFuncionarios.ocorrencia || "").trim();
     const medicamento = String(estadoFiltroFuncionarios.medicamento || "").trim();
 
     if (funcionario !== "") filtros.push("Funcionário: " + funcionario);
-    if (data !== "") filtros.push("Data: " + formatarDataFiltroRelatorio(data));
+    if (dataInicio !== "") filtros.push("Data inicial: " + formatarDataFiltroRelatorio(dataInicio));
+    if (dataFim !== "") filtros.push("Data final: " + formatarDataFiltroRelatorio(dataFim));
     if (ocorrencia !== "") filtros.push("Ocorrência: " + ocorrencia);
     if (medicamento !== "") filtros.push("Medicamento: " + medicamento);
 
@@ -471,7 +474,8 @@ function filtrarRegistrosRelatorioFuncionarios() {
         const filtroFuncionario = normalizarTextoRelatorio(estadoFiltroFuncionarios.funcionario);
         const filtroOcorrencia = normalizarTextoRelatorio(estadoFiltroFuncionarios.ocorrencia);
         const filtroMedicamento = normalizarTextoRelatorio(estadoFiltroFuncionarios.medicamento);
-        const filtroData = String(estadoFiltroFuncionarios.data || "").trim();
+        const filtroDataInicio = String(estadoFiltroFuncionarios.dataInicio || "").trim();
+        const filtroDataFim = String(estadoFiltroFuncionarios.dataFim || "").trim();
 
         if (filtroFuncionario !== "") {
             if (!normalizarTextoRelatorio(funcionario).includes(filtroFuncionario)) {
@@ -479,8 +483,14 @@ function filtrarRegistrosRelatorioFuncionarios() {
             }
         }
 
-        if (filtroData !== "") {
-            if (data !== filtroData) {
+        if (filtroDataInicio !== "") {
+            if (!data || data < filtroDataInicio) {
+                return false;
+            }
+        }
+
+        if (filtroDataFim !== "") {
+            if (!data || data > filtroDataFim) {
                 return false;
             }
         }
@@ -687,7 +697,8 @@ function configurarFiltrosRelatorioFuncionarios() {
     const painelFiltros = document.getElementById("filtroFuncionariosRelatorioPainel");
 
     const filtroFuncionario = document.getElementById("filtroFuncionarioRelatorio");
-    const filtroData = document.getElementById("filtroDataRelatorio");
+    const filtroDataInicio = document.getElementById("filtroDataInicioRelatorio");
+    const filtroDataFim = document.getElementById("filtroDataFimRelatorio");
     const filtroOcorrencia = document.getElementById("filtroOcorrenciaRelatorio");
     const filtroMedicamento = document.getElementById("filtroMedicamentoRelatorio");
     const btnLimpar = document.getElementById("limparFiltrosFuncionarioRelatorio");
@@ -711,9 +722,16 @@ function configurarFiltrosRelatorioFuncionarios() {
         });
     }
 
-    if (filtroData) {
-        filtroData.addEventListener("input", function () {
-            estadoFiltroFuncionarios.data = filtroData.value;
+    if (filtroDataInicio) {
+        filtroDataInicio.addEventListener("input", function () {
+            estadoFiltroFuncionarios.dataInicio = filtroDataInicio.value;
+            renderizarRegistrosFuncionarios();
+        });
+    }
+
+    if (filtroDataFim) {
+        filtroDataFim.addEventListener("input", function () {
+            estadoFiltroFuncionarios.dataFim = filtroDataFim.value;
             renderizarRegistrosFuncionarios();
         });
     }
@@ -735,12 +753,14 @@ function configurarFiltrosRelatorioFuncionarios() {
     if (btnLimpar) {
         btnLimpar.addEventListener("click", function () {
             estadoFiltroFuncionarios.funcionario = "";
-            estadoFiltroFuncionarios.data = "";
+            estadoFiltroFuncionarios.dataInicio = "";
+            estadoFiltroFuncionarios.dataFim = "";
             estadoFiltroFuncionarios.ocorrencia = "";
             estadoFiltroFuncionarios.medicamento = "";
 
             if (filtroFuncionario) filtroFuncionario.value = "";
-            if (filtroData) filtroData.value = "";
+            if (filtroDataInicio) filtroDataInicio.value = "";
+            if (filtroDataFim) filtroDataFim.value = "";
             if (filtroOcorrencia) filtroOcorrencia.value = "";
             if (filtroMedicamento) filtroMedicamento.value = "";
 

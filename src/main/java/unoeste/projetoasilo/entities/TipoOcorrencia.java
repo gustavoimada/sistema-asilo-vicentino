@@ -11,6 +11,7 @@ public class TipoOcorrencia
 	private int idOcorrencias;
 	private String descricao;
 	private int gravidade;
+	private boolean ativo = true;
 
 	public TipoOcorrencia()
 	{
@@ -50,6 +51,16 @@ public class TipoOcorrencia
 	public void setGravidade(int gravidade)
 	{
 		this.gravidade = gravidade;
+	}
+
+	public boolean isAtivo()
+	{
+		return ativo;
+	}
+
+	public void setAtivo(boolean ativo)
+	{
+		this.ativo = ativo;
 	}
 
 	public boolean gravar(Banco conexao) throws SQLException
@@ -110,6 +121,17 @@ public class TipoOcorrencia
 	{
 		TipoOcorrenciaDAO tipoOcorrenciaDAO = new TipoOcorrenciaDAO();
 		return tipoOcorrenciaDAO.deletar(this.idOcorrencias, conexao);
+	}
+
+	public boolean desativar(Banco conexao) throws SQLException
+	{
+		TipoOcorrenciaDAO tipoOcorrenciaDAO = new TipoOcorrenciaDAO();
+		boolean desativou = tipoOcorrenciaDAO.desativar(this.idOcorrencias, conexao);
+		if (desativou)
+		{
+			this.ativo = false;
+		}
+		return desativou;
 	}
 
 	public boolean possuiOcorrenciaVinculada(Banco conexao) throws SQLException

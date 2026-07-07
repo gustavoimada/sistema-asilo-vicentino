@@ -162,7 +162,7 @@
                     <div class="section-header section-header-inline">
                         <div>
                             <h2>Filtros do Relatório</h2>
-                            <p>Pesquise por funcionário, data, ocorrência e registro de uso de medicamento.</p>
+                            <p>Pesquise por funcionário, período, ocorrência e registro de uso de medicamento.</p>
                         </div>
                         <button type="button" id="fecharFiltrosFuncionarioRelatorio" class="close-panel-btn">
                             <span class="material-symbols-outlined">close</span>
@@ -176,8 +176,13 @@
                         </div>
 
                         <div class="form-field">
-                            <label for="filtroDataRelatorio">Data</label>
-                            <input type="date" id="filtroDataRelatorio">
+                            <label for="filtroDataInicioRelatorio">Data inicial</label>
+                            <input type="date" id="filtroDataInicioRelatorio">
+                        </div>
+
+                        <div class="form-field">
+                            <label for="filtroDataFimRelatorio">Data final</label>
+                            <input type="date" id="filtroDataFimRelatorio">
                         </div>
 
                         <div class="form-field">
@@ -258,7 +263,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-<script src="js/relatorioFuncionariosController.js?v=20260706-2"></script>
+<script src="js/relatorioFuncionariosController.js?v=20260707-2"></script>
 
 </body>
 </html>

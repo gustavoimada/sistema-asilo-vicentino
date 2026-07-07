@@ -140,8 +140,13 @@ public class Despesa {
 
     public List<Despesa> filtrar(String tipo, String status, String observacoes, LocalDate dtVencimento, LocalDate dtQuitacao, String fixa, String periodicidade, String ordenacao, String direcao, Banco conexao) throws SQLException
     {
+        return filtrar(tipo, status, observacoes, dtVencimento, dtVencimento, dtQuitacao, dtQuitacao, fixa, periodicidade, ordenacao, direcao, conexao);
+    }
+
+    public List<Despesa> filtrar(String tipo, String status, String observacoes, LocalDate dtVencimentoInicio, LocalDate dtVencimentoFim, LocalDate dtQuitacaoInicio, LocalDate dtQuitacaoFim, String fixa, String periodicidade, String ordenacao, String direcao, Banco conexao) throws SQLException
+    {
         DespesaDAO dao = new DespesaDAO();
-        return dao.filtrar(tipo, status, observacoes, dtVencimento, dtQuitacao, fixa, periodicidade, ordenacao, direcao, conexao);
+        return dao.filtrar(tipo, status, observacoes, dtVencimentoInicio, dtVencimentoFim, dtQuitacaoInicio, dtQuitacaoFim, fixa, periodicidade, ordenacao, direcao, conexao);
     }
 
     public List<TipoDespesa> listarTipos(Banco conexao) throws SQLException
