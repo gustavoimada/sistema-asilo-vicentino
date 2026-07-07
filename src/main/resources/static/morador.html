@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/cadastroTipoOcorrencia.css?v=12" />
   <link rel="stylesheet" href="css/funcionario.css" />
   <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260705-2" />
-  <link rel="stylesheet" href="css/morador.css?v=3" />
+  <link rel="stylesheet" href="css/morador.css?v=4" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 </head>
@@ -366,14 +366,10 @@
                 <table>
                   <thead>
                     <tr>
-                      <th id="th-nome" class="sortable" onclick="definirOrdenacaoMoradores('nome')">Nome <span id="sort-nome" class="sort-indicator"></span></th>
-                      <th>Sexo</th>
-                      <th id="th-cpf" class="sortable" onclick="definirOrdenacaoMoradores('cpf')">CPF <span id="sort-cpf" class="sort-indicator"></span></th>
-                      <th id="th-dtNascimento" class="sortable" onclick="definirOrdenacaoMoradores('dtNascimento')">Data Nasc. <span id="sort-dtNascimento" class="sort-indicator"></span></th>
+                      <th id="th-nome" class="sortable" onclick="definirOrdenacaoMoradores('nome')">Morador <span id="sort-nome" class="sort-indicator"></span></th>
                       <th>Ala/Quarto</th>
-                      <th id="th-endereco" class="sortable" onclick="definirOrdenacaoMoradores('endereco')">Endereço <span id="sort-endereco" class="sort-indicator"></span></th>
-                      <th id="th-cidade" class="sortable" onclick="definirOrdenacaoMoradores('cidade')">Cidade/Estado <span id="sort-cidade" class="sort-indicator"></span></th>
-                      <th>Telefone</th>
+                      <th>Contato</th>
+                      <th id="th-cidade" class="sortable" onclick="definirOrdenacaoMoradores('cidade')">Localização <span id="sort-cidade" class="sort-indicator"></span></th>
                       <th class="text-right">Ações</th>
                     </tr>
                   </thead>
@@ -389,7 +385,22 @@
 
   <div id="mensagem-feedback" class="popup-msg"></div>
 
-  <script src="js/moradorController.js?v=20260703-1"></script>
+  <div id="moradorDetalhesModal" class="morador-modal" aria-hidden="true">
+    <div class="morador-modal-card" role="dialog" aria-modal="true" aria-labelledby="moradorDetalhesTitulo">
+      <div class="morador-modal-header">
+        <div>
+          <span class="morador-modal-eyebrow">Ficha do morador</span>
+          <h3 id="moradorDetalhesTitulo">Detalhes do morador</h3>
+        </div>
+        <button type="button" class="morador-modal-close" aria-label="Fechar detalhes" onclick="fecharDetalhesMorador()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div id="moradorDetalhesConteudo" class="morador-modal-body"></div>
+    </div>
+  </div>
+
+  <script src="js/moradorController.js?v=20260706-2"></script>
   <script src="js/sidebarSecretaria.js?v=20260705-1"></script>
 </body>
 </html>

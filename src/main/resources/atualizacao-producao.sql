@@ -42,3 +42,24 @@ BEGIN
             CHECK (Turnos_idTurnos IS NULL OR Turnos_idTurnos IN (1, 2)) NOT VALID;
     END IF;
 END $$;
+
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'ck_funcionarioturnos_turno_padrao'
+          AND NOT convalidated
+    ) THEN
+        ALTER TABLE funcionarioturnos VALIDATE CONSTRAINT ck_funcionarioturnos_turno_padrao;
+    END IF;
+
+    IF EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'ck_ocorrencias_turno_padrao'
+          AND NOT convalidated
+    ) THEN
+        ALTER TABLE ocorrencias VALIDATE CONSTRAINT ck_ocorrencias_turno_padrao;
+    END IF;
+END $$;

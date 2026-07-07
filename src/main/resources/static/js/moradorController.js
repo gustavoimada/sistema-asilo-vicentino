@@ -104,13 +104,47 @@ function formatarData(data) {
     return (data || '').replace(/(\d{4})-(\d{2})-(\d{2})/, '$3/$2/$1');
 }
 
+function escaparHtml(valor) {
+    const div = document.createElement('div');
+    div.textContent = valor == null ? '' : String(valor);
+    return div.innerHTML;
+}
+
+function calcularIdade(dtNascimento) {
+    if (!dtNascimento)
+        return '';
+
+    const nascimento = new Date(dtNascimento);
+
+    if (Number.isNaN(nascimento.getTime()))
+        return '';
+
+    const hoje = new Date();
+    let idade = hoje.getFullYear() - nascimento.getFullYear();
+    const aniversarioJaPassou = hoje >= new Date(hoje.getFullYear(), nascimento.getMonth(), nascimento.getDate());
+
+    if (!aniversarioJaPassou)
+        idade--;
+
+    return idade > 0 ? String(idade) : '';
+}
+
 function formatarGenero(genero) {
     if (genero === 'M')
-        return 'M';
+        return 'Masculino';
     else if (genero === 'F')
-        return 'F';
+        return 'Feminino';
     else
         return genero || '';
+}
+
+function obterClasseGenero(genero) {
+    if (genero === 'M')
+        return 'masculino';
+    else if (genero === 'F')
+        return 'feminino';
+    else
+        return 'indefinido';
 }
 
 function formatarAlaQuarto(morador) {
@@ -202,17 +236,16 @@ function preencherSelectQuartos(quartoSelecionado = '') {
 }
 
 function limparIndicadoresOrdenacaoMoradores() {
-    document.getElementById('sort-nome').textContent = '';
-    document.getElementById('sort-cpf').textContent = '';
-    document.getElementById('sort-dtNascimento').textContent = '';
-    document.getElementById('sort-endereco').textContent = '';
-    document.getElementById('sort-cidade').textContent = '';
+    ['nome', 'cpf', 'dtNascimento', 'endereco', 'cidade'].forEach(function (campo) {
+        const indicador = document.getElementById(`sort-${campo}`);
+        const th = document.getElementById(`th-${campo}`);
 
-    document.getElementById('th-nome').classList.remove('is-active');
-    document.getElementById('th-cpf').classList.remove('is-active');
-    document.getElementById('th-dtNascimento').classList.remove('is-active');
-    document.getElementById('th-endereco').classList.remove('is-active');
-    document.getElementById('th-cidade').classList.remove('is-active');
+        if (indicador)
+            indicador.textContent = '';
+
+        if (th)
+            th.classList.remove('is-active');
+    });
 }
 
 function atualizarIndicadoresOrdenacaoMoradores() {
@@ -386,23 +419,70 @@ function renderizarMoradores(moradores) {
     if (Array.isArray(moradores))
         listaMoradores = moradores;
 
+    if (listaMoradores.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5">
+                    <div class="placeholder-table">Nenhum morador cadastrado.</div>
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
     listaMoradores.forEach(m => {
         const row = tbody.insertRow();
-        row.insertCell(0).textContent = m.nome;
-        row.insertCell(1).textContent = formatarGenero(m.genero);
-        row.insertCell(2).textContent = m.cpf;
-        row.insertCell(3).textContent = formatarData(m.dtNascimento);
-        row.insertCell(4).textContent = formatarAlaQuarto(m);
-        row.insertCell(5).textContent = `${m.endereco}, ${m.numero}`;
-        row.insertCell(6).textContent = `${m.cidade}/${m.estado}`;
-        row.insertCell(7).textContent = m.telefone;
+        const idade = calcularIdade(m.dtNascimento);
+        const generoTexto = formatarGenero(m.genero);
+        const quartoTexto = formatarAlaQuarto(m);
+        const enderecoCurto = [m.endereco, m.numero].filter(Boolean).join(', ');
+        const localizacao = [m.cidade, m.estado].filter(Boolean).join('/');
+        const idMorador = Number(m.idMorador) || 0;
 
-        const acoes = row.insertCell(8);
+        row.insertCell(0).innerHTML = `
+            <div class="morador-primary">
+                <strong>${escaparHtml(m.nome || 'Sem nome')}</strong>
+                <span>CPF ${escaparHtml(m.cpf || '-')}</span>
+                <div class="morador-tags">
+                    <span class="morador-badge genero-${obterClasseGenero(m.genero)}">${escaparHtml(generoTexto || 'Nao informado')}</span>
+                    <span class="morador-badge idade">${idade ? escaparHtml(idade + ' anos') : 'Idade nao informada'}</span>
+                </div>
+            </div>
+        `;
+
+        row.insertCell(1).innerHTML = quartoTexto
+            ? `<span class="morador-quarto-badge">${escaparHtml(quartoTexto)}</span>`
+            : `<span class="morador-quarto-badge alerta">Sem quarto</span>`;
+
+        row.insertCell(2).innerHTML = `
+            <div class="morador-info-block">
+                <strong>${escaparHtml(m.telefone || '-')}</strong>
+                <span>Respons&aacute;vel nos detalhes</span>
+            </div>
+        `;
+
+        row.insertCell(3).innerHTML = `
+            <div class="morador-info-block">
+                <strong>${escaparHtml(localizacao || '-')}</strong>
+                <span>${escaparHtml(enderecoCurto || 'Endereco nao informado')}</span>
+            </div>
+        `;
+
+        const acoes = row.insertCell(4);
+
+        const btnDetalhes = document.createElement('button');
+        btnDetalhes.type = 'button';
+        btnDetalhes.classList.add('morador-row-btn', 'view');
+        btnDetalhes.setAttribute('aria-label', 'Ver detalhes');
+        btnDetalhes.setAttribute('data-tooltip', 'Visualizar');
+        btnDetalhes.innerHTML = '<span class="material-symbols-outlined">visibility</span>';
+        btnDetalhes.onclick = () => abrirDetalhesMorador(idMorador);
 
         const btnEditar = document.createElement('button');
         btnEditar.type = 'button';
         btnEditar.classList.add('morador-row-btn');
         btnEditar.setAttribute('aria-label', 'Editar');
+        btnEditar.setAttribute('data-tooltip', 'Editar');
         btnEditar.innerHTML = '<span class="material-symbols-outlined">edit</span>';
         btnEditar.onclick = () => editarMorador(m);
 
@@ -410,13 +490,124 @@ function renderizarMoradores(moradores) {
         btnDeletar.type = 'button';
         btnDeletar.classList.add('morador-row-btn', 'danger');
         btnDeletar.setAttribute('aria-label', 'Excluir');
+        btnDeletar.setAttribute('data-tooltip', 'Excluir');
         btnDeletar.innerHTML = '<span class="material-symbols-outlined">delete</span>';
         btnDeletar.onclick = () => deletarMorador(m.idMorador);
 
         acoes.classList.add('morador-actions-cell');
+        acoes.appendChild(btnDetalhes);
         acoes.appendChild(btnEditar);
         acoes.appendChild(btnDeletar);
     });
+}
+
+function montarLinhaDetalhe(rotulo, valor) {
+    return `
+        <div class="morador-detail-item">
+            <span>${rotulo}</span>
+            <strong>${escaparHtml(valor || '-')}</strong>
+        </div>
+    `;
+}
+
+function renderizarResponsaveisDetalhes(vinculos) {
+    if (!Array.isArray(vinculos) || vinculos.length === 0) {
+        return `
+            <div class="morador-empty-responsavel">
+                Nenhum responsavel cadastrado para este morador.
+            </div>
+        `;
+    }
+
+    return vinculos.map(function (vinculo) {
+        const familiar = vinculo.composicaoFamiliar || {};
+        return `
+            <div class="morador-responsavel-card">
+                <div>
+                    <span>${escaparHtml(vinculo.vinculo || 'Responsavel')}</span>
+                    <strong>${escaparHtml(familiar.nome || 'Sem nome')}</strong>
+                </div>
+                <p>${escaparHtml(familiar.telefone || 'Telefone nao informado')}</p>
+                <p>CPF ${escaparHtml(familiar.cpf || '-')}</p>
+            </div>
+        `;
+    }).join('');
+}
+
+function carregarResponsaveisMorador(idMorador) {
+    return fetch(`${URL_FAMILIAR}/listar?moradorId=${idMorador}`)
+        .then(response => {
+            if (!response.ok)
+                throw new Error('Nao foi possivel carregar o responsavel.');
+
+            return response.json();
+        });
+}
+
+async function abrirDetalhesMorador(idMorador) {
+    const modal = document.getElementById('moradorDetalhesModal');
+    const conteudo = document.getElementById('moradorDetalhesConteudo');
+    const titulo = document.getElementById('moradorDetalhesTitulo');
+    const morador = moradores.find(item => Number(item.idMorador) === Number(idMorador));
+
+    if (!modal || !conteudo || !morador)
+        return;
+
+    const idade = calcularIdade(morador.dtNascimento);
+    const quartoTexto = formatarAlaQuarto(morador) || 'Sem quarto';
+    const endereco = [morador.endereco, morador.numero].filter(Boolean).join(', ');
+    const cidadeEstado = [morador.cidade, morador.estado].filter(Boolean).join('/');
+
+    titulo.textContent = morador.nome || 'Detalhes do morador';
+    conteudo.innerHTML = '<div class="morador-detail-loading">Carregando detalhes...</div>';
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden', 'false');
+
+    try {
+        const responsaveis = await carregarResponsaveisMorador(idMorador);
+        conteudo.innerHTML = `
+            <section class="morador-detail-section">
+                <h4>Dados principais</h4>
+                <div class="morador-detail-grid">
+                    ${montarLinhaDetalhe('CPF', morador.cpf)}
+                    ${montarLinhaDetalhe('G&ecirc;nero', formatarGenero(morador.genero))}
+                    ${montarLinhaDetalhe('Nascimento', formatarData(morador.dtNascimento))}
+                    ${montarLinhaDetalhe('Idade', idade ? idade + ' anos' : '')}
+                    ${montarLinhaDetalhe('Telefone', morador.telefone)}
+                    ${montarLinhaDetalhe('Quarto', quartoTexto)}
+                </div>
+            </section>
+            <section class="morador-detail-section">
+                <h4>Endere&ccedil;o</h4>
+                <div class="morador-detail-grid">
+                    ${montarLinhaDetalhe('Logradouro', endereco)}
+                    ${montarLinhaDetalhe('Cidade/UF', cidadeEstado)}
+                    ${montarLinhaDetalhe('CEP', morador.cep)}
+                </div>
+            </section>
+            <section class="morador-detail-section">
+                <h4>Respons&aacute;vel</h4>
+                <div class="morador-responsaveis-list">
+                    ${renderizarResponsaveisDetalhes(responsaveis)}
+                </div>
+            </section>
+        `;
+    } catch (error) {
+        conteudo.innerHTML = `
+            <div class="morador-empty-responsavel">
+                Nao foi possivel carregar os detalhes do responsavel.
+            </div>
+        `;
+    }
+}
+
+function fecharDetalhesMorador() {
+    const modal = document.getElementById('moradorDetalhesModal');
+
+    if (modal) {
+        modal.classList.remove('show');
+        modal.setAttribute('aria-hidden', 'true');
+    }
 }
 
 function aplicarFiltros() {
@@ -624,4 +815,18 @@ document.addEventListener('DOMContentLoaded', async function () {
     await carregarFuncionarioSessao();
     preencherPerfilTopo();
     inicializarPaginaMorador();
+
+    const modalDetalhes = document.getElementById('moradorDetalhesModal');
+
+    if (modalDetalhes) {
+        modalDetalhes.addEventListener('click', function (event) {
+            if (event.target === modalDetalhes)
+                fecharDetalhesMorador();
+        });
+    }
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape')
+            fecharDetalhesMorador();
+    });
 });

@@ -7,7 +7,7 @@
 
   <link rel="stylesheet" href="css/funcionario.css" />
   <link rel="stylesheet" href="css/cadastroMedicamento.css?v=2" />
-  <link rel="stylesheet" href="css/caixinhas.css?v=20260706-2" />
+  <link rel="stylesheet" href="css/caixinhas.css?v=20260706-3" />
   <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260705-2" />
 
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -152,19 +152,17 @@
                 <select id="idMedicamento" name="idMedicamento"></select>
               </div>
 
-              <div class="form-field">
-                <label for="frequenciaValor">Repetição</label>
-                <input type="number" min="1" placeholder="Ex: 8" id="frequenciaValor" name="frequenciaValor" />
-              </div>
-
-              <div class="form-field">
-                <label for="frequenciaUnidade">Como repetir</label>
-                <select id="frequenciaUnidade" name="frequenciaUnidade">
-                  <option value="">Selecione</option>
-                  <option value="Hora">A cada X hora(s)</option>
-                  <option value="Dia">X vez(es) ao dia</option>
-                  <option value="Semana">A cada X semana(s)</option>
-                </select>
+              <div class="form-field frequency-field">
+                <label for="frequenciaValor">Frequência</label>
+                <div class="frequency-control">
+                  <span class="frequency-prefix">A cada</span>
+                  <input type="number" min="1" step="1" placeholder="8" id="frequenciaValor" name="frequenciaValor" />
+                  <select id="frequenciaUnidade" name="frequenciaUnidade">
+                    <option value="Hora">hora(s)</option>
+                    <option value="Dia">vez(es) ao dia</option>
+                    <option value="Semana">semana(s)</option>
+                  </select>
+                </div>
               </div>
 
               <div class="form-field" id="grupoQtdDose">
@@ -251,19 +249,17 @@
                 <select id="idMedicamentoEditar"></select>
               </div>
 
-              <div class="form-field">
-                <label for="frequenciaValorEditar">Repetição</label>
-                <input type="number" min="1" placeholder="Ex: 8" id="frequenciaValorEditar" />
-              </div>
-
-              <div class="form-field">
-                <label for="frequenciaUnidadeEditar">Como repetir</label>
-                <select id="frequenciaUnidadeEditar">
-                  <option value="">Selecione</option>
-                  <option value="Hora">A cada X hora(s)</option>
-                  <option value="Dia">X vez(es) ao dia</option>
-                  <option value="Semana">A cada X semana(s)</option>
-                </select>
+              <div class="form-field frequency-field">
+                <label for="frequenciaValorEditar">Frequência</label>
+                <div class="frequency-control">
+                  <span class="frequency-prefix">A cada</span>
+                  <input type="number" min="1" step="1" placeholder="8" id="frequenciaValorEditar" />
+                  <select id="frequenciaUnidadeEditar">
+                    <option value="Hora">hora(s)</option>
+                    <option value="Dia">vez(es) ao dia</option>
+                    <option value="Semana">semana(s)</option>
+                  </select>
+                </div>
               </div>
 
               <div class="form-field" id="grupoQtdDoseEditar">
@@ -319,7 +315,7 @@
     </main>
   </div>
 
-  <script src="js/caixinhaMedicamentosController.js?v=20260706-2"></script>
+  <script src="js/caixinhaMedicamentosController.js?v=20260706-3"></script>
   <script src="js/sidebarSecretaria.js?v=20260705-1"></script>
 </body>
 </html>

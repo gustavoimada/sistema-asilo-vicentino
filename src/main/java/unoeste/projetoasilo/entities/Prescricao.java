@@ -1,6 +1,7 @@
 package unoeste.projetoasilo.entities;
 
 import unoeste.projetoasilo.dao.PrescricaoDAO;
+import unoeste.projetoasilo.dao.PrescricaoDoseDAO;
 import unoeste.projetoasilo.db.util.Banco;
 
 import java.sql.SQLException;
@@ -136,6 +137,11 @@ public class Prescricao {
     public boolean editar(Banco conexao) throws SQLException{
         PrescricaoDAO prescricaoDAO = new PrescricaoDAO();
         return prescricaoDAO.editar(this, conexao);
+    }
+
+    public boolean possuiUsoRegistrado(Banco conexao) throws SQLException {
+        PrescricaoDoseDAO prescricaoDoseDAO = new PrescricaoDoseDAO();
+        return prescricaoDoseDAO.existeRegistroUsoPorPrescricao(this.idPrescricao, conexao);
     }
 
     public List<Prescricao> listarOrdenado(String valor, String ordem, Banco conexao) throws SQLException{

@@ -827,7 +827,7 @@ function renderizarOcorrenciasRelatorio() {
     if (listaFiltrada.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="7">Nenhuma ocorrência encontrada.</td>
+                <td colspan="7" class="relatorio-empty">Nenhuma ocorrência encontrada.</td>
             </tr>
         `;
         return;
@@ -841,7 +841,15 @@ function renderizarOcorrenciasRelatorio() {
         const gravidade = escaparHtmlOcorrencias(obterTextoGravidade(gravidadeNumero));
         const funcionario = escaparHtmlOcorrencias(ocorrencia?.funcionario?.nome || "-");
         const observacoes = escaparHtmlOcorrencias(ocorrencia?.observacoes || "-");
-        const moradores = escaparHtmlOcorrencias(ocorrencia?._moradoresEnvolvidosTexto || "Nenhum");
+        const moradoresTexto = String(ocorrencia?._moradoresEnvolvidosTexto || "").trim();
+        const moradores = moradoresTexto === ""
+            ? "<span>Nenhum</span>"
+            : moradoresTexto
+                .split(",")
+                .map(function (nome) { return nome.trim(); })
+                .filter(function (nome) { return nome !== ""; })
+                .map(function (nome) { return `<span>${escaparHtmlOcorrencias(nome)}</span>`; })
+                .join("");
 
         let turno = "-";
         if (ocorrencia?.turno?.horaIni && ocorrencia?.turno?.horaFim) {
@@ -850,13 +858,23 @@ function renderizarOcorrenciasRelatorio() {
 
         linhas += `
             <tr>
-                <td>${data}</td>
-                <td>${tipo}</td>
+                <td><span class="relatorio-date">${data}</span></td>
+                <td>
+                    <div class="relatorio-cell-main">
+                        <strong>${tipo}</strong>
+                        <span class="relatorio-muted">Tipo</span>
+                    </div>
+                </td>
                 <td><span class="gravidade-chip ${obterClasseGravidade(gravidadeNumero)}">${gravidade}</span></td>
-                <td>${funcionario}</td>
-                <td>${escaparHtmlOcorrencias(turno)}</td>
-                <td><div class="moradores-lista">${moradores}</div></td>
-                <td>${observacoes}</td>
+                <td>
+                    <div class="relatorio-cell-main">
+                        <strong>${funcionario}</strong>
+                        <span class="relatorio-muted">Funcionário</span>
+                    </div>
+                </td>
+                <td><span class="relatorio-chip neutro">${escaparHtmlOcorrencias(turno)}</span></td>
+                <td><div class="moradores-lista relatorio-inline-list">${moradores}</div></td>
+                <td><span class="relatorio-note">${observacoes}</span></td>
             </tr>
         `;
     });

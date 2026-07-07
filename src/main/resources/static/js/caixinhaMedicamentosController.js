@@ -301,6 +301,24 @@ function formatarFrequencia(valor, unidade) {
     return "A cada " + valor + " " + unidade;
 }
 
+function normalizarUnidadeFrequencia(unidade) {
+    const unidadeTexto = removerAcentos(String(unidade || "").trim()).toLowerCase();
+
+    if (unidadeTexto.startsWith("hora")) {
+        return "Hora";
+    }
+
+    if (unidadeTexto.startsWith("dia")) {
+        return "Dia";
+    }
+
+    if (unidadeTexto.startsWith("semana")) {
+        return "Semana";
+    }
+
+    return "Hora";
+}
+
 function formatarData(valorData) {
     if (valorData == null) {
         return "-";
@@ -813,7 +831,7 @@ function prepararEdicaoPrescricao(prescricao) {
     document.getElementById("idMoradorEditar").value = prescricao.morador.idMorador;
     document.getElementById("idMedicamentoEditar").value = prescricao.medicamento.idMedicamento;
     document.getElementById("frequenciaValorEditar").value = prescricao.frequenciaValor;
-    document.getElementById("frequenciaUnidadeEditar").value = prescricao.frequenciaUnidade;
+    document.getElementById("frequenciaUnidadeEditar").value = normalizarUnidadeFrequencia(prescricao.frequenciaUnidade);
     if (prescricao.qtdDose != null) {
         document.getElementById("qtdDoseEditar").value = prescricao.qtdDose;
     } else {

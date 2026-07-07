@@ -516,7 +516,7 @@ function renderizarRegistrosFuncionarios() {
     if (listaFiltrada.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5">Nenhum registro encontrado.</td>
+                <td colspan="5" class="relatorio-empty">Nenhum registro encontrado.</td>
             </tr>
         `;
         return;
@@ -532,11 +532,16 @@ function renderizarRegistrosFuncionarios() {
 
         linhas += `
             <tr>
-                <td>${funcionario}</td>
-                <td>${data}</td>
-                <td>${ocorrencia}</td>
-                <td>${medicamento}</td>
-                <td>${observacoes}</td>
+                <td>
+                    <div class="relatorio-cell-main">
+                        <strong>${funcionario}</strong>
+                        <span class="relatorio-muted">Funcionário</span>
+                    </div>
+                </td>
+                <td><span class="relatorio-date">${data}</span></td>
+                <td><span class="relatorio-note">${ocorrencia}</span></td>
+                <td><span class="relatorio-note">${medicamento}</span></td>
+                <td><span class="relatorio-note">${observacoes}</span></td>
             </tr>
         `;
     });

@@ -90,7 +90,7 @@
 }
 
 .table-card .table-wrap table {
-  min-width: 1040px;
+  min-width: 900px;
   table-layout: auto;
 }
 
@@ -168,6 +168,7 @@
 }
 
 .morador-row-btn {
+  position: relative;
   border: none;
   background: transparent;
   padding: 8px;
@@ -181,12 +182,287 @@
   background: #eff6ff;
 }
 
+.morador-row-btn[data-tooltip]::before,
+.morador-row-btn[data-tooltip]::after {
+  position: absolute;
+  left: 50%;
+  z-index: 20;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 6px);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.morador-row-btn[data-tooltip]::before {
+  content: attr(data-tooltip);
+  bottom: calc(100% + 8px);
+  min-width: max-content;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+}
+
+.morador-row-btn[data-tooltip]::after {
+  content: "";
+  bottom: calc(100% + 3px);
+  width: 8px;
+  height: 8px;
+  background: #0f172a;
+  transform: translate(-50%, 6px) rotate(45deg);
+}
+
+.morador-row-btn[data-tooltip]:hover::before,
+.morador-row-btn[data-tooltip]:hover::after,
+.morador-row-btn[data-tooltip]:focus-visible::before,
+.morador-row-btn[data-tooltip]:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.morador-row-btn[data-tooltip]:hover::after,
+.morador-row-btn[data-tooltip]:focus-visible::after {
+  transform: translate(-50%, 0) rotate(45deg);
+}
+
+.morador-row-btn.view {
+  color: #0f766e;
+}
+
+.morador-row-btn.view:hover {
+  background: #ecfdf5;
+}
+
 .morador-row-btn.danger {
   color: var(--error);
 }
 
 .morador-row-btn.danger:hover {
   background: #fef2f2;
+}
+
+.morador-primary {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 240px;
+}
+
+.morador-primary strong {
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.morador-primary > span,
+.morador-info-block span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.morador-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.morador-badge,
+.morador-quarto-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  max-width: 100%;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.morador-badge.genero-feminino {
+  background: #fce7f3;
+  color: #be185d;
+}
+
+.morador-badge.genero-masculino {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.morador-badge.genero-indefinido,
+.morador-badge.idade {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.morador-quarto-badge {
+  background: #e0f2fe;
+  color: #075985;
+  box-shadow: inset 0 0 0 1px rgba(2, 132, 199, 0.16);
+}
+
+.morador-quarto-badge.alerta {
+  background: #fef3c7;
+  color: #92400e;
+  box-shadow: inset 0 0 0 1px rgba(217, 119, 6, 0.18);
+}
+
+.morador-info-block {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 160px;
+}
+
+.morador-info-block strong {
+  color: #172033;
+  font-size: 14px;
+  font-weight: 850;
+}
+
+.morador-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.42);
+}
+
+.morador-modal.show {
+  display: flex;
+}
+
+.morador-modal-card {
+  width: min(760px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  background: #ffffff;
+  border-radius: 22px;
+  box-shadow: 0 28px 80px rgba(15, 23, 42, 0.24);
+}
+
+.morador-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 24px 26px 18px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.morador-modal-eyebrow {
+  display: block;
+  margin-bottom: 6px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.morador-modal-header h3 {
+  margin: 0;
+  color: var(--primary);
+  font-size: 26px;
+  font-weight: 900;
+}
+
+.morador-modal-close {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 12px;
+  background: #fef2f2;
+  color: #dc2626;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.morador-modal-close:hover {
+  background: #fee2e2;
+}
+
+.morador-modal-body {
+  padding: 22px 26px 26px;
+}
+
+.morador-detail-section + .morador-detail-section {
+  margin-top: 22px;
+}
+
+.morador-detail-section h4 {
+  margin: 0 0 12px;
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.morador-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.morador-detail-item,
+.morador-responsavel-card,
+.morador-empty-responsavel,
+.morador-detail-loading {
+  border: 1px solid #dbe7f5;
+  border-radius: 16px;
+  background: #f8fbff;
+  padding: 14px;
+}
+
+.morador-detail-item span,
+.morador-responsavel-card span {
+  display: block;
+  margin-bottom: 6px;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.morador-detail-item strong,
+.morador-responsavel-card strong {
+  color: #172033;
+  font-size: 14px;
+  font-weight: 850;
+  overflow-wrap: anywhere;
+}
+
+.morador-responsaveis-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.morador-responsavel-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.morador-responsavel-card p,
+.morador-empty-responsavel,
+.morador-detail-loading {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .form-field select,
@@ -349,5 +625,24 @@
 
   .morador-actions-cell {
     justify-content: flex-start;
+  }
+
+  .morador-modal {
+    padding: 12px;
+  }
+
+  .morador-modal-header,
+  .morador-modal-body {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .morador-detail-grid,
+  .morador-responsaveis-list {
+    grid-template-columns: 1fr;
+  }
+
+  .morador-modal-header h3 {
+    font-size: 22px;
   }
 }

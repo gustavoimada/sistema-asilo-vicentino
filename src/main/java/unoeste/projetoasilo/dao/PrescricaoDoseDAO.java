@@ -318,7 +318,7 @@ public class PrescricaoDoseDAO {
     }
 
     public boolean deletarPorPrescricao(int idPrescricao, Banco conexao) throws SQLException {
-        if (!deletarRegistrosUsoPorPrescricao(idPrescricao, conexao)) {
+        if (existeRegistroUsoPorPrescricao(idPrescricao, conexao)) {
             return false;
         }
 
@@ -351,23 +351,6 @@ public class PrescricaoDoseDAO {
         return atualizou;
     }
 
-    private boolean deletarRegistrosUsoPorPrescricao(int idPrescricao, Banco conexao) throws SQLException {
-        if (!existeRegistroUsoPorPrescricao(idPrescricao, conexao)) {
-            return true;
-        }
-
-        String sql = """
-                DELETE FROM registrarusomedicacao
-                WHERE prescricaodose_idprescricaodose IN (
-                    SELECT idprescricaodose
-                    FROM prescricaodose
-                    WHERE prescricao_idprescricao = #1
-                )
-                """;
-        sql = sql.replace("#1", String.valueOf(idPrescricao));
-        return conexao.manipular(sql);
-    }
-
     private boolean existeDosePorPrescricao(int idPrescricao, Banco conexao) throws SQLException {
         String sql = """
                 SELECT 1
@@ -380,7 +363,7 @@ public class PrescricaoDoseDAO {
         return rs != null && rs.next();
     }
 
-    private boolean existeRegistroUsoPorPrescricao(int idPrescricao, Banco conexao) throws SQLException {
+    public boolean existeRegistroUsoPorPrescricao(int idPrescricao, Banco conexao) throws SQLException {
         String sql = """
                 SELECT 1
                 FROM registrarusomedicacao rum

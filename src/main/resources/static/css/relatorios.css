@@ -339,7 +339,7 @@ body {
 }
 
 .table-container {
-    overflow-x: auto;
+    overflow: visible;
 }
 
 .table-header {
@@ -364,12 +364,13 @@ body {
 .relatorio-table,
 .donation-table {
     width: 100%;
-    min-width: 880px;
+    min-width: 0;
     border-collapse: collapse;
+    table-layout: fixed;
 }
 
 .report-table-wide {
-    min-width: 1120px;
+    min-width: 0;
 }
 
 .relatorio-table thead,
@@ -379,9 +380,9 @@ body {
 
 .relatorio-table th,
 .donation-table th {
-    padding: 16px;
+    padding: 14px 16px;
     color: #64748b;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
     letter-spacing: 0.08em;
     text-align: left;
@@ -391,10 +392,12 @@ body {
 
 .relatorio-table td,
 .donation-table td {
-    padding: 18px 16px;
+    padding: 14px 16px;
     border-top: 1px solid #f1f5f9;
     color: #334155;
     vertical-align: top;
+    overflow-wrap: anywhere;
+    word-break: normal;
 }
 
 .relatorio-table tbody tr:hover,
@@ -416,6 +419,114 @@ body {
     min-width: 12px;
     color: #1e40af;
     font-weight: 900;
+}
+
+.relatorio-cell-main {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.relatorio-cell-main strong,
+.relatorio-value {
+    color: #172033;
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 1.25;
+}
+
+.relatorio-value {
+    color: #1e3a8a;
+}
+
+.relatorio-muted,
+.relatorio-date,
+.relatorio-note {
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.45;
+}
+
+.relatorio-date {
+    display: inline-flex;
+    width: fit-content;
+    max-width: 100%;
+    padding: 6px 9px;
+    border-radius: 999px;
+    background: #f1f5f9;
+    color: #334155;
+    white-space: nowrap;
+}
+
+.relatorio-note {
+    display: -webkit-box;
+    max-width: 100%;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.relatorio-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    max-width: 100%;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #e0f2fe;
+    color: #075985;
+    font-size: 11px;
+    font-weight: 900;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.relatorio-chip.financeiro {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.relatorio-chip.alimento {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.relatorio-chip.patrimonio {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.relatorio-chip.neutro {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.relatorio-inline-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.relatorio-inline-list span {
+    display: inline-flex;
+    max-width: 100%;
+    padding: 5px 8px;
+    border-radius: 999px;
+    background: #eef2ff;
+    color: #3730a3;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.relatorio-empty {
+    padding: 18px 16px !important;
+    color: #64748b !important;
+    font-size: 14px;
+    font-weight: 700;
 }
 
 .charts-column {
@@ -520,6 +631,16 @@ body {
     .cards-grid,
     .filtro-grid {
         grid-template-columns: 1fr;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .relatorio-table,
+    .donation-table,
+    .report-table-wide {
+        min-width: 760px;
     }
 
     .filter-actions {

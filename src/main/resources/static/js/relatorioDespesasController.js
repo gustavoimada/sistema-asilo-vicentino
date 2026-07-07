@@ -605,12 +605,17 @@ function renderizarDespesasRelatorio() {
 
         linhas += `
             <tr>
-                <td>${formatarMoedaDespesa(valor)}</td>
-                <td>${escaparHtmlDespesa(categoria)}</td>
+                <td><span class="relatorio-value">${formatarMoedaDespesa(valor)}</span></td>
+                <td>
+                    <div class="relatorio-cell-main">
+                        <strong>${escaparHtmlDespesa(categoria)}</strong>
+                        <span class="relatorio-muted">Categoria</span>
+                    </div>
+                </td>
                 <td><span class="status-pill ${status.chave}">${status.label}</span></td>
-                <td>${vencimento}</td>
-                <td>${quitacao}</td>
-                <td>${escaparHtmlDespesa(observacao)}</td>
+                <td><span class="relatorio-date">${vencimento}</span></td>
+                <td><span class="relatorio-date">${quitacao}</span></td>
+                <td><span class="relatorio-note">${escaparHtmlDespesa(observacao || "-")}</span></td>
             </tr>
         `;
     });
@@ -625,7 +630,7 @@ function renderizarDespesasRelatorio() {
     if (linhas === "") {
         tbody.innerHTML = `
             <tr>
-                <td colspan="6">Nenhuma despesa encontrada.</td>
+                <td colspan="6" class="relatorio-empty">Nenhuma despesa encontrada.</td>
             </tr>
         `;
     } else {

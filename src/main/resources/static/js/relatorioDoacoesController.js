@@ -26,6 +26,15 @@ function padronizarTexto(valor) {
         .toUpperCase();
 }
 
+function escaparHtmlDoacao(valor) {
+    return String(valor == null ? "" : valor)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
 function formatarValorDoacao(valor) {
     const numero = Number(valor);
     if (Number.isNaN(numero)) return "-";
@@ -45,6 +54,16 @@ function formatarDataDoacao(data) {
     const valorData = new Date(data);
     if (Number.isNaN(valorData.getTime())) return "-";
     return valorData.toLocaleDateString("pt-BR");
+}
+
+function obterClasseTipoDoacao(tipo) {
+    const tipoNormalizado = padronizarTexto(tipo).toLowerCase();
+
+    if (tipoNormalizado === "financeiro") return "financeiro";
+    if (tipoNormalizado === "alimento") return "alimento";
+    if (tipoNormalizado === "patrimonio") return "patrimonio";
+
+    return "neutro";
 }
 
 function formatarDataFiltroRelatorio(data) {
@@ -593,15 +612,18 @@ function renderizarDoacoes() {
     qtdPatrimonio = 0;
 
     listaFiltrada.forEach(doacao => {
-        const valor = formatarValorOuQuantidade(doacao);
+        const valor = escaparHtmlDoacao(formatarValorOuQuantidade(doacao));
         const tipo = obterTipo(doacao);
-        const nomeDoador = obterNomeDoador(doacao);
-        const doador = obterDoador(doacao);
-        const data = formatarDataDoacao(doacao.dtDoacao);
+        const tipoSeguro = escaparHtmlDoacao(tipo);
+        const classeTipo = obterClasseTipoDoacao(tipo);
+        const nomeDoador = escaparHtmlDoacao(obterNomeDoador(doacao));
+        const doador = escaparHtmlDoacao(obterDoador(doacao));
+        const data = escaparHtmlDoacao(formatarDataDoacao(doacao.dtDoacao));
         let observacoes = "";
         if (doacao.observacoes != null) {
             observacoes = String(doacao.observacoes);
         }
+        observacoes = escaparHtmlDoacao(observacoes || "-");
         const tipoAtual = padronizarTexto(doacao.tipo);
         if (tipoAtual === "FINANCEIRO") {
             valorDoacao += Number(doacao.valor);
@@ -616,12 +638,17 @@ function renderizarDoacoes() {
 
         linhas += `
             <tr>
-                <td>${valor}</td>
-                <td>${tipo}</td>
-                <td>${nomeDoador}</td>
-                <td>${doador}</td>
-                <td>${data}</td>
-                <td>${observacoes}</td>
+                <td><span class="relatorio-value">${valor}</span></td>
+                <td><span class="relatorio-chip ${classeTipo}">${tipoSeguro}</span></td>
+                <td>
+                    <div class="relatorio-cell-main">
+                        <strong>${nomeDoador}</strong>
+                        <span class="relatorio-muted">Doador</span>
+                    </div>
+                </td>
+                <td><span class="relatorio-muted">${doador}</span></td>
+                <td><span class="relatorio-date">${data}</span></td>
+                <td><span class="relatorio-note">${observacoes}</span></td>
             </tr>
         `;
     });
@@ -636,7 +663,7 @@ function renderizarDoacoes() {
     if (linhas === "") {
         tbody.innerHTML = `
             <tr>
-                <td colspan="6">Nenhuma doacao encontrada.</td>
+                <td colspan="6" class="relatorio-empty">Nenhuma doacao encontrada.</td>
             </tr>
         `;
     } else {

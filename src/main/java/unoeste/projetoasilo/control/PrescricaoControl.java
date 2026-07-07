@@ -70,6 +70,9 @@ public class PrescricaoControl {
             if (prescricaoDeletar == null) {
                 return ResponseEntity.badRequest().body(new Error("Erro", "Medicamento da caixinha nao encontrado"));
             }
+            if (prescricaoDeletar.possuiUsoRegistrado(conexao)) {
+                return ResponseEntity.badRequest().body(new Error("Erro", "Nao e possivel remover este medicamento porque ja existem usos registrados no historico"));
+            }
             if(prescricaoDeletar.deletar(conexao))
                 return ResponseEntity.ok(prescricaoDeletar);
             return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel remover o medicamento da caixinha"));
@@ -94,6 +97,9 @@ public class PrescricaoControl {
         try {
             Prescricao prescricaoEncontrada = prescricao.buscarId(id, conexao);
             if (prescricaoEncontrada != null) {
+                if (prescricaoEncontrada.possuiUsoRegistrado(conexao)) {
+                    return ResponseEntity.badRequest().body(new Error("Erro", "Nao e possivel editar este medicamento porque ja existem usos registrados no historico"));
+                }
                 Medicamento medicamento = new Medicamento();
                 medicamento.setIdMedicamento(idMedicamento);
 

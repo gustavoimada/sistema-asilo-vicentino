@@ -40,6 +40,59 @@
   font-size: 18px;
 }
 
+.frequency-field {
+  grid-column: span 2;
+}
+
+.frequency-control {
+  display: grid;
+  grid-template-columns: auto minmax(78px, 96px) minmax(150px, 1fr);
+  align-items: center;
+  min-height: 48px;
+  overflow: hidden;
+  border-radius: 14px;
+  background: var(--surface-container-highest);
+  transition: box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.frequency-control:focus-within {
+  background: #edf1f5;
+  box-shadow: 0 0 0 3px rgba(0, 53, 127, 0.12);
+}
+
+.frequency-prefix {
+  padding-left: 16px;
+  color: var(--outline);
+  font-size: 13px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.frequency-control input,
+.frequency-control select,
+.frequency-control input:focus,
+.frequency-control select:focus {
+  height: 48px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.frequency-control input {
+  padding: 12px 10px;
+  color: var(--primary);
+  font-size: 16px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.frequency-control select {
+  border-left: 1px solid #dbe3ee;
+  color: #334155;
+  font-weight: 800;
+}
+
 #tbodyPrescricao td:last-child {
   text-align: right;
 }
@@ -155,5 +208,13 @@
 @media (max-width: 700px) {
   #tabelaPrescricao {
     min-width: 980px;
+  }
+
+  .frequency-field {
+    grid-column: 1;
+  }
+
+  .frequency-control {
+    grid-template-columns: auto minmax(72px, 88px) minmax(126px, 1fr);
   }
 }

@@ -104,10 +104,10 @@ function confirmarAcao(mensagem) {
 
 function obterBadgeDisponibilidade(disponibilidade) {
     if (mapearDisponibilidadeParaTela(disponibilidade) === "I") {
-        return `<span class="badge-status badge-vencido">Indisponivel</span>`;
+        return `<span class="quarto-status-badge indisponivel">Indispon&iacute;vel</span>`;
     }
 
-    return `<span class="badge-status badge-valido">Disponivel</span>`;
+    return `<span class="quarto-status-badge disponivel">Dispon&iacute;vel</span>`;
 }
 
 function renderizarTabela(quartos) {
