@@ -6,7 +6,7 @@
   <title>Gerenciar Escalas - SGAV</title>
 
   <link rel="stylesheet" href="css/funcionario.css" />
-  <link rel="stylesheet" href="css/escalas.css?v=20260706-2" />
+  <link rel="stylesheet" href="css/escalas.css?v=20260706-3" />
   <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
@@ -338,6 +338,36 @@
     </div>
   </div>
 
+  <div id="confirmarExclusaoModeloModal" class="modal escala-confirm-modal" style="display:none;">
+    <div class="modal-content escala-confirm-content">
+      <div class="modal-header">
+        <div>
+          <h2>Excluir modelo semanal</h2>
+          <p class="preview-subtitle" id="confirmarExclusaoModeloTexto">Deseja realmente excluir este modelo?</p>
+        </div>
+        <button class="modal-close" type="button" onclick="fecharConfirmacaoExclusaoModelo()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="modal-body confirm-model-body">
+        <div class="confirm-model-icon">
+          <span class="material-symbols-outlined">delete</span>
+        </div>
+        <div>
+          <strong>Esta ação não altera escalas já salvas.</strong>
+          <p>Ela remove apenas o padrão semanal guardado nesta máquina.</p>
+        </div>
+      </div>
+      <div class="preview-actions confirm-model-actions">
+        <button id="cancelarExclusaoModeloBtn" class="secondary-btn" type="button">Cancelar</button>
+        <button id="confirmarExclusaoModeloBtn" class="danger-btn" type="button">
+          <span class="material-symbols-outlined">delete</span>
+          Excluir Modelo
+        </button>
+      </div>
+    </div>
+  </div>
+
   <div id="previewEscalaModal" class="modal escala-preview-modal" style="display:none;">
     <div class="modal-content escala-preview-content">
       <div class="modal-header">
@@ -365,7 +395,7 @@
 
   <div id="mensagem-feedback" class="popup-msg"></div>
 
-  <script src="js/escalasController.js?v=20260706-2"></script>
+  <script src="js/escalasController.js?v=20260706-3"></script>
 </body>
 </html>
 

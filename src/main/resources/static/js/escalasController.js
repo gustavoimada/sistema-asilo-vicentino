@@ -11,6 +11,7 @@ var escalasConflitoExternas = [];
 var STORAGE_MODELO_ESCALA_LEGADO = "sgav.modeloEscalaSemanal.v1";
 var STORAGE_MODELOS_ESCALA = "sgav.modelosEscalaSemanal.v2";
 var planoPreviewAtual = null;
+var modeloEscalaPendenteExclusao = null;
 
 function preencherPerfilTopo()
 {
@@ -773,17 +774,48 @@ function excluirModeloEscala(modeloId)
 
     if (!modelo) return;
 
-    if (!confirm("Excluir " + modelo.nome + "?"))
+    modeloEscalaPendenteExclusao = {
+        id: modelo.id,
+        nome: modelo.nome || "Modelo semanal"
+    };
+
+    var texto = document.getElementById("confirmarExclusaoModeloTexto");
+    var modal = document.getElementById("confirmarExclusaoModeloModal");
+
+    if (texto)
+        texto.textContent = 'Deseja realmente excluir "' + modeloEscalaPendenteExclusao.nome + '"?';
+
+    if (modal)
+        modal.style.display = "flex";
+}
+
+function fecharConfirmacaoExclusaoModelo()
+{
+    modeloEscalaPendenteExclusao = null;
+
+    var modal = document.getElementById("confirmarExclusaoModeloModal");
+    if (modal)
+        modal.style.display = "none";
+}
+
+function confirmarExclusaoModeloEscala()
+{
+    if (!modeloEscalaPendenteExclusao)
     {
+        fecharConfirmacaoExclusaoModelo();
         return;
     }
 
+    var modelo = modeloEscalaPendenteExclusao;
+    var modelos = carregarModelosEscala();
     modelos = modelos.filter(function(item)
     {
-        return item.id !== modeloId;
+        return item.id !== modelo.id;
     });
+
     salvarModelosEscala(modelos);
     renderizarModelosEscala();
+    fecharConfirmacaoExclusaoModelo();
     showToast("success", modelo.nome + " excluido.");
 }
 
@@ -1346,6 +1378,8 @@ function setupEventListeners()
     var aplicarModeloBtn = document.getElementById("aplicarModeloBtn");
     var cancelarPreviewBtn = document.getElementById("cancelarPreviewEscalaBtn");
     var confirmarPreviewBtn = document.getElementById("confirmarPreviewEscalaBtn");
+    var cancelarExclusaoModeloBtn = document.getElementById("cancelarExclusaoModeloBtn");
+    var confirmarExclusaoModeloBtn = document.getElementById("confirmarExclusaoModeloBtn");
     var listaModelos = document.getElementById("modelosEscalaLista");
 
     if (copiarBtn) copiarBtn.addEventListener("click", copiarSemanaAnterior);
@@ -1353,6 +1387,8 @@ function setupEventListeners()
     if (aplicarModeloBtn) aplicarModeloBtn.addEventListener("click", aplicarModeloSemanal);
     if (cancelarPreviewBtn) cancelarPreviewBtn.addEventListener("click", fecharPreviewEscala);
     if (confirmarPreviewBtn) confirmarPreviewBtn.addEventListener("click", aplicarPlanoPreview);
+    if (cancelarExclusaoModeloBtn) cancelarExclusaoModeloBtn.addEventListener("click", fecharConfirmacaoExclusaoModelo);
+    if (confirmarExclusaoModeloBtn) confirmarExclusaoModeloBtn.addEventListener("click", confirmarExclusaoModeloEscala);
     if (listaModelos)
     {
         listaModelos.addEventListener("click", function(e)
@@ -1394,5 +1430,11 @@ document.addEventListener("click", function(e)
     if (modelosModal && e.target === modelosModal)
     {
         fecharModelosEscala();
+    }
+
+    var confirmarExclusaoModeloModal = document.getElementById("confirmarExclusaoModeloModal");
+    if (confirmarExclusaoModeloModal && e.target === confirmarExclusaoModeloModal)
+    {
+        fecharConfirmacaoExclusaoModelo();
     }
 });
