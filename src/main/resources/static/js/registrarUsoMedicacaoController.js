@@ -145,7 +145,7 @@ function cargoPerfilRegistroMedicacao(categoria) {
         return "Cuidador(a)";
     }
     if (valor === "secretaria") {
-        return "Secretaria(o)";
+        return "Secretária";
     }
     if (categoria) {
         return String(categoria).trim();

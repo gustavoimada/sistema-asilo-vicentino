@@ -1,5 +1,6 @@
 (function () {
     const CHAVE_ROLAGEM_MENU = "sgav.sidebar.secretaria.scrollTop";
+    const CHAVE_MENU_RECOLHIDO = "sgav.sidebar.secretaria.recolhido";
 
     const itensMenu = [
         { href: "secretaria.html", icone: "dashboard", texto: "Painel", aliases: ["secretaria.html", "tipoOcorrencia.html"] },
@@ -104,6 +105,7 @@
             </div>
         `;
 
+        configurarSidebarRetiravel(sidebar);
         configurarRolagemDoMenu(sidebar);
         atualizarAtalhoCoordenador(localStorage.getItem("funcionarioCategoria") || "");
         fetch("/login/sessao", { credentials: "include" })
@@ -166,6 +168,45 @@
             restaurarRolagem();
             atualizarEstado();
         });
+    }
+
+    function configurarSidebarRetiravel(sidebar) {
+        if (!document.body.classList.contains("sidebar-collapsible-demo")) return;
+
+        const botao = document.createElement("button");
+        botao.type = "button";
+        botao.className = "sidebar-collapse-toggle";
+        botao.innerHTML = '<span class="material-symbols-outlined">keyboard_double_arrow_left</span>';
+        sidebar.appendChild(botao);
+
+        function lerPreferencia() {
+            try {
+                return localStorage.getItem(CHAVE_MENU_RECOLHIDO) === "true";
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function salvarPreferencia(recolhido) {
+            try {
+                localStorage.setItem(CHAVE_MENU_RECOLHIDO, String(recolhido));
+            } catch (e) {}
+        }
+
+        function aplicarEstado(recolhido) {
+            document.body.classList.toggle("sidebar-collapsed", recolhido);
+            botao.setAttribute("aria-expanded", String(!recolhido));
+            botao.setAttribute("aria-label", recolhido ? "Fixar menu lateral aberto" : "Recolher menu lateral");
+            botao.setAttribute("title", recolhido ? "Fixar menu aberto" : "Recolher menu");
+        }
+
+        botao.addEventListener("click", function () {
+            const recolhido = !document.body.classList.contains("sidebar-collapsed");
+            salvarPreferencia(recolhido);
+            aplicarEstado(recolhido);
+        });
+
+        aplicarEstado(lerPreferencia());
     }
 
     function atualizarAtalhoCoordenador(categoria) {

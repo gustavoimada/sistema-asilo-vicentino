@@ -2,7 +2,6 @@ document.addEventListener("DOMContentLoaded", function ()
 {
   iniciarEntradaInicial();
   iniciarMenu();
-  iniciarCarrossel();
   iniciarRotinaAsilo();
   iniciarNoticias();
   iniciarBotoesFinais();
@@ -15,8 +14,17 @@ document.addEventListener("DOMContentLoaded", function ()
 function iniciarMenu()
 {
   const links = document.querySelectorAll('.topbar-nav a[href^="#"]');
+  const topbar = document.querySelector(".topbar");
   if (!links.length)
     return;
+
+  const destinos = Array.from(links)
+    .map(function (link) {
+      const id = link.getAttribute("href").replace("#", "");
+      const el = document.getElementById(id);
+      return el ? { id, el } : null;
+    })
+    .filter(Boolean);
 
   function marcarAtivo(id)
   {
@@ -27,18 +35,41 @@ function iniciarMenu()
     }
   }
 
+  function alturaMenu()
+  {
+    return topbar ? topbar.getBoundingClientRect().height : 80;
+  }
+
+  function rolarPara(secao)
+  {
+    const margem = alturaMenu() + 12;
+    const topo = secao.getBoundingClientRect().top + window.scrollY - margem;
+    window.scrollTo({
+      top: Math.max(topo, 0),
+      behavior: "smooth"
+    });
+  }
+
   function atualizarPeloScroll()
   {
-    let idAtual = "sobre-nos";
-    const linha = window.scrollY + 120;
+    if (!destinos.length)
+      return;
 
-    for (let i = 0; i < links.length; i += 1)
+    let idAtual = destinos[0].id;
+    const linha = window.scrollY + alturaMenu() + Math.max(window.innerHeight * 0.18, 96);
+    const chegouNoFim = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 8;
+
+    if (chegouNoFim)
     {
-      const id = links[i].getAttribute("href").replace("#", "");
-      const secao = document.getElementById(id);
-      if (secao && secao.offsetTop <= linha)
+      marcarAtivo(destinos[destinos.length - 1].id);
+      return;
+    }
+
+    for (let i = 0; i < destinos.length; i += 1)
+    {
+      if (destinos[i].el.offsetTop <= linha)
       {
-        idAtual = id;
+        idAtual = destinos[i].id;
       }
     }
 
@@ -55,68 +86,13 @@ function iniciarMenu()
         return;
 
       e.preventDefault();
-      secao.scrollIntoView({ behavior: "smooth", block: "start" });
       marcarAtivo(id);
+      rolarPara(secao);
     });
   }
 
   window.addEventListener("scroll", atualizarPeloScroll, { passive: true });
   atualizarPeloScroll();
-}
-
-function iniciarCarrossel()
-{
-  const opcoes = document.querySelectorAll(".life-option");
-  const imagem = document.getElementById("lifeShowcaseImage");
-  const tag = document.getElementById("lifeShowcaseTag");
-  const titulo = document.getElementById("lifeShowcaseTitle");
-  const texto = document.getElementById("lifeShowcaseText");
-  let timerAutomatico = null;
-  let indiceAtual = 0;
-  if (!opcoes.length || !imagem)
-    return;
-
-  function ativarOpcao(opcao, reiniciarTimer)
-  {
-    for (let i = 0; i < opcoes.length; i += 1)
-    {
-      opcoes[i].classList.toggle("is-active", opcoes[i] === opcao);
-      if (opcoes[i] === opcao) indiceAtual = i;
-    }
-
-    imagem.classList.add("is-changing");
-    window.setTimeout(function () {
-      imagem.src = opcao.getAttribute("data-image") || imagem.src;
-      imagem.alt = opcao.getAttribute("data-alt") || "";
-      if (tag) tag.textContent = opcao.getAttribute("data-tag") || tag.textContent;
-      if (titulo) titulo.textContent = opcao.getAttribute("data-title") || titulo.textContent;
-      if (texto) texto.textContent = opcao.getAttribute("data-text") || texto.textContent;
-      imagem.classList.remove("is-changing");
-    }, 140);
-
-    if (reiniciarTimer) iniciarTimer();
-  }
-
-  function avancarAutomatico()
-  {
-    const proximoIndice = (indiceAtual + 1) % opcoes.length;
-    ativarOpcao(opcoes[proximoIndice], false);
-  }
-
-  function iniciarTimer()
-  {
-    if (timerAutomatico) window.clearInterval(timerAutomatico);
-    timerAutomatico = window.setInterval(avancarAutomatico, 5200);
-  }
-
-  for (let i = 0; i < opcoes.length; i += 1)
-  {
-    opcoes[i].addEventListener("click", function () {
-      ativarOpcao(this, true);
-    });
-  }
-
-  iniciarTimer();
 }
 
 function iniciarRotinaAsilo()
@@ -129,7 +105,7 @@ function iniciarRotinaAsilo()
   let timerAutomatico = null;
   let indiceAtual = 0;
 
-  if (!passos.length || !imagem || !horario)
+  if (!passos.length || !imagem)
     return;
 
   function ativarPasso(passo, reiniciarTimer)
@@ -146,7 +122,7 @@ function iniciarRotinaAsilo()
       imagem.src = passo.getAttribute("data-image") || imagem.src;
       imagem.alt = passo.getAttribute("data-title") || "Rotina do asilo";
       imagem.classList.toggle("is-contain", passo.getAttribute("data-fit") === "contain");
-      horario.textContent = passo.getAttribute("data-time") || horario.textContent;
+      if (horario) horario.textContent = passo.getAttribute("data-time") || horario.textContent;
       if (titulo) titulo.textContent = passo.getAttribute("data-title") || titulo.textContent;
       if (texto) texto.textContent = passo.getAttribute("data-text") || texto.textContent;
       imagem.classList.remove("is-changing");
@@ -291,7 +267,7 @@ function iniciarBotoesFinais() {
   const formDoacaoPublica = document.getElementById("formDoacaoPublica");
   const inputCpfDoacao = document.getElementById("doacaoCpf");
 
-  if (!botaoDoacao || !painelDoacao) return;
+  if (!painelDoacao) return;
 
   function atualizarImpactoDoacao(valor)
   {
@@ -356,11 +332,9 @@ function iniciarBotoesFinais() {
     prepararPainelDoacao();
   }
 
-  botaoDoacao.addEventListener("click", function () {
-    const abrir = painelDoacao.hidden;
-    painelDoacao.hidden = !abrir;
-    if (abrir) prepararPainelDoacao();
-  });
+  if (botaoDoacao) {
+    botaoDoacao.addEventListener("click", abrirDoacao);
+  }
 
   for (let i = 0; i < chipsValorDoacao.length; i += 1) {
     chipsValorDoacao[i].addEventListener("click", function () {
@@ -694,7 +668,7 @@ function marcarElementosAnimados(elementos) {
 }
 
 function iniciarAnimacoesScroll() {
-  const elementos = document.querySelectorAll(".section-head-left, .section-head-center, .life-explorer, .testimonial-card, .cta-box, .history-photo, .history-stat-card, .history-blue-card, .cta-impact-card");
+  const elementos = document.querySelectorAll(".section-head-left, .section-head-center, .dayflow, .testimonial-card, .cta-box, .history-photo, .history-stat-card, .history-blue-card, .cta-impact-card");
   marcarElementosAnimados(elementos);
 
   function atualizarVisibilidade() {
@@ -736,7 +710,7 @@ function iniciarEfeitosScroll() {
 
     const deslocamento = Math.min(window.scrollY, 520);
     if (heroFoto) {
-      heroFoto.style.transform = `rotate(3deg) translate(48px, ${24 + deslocamento * 0.035}px)`;
+      heroFoto.style.transform = `rotate(2deg) translate(18px, ${deslocamento * 0.025}px)`;
     }
     if (cardFlutuante) {
       cardFlutuante.style.transform = `translateY(${-deslocamento * 0.045}px)`;
@@ -876,7 +850,7 @@ function enviarFormularioDoacaoDoador(event) {
   if (botaoEnviar) {
     botaoEnviar.disabled = true;
     botaoEnviar.dataset.originalText = botaoEnviar.innerHTML;
-    botaoEnviar.innerHTML = '<span class="material-symbols-outlined">hourglass_top</span>Registrando...';
+    botaoEnviar.innerHTML = '<span class="material-symbols-outlined">hourglass_top</span>Enviando...';
   }
 
   // Monta os dados
@@ -925,7 +899,7 @@ function enviarFormularioDoacaoDoador(event) {
         return;
       }
 
-      mostrarNotificacaoDoacaoDoador("success", "Intenção de doação registrada. Obrigado pelo apoio!");
+      mostrarNotificacaoDoacaoDoador("success", "Doação registrada. Obrigado pelo apoio!");
 
       // Limpa o formulário
       inputNome.value = "";
@@ -947,7 +921,7 @@ function enviarFormularioDoacaoDoador(event) {
     .finally(function () {
       if (botaoEnviar) {
         botaoEnviar.disabled = false;
-        botaoEnviar.innerHTML = botaoEnviar.dataset.originalText || '<span class="material-symbols-outlined">volunteer_activism</span>Registrar intenção';
+        botaoEnviar.innerHTML = botaoEnviar.dataset.originalText || '<span class="material-symbols-outlined">volunteer_activism</span>Fazer doação';
       }
     });
 }

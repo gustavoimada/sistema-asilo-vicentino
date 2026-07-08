@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Asilo Vicentino</title>
 
-  <link rel="stylesheet" href="css/index.css?v=20260706-4" />
+  <link rel="stylesheet" href="css/index.css?v=20260708-7" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 </head>
@@ -17,10 +17,13 @@
     </div>
 
     <div class="topbar-nav">
-      <a href="#sobre-nos">Sobre Nós</a>
+      <a href="#sobre-nos">Sobre</a>
       <a href="#historico">Histórico</a>
+      <a href="#rotina">Rotina</a>
       <a href="#transparencia">Transparência</a>
-      <a href="#novidades">Novidades</a>
+      <a href="#novidades">Notícias</a>
+      <a href="#reconhecimento">Feedback</a>
+      <a href="#doacao">Doações</a>
       <a href="#contato">Contato</a>
     </div>
 
@@ -45,9 +48,6 @@
             <button id="btnDoarTopo" class="primary-btn-lg" type="button">
               <span class="material-symbols-outlined">volunteer_activism</span>
               Fazer uma Doação
-            </button>
-            <button class="secondary-btn-lg" onclick="document.getElementById('transparencia').scrollIntoView({behavior:'smooth'});" type="button">
-              Ver Transparência
             </button>
           </div>
         </div>
@@ -93,10 +93,10 @@
         <div class="history-copy">
           <div class="section-head-left">
             <div class="eyebrow-text">A Nossa Jornada</div>
-            <h2>Tradição e Inovação: O Legado do SGAV</h2>
+            <h2>Tradição e cuidado: o legado do Asilo Vicentino</h2>
           </div>
 
-          <p>Fundado em 29/10/1965 sobre pilares de respeito e humanidade, o SGAV Care evoluiu de um pequeno refúgio para uma instituição de referência tecnológica sem nunca perder a essência do acolhimento familiar.</p>
+          <p>Fundado em 29/10/1965 sobre pilares de respeito e humanidade, o Asilo Vicentino cresceu como um lar de acolhimento para idosos, preservando sua essência familiar e o compromisso diário com cuidado digno.</p>
           <p>Nossa história é escrita diariamente através do equilíbrio entre protocolos médicos rigorosos e o calor de um sorriso amigo, garantindo que a longevidade seja celebrada com plenitude.</p>
 
           <div class="history-inline-stats">
@@ -113,88 +113,55 @@
       </div>
     </section>
 
-    <section class="section soft">
-      <div class="container section-head-split">
-        <div class="section-head-left" style="margin-bottom:0;">
-          <div class="eyebrow-text">Espaços de Vida</div>
-          <h2>Um refúgio desenhado para o bem-estar</h2>
-        </div>
-      </div>
-
-      <div class="life-explorer">
-        <div class="life-showcase">
-          <img id="lifeShowcaseImage" src="assets/quebraCabeca.png" alt="Atividades diárias" />
-          <div class="life-showcase-caption">
-            <span id="lifeShowcaseTag">Convivência</span>
-            <strong id="lifeShowcaseTitle">Atividades Diárias</strong>
-            <p id="lifeShowcaseText">Momentos de estímulo cognitivo, participação e convivência acompanhada pela equipe.</p>
-          </div>
-        </div>
-
-        <div class="life-options" aria-label="Escolha um espaço de vida">
-          <button class="life-option is-active" type="button" data-image="assets/quebraCabeca.png" data-alt="Atividades diárias" data-tag="Convivência" data-title="Atividades Diárias" data-text="Momentos de estímulo cognitivo, participação e convivência acompanhada pela equipe.">
-            <span>01</span>
-            <strong>Atividades Diárias</strong>
-            <small>Estímulo, memória e autonomia</small>
-          </button>
-          <button class="life-option" type="button" data-image="assets/rodaDeConversa.png" data-alt="Roda de conversa" data-tag="Encontro" data-title="Roda de Conversa" data-text="Espaço de escuta, troca de histórias e fortalecimento de vínculos entre os residentes.">
-            <span>02</span>
-            <strong>Roda de Conversa</strong>
-            <small>Escuta e integração em grupo</small>
-          </button>
-          <button class="life-option" type="button" data-image="assets/inicial2.png" data-alt="Datas especiais" data-tag="Celebração" data-title="Datas Especiais" data-text="Comemorações preparadas para aproximar famílias, equipe e moradores em momentos leves.">
-            <span>03</span>
-            <strong>Datas Especiais</strong>
-            <small>Afeto, família e memória</small>
-          </button>
-          <button class="life-option" type="button" data-image="assets/diaadia.png" data-alt="Cuidados diários" data-tag="Cuidado" data-title="Cuidados Diários" data-text="Rotina de atenção contínua com carinho, segurança e acompanhamento próximo.">
-            <span>04</span>
-            <strong>Cuidados Diários</strong>
-            <small>Presença e segurança</small>
-          </button>
-        </div>
-      </div>
-    </section>
-
-    <section id="rotina" class="section white dayflow-section">
+    <section id="rotina" class="section soft dayflow-section">
       <div class="container">
         <div class="dayflow-head">
           <div>
-            <div class="eyebrow-text">Rotina com carinho</div>
-            <h2>Um dia tranquilo, no ritmo de cada morador</h2>
+            <div class="eyebrow-text">Rotina e espaços de vida</div>
+            <h2>Atividades que acolhem corpo, mente e fé</h2>
           </div>
-          <p>Pequenos momentos se repetem todos os dias: cuidado, conversa, refeição, descanso e presença da equipe.</p>
+          <p>Momentos simples que dão ritmo ao lar: refeições, missa, conversa, memória, celebrações e descanso com presença da equipe.</p>
         </div>
 
         <div class="dayflow">
           <div class="dayflow-visual">
             <img id="dayflowImage" src="assets/diaadia.png" alt="Cuidados pela manhã" />
-            <div class="dayflow-badge" id="dayflowTime">07h30</div>
+            <div class="dayflow-badge" id="dayflowTime">Rotina</div>
             <div class="dayflow-caption">
-              <strong id="dayflowTitle">Começo tranquilo</strong>
-              <p id="dayflowText">A manhã começa com higiene, café e acompanhamento próximo da equipe.</p>
+              <strong id="dayflowTitle">Refeições tranquilas</strong>
+              <p id="dayflowText">Alimentação, conversa e presença da equipe em um ambiente calmo e familiar.</p>
             </div>
           </div>
 
           <div class="dayflow-steps">
-            <button class="dayflow-step is-active" type="button" data-time="07h30" data-image="assets/diaadia.png" data-title="Começo tranquilo" data-text="A manhã começa com higiene, café e acompanhamento próximo da equipe.">
-              <span>Manhã</span>
-              <strong>Começo tranquilo</strong>
-              <small>Higiene, café e primeiros cuidados.</small>
+            <button class="dayflow-step is-active" type="button" data-image="assets/diaadia.png" data-title="Refeições tranquilas" data-text="Alimentação, conversa e presença da equipe em um ambiente calmo e familiar.">
+              <span>01</span>
+              <strong>Refeições tranquilas</strong>
+              <small>Café, almoço e lanche com cuidado.</small>
             </button>
-            <button class="dayflow-step" type="button" data-time="10h00" data-image="assets/rotina-missa.png" data-fit="contain" data-title="Atividades, memória e fé" data-text="Momentos de oração, missa, conversa e estímulos ajudam a fortalecer a memória, a convivência e a espiritualidade.">
-              <span>Manhã</span>
-              <strong>Atividades, memória e fé</strong>
-              <small>Missa, estímulo e participação.</small>
+            <button class="dayflow-step" type="button" data-image="assets/quebraCabeca.png" data-title="Atividades e memória" data-text="Jogos, estímulos cognitivos e atividades em grupo ajudam a manter autonomia, atenção e convivência.">
+              <span>02</span>
+              <strong>Atividades e memória</strong>
+              <small>Jogos, participação e autonomia.</small>
             </button>
-            <button class="dayflow-step" type="button" data-time="14h30" data-image="assets/rodaDeConversa.png" data-title="Escuta e vínculos" data-text="Rodas de conversa fortalecem histórias, afetos e presença em grupo.">
-              <span>Tarde</span>
-              <strong>Escuta e vínculos</strong>
-              <small>Convivência e acolhimento.</small>
+            <button class="dayflow-step" type="button" data-image="assets/rotina-missa.png" data-fit="contain" data-title="Missas e espiritualidade" data-text="Momentos de oração e missa fortalecem a espiritualidade, o pertencimento e a serenidade dos moradores.">
+              <span>03</span>
+              <strong>Missas e espiritualidade</strong>
+              <small>Missa, oração e acolhimento.</small>
             </button>
-            <button class="dayflow-step" type="button" data-time="18h30" data-image="assets/rotina-organizada.png" data-fit="contain" data-title="Noite segura" data-text="A rotina organizada desacelera o dia com acompanhamento, medicação e ambiente preparado para descanso.">
-              <span>Noite</span>
-              <strong>Noite segura</strong>
+            <button class="dayflow-step" type="button" data-image="assets/rodaDeConversa.png" data-title="Rodas de conversa" data-text="Rodas de conversa fortalecem histórias, afetos e presença em grupo.">
+              <span>04</span>
+              <strong>Rodas de conversa</strong>
+              <small>Escuta, histórias e vínculos.</small>
+            </button>
+            <button class="dayflow-step" type="button" data-image="assets/inicial2.png" data-title="Datas especiais" data-text="Comemorações aproximam famílias, equipe e moradores em momentos leves, afetuosos e cheios de memória.">
+              <span>05</span>
+              <strong>Datas especiais</strong>
+              <small>Afeto, família e celebração.</small>
+            </button>
+            <button class="dayflow-step" type="button" data-image="assets/rotina-organizada.png" data-fit="contain" data-title="Descanso com segurança" data-text="A rotina organizada desacelera o dia com acompanhamento, medicação e ambiente preparado para descanso.">
+              <span>06</span>
+              <strong>Descanso com segurança</strong>
               <small>Organização, cuidado e descanso.</small>
             </button>
           </div>
@@ -230,8 +197,8 @@
     <section id="novidades" class="section white">
       <div class="container">
         <div class="section-head-center">
-          <div class="eyebrow-text">Comunicados</div>
           <h2>Notícias</h2>
+          <p id="newsLastUpdate" class="news-last-update">Última atualização: carregando...</p>
         </div>
 
         <div class="news-stage">
@@ -247,7 +214,7 @@
       </div>
     </section>
 
-    <section class="section primary">
+    <section id="reconhecimento" class="section primary testimonial-section">
       <div class="quote-bg">
         <span class="material-symbols-outlined">format_quote</span>
       </div>
@@ -255,7 +222,7 @@
       <div class="container">
         <div class="section-head-left">
           <div class="eyebrow-text">Reconhecimento</div>
-          <h2>Vozes de Gratidão</h2>
+          <h2>Feedback de quem acompanha nosso cuidado</h2>
         </div>
 
         <div class="testimonial-grid">
@@ -298,8 +265,8 @@
           </div>
 
           <div class="cta-content">
-            <h2>Ajude-nos a Manter a qualidade.</h2>
-            <p>Seu apoio permite que continuemos investindo em novas tecnologias de cuidado e infraestrutura, garantindo um futuro digno para nossos residentes.</p>
+            <h2>Ajude a manter o cuidado diário.</h2>
+            <p>Sua contribuição apoia alimentação, higiene, atividades e melhorias simples que fazem diferença na rotina dos moradores.</p>
             <section class="donation-goal" data-current="850" data-goal="2000">
               <div class="donation-goal-head">
                 <span>Meta mensal de doação</span>
@@ -348,14 +315,10 @@
               </article>
             </div>
 
-            <div class="cta-actions">
-              <button id="abrirDoacao" class="primary-btn-lg" type="button">Fazer uma Doação</button>
-            </div>
-
             <div class="cta-extra-panels">
-              <section id="painelDoacao" class="cta-panel" hidden>
-                <h4>Registrar intenção de doação</h4>
-                <p class="cta-panel-subtitle">Informe seus dados para a secretaria acompanhar e confirmar a contribuição com segurança.</p>
+              <section id="painelDoacao" class="cta-panel">
+                <h4>Faça sua doação</h4>
+                <p class="cta-panel-subtitle">Preencha seus dados e escolha o valor para apoiar diretamente o cuidado dos moradores.</p>
                 <div class="cta-quick-values">
                   <span>Valores sugeridos</span>
                   <div class="cta-chip-row">
@@ -395,28 +358,27 @@
                   </div>
                   <input type="hidden" id="doacaoTipo" value="Financeiro" />
                   <input type="hidden" id="doacaoData" />
+                  <div class="cta-pix-placeholder cta-field-full">
+                    <span class="material-symbols-outlined">security</span>
+                    <div>
+                      <strong>PIX oficial em configuração</strong>
+                      <p>O QR code e a chave PIX devem ser os dados oficiais da instituição. Assim que forem informados, eles entram aqui para o doador concluir o pagamento com segurança.</p>
+                    </div>
+                  </div>
                   <div class="cta-field cta-field-full">
                     <button type="submit" class="primary-btn-lg" id="btnEnviarDoacao" style="width: 100%;">
                       <span class="material-symbols-outlined">volunteer_activism</span>
-                      Registrar intenção
+                      Fazer doação
                     </button>
                   </div>
                 </form>
                 <div id="doacaoSucessoMsg" class="cta-success-msg">
                   <span class="cta-success-icon material-symbols-outlined">check_circle</span>
                   <div class="cta-success-text">
-                    <strong>Intenção de doação registrada!</strong>
-                    <p>Ela aparecerá para a secretaria como "Em análise". A confirmação deve ser feita após conferência do PIX/extrato.</p>
+                    <strong>Doação registrada. Muito obrigado!</strong>
+                    <p>A equipe do asilo acompanhará o recebimento e manterá a contribuição organizada no sistema.</p>
                   </div>
                 </div>
-                <div class="cta-pix-placeholder">
-                  <span class="material-symbols-outlined">security</span>
-                  <div>
-                    <strong>PIX oficial em configuração</strong>
-                    <p>O QR code e a chave PIX devem ser os dados oficiais da instituição. Assim que forem informados, eles entram aqui para o doador concluir o pagamento com segurança.</p>
-                  </div>
-                </div>
-                <p class="cta-donation-note">O registro público não confirma pagamento automaticamente. A secretaria valida a entrada e marca a doação como concluída.</p>
               </section>
             </div>
           </div>
@@ -481,7 +443,7 @@
     </div>
   </div>
 
-  <script src="js/indexController.js?v=20260706-4"></script>
-  <script src="js/indexNoticias.js?v=20260703-1"></script>
+  <script src="js/indexController.js?v=20260708-5"></script>
+  <script src="js/indexNoticias.js?v=20260708-1"></script>
 </body>
 </html>

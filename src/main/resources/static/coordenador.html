@@ -6,7 +6,7 @@
   <title>Painel Coordenador(a)</title>
 
   <link rel="stylesheet" href="css/funcionario.css" />
-  <link rel="stylesheet" href="css/coordenador.css?v=20260705-1" />
+  <link rel="stylesheet" href="css/coordenador.css?v=20260708-1" />
   <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260507-1" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
@@ -99,9 +99,14 @@
 
       <div class="content">
         <div class="content-wrap">
-          <section class="hero">
-            <h2>Painel da Coordenação</h2>
-            <p>Visão rápida dos indicadores financeiros e gestão de escalas da equipe.</p>
+          <section class="hero coordenador-hero">
+            <div class="coordenador-hero-copy">
+              <h2>Painel da Coordenação</h2>
+              <p>Visão rápida dos indicadores financeiros e gestão de escalas da equipe.</p>
+            </div>
+            <div id="turnosStatusResumo" class="turnos-status-resumo">
+              <div class="turnos-status-placeholder">Carregando status...</div>
+            </div>
           </section>
 
           <section class="dashboard-grid bloco-turnos">
@@ -109,9 +114,6 @@
               <div class="section-title">
                 <span class="section-title-bar primary"></span>
                 <span>Acompanhamento de Turnos</span>
-              </div>
-              <div id="turnosStatusResumo" class="turnos-status-resumo">
-                <div class="turnos-status-placeholder">Carregando status...</div>
               </div>
               <div id="historicoTurnosLista" class="historico-turnos-lista">
                 <p class="empty-text">Carregando turnos...</p>

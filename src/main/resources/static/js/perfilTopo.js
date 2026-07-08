@@ -13,7 +13,7 @@
         if (valor === "cuidador")
             return "Cuidador(a)";
         if (valor === "secretaria")
-            return "Secretaria(o)";
+            return "Secretária";
 
         return String(categoria || "").trim() || "Acesso";
     }

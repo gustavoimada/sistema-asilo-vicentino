@@ -48,7 +48,7 @@ function formatarCargoInclusivo(categoria) {
     else if (valor === 'cuidador')
         return 'Cuidador(a)';
     else if (valor === 'secretaria')
-        return 'Secretária(o)';
+        return 'Secretária';
     else
         return String(categoria || '').trim();
 }

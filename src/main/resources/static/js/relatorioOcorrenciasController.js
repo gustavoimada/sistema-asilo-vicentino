@@ -1055,7 +1055,7 @@ function formatarCargoPerfilOcorrencias(categoria) {
 
     if (cargo === "coordenador") return "Coordenador(a)";
     if (cargo === "cuidador") return "Cuidador(a)";
-    if (cargo === "secretaria") return "Secretária(o)";
+    if (cargo === "secretaria") return "Secretária";
     return texto || "Acesso";
 }
 

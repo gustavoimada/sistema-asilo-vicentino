@@ -1,1 +1,139 @@
-﻿@import url('cadastroFuncionario.css');
+@import url('cadastroFuncionario.css');
+
+.doacoes-page .content {
+  max-width: 1480px;
+}
+
+.doacao-table-card .table-wrap {
+  overflow-x: visible;
+}
+
+.doacao-table-card .table-wrap table.doacao-table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+
+.doacao-table th,
+.doacao-table td {
+  padding: 18px 18px;
+}
+
+.doacao-table th:nth-child(1),
+.doacao-table td:nth-child(1) {
+  width: 16%;
+}
+
+.doacao-table th:nth-child(2),
+.doacao-table td:nth-child(2) {
+  width: 28%;
+}
+
+.doacao-table th:nth-child(3),
+.doacao-table td:nth-child(3) {
+  width: 13%;
+}
+
+.doacao-table th:nth-child(4),
+.doacao-table td:nth-child(4) {
+  width: 14%;
+}
+
+.doacao-table th:nth-child(6),
+.doacao-table td:nth-child(6) {
+  width: 128px;
+}
+
+.doacao-value-cell,
+.doacao-donor-cell,
+.doacao-date-cell,
+.doacao-note-cell {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.doacao-value-cell strong,
+.doacao-donor-cell strong,
+.doacao-date-cell strong {
+  color: var(--on-surface);
+  font-size: 14px;
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.doacao-value-cell span,
+.doacao-donor-cell span,
+.doacao-date-cell span,
+.doacao-note-cell span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.doacao-note-cell span {
+  color: #334155;
+}
+
+.doacao-type-badge,
+.doacao-status-badge {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.doacao-type-badge {
+  background: #eef4ff;
+  color: var(--primary);
+}
+
+.doacao-status-badge {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.doacao-status-badge.concluida {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.doacao-table .acoes {
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.doacao-table .action-icon-btn {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.doacao-table .action-icon-btn:hover {
+  background: #edf4ff;
+}
+
+.doacao-table .action-icon-btn.delete:hover {
+  background: #fff1f2;
+}
+
+@media (max-width: 1180px) {
+  .doacao-table-card .table-wrap {
+    overflow-x: auto;
+  }
+
+  .doacao-table-card .table-wrap table.doacao-table {
+    min-width: 840px;
+  }
+}

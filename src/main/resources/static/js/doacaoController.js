@@ -60,9 +60,13 @@ function obterNomeDoador(doacao) {
 
 function formatarStatus(status) {
   const valor = String(status || "").trim();
-  if (valor === "Em_Analise") return "Em Analise";
-  if (valor === "Concluida") return "Concluida";
+  if (valor === "Em_Analise") return "Em análise";
+  if (valor === "Concluida") return "Concluída";
   return valor || "-";
+}
+
+function classeStatusDoacao(status) {
+  return String(status || "").trim() === "Concluida" ? "concluida" : "analise";
 }
 
 function formatarDataDoacao(data) {
@@ -128,7 +132,7 @@ function formatarCargoInclusivo(categoria) {
     .toLowerCase();
   if (valor === "coordenador") return "Coordenador(a)";
   if (valor === "cuidador") return "Cuidador(a)";
-  if (valor === "secretaria") return "Secretária(o)";
+  if (valor === "secretaria") return "Secretária";
   return String(categoria || "").trim();
 }
 
@@ -212,7 +216,7 @@ function renderizarTabela() {
   });
   dados = dados.sort((a, b) => comparar(a, b, ordenacaoAtual.chave, ordenacaoAtual.direcao));
   if (dados.length === 0) {
-    corpo.innerHTML = '<tr><td colspan="9" class="empty-row">Nenhuma doação encontrada.</td></tr>';
+    corpo.innerHTML = '<tr><td colspan="6" class="empty-row">Nenhuma doação encontrada.</td></tr>';
     return;
   }
   var html = "";
@@ -220,16 +224,40 @@ function renderizarTabela() {
     var doacao = dados[i];
     const nomeDoador = obterNomeDoador(doacao);
     const estaConcluida = doacao.status === "Concluida";
+    const valorFormatado = formatarValorDoacao(doacao) || "-";
+    const tipoFormatado = doacao.tipoDoacaoNome || doacao.tipo || "Não informado";
+    const emailFormatado = doacao.pagEmail || "E-mail não informado";
+    const cpfFormatado = formatarCpf(doacao.cpfDoador || "") || "CPF não informado";
+    const dataFormatada = formatarDataDoacao(doacao.dtDoacao) || "-";
+    const statusFormatado = formatarStatus(doacao.status);
+    const classeStatus = classeStatusDoacao(doacao.status);
+    const observacaoFormatada = doacao.observacoes || "Sem observações";
     html += `
       <tr>
-        <td>${escaparHtml(formatarValorDoacao(doacao))}</td>
-        <td>${escaparHtml(doacao.tipoDoacaoNome || "")}</td>
-        <td>${escaparHtml(nomeDoador)}</td>
-        <td>${escaparHtml(doacao.pagEmail || "")}</td>
-        <td>${escaparHtml(formatarCpf(doacao.cpfDoador || ""))}</td>
-        <td>${escaparHtml(formatarDataDoacao(doacao.dtDoacao))}</td>
-        <td>${escaparHtml(formatarStatus(doacao.status))}</td>
-        <td>${escaparHtml(doacao.observacoes || "")}</td>
+        <td>
+          <div class="doacao-value-cell">
+            <strong>${escaparHtml(valorFormatado)}</strong>
+            <span class="doacao-type-badge">${escaparHtml(tipoFormatado)}</span>
+          </div>
+        </td>
+        <td>
+          <div class="doacao-donor-cell">
+            <strong>${escaparHtml(nomeDoador)}</strong>
+            <span>${escaparHtml(emailFormatado)}</span>
+            <span>${escaparHtml(cpfFormatado)}</span>
+          </div>
+        </td>
+        <td>
+          <div class="doacao-date-cell">
+            <strong>${escaparHtml(dataFormatada)}</strong>
+          </div>
+        </td>
+        <td><span class="doacao-status-badge ${classeStatus}">${escaparHtml(statusFormatado)}</span></td>
+        <td>
+          <div class="doacao-note-cell">
+            <span>${escaparHtml(observacaoFormatada)}</span>
+          </div>
+        </td>
         <td class="text-right">
           <div class="acoes">
             ${estaConcluida ? `
@@ -255,7 +283,7 @@ function renderizarTabela() {
 
 function carregarDoacoes() {
   const corpo = el("tabelaDoacoes");
-  if (corpo) corpo.innerHTML = '<tr><td colspan="9" class="empty-row">Carregando doações...</td></tr>';
+  if (corpo) corpo.innerHTML = '<tr><td colspan="6" class="empty-row">Carregando doações...</td></tr>';
   return fetch("/doacao/listar")
     .then(function (response) {
       return parseJsonSegura(response).then(function (body) {
@@ -292,7 +320,7 @@ function carregarDoacoes() {
       renderizarTabela();
     })
     .catch(function () {
-      if (corpo) corpo.innerHTML = '<tr><td colspan="9" class="empty-row">Nenhuma doação encontrada.</td></tr>';
+      if (corpo) corpo.innerHTML = '<tr><td colspan="6" class="empty-row">Nenhuma doação encontrada.</td></tr>';
     });
 }
 

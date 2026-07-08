@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestão de Doações - SGAV</title>
   <link rel="stylesheet" href="css/funcionario.css" />
-  <link rel="stylesheet" href="css/cadastroDoacao.css?v=1" />
-  <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260705-2" />
+  <link rel="stylesheet" href="css/cadastroDoacao.css?v=20260708-1" />
+  <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260708-1" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 </head>
-<body onload="carregarDoacoes()">
+<body class="doacoes-page sidebar-collapsible-demo" onload="carregarDoacoes()">
   <div class="page">
     <aside class="sidebar" data-secretaria-sidebar="true">
       <div class="sidebar-brand">
@@ -216,16 +216,13 @@
                 </div>
               </div>
             </section>
-            <div class="table-card">
+            <div class="table-card doacao-table-card">
               <div class="table-wrap">
-                <table>
+                <table class="doacao-table">
                   <thead>
                     <tr>
                       <th class="sortable" data-sort-key="valor" tabindex="0">Valor <span class="sort-indicator"></span></th>
-                      <th class="sortable" data-sort-key="tipoDoacao" tabindex="0">Tipo <span class="sort-indicator"></span></th>
-                      <th class="sortable" data-sort-key="nomeDoador" tabindex="0">Nome Doador <span class="sort-indicator"></span></th>
-                      <th class="sortable" data-sort-key="pagEmail" tabindex="0">E-mail <span class="sort-indicator"></span></th>
-                      <th class="sortable" data-sort-key="cpfDoador" tabindex="0">CPF Doador <span class="sort-indicator"></span></th>
+                      <th class="sortable" data-sort-key="nomeDoador" tabindex="0">Doador <span class="sort-indicator"></span></th>
                       <th class="sortable" data-sort-key="dtDoacao" tabindex="0">Data <span class="sort-indicator"></span></th>
                       <th class="sortable" data-sort-key="status" tabindex="0">Status <span class="sort-indicator"></span></th>
                       <th class="sortable" data-sort-key="observacoes" tabindex="0">Observações <span class="sort-indicator"></span></th>
@@ -234,7 +231,7 @@
                   </thead>
                   <tbody id="tabelaDoacoes">
                     <tr>
-                      <td colspan="9" class="empty-row">Carregando doações...</td>
+                      <td colspan="6" class="empty-row">Carregando doações...</td>
                     </tr>
                   </tbody>
                 </table>
@@ -256,7 +253,7 @@
     </div>
   </section>
   <div id="mensagem-feedback" class="popup-msg"></div>
-  <script src="js/doacaoController.js?v=20260707-2"></script>
-  <script src="js/sidebarSecretaria.js?v=20260707-1"></script>
+  <script src="js/doacaoController.js?v=20260708-1"></script>
+  <script src="js/sidebarSecretaria.js?v=20260708-1"></script>
 </body>
 </html>

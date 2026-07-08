@@ -70,6 +70,54 @@ function _fecharLightbox() {
     document.body.style.overflow = "";
 }
 
+function formatarDataNoticiaIndex(valor) {
+    if (!valor) return "";
+
+    const texto = String(valor).trim();
+    const partesIso = texto.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (partesIso) {
+        return `${partesIso[3]}/${partesIso[2]}/${partesIso[1]}`;
+    }
+
+    const data = new Date(texto);
+    if (!Number.isNaN(data.getTime())) {
+        return new Intl.DateTimeFormat("pt-BR", {
+            timeZone: "America/Sao_Paulo",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        }).format(data);
+    }
+
+    return texto;
+}
+
+function atualizarUltimaAtualizacaoNoticias(noticias, erro = false) {
+    const el = document.getElementById("newsLastUpdate");
+    if (!el) return;
+
+    if (erro) {
+        el.textContent = "Última atualização: não foi possível verificar";
+        return;
+    }
+
+    if (!Array.isArray(noticias) || noticias.length === 0) {
+        el.textContent = "Última atualização: aguardando publicações";
+        return;
+    }
+
+    const datas = noticias
+        .map(noticia => noticia.dataUpload)
+        .filter(Boolean)
+        .sort()
+        .reverse();
+
+    const dataFormatada = formatarDataNoticiaIndex(datas[0]);
+    el.textContent = dataFormatada
+        ? `Última atualização: ${dataFormatada}`
+        : "Última atualização: notícias em revisão";
+}
+
 // ── CARDS ─────────────────────────────────────────────────────────────────────
 async function carregarNoticiasIndex() {
     const newsGrid = document.getElementById("newsGrid");
@@ -82,6 +130,8 @@ async function carregarNoticiasIndex() {
         if (!response.ok || !Array.isArray(data)) {
             throw new Error("Falha ao carregar");
         }
+
+        atualizarUltimaAtualizacaoNoticias(data);
 
         if (data.length === 0) {
             newsGrid.innerHTML = '<p style="padding: 2rem; color: var(--text-muted);">Nenhuma notícia publicada no momento.</p>';
@@ -135,6 +185,7 @@ async function carregarNoticiasIndex() {
         }
 
     } catch (error) {
+        atualizarUltimaAtualizacaoNoticias([], true);
         console.error("Erro ao carregar notícias no index:", error);
         newsGrid.innerHTML = '<p style="padding: 2rem; color: var(--text-muted);">Não foi possível carregar as notícias mais recentes.</p>';
     }

@@ -126,7 +126,7 @@ function formatarCargoInclusivoTurno(categoria)
         .toLowerCase();
     if (valor === "coordenador") return "Coordenador(a)";
     if (valor === "cuidador") return "Cuidador(a)";
-    if (valor === "secretaria") return "Secretária(o)";
+    if (valor === "secretaria") return "Secretária";
     const texto = String(categoria || "").trim();
     return texto ? texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase() : "Acesso";
 }
