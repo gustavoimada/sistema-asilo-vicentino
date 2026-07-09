@@ -943,7 +943,16 @@ main {
 }
 
 .dayflow-step::after {
-  display: none;
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--primary-container));
+  transform: scaleX(0);
+  transform-origin: left center;
+  opacity: 0;
 }
 
 .dayflow-step:hover {
@@ -963,8 +972,18 @@ main {
 }
 
 .dayflow-step.is-active::after {
-  background: #ffffff;
-  box-shadow: inset 0 0 0 1px #bfdbfe;
+  opacity: 1;
+  animation: dayflowProgress 5.6s linear forwards;
+}
+
+@keyframes dayflowProgress {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
 }
 
 .dayflow-step span {
@@ -1636,6 +1655,60 @@ main {
   margin-bottom: 0;
 }
 
+.donation-kind-card {
+  grid-column: 1;
+  grid-row: 3;
+  align-self: end;
+  max-width: 420px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 16px;
+  border: 1px solid #cfe0f7;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(239, 246, 255, 0.82));
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+}
+
+.donation-kind-card .material-symbols-outlined {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: var(--primary);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.donation-kind-card strong {
+  display: block;
+  color: var(--primary);
+  font-size: 15px;
+  line-height: 1.25;
+  margin-bottom: 5px;
+}
+
+.donation-kind-card p {
+  margin: 0 0 8px;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.donation-kind-card a {
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.donation-kind-card a:hover {
+  text-decoration: underline;
+}
+
 .donation-goal {
   grid-column: 2;
   grid-row: 1;
@@ -1751,10 +1824,11 @@ main {
   background: rgba(255, 255, 255, 0.78);
   border: 1px solid #d9e4f4;
   border-radius: 14px;
-  padding: 12px;
+  padding: 11px 12px;
   text-align: left;
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
   gap: 9px;
 }
 
@@ -1762,17 +1836,24 @@ main {
   font-size: 21px;
   color: var(--primary);
   margin-bottom: 0;
+  grid-row: 1 / span 2;
+  margin-top: 1px;
 }
 
 .cta-impact-card strong {
   display: block;
   color: var(--primary);
   font-size: 13px;
-  margin-bottom: 0;
+  line-height: 1.2;
+  margin-bottom: 3px;
 }
 
 .cta-impact-card p {
-  display: none;
+  display: block;
+  margin: 0;
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1.35;
 }
 
 .cta-actions {
@@ -2436,6 +2517,7 @@ main {
 
   .cta-content h2,
   .cta-content > p,
+  .donation-kind-card,
   .donation-goal,
   .donation-use,
   .cta-impact-grid,
@@ -2447,6 +2529,10 @@ main {
 
   .cta-content > p {
     font-size: 18px;
+  }
+
+  .donation-kind-card {
+    max-width: 100%;
   }
 
   .cta-impact-grid {
@@ -2563,17 +2649,8 @@ main {
     padding: 14px 14px 14px 18px;
   }
 
-  .dayflow-step::after {
-    grid-column: 2;
-    grid-row: 1;
-    align-self: start;
-    min-width: 58px;
-    height: 28px;
-    padding: 0 10px;
-  }
-
   .dayflow-step strong {
-    padding-right: 74px;
+    padding-right: 0;
   }
 
   .dayflow-caption {

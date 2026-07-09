@@ -166,8 +166,7 @@ function escaparHtmlTurno(valor)
 function formatarDataHoraTurno(valor)
 {
     if (!valor) return "-";
-    const texto = String(valor).replace(" ", "T");
-    const data = new Date(texto);
+    const data = valor instanceof Date ? valor : new Date(String(valor).replace(" ", "T"));
     if (Number.isNaN(data.getTime()))
     {
         return String(valor);
@@ -182,10 +181,30 @@ function formatarDataHoraTurno(valor)
     });
 }
 
-function formatarDataHoraRealTurno(dataEscala, hora)
+function obterMinutosHoraTurno(hora)
+{
+    const match = String(hora || "").trim().match(/^(\d{1,2}):(\d{2})/);
+    if (!match) return null;
+    return Number(match[1]) * 60 + Number(match[2]);
+}
+
+function formatarDataHoraRealTurno(dataEscala, hora, horaInicioReferencia)
 {
     if (!dataEscala || !hora) return "-";
-    return formatarDataHoraTurno(`${dataEscala} ${hora}`);
+
+    const horaTexto = String(hora).trim();
+    const horaNormalizada = horaTexto.length === 5 ? `${horaTexto}:00` : horaTexto;
+    const data = new Date(`${dataEscala}T${horaNormalizada}`);
+    if (Number.isNaN(data.getTime())) return formatarDataHoraTurno(`${dataEscala} ${hora}`);
+
+    const minutosInicio = obterMinutosHoraTurno(horaInicioReferencia);
+    const minutosAtual = obterMinutosHoraTurno(hora);
+    if (minutosInicio !== null && minutosAtual !== null && minutosAtual <= minutosInicio)
+    {
+        data.setDate(data.getDate() + 1);
+    }
+
+    return formatarDataHoraTurno(data);
 }
 
 function formatarDataTurno(valor)
@@ -399,7 +418,7 @@ function montarResumoUltimoTurno(turno)
             <div><span>Cuidador(a)</span><strong>${escaparHtmlTurno(obterNomeFuncionarioEscala(turno, obterNomePerfilTurno()))}</strong></div>
             <div><span>Turno</span><strong>${textoTurnoNome(obterIdTurnoEscala(turno))} - ${formatarDataTurno(turno.dataEscala)}</strong></div>
             <div><span>Início</span><strong>${formatarDataHoraRealTurno(turno.dataEscala, turno.horaInicio)}</strong></div>
-            <div><span>Fim</span><strong>${formatarDataHoraRealTurno(turno.dataEscala, turno.horaFim)}</strong></div>
+            <div><span>Fim</span><strong>${formatarDataHoraRealTurno(turno.dataEscala, turno.horaFim, turno.horaInicio)}</strong></div>
             <div><span>Status</span><strong>${textoStatusExibicaoTurno(turno)}</strong></div>
             <div><span>Ocorrências</span><strong>${(turno.ocorrencias || []).length}</strong></div>
         </div>

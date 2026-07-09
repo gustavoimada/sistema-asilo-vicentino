@@ -8,7 +8,7 @@
     <title>Login</title>
 
     <script>document.documentElement.style.colorScheme = "light"; document.documentElement.classList.add("tema-claro");</script>
-    <link rel="stylesheet" href="css/login.css?v=20260504-3" />
+    <link rel="stylesheet" href="css/login.css?v=20260708-1" />
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
@@ -78,9 +78,12 @@
 
                         <div class="form-group">
                             <label for="senha">Senha de Acesso</label>
-                            <div class="input-wrap">
+                            <div class="input-wrap password-wrap">
                                 <span class="input-icon material-symbols-outlined">lock</span>
                                 <input type="password" id="senha" name="senha" placeholder="••••••••" />
+                                <button type="button" id="toggleSenha" class="password-toggle" aria-label="Exibir senha" aria-pressed="false" title="Exibir senha">
+                                    <span class="material-symbols-outlined">visibility</span>
+                                </button>
                             </div>
                         </div>
 
@@ -105,7 +108,7 @@
 
     <div id="mensagem-feedback" class="popup-msg"></div>
 
-    <script src="js/loginController.js?v=20260524-1"></script>
+    <script src="js/loginController.js?v=20260708-1"></script>
 </body>
 
 </html>

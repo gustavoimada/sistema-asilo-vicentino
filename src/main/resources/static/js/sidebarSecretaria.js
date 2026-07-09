@@ -1,6 +1,6 @@
 (function () {
     const CHAVE_ROLAGEM_MENU = "sgav.sidebar.secretaria.scrollTop";
-    const CHAVE_MENU_RECOLHIDO = "sgav.sidebar.secretaria.recolhido";
+    const CHAVE_MENU_RECOLHIDO = "sgav.sidebar.recolhido";
 
     const itensMenu = [
         { href: "secretaria.html", icone: "dashboard", texto: "Painel", aliases: ["secretaria.html", "tipoOcorrencia.html"] },

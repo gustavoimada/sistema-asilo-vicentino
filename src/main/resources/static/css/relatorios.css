@@ -390,6 +390,13 @@ body {
     white-space: nowrap;
 }
 
+#registrosFuncionarios th,
+#ocorrenciasRelatorio th {
+    white-space: normal;
+    line-height: 1.2;
+    vertical-align: bottom;
+}
+
 .relatorio-table td,
 .donation-table td {
     padding: 14px 16px;
@@ -468,6 +475,30 @@ body {
     -webkit-box-orient: vertical;
 }
 
+#registrosFuncionarios .relatorio-note,
+#ocorrenciasRelatorio .relatorio-note {
+    display: block;
+    overflow: visible;
+    -webkit-line-clamp: unset;
+}
+
+.relatorio-observacoes-stack,
+.relatorio-detail-block {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.relatorio-detail-label {
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    line-height: 1.1;
+    text-transform: uppercase;
+}
+
 .relatorio-chip {
     display: inline-flex;
     align-items: center;
@@ -509,6 +540,7 @@ body {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
+    align-items: flex-start;
 }
 
 .relatorio-inline-list span {
@@ -520,6 +552,78 @@ body {
     color: #3730a3;
     font-size: 11px;
     font-weight: 800;
+}
+
+.relatorio-moradores-list span {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#registrosFuncionarios th:nth-child(1),
+#registrosFuncionarios td:nth-child(1) {
+    width: 16%;
+}
+
+#registrosFuncionarios th:nth-child(2),
+#registrosFuncionarios td:nth-child(2) {
+    width: 14%;
+}
+
+#registrosFuncionarios th:nth-child(3),
+#registrosFuncionarios td:nth-child(3) {
+    width: 15%;
+}
+
+#registrosFuncionarios th:nth-child(4),
+#registrosFuncionarios td:nth-child(4) {
+    width: 19%;
+}
+
+#registrosFuncionarios th:nth-child(5),
+#registrosFuncionarios td:nth-child(5) {
+    width: 18%;
+}
+
+#registrosFuncionarios th:nth-child(6),
+#registrosFuncionarios td:nth-child(6) {
+    width: 18%;
+}
+
+#ocorrenciasRelatorio th:nth-child(1),
+#ocorrenciasRelatorio td:nth-child(1) {
+    width: 14%;
+}
+
+#ocorrenciasRelatorio th:nth-child(2),
+#ocorrenciasRelatorio td:nth-child(2) {
+    width: 15%;
+}
+
+#ocorrenciasRelatorio th:nth-child(3),
+#ocorrenciasRelatorio td:nth-child(3) {
+    width: 13%;
+}
+
+#ocorrenciasRelatorio th:nth-child(4),
+#ocorrenciasRelatorio td:nth-child(4) {
+    width: 15%;
+}
+
+#ocorrenciasRelatorio th:nth-child(5),
+#ocorrenciasRelatorio td:nth-child(5) {
+    width: 12%;
+}
+
+#ocorrenciasRelatorio th:nth-child(6),
+#ocorrenciasRelatorio td:nth-child(6) {
+    width: 17%;
+}
+
+#ocorrenciasRelatorio th:nth-child(7),
+#ocorrenciasRelatorio td:nth-child(7) {
+    width: 14%;
 }
 
 .relatorio-empty {

@@ -433,6 +433,24 @@ select {
   gap: 32px;
 }
 
+.medicamentos-page .content,
+.caixinhas-page .content {
+  max-width: none;
+}
+
+.medicamentos-page .content > section,
+.caixinhas-page .content > section {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+body.sidebar-collapsible-demo.sidebar-collapsed.medicamentos-page .content,
+body.sidebar-collapsible-demo.sidebar-collapsed.caixinhas-page .content {
+  padding-left: 48px;
+  padding-right: 32px;
+}
+
 /* CARDS */
 .card {
   background: var(--surface-container-lowest);

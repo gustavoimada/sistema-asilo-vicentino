@@ -427,7 +427,7 @@ function escaparHtmlCoordenador(valor)
 function formatarDataHoraCoordenador(valor)
 {
     if (!valor) return "-";
-    const data = new Date(String(valor).replace(" ", "T"));
+    const data = valor instanceof Date ? valor : new Date(String(valor).replace(" ", "T"));
     if (Number.isNaN(data.getTime())) return String(valor);
     return data.toLocaleString("pt-BR",
     {
@@ -439,10 +439,29 @@ function formatarDataHoraCoordenador(valor)
     });
 }
 
-function formatarDataHoraRealCoordenador(dataEscala, hora)
+function obterMinutosHoraCoordenador(hora)
+{
+    const match = String(hora || "").trim().match(/^(\d{1,2}):(\d{2})/);
+    if (!match) return null;
+    return Number(match[1]) * 60 + Number(match[2]);
+}
+
+function formatarDataHoraRealCoordenador(dataEscala, hora, horaInicioReferencia)
 {
     if (!dataEscala || !hora) return "-";
-    return formatarDataHoraCoordenador(`${dataEscala} ${hora}`);
+
+    const horaNormalizada = String(hora).trim().length === 5 ? `${String(hora).trim()}:00` : String(hora).trim();
+    const data = new Date(`${dataEscala}T${horaNormalizada}`);
+    if (Number.isNaN(data.getTime())) return formatarDataHoraCoordenador(`${dataEscala} ${hora}`);
+
+    const minutosInicio = obterMinutosHoraCoordenador(horaInicioReferencia);
+    const minutosAtual = obterMinutosHoraCoordenador(hora);
+    if (minutosInicio !== null && minutosAtual !== null && minutosAtual <= minutosInicio)
+    {
+        data.setDate(data.getDate() + 1);
+    }
+
+    return formatarDataHoraCoordenador(data);
 }
 
 function nomeTurnoCurto(idTurno)
@@ -807,7 +826,7 @@ function renderizarDetalhesTurnoCoordenador()
         </div>
         <div class="turno-resumo-grid">
             <div><span>In\u00edcio real</span><strong>${formatarDataHoraRealCoordenador(turno.dataEscala, turno.horaInicio)}</strong></div>
-            <div><span>Fim real</span><strong>${formatarDataHoraRealCoordenador(turno.dataEscala, turno.horaFim)}</strong></div>
+            <div><span>Fim real</span><strong>${formatarDataHoraRealCoordenador(turno.dataEscala, turno.horaFim, turno.horaInicio)}</strong></div>
             <div><span>Registros</span><strong>${totalRegistros}</strong><small>${totalOcorrencias} ocorr\u00eancia(s) / ${totalMedicacoes} uso(s) de medica\u00e7\u00e3o</small></div>
         </div>
         <div class="turno-descricao-box">

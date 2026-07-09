@@ -6,6 +6,10 @@
   gap: 24px;
 }
 
+body.sidebar-collapsible-demo.sidebar-collapsed .content {
+  padding-left: 48px;
+}
+
 /* WEEK SELECTOR */
 .week-selector {
   display: flex;

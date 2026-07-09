@@ -351,8 +351,8 @@ body.sidebar-collapsible-demo .sidebar-nav {
 
 body.sidebar-collapsible-demo .sidebar-collapse-toggle {
   position: absolute !important;
-  top: 29px !important;
-  right: 16px !important;
+  top: 24px !important;
+  right: 22px !important;
   width: 36px !important;
   height: 36px !important;
   border: 1px solid #dbe7fb !important;
@@ -380,7 +380,7 @@ body.sidebar-collapsible-demo .sidebar-collapse-toggle .material-symbols-outline
 }
 
 body.sidebar-collapsible-demo.sidebar-collapsed .sidebar:not(:hover):not(:focus-within) .sidebar-collapse-toggle {
-  top: 18px !important;
+  top: 8px !important;
   right: -16px !important;
   width: 32px !important;
   height: 42px !important;
@@ -409,6 +409,11 @@ body.sidebar-collapsible-demo.sidebar-collapsed .sidebar::after {
   border-right: 1px solid #dbe7fb !important;
   background: linear-gradient(180deg, #eff6ff 0%, #ffffff 42%, #eff6ff 100%) !important;
   pointer-events: none !important;
+}
+
+body.sidebar-collapsible-demo.sidebar-collapsed .sidebar:hover::after,
+body.sidebar-collapsible-demo.sidebar-collapsed .sidebar:focus-within::after {
+  display: none !important;
 }
 
 body.sidebar-collapsible-demo.sidebar-collapsed .main-area {

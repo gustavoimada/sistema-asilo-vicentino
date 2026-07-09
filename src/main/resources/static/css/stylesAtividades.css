@@ -1,5 +1,15 @@
 @import url('cadastroFuncionario.css');
 
+.atividades-page .content-wrap {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+body.sidebar-collapsible-demo.sidebar-collapsed.atividades-page .content {
+    padding-left: 48px;
+    padding-right: 32px;
+}
+
 .medicamento-form .span-2 {
     grid-column: span 2;
 }

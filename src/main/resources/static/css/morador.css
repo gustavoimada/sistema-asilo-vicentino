@@ -4,9 +4,8 @@
 }
 
 .main-area {
-  width: calc(100% - var(--sidebar-width));
-  max-width: calc(100% - var(--sidebar-width));
   margin-left: var(--sidebar-width);
+  min-height: 100vh;
   overflow-x: hidden;
 }
 
@@ -38,12 +37,13 @@
 }
 
 .content-wrap {
-  max-width: none;
+  max-width: 1280px;
+  margin: 0 auto;
 }
 
 .content {
-  max-width: 1440px;
-  padding: 88px 24px 24px;
+  max-width: none;
+  padding: 96px 32px 32px;
 }
 
 .list-header {

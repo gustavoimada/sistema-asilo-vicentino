@@ -160,6 +160,27 @@ document.addEventListener("DOMContentLoaded", function ()
 {
     const botaoAjuda = document.getElementById("helpBtn");
     const painelAjuda = document.getElementById("helpPanel");
+    const campoSenha = document.getElementById("senha");
+    const botaoSenha = document.getElementById("toggleSenha");
+
+    if (campoSenha && botaoSenha)
+    {
+        const iconeSenha = botaoSenha.querySelector(".material-symbols-outlined");
+
+        botaoSenha.addEventListener("click", function ()
+        {
+            const deveExibir = campoSenha.type === "password";
+            campoSenha.type = deveExibir ? "text" : "password";
+            botaoSenha.setAttribute("aria-pressed", String(deveExibir));
+            botaoSenha.setAttribute("aria-label", deveExibir ? "Ocultar senha" : "Exibir senha");
+            botaoSenha.setAttribute("title", deveExibir ? "Ocultar senha" : "Exibir senha");
+            if (iconeSenha)
+            {
+                iconeSenha.textContent = deveExibir ? "visibility_off" : "visibility";
+            }
+            campoSenha.focus();
+        });
+    }
 
     if (!botaoAjuda || !painelAjuda)
     {

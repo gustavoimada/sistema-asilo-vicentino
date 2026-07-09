@@ -38,6 +38,33 @@ function escaparHtmlRelatorio(valor) {
         .replaceAll("'", "&#39;");
 }
 
+function montarChipsMoradoresRelatorio(moradores) {
+    const lista = Array.isArray(moradores) ? moradores : [];
+    const chips = lista
+        .map(function (nome) {
+            return String(nome || "").trim();
+        })
+        .filter(function (nome) {
+            return nome !== "";
+        })
+        .map(function (nome) {
+            return `<span>${escaparHtmlRelatorio(nome)}</span>`;
+        })
+        .join("");
+
+    if (chips === "") return '<span class="relatorio-muted">-</span>';
+
+    return `
+        <div class="relatorio-inline-list relatorio-moradores-list">${chips}</div>
+    `;
+}
+
+function montarObservacoesFuncionarioRelatorio(observacoes) {
+    const texto = String(observacoes || "").trim();
+    if (texto === "") return '<span class="relatorio-muted">-</span>';
+    return `<span class="relatorio-note">${escaparHtmlRelatorio(texto)}</span>`;
+}
+
 function converterDataRelatorio(valor) {
     if (valor == null) return null;
 
@@ -526,7 +553,7 @@ function renderizarRegistrosFuncionarios() {
     if (listaFiltrada.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5" class="relatorio-empty">Nenhum registro encontrado.</td>
+                <td colspan="6" class="relatorio-empty">Nenhum registro encontrado.</td>
             </tr>
         `;
         return;
@@ -538,7 +565,8 @@ function renderizarRegistrosFuncionarios() {
         const data = escaparHtmlRelatorio(formatarDataHoraRelatorio(registro.dataRegistro));
         const ocorrencia = escaparHtmlRelatorio(registro.ocorrencia || "-");
         const medicamento = escaparHtmlRelatorio(registro.medicamento || "-");
-        const observacoes = escaparHtmlRelatorio(registro.observacoes || "-");
+        const moradores = montarChipsMoradoresRelatorio(registro.moradoresEnvolvidos || []);
+        const observacoes = montarObservacoesFuncionarioRelatorio(registro.observacoes);
 
         linhas += `
             <tr>
@@ -551,7 +579,8 @@ function renderizarRegistrosFuncionarios() {
                 <td><span class="relatorio-date">${data}</span></td>
                 <td><span class="relatorio-note">${ocorrencia}</span></td>
                 <td><span class="relatorio-note">${medicamento}</span></td>
-                <td><span class="relatorio-note">${observacoes}</span></td>
+                <td>${moradores}</td>
+                <td>${observacoes}</td>
             </tr>
         `;
     });
@@ -642,15 +671,7 @@ async function carregarRegistrosFuncionarios() {
         const registros = [];
 
         ocorrenciasComMoradores.forEach(function (ocorrencia) {
-            const observacaoBase = String(ocorrencia?.observacoes || "").trim();
             const moradoresEnvolvidos = String(ocorrencia?._moradoresEnvolvidosTexto || "").trim();
-            let observacoesCompletas = observacaoBase;
-            if (moradoresEnvolvidos !== "") {
-                if (observacoesCompletas !== "") {
-                    observacoesCompletas += " | ";
-                }
-                observacoesCompletas += "Moradores envolvidos: " + moradoresEnvolvidos;
-            }
 
             registros.push({
                 tipoRegistro: "ocorrencia",
@@ -658,7 +679,8 @@ async function carregarRegistrosFuncionarios() {
                 dataRegistro: ocorrencia?.dtOcorrencia || "",
                 ocorrencia: String(ocorrencia?.tipoOcorrencia?.descricao || "").trim(),
                 medicamento: "",
-                observacoes: observacoesCompletas
+                observacoes: String(ocorrencia?.observacoes || "").trim(),
+                moradoresEnvolvidos: moradoresEnvolvidos === "" ? [] : moradoresEnvolvidos.split(",").map(function (nome) { return nome.trim(); })
             });
         });
 
@@ -670,7 +692,8 @@ async function carregarRegistrosFuncionarios() {
                 dataRegistro: registroUso?.dataRegistro || "",
                 ocorrencia: "",
                 medicamento: montarTextoUsoMedicamentoRelatorio(registroUso),
-                observacoes: morador !== "" ? "Morador: " + morador : ""
+                observacoes: "",
+                moradoresEnvolvidos: morador !== "" ? [morador] : []
             });
         });
 

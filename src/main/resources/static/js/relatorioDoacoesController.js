@@ -66,6 +66,10 @@ function obterClasseTipoDoacao(tipo) {
     return "neutro";
 }
 
+function doacaoFoiContabilizada(doacao) {
+    return padronizarTexto(doacao?.status) === "CONCLUIDA";
+}
+
 function formatarDataFiltroRelatorio(data) {
     if (!data) return "";
     const texto = String(data).trim();
@@ -567,6 +571,10 @@ function renderizarDoacoes() {
     let linhas = "";
 
     const listaFiltrada = doacoesRelatorio.filter(doacao => {
+        if (!doacaoFoiContabilizada(doacao)) {
+            return false;
+        }
+
         const doador = obterDoador(doacao);
         const nomeDoador = obterNomeDoador(doacao);
         const tipo = obterTipo(doacao);
@@ -663,7 +671,7 @@ function renderizarDoacoes() {
     if (linhas === "") {
         tbody.innerHTML = `
             <tr>
-                <td colspan="6" class="relatorio-empty">Nenhuma doacao encontrada.</td>
+                <td colspan="6" class="relatorio-empty">Nenhuma doacao contabilizada encontrada.</td>
             </tr>
         `;
     } else {
@@ -687,11 +695,7 @@ function carregarDoacoes() {
     fetch("/doacao/listarOrdenado?valor=dtdoacao&ordem=DESC")
         .then(resp => resp.json())
         .then(doacoes => {
-            if (!Array.isArray(doacoes)) {
-                doacoesRelatorio = [];
-            } else {
-                doacoesRelatorio = doacoes;
-            }
+            doacoesRelatorio = Array.isArray(doacoes) ? doacoes : [];
             renderizarDoacoes();
         })
         .catch(() => {

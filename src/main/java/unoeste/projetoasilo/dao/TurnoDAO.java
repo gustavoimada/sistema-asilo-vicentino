@@ -42,8 +42,7 @@ public class TurnoDAO
                 (
                     ft.dataEscala
                     + CASE
-                        WHEN ft.Turnos_idTurnos = 2
-                             AND """ + SQL_HORA_FIM_EFETIVA + """
+                        WHEN """ + SQL_HORA_FIM_EFETIVA + """
                              <= """ + SQL_HORA_INICIO_EFETIVA + """
                         THEN INTERVAL '1 day'
                         ELSE INTERVAL '0 day'
