@@ -76,14 +76,17 @@ Para um banco novo em producao:
 
 1. Criar o PostgreSQL no Railway.
 2. Rodar `src/main/resources/abrigovicentinodb.sql`.
-3. Criar usuarios reais no sistema ou inserir o primeiro usuario administrador com senha segura.
+3. Criar apenas usuarios reais do asilo.
+4. Garantir que a senha do primeiro usuario administrativo esteja criptografada com BCrypt.
+5. Nao levar dados de teste para producao.
 
 Para um banco que ja existia:
 
 1. Fazer backup antes.
 2. Rodar `src/main/resources/atualizacao-producao.sql`.
 3. Conferir se nao existem mais `turnos` e `historicomorador`.
+4. Conferir se nao sobraram usuarios, moradores, escalas, doacoes ou noticias de teste.
 
 ## Observacao sobre uploads
 
-O banco guarda o caminho dos arquivos de `noticia` e `transparencia`, mas os arquivos em si ficam no diretorio `UPLOAD_DIR`. Em producao, esse diretorio precisa estar em volume persistente, por exemplo `/data/uploads` no Railway.
+O banco guarda o caminho dos arquivos de `noticia` e `transparencia`, mas os arquivos em si ficam no diretorio `UPLOAD_DIR`. Em producao, esse diretorio precisa estar em volume persistente, por exemplo `/data/uploads` no Railway. Depois de configurar, reinicie o servico e confirme se imagens e PDFs continuam abrindo.

@@ -24,6 +24,8 @@ Este guia resume o caminho recomendado para publicar o sistema em producao usand
 3. Criar um novo projeto.
 4. Adicionar um banco PostgreSQL.
 5. Adicionar um servico conectado ao repositorio do GitHub.
+6. Criar um volume persistente para o servico web.
+7. Montar o volume em `/data`.
 
 ## 4. Variaveis de ambiente
 
@@ -32,7 +34,8 @@ Configure no Railway:
 ```env
 PORT=8080
 SESSION_COOKIE_SECURE=true
-UPLOAD_DIR=/app/uploads
+SESSION_TIMEOUT=2h
+UPLOAD_DIR=/data/uploads
 ```
 
 Configure tambem a conexao com o PostgreSQL. Se o Railway fornecer `DATABASE_URL`, o sistema consegue converter a URL para JDBC automaticamente. Se preferir configurar manualmente:
@@ -51,6 +54,8 @@ Para banco novo, execute:
 src/main/resources/abrigovicentinodb.sql
 ```
 
+Esse script cria a estrutura limpa, sem dados de teste. Depois dele, crie apenas usuarios reais do asilo.
+
 Para banco que ja existia antes da criptografia de senha, execute:
 
 ```text
@@ -59,11 +64,28 @@ src/main/resources/atualizacao-producao.sql
 
 Depois, teste o login. Senhas antigas em texto simples sao migradas para BCrypt no primeiro login correto.
 
+### Primeiro usuario administrativo
+
+Em banco novo, o primeiro acesso precisa ser criado com cuidado porque as telas administrativas ja ficam protegidas por login.
+
+1. Criar uma coordenadora ou secretaria real com senha temporaria forte.
+2. Garantir que a senha fique criptografada com BCrypt.
+3. Testar o login em `https://asilovicentino.com.br/login.html`.
+4. Remover qualquer usuario de teste antes de divulgar o site.
+5. Guardar o acesso principal com a administracao do asilo.
+
 ## 6. Uploads
 
 O sistema salva arquivos de noticias e transparencia no diretorio definido por `UPLOAD_DIR`.
 
-No Railway, confirme se o projeto tera armazenamento persistente. Sem volume persistente, arquivos enviados podem sumir quando o servico reiniciar ou for recriado.
+No Railway, `UPLOAD_DIR` deve apontar para o volume persistente, por exemplo `/data/uploads`. Sem volume persistente, arquivos enviados podem sumir quando o servico reiniciar ou for recriado.
+
+Depois do deploy, faca este teste antes de divulgar:
+
+1. Enviar uma imagem de noticia.
+2. Enviar um PDF de transparencia.
+3. Reiniciar o servico no Railway.
+4. Conferir se a imagem e o PDF continuam abrindo no site.
 
 ## 7. Dominio customizado
 
@@ -80,8 +102,12 @@ No Railway, confirme se o projeto tera armazenamento persistente. Sem volume per
 - Site publico abre com HTTPS.
 - Login administrativo funciona.
 - Rotas administrativas bloqueiam usuarios sem permissao.
+- `SESSION_COOKIE_SECURE=true` esta configurado.
+- `UPLOAD_DIR` aponta para o volume persistente.
 - Doacoes, noticias, transparencia e relatorios foram testados.
 - Banco esta com backup/export inicial.
+- Banco nao tem dados de teste.
+- Usuarios reais usam senhas fortes.
 - Uploads continuam existindo apos reiniciar o servico.
 - Dominio oficial aponta para o Railway.
 

@@ -3,82 +3,116 @@ package unoeste.projetoasilo.dao;
 import unoeste.projetoasilo.db.util.Banco;
 import unoeste.projetoasilo.entities.Doacao;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DoacaoDAO
 {
+    private static final String COLUNAS_DOACAO = "idDoacao, valor, observacoes, nomeDoador, cpfDoador, dtDoacao, tipo, status, txid, pag_nome, pag_email";
+
     public boolean gravar(Doacao doacao, Banco conexao) throws SQLException
     {
-        String sql = String.format(
-                "INSERT INTO doacao (valor, observacoes, nomeDoador, cpfDoador, dtDoacao, tipo, status, txid, pag_nome, pag_email) VALUES (%s, %s, %s, %s, %s, %s, 'Em_Analise', NULL, NULL, %s);",
-                String.valueOf(doacao.getValor()),
-                textoSqlNulo(doacao.getObservacoes()),
-                textoSqlNulo(doacao.getNomeDoador()),
-                textoSqlNulo(doacao.getCpfDoador()),
-                dataSqlNula(doacao.getDtDoacao()),
-                textoSqlNulo(doacao.getTipo()),
-                textoSqlNulo(doacao.getPag_email())
-        );
+        String sql = """
+                INSERT INTO doacao
+                    (valor, observacoes, nomeDoador, cpfDoador, dtDoacao, tipo, status, txid, pag_nome, pag_email)
+                VALUES (?, ?, ?, ?, ?, ?, 'Em_Analise', NULL, NULL, ?)
+                """;
 
-        if (!conexao.manipular(sql))
+        try (PreparedStatement ps = conexao.prepararComChaves(sql))
         {
-            return false;
+            ps.setDouble(1, doacao.getValor());
+            setTextoNulo(ps, 2, doacao.getObservacoes());
+            setTextoNulo(ps, 3, doacao.getNomeDoador());
+            setTextoNulo(ps, 4, doacao.getCpfDoador());
+            ps.setTimestamp(5, doacao.getDtDoacao());
+            setTextoNulo(ps, 6, doacao.getTipo());
+            setTextoNulo(ps, 7, doacao.getPag_email());
+
+            if (ps.executeUpdate() <= 0)
+            {
+                return false;
+            }
+
+            try (ResultSet chaves = ps.getGeneratedKeys())
+            {
+                if (chaves.next())
+                {
+                    doacao.setIdDoacao(chaves.getInt(1));
+                }
+            }
         }
 
-        int novoId = conexao.getMaxPK("doacao", "idDoacao");
-        if (novoId > 0)
+        if (doacao.getIdDoacao() <= 0)
         {
-            doacao.setIdDoacao(novoId);
+            int novoId = conexao.getMaxPK("doacao", "idDoacao");
+            if (novoId > 0)
+            {
+                doacao.setIdDoacao(novoId);
+            }
         }
         return true;
     }
 
     public boolean editar(Doacao doacao, Banco conexao) throws SQLException
     {
-        String sql = String.format(
-                "UPDATE doacao SET valor = %s, observacoes = %s, nomeDoador = %s, cpfDoador = %s, dtDoacao = %s, tipo = %s, txid = NULL, pag_nome = NULL, pag_email = NULL WHERE idDoacao = %d;",
-                String.valueOf(doacao.getValor()),
-                textoSqlNulo(doacao.getObservacoes()),
-                textoSqlNulo(doacao.getNomeDoador()),
-                textoSqlNulo(doacao.getCpfDoador()),
-                dataSqlNula(doacao.getDtDoacao()),
-                textoSqlNulo(doacao.getTipo()),
-                doacao.getIdDoacao()
-        );
-        return conexao.manipular(sql);
+        String sql = """
+                UPDATE doacao
+                SET valor = ?, observacoes = ?, nomeDoador = ?, cpfDoador = ?, dtDoacao = ?,
+                    tipo = ?, txid = NULL, pag_nome = NULL, pag_email = NULL
+                WHERE idDoacao = ?
+                """;
+
+        try (PreparedStatement ps = conexao.preparar(sql))
+        {
+            ps.setDouble(1, doacao.getValor());
+            setTextoNulo(ps, 2, doacao.getObservacoes());
+            setTextoNulo(ps, 3, doacao.getNomeDoador());
+            setTextoNulo(ps, 4, doacao.getCpfDoador());
+            ps.setTimestamp(5, doacao.getDtDoacao());
+            setTextoNulo(ps, 6, doacao.getTipo());
+            ps.setInt(7, doacao.getIdDoacao());
+            return ps.executeUpdate() > 0;
+        }
     }
 
     public boolean atualizarStatus(int id, String status, Banco conexao) throws SQLException
     {
         String sql = """
                 UPDATE doacao
-                SET status = '#1', txid = NULL, pag_nome = NULL, pag_email = NULL
-                WHERE idDoacao = #2
+                SET status = ?, txid = NULL, pag_nome = NULL, pag_email = NULL
+                WHERE idDoacao = ?
                 """;
-        sql = sql.replace("#1", escaparSql(status));
-        sql = sql.replace("#2", String.valueOf(id));
-        return conexao.manipular(sql);
+
+        try (PreparedStatement ps = conexao.preparar(sql))
+        {
+            ps.setString(1, status);
+            ps.setInt(2, id);
+            return ps.executeUpdate() > 0;
+        }
     }
 
     public boolean deletar(int id, Banco conexao) throws SQLException
     {
-        String sql = "DELETE FROM doacao WHERE idDoacao = #1";
-        sql = sql.replace("#1", String.valueOf(id));
-        return conexao.manipular(sql);
+        String sql = "DELETE FROM doacao WHERE idDoacao = ?";
+
+        try (PreparedStatement ps = conexao.preparar(sql))
+        {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        }
     }
 
     public List<Doacao> listar(Banco conexao) throws SQLException
     {
-        String sql = "SELECT idDoacao, valor, observacoes, nomeDoador, cpfDoador, dtDoacao, tipo, status, txid, pag_nome, pag_email FROM doacao ORDER BY idDoacao";
+        String sql = "SELECT " + COLUNAS_DOACAO + " FROM doacao ORDER BY idDoacao";
         List<Doacao> doacoes = new ArrayList<>();
-        ResultSet rs = conexao.consultar(sql);
 
-        if (rs != null)
+        try (PreparedStatement ps = conexao.preparar(sql);
+             ResultSet rs = ps.executeQuery())
         {
             while (rs.next())
             {
@@ -91,13 +125,18 @@ public class DoacaoDAO
 
     public Doacao buscarPorId(int id, Banco conexao) throws SQLException
     {
-        String sql = "SELECT idDoacao, valor, observacoes, nomeDoador, cpfDoador, dtDoacao, tipo, status, txid, pag_nome, pag_email FROM doacao WHERE idDoacao = #1";
-        sql = sql.replace("#1", String.valueOf(id));
+        String sql = "SELECT " + COLUNAS_DOACAO + " FROM doacao WHERE idDoacao = ?";
 
-        ResultSet rs = conexao.consultar(sql);
-        if (rs != null && rs.next())
+        try (PreparedStatement ps = conexao.preparar(sql))
         {
-            return popularDoacao(rs);
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery())
+            {
+                if (rs.next())
+                {
+                    return popularDoacao(rs);
+                }
+            }
         }
 
         return null;
@@ -105,35 +144,62 @@ public class DoacaoDAO
 
     public boolean existeDuplicada(Doacao doacao, Banco conexao) throws SQLException
     {
-        String sql = String.format(
-                "SELECT idDoacao FROM doacao WHERE valor = %s AND observacoes %s AND nomeDoador %s AND cpfDoador %s AND dtDoacao %s AND tipo %s",
-                String.valueOf(doacao.getValor()),
-                condicaoSqlNula(doacao.getObservacoes()),
-                condicaoSqlNula(doacao.getNomeDoador()),
-                condicaoSqlNula(doacao.getCpfDoador()),
-                condicaoDataSqlNula(doacao.getDtDoacao()),
-                condicaoSqlNula(doacao.getTipo())
-        );
+        String sql = """
+                SELECT idDoacao
+                FROM doacao
+                WHERE valor = ?
+                  AND observacoes IS NOT DISTINCT FROM ?
+                  AND nomeDoador IS NOT DISTINCT FROM ?
+                  AND cpfDoador IS NOT DISTINCT FROM ?
+                  AND dtDoacao IS NOT DISTINCT FROM ?
+                  AND tipo IS NOT DISTINCT FROM ?
+                """;
 
-        ResultSet rs = conexao.consultar(sql);
-        return rs != null && rs.next();
+        try (PreparedStatement ps = conexao.preparar(sql))
+        {
+            ps.setDouble(1, doacao.getValor());
+            setTextoNulo(ps, 2, doacao.getObservacoes());
+            setTextoNulo(ps, 3, doacao.getNomeDoador());
+            setTextoNulo(ps, 4, doacao.getCpfDoador());
+            ps.setTimestamp(5, doacao.getDtDoacao());
+            setTextoNulo(ps, 6, doacao.getTipo());
+
+            try (ResultSet rs = ps.executeQuery())
+            {
+                return rs.next();
+            }
+        }
     }
 
     public boolean existeDuplicadaExcluindoId(Doacao doacao, int id, Banco conexao) throws SQLException
     {
-        String sql = String.format(
-                "SELECT idDoacao FROM doacao WHERE valor = %s AND observacoes %s AND nomeDoador %s AND cpfDoador %s AND dtDoacao %s AND tipo %s AND idDoacao <> %d",
-                String.valueOf(doacao.getValor()),
-                condicaoSqlNula(doacao.getObservacoes()),
-                condicaoSqlNula(doacao.getNomeDoador()),
-                condicaoSqlNula(doacao.getCpfDoador()),
-                condicaoDataSqlNula(doacao.getDtDoacao()),
-                condicaoSqlNula(doacao.getTipo()),
-                id
-        );
+        String sql = """
+                SELECT idDoacao
+                FROM doacao
+                WHERE valor = ?
+                  AND observacoes IS NOT DISTINCT FROM ?
+                  AND nomeDoador IS NOT DISTINCT FROM ?
+                  AND cpfDoador IS NOT DISTINCT FROM ?
+                  AND dtDoacao IS NOT DISTINCT FROM ?
+                  AND tipo IS NOT DISTINCT FROM ?
+                  AND idDoacao <> ?
+                """;
 
-        ResultSet rs = conexao.consultar(sql);
-        return rs != null && rs.next();
+        try (PreparedStatement ps = conexao.preparar(sql))
+        {
+            ps.setDouble(1, doacao.getValor());
+            setTextoNulo(ps, 2, doacao.getObservacoes());
+            setTextoNulo(ps, 3, doacao.getNomeDoador());
+            setTextoNulo(ps, 4, doacao.getCpfDoador());
+            ps.setTimestamp(5, doacao.getDtDoacao());
+            setTextoNulo(ps, 6, doacao.getTipo());
+            ps.setInt(7, id);
+
+            try (ResultSet rs = ps.executeQuery())
+            {
+                return rs.next();
+            }
+        }
     }
 
     public List<Doacao> listarOrdenado(String valor, String ordem, String tipo, String dataInicio, String dataFim, Banco conexao) throws SQLException
@@ -147,42 +213,51 @@ public class DoacaoDAO
             ordem = "ASC";
         }
 
-        String sql = "SELECT idDoacao, valor, observacoes, nomeDoador, cpfDoador, dtDoacao, tipo, status, txid, pag_nome, pag_email FROM doacao";
+        StringBuilder sql = new StringBuilder("SELECT " + COLUNAS_DOACAO + " FROM doacao");
+        List<Object> parametros = new ArrayList<>();
         boolean temWhere = false;
 
         if (tipo != null && !tipo.trim().isEmpty())
         {
-            sql += " WHERE tipo = '" + escaparSql(tipo) + "'";
+            sql.append(" WHERE tipo = ?");
+            parametros.add(tipo.trim());
             temWhere = true;
         }
 
         if (dataInicio != null && !dataInicio.trim().isEmpty() && dataFim != null && !dataFim.trim().isEmpty())
         {
-            sql += temWhere ? " AND" : " WHERE";
+            sql.append(temWhere ? " AND" : " WHERE");
             temWhere = true;
-            sql += " dtDoacao >= '" + escaparSql(dataInicio) + " 00:00:00' AND dtDoacao <= '" + escaparSql(dataFim) + " 23:59:59'";
+            sql.append(" dtDoacao >= CAST(? AS timestamp) AND dtDoacao <= CAST(? AS timestamp)");
+            parametros.add(dataInicio.trim() + " 00:00:00");
+            parametros.add(dataFim.trim() + " 23:59:59");
         }
         else if (dataInicio != null && !dataInicio.trim().isEmpty())
         {
-            sql += temWhere ? " AND" : " WHERE";
+            sql.append(temWhere ? " AND" : " WHERE");
             temWhere = true;
-            sql += " dtDoacao >= '" + escaparSql(dataInicio) + " 00:00:00'";
+            sql.append(" dtDoacao >= CAST(? AS timestamp)");
+            parametros.add(dataInicio.trim() + " 00:00:00");
         }
         else if (dataFim != null && !dataFim.trim().isEmpty())
         {
-            sql += temWhere ? " AND" : " WHERE";
-            sql += " dtDoacao <= '" + escaparSql(dataFim) + " 23:59:59'";
+            sql.append(temWhere ? " AND" : " WHERE");
+            sql.append(" dtDoacao <= CAST(? AS timestamp)");
+            parametros.add(dataFim.trim() + " 23:59:59");
         }
 
-        sql += " ORDER BY " + colunaOrdenacao(valor) + " " + direcaoOrdenacao(ordem);
+        sql.append(" ORDER BY ").append(colunaOrdenacao(valor)).append(" ").append(direcaoOrdenacao(ordem));
         List<Doacao> doacaoList = new ArrayList<>();
-        ResultSet rs = conexao.consultar(sql);
 
-        if (rs != null)
+        try (PreparedStatement ps = conexao.preparar(sql.toString()))
         {
-            while (rs.next())
+            preencherParametros(ps, parametros);
+            try (ResultSet rs = ps.executeQuery())
             {
-                doacaoList.add(popularDoacao(rs));
+                while (rs.next())
+                {
+                    doacaoList.add(popularDoacao(rs));
+                }
             }
         }
 
@@ -206,13 +281,31 @@ public class DoacaoDAO
         return doacao;
     }
 
-    private String textoSqlNulo(String valor)
+    private void setTextoNulo(PreparedStatement ps, int indice, String valor) throws SQLException
     {
         if (valor == null || valor.trim().isEmpty())
         {
-            return "NULL";
+            ps.setString(indice, null);
+            return;
         }
-        return "'" + escaparSql(valor) + "'";
+        ps.setString(indice, valor.trim());
+    }
+
+    private void preencherParametros(PreparedStatement ps, List<Object> parametros) throws SQLException
+    {
+        for (int i = 0; i < parametros.size(); i++)
+        {
+            Object parametro = parametros.get(i);
+            int indice = i + 1;
+            if (parametro instanceof String texto)
+            {
+                ps.setString(indice, texto);
+            }
+            else
+            {
+                ps.setObject(indice, parametro);
+            }
+        }
     }
 
     private String colunaOrdenacao(String valor)
@@ -237,42 +330,5 @@ public class DoacaoDAO
     private String direcaoOrdenacao(String ordem)
     {
         return "DESC".equalsIgnoreCase(ordem) ? "DESC" : "ASC";
-    }
-
-    private String dataSqlNula(Timestamp data)
-    {
-        if (data == null)
-        {
-            return "NULL";
-        }
-
-        return "'" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(data) + "'";
-    }
-
-    private String condicaoSqlNula(String valor)
-    {
-        if (valor == null || valor.trim().isEmpty())
-        {
-            return "IS NULL";
-        }
-        return "= '" + escaparSql(valor) + "'";
-    }
-
-    private String condicaoDataSqlNula(Timestamp data)
-    {
-        if (data == null)
-        {
-            return "IS NULL";
-        }
-        return "= '" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(data) + "'";
-    }
-
-    private String escaparSql(String valor)
-    {
-        if (valor == null)
-        {
-            return "";
-        }
-        return valor.replace("'", "''");
     }
 }
