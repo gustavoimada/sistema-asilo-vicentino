@@ -5,7 +5,7 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)
 ![Maven](https://img.shields.io/badge/Maven-Wrapper-orange)
 ![Security](https://img.shields.io/badge/Security-BCrypt%20%2B%20Access%20Filters-darkgreen)
-![Status](https://img.shields.io/badge/status-deployment%20in%20progress-yellow)
+![Status](https://img.shields.io/badge/status-live%20on%20Railway-brightgreen)
 
 Sistema Asilo Vicentino is a full-stack web platform developed for a real charitable elderly care institution. The project combines a public institutional website with a protected internal management system, helping the organization present its mission online while supporting daily administrative and care-related workflows.
 
@@ -184,7 +184,7 @@ The project includes SQL scripts for initial database creation and production up
 
 ## Deployment Status
 
-This project has moved from local development into a real deployment workflow.
+This project has moved from local development into a real deployment workflow and is already running on Railway for production validation.
 
 - GitHub repository cleaned and updated for deployment.
 - Official domain purchased: `asilovicentino.com.br`.
@@ -192,12 +192,13 @@ This project has moved from local development into a real deployment workflow.
 - Railway PostgreSQL service created.
 - Initial PostgreSQL schema executed in the Railway database.
 - Environment variables configured for production behavior.
-- Temporary Railway public URL generated for validation.
+- Railway public URL active for validation.
 - HTTPS-ready session configuration with secure cookies.
 - Persistent upload strategy documented for images and transparency files.
 - Production SQL scripts documented for clean databases and future updates.
+- Official domain DNS connection in progress through Registro.br.
 
-The official domain is not the final public entry point yet. The current deployment is being validated through Railway before DNS configuration and public release.
+The application is live through Railway while the official domain `asilovicentino.com.br` is being connected and validated through DNS records.
 
 ## Technical Strengths
 
@@ -230,4 +231,4 @@ The `.env.example` file is kept only as a safe configuration model, without real
 
 ## Status
 
-The project is currently in deployment validation. The domain has been purchased, Railway hosting is active, PostgreSQL has been provisioned and the initial schema has been created. The next steps are validating the temporary Railway URL, creating real administrative users, testing uploads and protected workflows, rotating exposed database credentials and then pointing `asilovicentino.com.br` to the Railway deployment.
+The project is currently live on Railway for deployment validation. The domain has been purchased, Railway hosting is active, PostgreSQL has been provisioned, the initial schema has been created and real administrative access has been configured. The next steps are finishing DNS validation for `asilovicentino.com.br`, confirming persistent uploads, reviewing production credentials, testing protected workflows end-to-end and preparing the final public release.
