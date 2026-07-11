@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestão de Doações - SGAV</title>
   <link rel="stylesheet" href="css/funcionario.css" />
-  <link rel="stylesheet" href="css/cadastroDoacao.css?v=20260708-1" />
+  <link rel="stylesheet" href="css/cadastroDoacao.css?v=20260711-1" />
   <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260708-3" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
@@ -130,7 +130,7 @@
                   <span class="material-symbols-outlined">close</span>
                 </button>
               </div>
-              <form class="doacao-form" id="doacaoForm">
+              <form class="panel-grid-form doacao-form" id="doacaoForm">
                 <input type="hidden" id="doacaoId" />
                 <div class="form-field">
                   <label id="valorLabel" for="valor">Valor</label>
@@ -178,7 +178,7 @@
                   <span class="material-symbols-outlined">close</span>
                 </button>
               </div>
-              <div class="doacao-form filtro-form">
+              <div class="panel-grid-form compact-filter doacao-filter-form">
                 <div class="form-field">
                   <label for="filtroValor">Valor</label>
                   <input id="filtroValor" type="number" step="0.01" placeholder="Ex: 100.00" />
@@ -253,7 +253,7 @@
     </div>
   </section>
   <div id="mensagem-feedback" class="popup-msg"></div>
-  <script src="js/doacaoController.js?v=20260708-1"></script>
+  <script src="js/doacaoController.js?v=20260711-1"></script>
   <script src="js/sidebarSecretaria.js?v=20260708-1"></script>
   <script src="js/sidebarRecolhivel.js?v=20260708-1"></script>
 </body>

@@ -117,6 +117,27 @@ th.sortable.is-active {
   gap: 24px;
 }
 
+.panel-grid-form {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px 32px;
+  margin-top: 24px;
+}
+
+.panel-grid-form.compact-filter {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.panel-grid-form .form-field-wide,
+.panel-grid-form .form-row-inline,
+.panel-grid-form .form-actions {
+  grid-column: 1 / -1;
+}
+
+.despesa-filter-form {
+  align-items: end;
+}
+
 .form-field select,
 #tipo,
 #fixa,
@@ -163,6 +184,7 @@ th.sortable.is-active {
 }
 
 @media (max-width: 700px) {
+  .panel-grid-form,
   .form-row-inline {
     grid-template-columns: 1fr;
     gap: 18px;
@@ -170,8 +192,18 @@ th.sortable.is-active {
 }
 
 @media (max-width: 1100px) {
+  .panel-grid-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .form-row-inline {
     grid-template-columns: 1fr;
     gap: 18px;
+  }
+}
+
+@media (max-width: 700px) {
+  .panel-grid-form {
+    grid-template-columns: 1fr;
   }
 }

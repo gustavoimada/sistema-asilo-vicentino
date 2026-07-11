@@ -1288,6 +1288,32 @@ function alterarTipoBuscaAtividade() {
     atualizarIndicadoresOrdenacaoAtividades();
 }
 
+function limparFiltrosAtividade() {
+    const campo = document.getElementById("filtroCampoAtividade");
+    const busca = document.getElementById("filtroBuscaAtividade");
+    const dataInicio = document.getElementById("filtroDataInicioAtividade");
+    const dataFim = document.getElementById("filtroDataFimAtividade");
+
+    if (campo) {
+        campo.value = "nome";
+    }
+
+    if (busca) {
+        busca.value = "";
+        busca.disabled = false;
+    }
+
+    if (dataInicio) {
+        dataInicio.value = "";
+    }
+
+    if (dataFim) {
+        dataFim.value = "";
+    }
+
+    alterarTipoBuscaAtividade();
+}
+
 async function inicializarDadosTela() {
     try {
         await carregarTiposAtividades();
@@ -1307,6 +1333,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const filtroPainel = document.getElementById("painelFiltroAtividade");
         const botaoFiltros = document.getElementById("abrirFiltrosAtividade");
         const fecharFiltros = document.getElementById("fecharFiltrosAtividade");
+        const limparFiltros = document.getElementById("limparFiltrosAtividade");
 
         configurarOrdenacaoCabecalhoAtividades();
         inicializarDadosTela();
@@ -1328,6 +1355,10 @@ document.addEventListener("DOMContentLoaded", function () {
             fecharFiltros.addEventListener("click", function () {
                 filtroPainel.hidden = true;
             });
+        }
+
+        if (limparFiltros) {
+            limparFiltros.addEventListener("click", limparFiltrosAtividade);
         }
     }
 

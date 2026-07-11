@@ -572,6 +572,21 @@ function alterarTipoBusca() {
     carregarQuartos();
 }
 
+function limparFiltrosQuarto() {
+    const campo = document.getElementById("filtroCampo");
+    const busca = document.getElementById("filtroBusca");
+
+    if (campo) {
+        campo.value = "Numero";
+    }
+
+    if (busca) {
+        busca.value = "";
+    }
+
+    alterarTipoBusca();
+}
+
 document.addEventListener("DOMContentLoaded", function () {
     if (!exigirPaginaViaServidor()) {
         return;
@@ -581,6 +596,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const filtroPainel = document.getElementById("painelFiltroQuarto");
         const botaoFiltros = document.getElementById("abrirFiltrosQuarto");
         const fecharFiltros = document.getElementById("fecharFiltrosQuarto");
+        const limparFiltros = document.getElementById("limparFiltrosQuarto");
 
         configurarOrdenacaoCabecalhoQuartos();
         carregarQuartos();
@@ -599,6 +615,10 @@ document.addEventListener("DOMContentLoaded", function () {
             fecharFiltros.addEventListener("click", function () {
                 filtroPainel.hidden = true;
             });
+        }
+
+        if (limparFiltros) {
+            limparFiltros.addEventListener("click", limparFiltrosQuarto);
         }
     }
 

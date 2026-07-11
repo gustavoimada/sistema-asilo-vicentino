@@ -10,11 +10,11 @@ body.sidebar-collapsible-demo.sidebar-collapsed.atividades-page .content {
     padding-right: 32px;
 }
 
-.medicamento-form .span-2 {
+.atividade-form .span-2 {
     grid-column: span 2;
 }
 
-.medicamento-form .span-3 {
+.atividade-form .span-3 {
     grid-column: 1 / -1;
 }
 
@@ -228,8 +228,8 @@ body.sidebar-collapsible-demo.sidebar-collapsed.atividades-page .content {
 }
 
 @media (max-width: 960px) {
-    .medicamento-form .span-2,
-    .medicamento-form .span-3 {
+    .atividade-form .span-2,
+    .atividade-form .span-3 {
         grid-column: span 1;
     }
 

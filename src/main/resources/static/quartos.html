@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SGAV - Gestão de Quartos</title>
 
-  <link rel="stylesheet" href="css/stylesQuartos.css?v=20260706-1" />
+  <link rel="stylesheet" href="css/stylesQuartos.css?v=20260711-1" />
   <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260708-3" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
@@ -134,7 +134,7 @@
             </button>
           </div>
 
-          <form id="quartoForm" class="medicamento-form" style="margin-top:24px;">
+          <form id="quartoForm" class="panel-grid-form">
             <input type="hidden" id="quartoId" />
 
             <div class="form-field">
@@ -175,14 +175,15 @@
         <section class="card" id="painelFiltroQuarto" hidden>
           <div class="section-header-inline">
             <div class="section-header" style="margin-bottom:0;">
-              <h2>Filtros</h2>
+              <h2>Filtrar Quartos</h2>
+              <p>Pesquise por número, ala ou disponibilidade.</p>
             </div>
             <button type="button" id="fecharFiltrosQuarto" class="close-panel-btn" aria-label="Fechar filtros">
               <span class="material-symbols-outlined">close</span>
             </button>
           </div>
 
-          <div class="medicamento-form" style="margin-top:24px;">
+          <div class="panel-grid-form compact-filter">
             <div class="form-field">
               <label for="filtroCampo">Filtrar por</label>
               <select id="filtroCampo">
@@ -195,6 +196,13 @@
             <div class="form-field">
               <label for="filtroBusca">Busca</label>
               <input id="filtroBusca" type="text" placeholder="Digite para buscar" />
+            </div>
+
+            <div class="form-actions form-actions-between">
+              <button type="button" id="limparFiltrosQuarto" class="secondary-panel-btn">
+                <span class="material-symbols-outlined">cleaning_services</span>
+                Limpar Filtros
+              </button>
             </div>
 
           </div>
@@ -231,7 +239,7 @@
   </div>
 
   <script src="js/perfilTopo.js"></script>
-  <script src="js/quartoController.js?v=20260706-1"></script>
+  <script src="js/quartoController.js?v=20260711-1"></script>
   <script src="js/sidebarSecretaria.js?v=20260707-1"></script>
   <script src="js/sidebarRecolhivel.js?v=20260708-1"></script>
 </body>
