@@ -429,18 +429,17 @@ function abrirEdicaoTipoDespesa(id) {
 }
 
 function buscarTiposDespesas() {
-    const campo = document.getElementById("filtroCampoTipoDespesa");
-    const busca = document.getElementById("filtroBuscaTipoDespesa");
+    const nome = document.getElementById("filtroNomeTipoDespesa");
 
-    if (!campo || !busca) {
+    if (!nome) {
         return;
     }
 
-    const texto = busca.value.trim().toLowerCase();
-    const tipoFiltro = campo.value;
+    const texto = nome.value.trim().toLowerCase();
 
     if (texto === "") {
         renderizarTabela(tiposDespesasCarregados);
+        atualizarIndicadoresOrdenacaoTiposDespesas();
         return;
     }
 
@@ -452,18 +451,11 @@ function buscarTiposDespesas() {
     atualizarIndicadoresOrdenacaoTiposDespesas();
 }
 
-function alterarTipoBusca() {
-    const campo = document.getElementById("filtroCampoTipoDespesa");
-    const busca = document.getElementById("filtroBuscaTipoDespesa");
+function limparFiltrosTipoDespesa() {
+    const nome = document.getElementById("filtroNomeTipoDespesa");
 
-    if (!campo || !busca) {
-        return;
-    }
+    if (nome) nome.value = "";
 
-    busca.type = "text";
-    busca.placeholder = "Digite para buscar";
-
-    busca.value = "";
     renderizarTabela(tiposDespesasCarregados);
     atualizarIndicadoresOrdenacaoTiposDespesas();
 }
@@ -477,13 +469,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const filtroPainel = document.getElementById("painelFiltroTipoDespesa");
         const botaoFiltros = document.getElementById("abrirFiltrosTipoDespesa");
         const fecharFiltros = document.getElementById("fecharFiltrosTipoDespesa");
+        const limparFiltros = document.getElementById("limparFiltrosTipoDespesa");
 
         configurarOrdenacaoCabecalhoTiposDespesas();
         carregarTiposDespesas();
-        alterarTipoBusca();
 
-        document.getElementById("filtroCampoTipoDespesa").addEventListener("change", alterarTipoBusca);
-        document.getElementById("filtroBuscaTipoDespesa").addEventListener("input", buscarTiposDespesas);
+        document.getElementById("filtroNomeTipoDespesa").addEventListener("input", buscarTiposDespesas);
         document.getElementById("novoTipoDespesaBtn").addEventListener("click", abrirCadastroTipoDespesa);
 
         if (botaoFiltros && filtroPainel) {
@@ -496,6 +487,10 @@ document.addEventListener("DOMContentLoaded", function () {
             fecharFiltros.addEventListener("click", function () {
                 filtroPainel.hidden = true;
             });
+        }
+
+        if (limparFiltros) {
+            limparFiltros.addEventListener("click", limparFiltrosTipoDespesa);
         }
     }
 

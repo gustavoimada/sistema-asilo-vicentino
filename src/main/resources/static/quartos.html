@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SGAV - Gestão de Quartos</title>
 
-  <link rel="stylesheet" href="css/stylesQuartos.css?v=20260711-1" />
+  <link rel="stylesheet" href="css/stylesQuartos.css?v=20260711-2" />
   <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260708-3" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
@@ -185,17 +185,26 @@
 
           <div class="panel-grid-form compact-filter">
             <div class="form-field">
-              <label for="filtroCampo">Filtrar por</label>
-              <select id="filtroCampo">
-                <option value="Numero">Número</option>
-                <option value="Ala">Ala</option>
-                <option value="Disponibilidade">Disponibilidade</option>
+              <label for="filtroDisponibilidadeQuarto">Disponibilidade</label>
+              <select id="filtroDisponibilidadeQuarto">
+                <option value="">Todas</option>
+                <option value="D">Disponíveis</option>
+                <option value="I">Indisponíveis</option>
               </select>
             </div>
 
             <div class="form-field">
-              <label for="filtroBusca">Busca</label>
-              <input id="filtroBusca" type="text" placeholder="Digite para buscar" />
+              <label for="filtroAlaQuarto">Ala</label>
+              <select id="filtroAlaQuarto">
+                <option value="">Todas</option>
+                <option value="F">Feminina</option>
+                <option value="M">Masculina</option>
+              </select>
+            </div>
+
+            <div class="form-field">
+              <label for="filtroNumeroQuarto">Número</label>
+              <input id="filtroNumeroQuarto" type="number" min="1" placeholder="Ex: 2" />
             </div>
 
             <div class="form-actions form-actions-between">
@@ -239,7 +248,7 @@
   </div>
 
   <script src="js/perfilTopo.js"></script>
-  <script src="js/quartoController.js?v=20260711-1"></script>
+  <script src="js/quartoController.js?v=20260711-2"></script>
   <script src="js/sidebarSecretaria.js?v=20260707-1"></script>
   <script src="js/sidebarRecolhivel.js?v=20260708-1"></script>
 </body>

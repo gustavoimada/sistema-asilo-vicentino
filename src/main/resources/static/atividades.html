@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SGAV - Atividades</title>
 
-  <link rel="stylesheet" href="css/stylesAtividades.css?v=20260711-1" />
+  <link rel="stylesheet" href="css/stylesAtividades.css?v=20260711-2" />
   <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260708-3" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
@@ -196,7 +196,7 @@
           <div class="section-header-inline">
             <div class="section-header" style="margin-bottom:0;">
               <h2>Filtrar Atividades</h2>
-              <p>Pesquise por nome, data, tipo ou atividades antigas.</p>
+              <p>Pesquise por nome, tipo, período ou situação da atividade.</p>
             </div>
             <button type="button" id="fecharFiltrosAtividade" class="close-panel-btn" aria-label="Fechar filtros">
               <span class="material-symbols-outlined">close</span>
@@ -205,28 +205,34 @@
 
           <div class="panel-grid-form compact-filter atividade-filter-form">
             <div class="form-field">
-              <label for="filtroCampoAtividade">Filtrar por</label>
-              <select id="filtroCampoAtividade">
-                <option value="nome">Nome</option>
-                <option value="date">Data</option>
-                <option value="tipo">Tipo</option>
-                <option value="antigas">Atividades Antigas</option>
+              <label for="filtroNomeAtividade">Nome</label>
+              <input id="filtroNomeAtividade" type="text" placeholder="Ex: Missa, bingo..." />
+            </div>
+
+            <div class="form-field">
+              <label for="filtroTipoAtividade">Tipo</label>
+              <select id="filtroTipoAtividade">
+                <option value="">Todos</option>
               </select>
             </div>
 
-            <div class="form-field" id="campoBuscaAtividade">
-              <label for="filtroBuscaAtividade">Busca</label>
-              <input id="filtroBuscaAtividade" type="text" placeholder="Digite para buscar" />
-            </div>
-
-            <div class="form-field" id="campoDataInicioAtividade" hidden>
+            <div class="form-field">
               <label for="filtroDataInicioAtividade">Data inicial</label>
               <input id="filtroDataInicioAtividade" type="date" />
             </div>
 
-            <div class="form-field" id="campoDataFimAtividade" hidden>
+            <div class="form-field">
               <label for="filtroDataFimAtividade">Data final</label>
               <input id="filtroDataFimAtividade" type="date" />
+            </div>
+
+            <div class="form-field">
+              <label for="filtroSituacaoAtividade">Situação</label>
+              <select id="filtroSituacaoAtividade">
+                <option value="">Todas</option>
+                <option value="proximas">Próximas</option>
+                <option value="antigas">Antigas</option>
+              </select>
             </div>
 
             <div class="form-actions form-actions-between">
@@ -267,7 +273,7 @@
   </div>
 
   <script src="js/perfilTopo.js"></script>
-  <script src="js/atividadesController.js?v=20260711-1"></script>
+  <script src="js/atividadesController.js?v=20260711-2"></script>
   <script src="js/sidebarSecretaria.js?v=20260707-1"></script>
   <script src="js/sidebarRecolhivel.js?v=20260708-1"></script>
 </body>

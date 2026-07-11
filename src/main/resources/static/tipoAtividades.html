@@ -174,16 +174,20 @@
 
               <div class="ocorrencia-form filtro-form">
                 <div class="form-field">
-                  <label for="filtroCampoTipoAtividade">Filtrar por</label>
-                  <select id="filtroCampoTipoAtividade">
-                    <option value="tipo">Tipo</option>
-                    <option value="org">Organização</option>
-                  </select>
+                  <label for="filtroNomeTipoAtividade">Nome do tipo</label>
+                  <input id="filtroNomeTipoAtividade" type="text" placeholder="Ex: Bingo" />
                 </div>
 
                 <div class="form-field">
-                  <label for="filtroBuscaTipoAtividade">Busca</label>
-                  <input id="filtroBuscaTipoAtividade" type="text" placeholder="Digite para buscar" />
+                  <label for="filtroOrgTipoAtividade">Organização</label>
+                  <input id="filtroOrgTipoAtividade" type="text" placeholder="Ex: Equipe interna" />
+                </div>
+
+                <div class="form-actions form-actions-between">
+                  <button type="button" id="limparFiltrosTipoAtividade" class="secondary-panel-btn">
+                    <span class="material-symbols-outlined">cleaning_services</span>
+                    Limpar Filtros
+                  </button>
                 </div>
               </div>
             </section>
@@ -213,7 +217,7 @@
   </div>
 
   <script src="js/perfilTopo.js"></script>
-  <script src="js/tiposAtividadesController.js?v=20260703-1"></script>
+  <script src="js/tiposAtividadesController.js?v=20260711-1"></script>
   <script src="js/sidebarSecretaria.js?v=20260707-1"></script>
   <script src="js/sidebarRecolhivel.js?v=20260708-1"></script>
 </body>

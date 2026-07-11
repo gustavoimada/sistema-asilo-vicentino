@@ -437,45 +437,45 @@ function abrirEdicaoTipoAtividade(id) {
 }
 
 function buscarTiposAtividades() {
-    const campo = document.getElementById("filtroCampoTipoAtividade");
-    const busca = document.getElementById("filtroBuscaTipoAtividade");
+    const nome = document.getElementById("filtroNomeTipoAtividade");
+    const org = document.getElementById("filtroOrgTipoAtividade");
 
-    if (!campo || !busca) {
+    if (!nome || !org) {
         return;
     }
 
-    const texto = busca.value.trim().toLowerCase();
-    const tipoFiltro = campo.value;
+    const nomeFiltro = nome.value.trim().toLowerCase();
+    const orgFiltro = org.value.trim().toLowerCase();
 
-    if (texto === "") {
+    if (nomeFiltro === "" && orgFiltro === "") {
         renderizarTabela(tiposAtividadesCarregados);
+        atualizarIndicadoresOrdenacaoTiposAtividades();
         return;
     }
 
     const tiposFiltrados = tiposAtividadesCarregados.filter(tipoAtividade => {
-        if (tipoFiltro === "org") {
-            return String(tipoAtividade.org || "").toLowerCase().includes(texto);
+        if (nomeFiltro && !String(tipoAtividade.tipo || "").toLowerCase().includes(nomeFiltro)) {
+            return false;
         }
 
-        return String(tipoAtividade.tipo || "").toLowerCase().includes(texto);
+        if (orgFiltro && !String(tipoAtividade.org || "").toLowerCase().includes(orgFiltro)) {
+            return false;
+        }
+
+        return true;
     });
 
     renderizarTabela(tiposFiltrados);
     atualizarIndicadoresOrdenacaoTiposAtividades();
 }
 
-function alterarTipoBusca() {
-    const campo = document.getElementById("filtroCampoTipoAtividade");
-    const busca = document.getElementById("filtroBuscaTipoAtividade");
+function limparFiltrosTipoAtividade() {
+    const nome = document.getElementById("filtroNomeTipoAtividade");
+    const org = document.getElementById("filtroOrgTipoAtividade");
 
-    if (!campo || !busca) {
-        return;
-    }
+    if (nome) nome.value = "";
+    if (org) org.value = "";
 
-    busca.type = "text";
-    busca.placeholder = "Digite para buscar";
-
-    busca.value = "";
     renderizarTabela(tiposAtividadesCarregados);
     atualizarIndicadoresOrdenacaoTiposAtividades();
 }
@@ -489,13 +489,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const filtroPainel = document.getElementById("painelFiltroTipoAtividade");
         const botaoFiltros = document.getElementById("abrirFiltrosTipoAtividade");
         const fecharFiltros = document.getElementById("fecharFiltrosTipoAtividade");
+        const limparFiltros = document.getElementById("limparFiltrosTipoAtividade");
 
         configurarOrdenacaoCabecalhoTiposAtividades();
         carregarTiposAtividades();
-        alterarTipoBusca();
 
-        document.getElementById("filtroCampoTipoAtividade").addEventListener("change", alterarTipoBusca);
-        document.getElementById("filtroBuscaTipoAtividade").addEventListener("input", buscarTiposAtividades);
+        document.getElementById("filtroNomeTipoAtividade").addEventListener("input", buscarTiposAtividades);
+        document.getElementById("filtroOrgTipoAtividade").addEventListener("input", buscarTiposAtividades);
         document.getElementById("novoTipoAtividadeBtn").addEventListener("click", abrirCadastroTipoAtividade);
 
         if (botaoFiltros && filtroPainel) {
@@ -508,6 +508,10 @@ document.addEventListener("DOMContentLoaded", function () {
             fecharFiltros.addEventListener("click", function () {
                 filtroPainel.hidden = true;
             });
+        }
+
+        if (limparFiltros) {
+            limparFiltros.addEventListener("click", limparFiltrosTipoAtividade);
         }
     }
 

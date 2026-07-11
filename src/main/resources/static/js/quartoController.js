@@ -476,42 +476,33 @@ function abrirEdicaoQuarto(id) {
 }
 
 function buscarQuartos() {
-    const campo = document.getElementById("filtroCampo");
-    const busca = document.getElementById("filtroBusca");
+    const disponibilidade = document.getElementById("filtroDisponibilidadeQuarto");
+    const ala = document.getElementById("filtroAlaQuarto");
+    const numero = document.getElementById("filtroNumeroQuarto");
     const tabela = document.getElementById("tabelaQuartos");
 
-    if (!campo || !busca || !tabela) {
+    if (!disponibilidade || !ala || !numero || !tabela) {
         return;
     }
 
-    const texto = busca.value.trim().toLowerCase();
-    const tipo = campo.value;
-
-    if (texto === "") {
-        renderizarTabela(quartosCarregados);
-        atualizarIndicadoresOrdenacaoQuartos();
-        return;
-    }
+    const disponibilidadeFiltro = disponibilidade.value;
+    const alaFiltro = ala.value;
+    const numeroFiltro = String(numero.value || "").trim();
 
     const quartosFiltrados = quartosCarregados.filter(quarto => {
-        if (tipo === "Numero") {
-            return String(quarto.numero).toLowerCase().includes(texto);
+        const disponibilidadeQuarto = mapearDisponibilidadeParaTela(quarto.disponibilidade);
+        const alaQuarto = String(quarto.ala || "");
+        const numeroQuarto = String(quarto.numero || "");
+
+        if (disponibilidadeFiltro && disponibilidadeQuarto !== disponibilidadeFiltro) {
+            return false;
         }
 
-        if (tipo === "Disponibilidade") {
-            const disponibilidade = obterDescricaoDisponibilidade(quarto.disponibilidade).toLowerCase();
-            if (texto === "d" || texto === "disponivel" || texto === "disp") {
-                return disponibilidade === "disponivel";
-            }
-
-            if (texto === "i" || texto === "indisponivel" || texto === "ind") {
-                return disponibilidade === "indisponivel";
-            }
-
-            return disponibilidade.includes(texto);
+        if (alaFiltro && alaQuarto !== alaFiltro) {
+            return false;
         }
 
-        return String(quarto.ala || "").toLowerCase().includes(texto);
+        return !numeroFiltro || numeroQuarto.includes(numeroFiltro);
     });
 
     let linhas = "";
@@ -552,39 +543,17 @@ function buscarQuartos() {
     atualizarIndicadoresOrdenacaoQuartos();
 }
 
-function alterarTipoBusca() {
-    const campo = document.getElementById("filtroCampo");
-    const busca = document.getElementById("filtroBusca");
-
-    if (!campo || !busca) {
-        return;
-    }
-
-    if (campo.value === "Numero") {
-        busca.type = "number";
-        busca.placeholder = "Digite o numero";
-    } else {
-        busca.type = "text";
-        busca.placeholder = "Digite para buscar";
-    }
-
-    busca.value = "";
-    carregarQuartos();
-}
-
 function limparFiltrosQuarto() {
-    const campo = document.getElementById("filtroCampo");
-    const busca = document.getElementById("filtroBusca");
+    const disponibilidade = document.getElementById("filtroDisponibilidadeQuarto");
+    const ala = document.getElementById("filtroAlaQuarto");
+    const numero = document.getElementById("filtroNumeroQuarto");
 
-    if (campo) {
-        campo.value = "Numero";
-    }
+    if (disponibilidade) disponibilidade.value = "";
+    if (ala) ala.value = "";
+    if (numero) numero.value = "";
 
-    if (busca) {
-        busca.value = "";
-    }
-
-    alterarTipoBusca();
+    renderizarTabela(quartosCarregados);
+    atualizarIndicadoresOrdenacaoQuartos();
 }
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -600,9 +569,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
         configurarOrdenacaoCabecalhoQuartos();
         carregarQuartos();
-        alterarTipoBusca();
-        document.getElementById("filtroCampo").addEventListener("change", alterarTipoBusca);
-        document.getElementById("filtroBusca").addEventListener("input", buscarQuartos);
+        document.getElementById("filtroDisponibilidadeQuarto").addEventListener("change", buscarQuartos);
+        document.getElementById("filtroAlaQuarto").addEventListener("change", buscarQuartos);
+        document.getElementById("filtroNumeroQuarto").addEventListener("input", buscarQuartos);
         document.getElementById("novoQuartoBtn").addEventListener("click", abrirCadastroQuarto);
 
         if (botaoFiltros && filtroPainel) {

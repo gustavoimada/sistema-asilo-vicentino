@@ -504,25 +504,35 @@ window.alternarMoradorSelecionado = alternarMoradorSelecionado;
 
 function renderizarSelectTiposAtividades() {
     const select = document.getElementById("idtipoatividade");
-    if (!select) {
-        return;
-    }
+    const filtro = document.getElementById("filtroTipoAtividade");
 
     if (!Array.isArray(tiposAtividadesCarregados) || tiposAtividadesCarregados.length === 0) {
-        select.innerHTML = `<option value="">Nenhum tipo cadastrado</option>`;
+        if (select) {
+            select.innerHTML = `<option value="">Nenhum tipo cadastrado</option>`;
+        }
+        if (filtro) {
+            filtro.innerHTML = `<option value="">Todos</option>`;
+        }
         return;
     }
 
     let opcoes = `<option value="">Selecione...</option>`;
+    let opcoesFiltro = `<option value="">Todos</option>`;
     tiposAtividadesCarregados.forEach(function (tipoAtividade) {
         let texto = tipoAtividade.tipo;
         if (tipoAtividade.org) {
             texto = tipoAtividade.tipo + " (" + tipoAtividade.org + ")";
         }
         opcoes += `<option value="${tipoAtividade.idtipoatividades}">${texto}</option>`;
+        opcoesFiltro += `<option value="${tipoAtividade.idtipoatividades}">${texto}</option>`;
     });
 
-    select.innerHTML = opcoes;
+    if (select) {
+        select.innerHTML = opcoes;
+    }
+    if (filtro) {
+        filtro.innerHTML = opcoesFiltro;
+    }
 }
 
 function renderizarTabela(atividades) {
@@ -1178,140 +1188,75 @@ function abrirCadastroAtividade() {
 }
 
 async function buscarAtividades() {
-    const campo = document.getElementById("filtroCampoAtividade");
-    const busca = document.getElementById("filtroBuscaAtividade");
+    const nome = document.getElementById("filtroNomeAtividade");
+    const tipo = document.getElementById("filtroTipoAtividade");
     const dataInicio = document.getElementById("filtroDataInicioAtividade");
     const dataFim = document.getElementById("filtroDataFimAtividade");
+    const situacao = document.getElementById("filtroSituacaoAtividade");
 
-    if (!campo || !busca) {
+    if (!nome || !tipo || !dataInicio || !dataFim || !situacao) {
         return;
     }
 
-    const texto = busca.value.trim().toLowerCase();
-    const tipoFiltro = campo.value;
-    let atividadesBase = atividadesCarregadas;
+    const nomeFiltro = nome.value.trim().toLowerCase();
+    const tipoFiltro = tipo.value;
+    const dataInicioFiltro = dataInicio.value;
+    const dataFimFiltro = dataFim.value;
+    const situacaoFiltro = situacao.value;
+    const hoje = obterDataHojeIso();
+    let atividadesBase = [];
 
-    if (tipoFiltro === "antigas") {
+    if (situacaoFiltro === "antigas") {
         atividadesBase = await carregarAtividadesAntigas();
-        renderizarTabela(atividadesBase);
-        atualizarIndicadoresOrdenacaoAtividades();
-        return;
-    }
-
-    if (tipoFiltro === "date") {
-        const valorInicio = dataInicio ? dataInicio.value : "";
-        const valorFim = dataFim ? dataFim.value : "";
-
-        if (valorInicio === "" && valorFim === "") {
-            renderizarTabela(atividadesBase);
-            atualizarIndicadoresOrdenacaoAtividades();
-            return;
-        }
-
-        const atividadesFiltradasPorData = atividadesBase.filter(function (atividade) {
-            const dataAtividade = String(atividade.date || "").slice(0, 10);
-            if (!dataAtividade) {
-                return false;
-            }
-            return (!valorInicio || dataAtividade >= valorInicio) && (!valorFim || dataAtividade <= valorFim);
-        });
-
-        renderizarTabela(atividadesFiltradasPorData);
-        atualizarIndicadoresOrdenacaoAtividades();
-        return;
-    }
-
-    if (texto === "") {
-        renderizarTabela(atividadesBase);
-        atualizarIndicadoresOrdenacaoAtividades();
-        return;
+    } else {
+        atividadesBase = atividadesCarregadas;
     }
 
     const atividadesFiltradas = atividadesBase.filter(function (atividade) {
-        if (tipoFiltro === "tipo") {
-            const idTipo = obterIdTipoAtividade(atividade);
-            return obterDescricaoTipoAtividade(idTipo).toLowerCase().includes(texto);
+        const dataAtividade = String(atividade.date || "").slice(0, 10);
+        const idTipo = String(obterIdTipoAtividade(atividade) || "");
+
+        if (nomeFiltro && !String(atividade.nome || "").toLowerCase().includes(nomeFiltro)) {
+            return false;
         }
 
-        return String(atividade.nome || "").toLowerCase().includes(texto);
+        if (tipoFiltro && idTipo !== String(tipoFiltro)) {
+            return false;
+        }
+
+        if (dataInicioFiltro && (!dataAtividade || dataAtividade < dataInicioFiltro)) {
+            return false;
+        }
+
+        if (dataFimFiltro && (!dataAtividade || dataAtividade > dataFimFiltro)) {
+            return false;
+        }
+
+        if (situacaoFiltro === "proximas" && (!dataAtividade || dataAtividade < hoje)) {
+            return false;
+        }
+
+        return true;
     });
 
     renderizarTabela(atividadesFiltradas);
     atualizarIndicadoresOrdenacaoAtividades();
 }
 
-function alterarTipoBuscaAtividade() {
-    const campo = document.getElementById("filtroCampoAtividade");
-    const busca = document.getElementById("filtroBuscaAtividade");
-    const campoBusca = document.getElementById("campoBuscaAtividade");
-    const campoDataInicio = document.getElementById("campoDataInicioAtividade");
-    const campoDataFim = document.getElementById("campoDataFimAtividade");
+function limparFiltrosAtividade() {
+    const nome = document.getElementById("filtroNomeAtividade");
+    const tipo = document.getElementById("filtroTipoAtividade");
     const dataInicio = document.getElementById("filtroDataInicioAtividade");
     const dataFim = document.getElementById("filtroDataFimAtividade");
+    const situacao = document.getElementById("filtroSituacaoAtividade");
 
-    if (!campo || !busca) {
-        return;
-    }
-
-    if (campoDataInicio) campoDataInicio.hidden = true;
-    if (campoDataFim) campoDataFim.hidden = true;
+    if (nome) nome.value = "";
+    if (tipo) tipo.value = "";
     if (dataInicio) dataInicio.value = "";
     if (dataFim) dataFim.value = "";
-    if (campoBusca) campoBusca.hidden = false;
+    if (situacao) situacao.value = "";
 
-    if (campo.value === "antigas") {
-        busca.type = "text";
-        busca.placeholder = "Atividades antigas";
-        busca.value = "";
-        busca.disabled = true;
-        buscarAtividades();
-        return;
-    }
-
-    if (campo.value === "date") {
-        if (campoBusca) campoBusca.hidden = true;
-        if (campoDataInicio) campoDataInicio.hidden = false;
-        if (campoDataFim) campoDataFim.hidden = false;
-        busca.value = "";
-        busca.disabled = true;
-        buscarAtividades();
-        return;
-    }
-
-    busca.disabled = false;
-
-    busca.type = "text";
-    busca.placeholder = "Digite para buscar";
-
-    busca.value = "";
     buscarAtividades();
-    atualizarIndicadoresOrdenacaoAtividades();
-}
-
-function limparFiltrosAtividade() {
-    const campo = document.getElementById("filtroCampoAtividade");
-    const busca = document.getElementById("filtroBuscaAtividade");
-    const dataInicio = document.getElementById("filtroDataInicioAtividade");
-    const dataFim = document.getElementById("filtroDataFimAtividade");
-
-    if (campo) {
-        campo.value = "nome";
-    }
-
-    if (busca) {
-        busca.value = "";
-        busca.disabled = false;
-    }
-
-    if (dataInicio) {
-        dataInicio.value = "";
-    }
-
-    if (dataFim) {
-        dataFim.value = "";
-    }
-
-    alterarTipoBuscaAtividade();
 }
 
 async function inicializarDadosTela() {
@@ -1337,12 +1282,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         configurarOrdenacaoCabecalhoAtividades();
         inicializarDadosTela();
-        alterarTipoBuscaAtividade();
 
-        document.getElementById("filtroCampoAtividade").addEventListener("change", alterarTipoBuscaAtividade);
-        document.getElementById("filtroBuscaAtividade").addEventListener("input", buscarAtividades);
+        document.getElementById("filtroNomeAtividade").addEventListener("input", buscarAtividades);
+        document.getElementById("filtroTipoAtividade").addEventListener("change", buscarAtividades);
         document.getElementById("filtroDataInicioAtividade").addEventListener("input", buscarAtividades);
         document.getElementById("filtroDataFimAtividade").addEventListener("input", buscarAtividades);
+        document.getElementById("filtroSituacaoAtividade").addEventListener("change", buscarAtividades);
         document.getElementById("novoAtividadeBtn").addEventListener("click", abrirCadastroAtividade);
 
         if (botaoFiltros && filtroPainel) {

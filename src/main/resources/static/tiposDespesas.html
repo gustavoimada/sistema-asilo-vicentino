@@ -169,15 +169,15 @@
 
               <div class="ocorrencia-form filtro-form">
                 <div class="form-field">
-                  <label for="filtroCampoTipoDespesa">Filtrar por</label>
-                  <select id="filtroCampoTipoDespesa">
-                    <option value="tipo">Tipo</option>
-                  </select>
+                  <label for="filtroNomeTipoDespesa">Nome do tipo</label>
+                  <input id="filtroNomeTipoDespesa" type="text" placeholder="Ex: Alimentação" />
                 </div>
 
-                <div class="form-field">
-                  <label for="filtroBuscaTipoDespesa">Busca</label>
-                  <input id="filtroBuscaTipoDespesa" type="text" placeholder="Digite para buscar" />
+                <div class="form-actions form-actions-between">
+                  <button type="button" id="limparFiltrosTipoDespesa" class="secondary-panel-btn">
+                    <span class="material-symbols-outlined">cleaning_services</span>
+                    Limpar Filtros
+                  </button>
                 </div>
               </div>
             </section>
@@ -206,7 +206,7 @@
   </div>
 
   <script src="js/perfilTopo.js"></script>
-  <script src="js/tiposDespesasController.js?v=20260703-1"></script>
+  <script src="js/tiposDespesasController.js?v=20260711-1"></script>
   <script src="js/sidebarSecretaria.js?v=20260707-1"></script>
   <script src="js/sidebarRecolhivel.js?v=20260708-1"></script>
 </body>
