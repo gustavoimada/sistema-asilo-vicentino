@@ -45,7 +45,96 @@ function exibirMensagem(mensagem, tipo = "info") {
     }
 }
 
+function escaparHtml(valor) {
+    return String(valor ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function normalizarClasseCategoria(categoria) {
+    const valor = String(categoria || "sem-categoria")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+    return valor || "sem-categoria";
+}
+
+function obterIdNoticia(noticia) {
+    return noticia.idNoticia || noticia.id || noticia.idnoticia || 0;
+}
+
+function urlImagemNoticia(noticia) {
+    const idNoticia = obterIdNoticia(noticia);
+    return idNoticia ? `/noticia/download/${idNoticia}` : "";
+}
+
+function resumirDescricao(descricao) {
+    const texto = String(descricao || "").trim();
+    if (texto.length <= 150) return texto;
+    return `${texto.slice(0, 147).trim()}...`;
+}
+
 function renderizarNoticias(lista = noticias) {
+    const container = document.getElementById("listaNoticias");
+    if (!container) return;
+
+    if (!lista.length) {
+        container.innerHTML = '<tr><td colspan="4" class="empty-text" style="text-align: center; padding: 2rem;">Nenhuma noticia publicada.</td></tr>';
+        return;
+    }
+
+    container.innerHTML = lista.map(noticia => {
+        const idNoticia = obterIdNoticia(noticia);
+
+        let dataStr = noticia.dataUpload || "";
+        if (dataStr.includes("-")) {
+            const partes = dataStr.split("-");
+            if (partes.length === 3) dataStr = `${partes[2]}/${partes[1]}/${partes[0]}`;
+        }
+
+        const titulo = escaparHtml(noticia.titulo || "Sem titulo");
+        const descricao = escaparHtml(resumirDescricao(noticia.descricao));
+        const categoria = escaparHtml(noticia.categoria || "Sem categoria");
+        const classeCategoria = normalizarClasseCategoria(noticia.categoria);
+        const imagem = urlImagemNoticia(noticia);
+
+        return `
+            <tr class="noticia-table-row">
+                <td>
+                  <div class="noticia-list-item">
+                    <div class="noticia-thumb">
+                      ${imagem ? `<img src="${imagem}" alt="Imagem da noticia ${titulo}" loading="lazy" onerror="this.parentElement.classList.add('sem-imagem'); this.remove();">` : ""}
+                      <span class="material-symbols-outlined">image</span>
+                    </div>
+                    <div class="noticia-list-text">
+                      <strong>${titulo}</strong>
+                      <p>${descricao || "Sem descricao informada."}</p>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="noticia-categoria-badge categoria-${classeCategoria}">${categoria}</span></td>
+                <td><span class="noticia-data-badge">${escaparHtml(dataStr || "-")}</span></td>
+                <td class="text-right">
+                  <div class="acoes">
+                    <button type="button" class="action-icon-btn edit" onclick="prepararEdicaoPorId(${idNoticia})" title="Editar">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
+                    <button type="button" class="action-icon-btn delete" onclick="excluirNoticia(${idNoticia})" title="Excluir">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+                  </div>
+                </td>
+            </tr>
+        `;
+    }).join("");
+}
+
+function renderizarNoticiasTabelaAntiga(lista = noticias) {
     const container = document.getElementById("listaNoticias");
     if (!container) return;
 
@@ -127,10 +216,19 @@ function aplicarFiltros() {
     renderizarNoticias(filtrados);
 }
 
+function prepararEdicaoPorId(idNoticia) {
+    const noticia = noticias.find(item => Number(obterIdNoticia(item)) === Number(idNoticia));
+    if (!noticia) {
+        exibirMensagem("Noticia nao encontrada para edicao.", "error");
+        return;
+    }
+    prepararEdicao(noticia);
+}
+
 async function carregarNoticias() {
     const container = document.getElementById("listaNoticias");
     if (container) {
-        container.innerHTML = '<p class="empty-text">Carregando notícias...</p>';
+        container.innerHTML = '<tr><td colspan="4" class="empty-text" style="text-align: center; padding: 2rem;">Carregando noticias...</td></tr>';
     }
 
     try {
@@ -145,7 +243,7 @@ async function carregarNoticias() {
         console.error("Erro ao carregar noticias:", error);
         noticias = [];
         if (container) {
-            container.innerHTML = '<p class="empty-text">Não foi possível carregar as notícias. Verifique sua conexão e tente novamente.</p>';
+            container.innerHTML = '<tr><td colspan="4" class="empty-text" style="text-align: center; padding: 2rem;">Nao foi possivel carregar as noticias. Verifique sua conexao e tente novamente.</td></tr>';
         }
     }
 }

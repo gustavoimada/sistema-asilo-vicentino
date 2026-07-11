@@ -498,6 +498,142 @@ body.sidebar-collapsible-demo.sidebar-collapsed.noticias-page .content {
   vertical-align: middle;
 }
 
+.noticia-table-row td {
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.noticia-list-item {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.noticia-thumb {
+  width: 96px;
+  aspect-ratio: 16 / 10;
+  border-radius: 14px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e0f2fe, #dbeafe);
+  border: 1px solid #dbeafe;
+  color: #2563eb;
+  flex-shrink: 0;
+}
+
+.noticia-thumb img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.noticia-thumb span {
+  font-size: 26px;
+}
+
+.noticia-thumb:not(.sem-imagem) span {
+  opacity: 0;
+}
+
+.noticia-list-text {
+  min-width: 0;
+}
+
+.noticia-list-text strong {
+  display: block;
+  color: var(--on-surface);
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.35;
+  margin-bottom: 6px;
+  overflow-wrap: anywhere;
+}
+
+.noticia-list-text p {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.noticia-categoria-badge,
+.noticia-data-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.noticia-categoria-badge {
+  min-width: 92px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+}
+
+.noticia-data-badge {
+  padding: 8px 10px;
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.categoria-institucional {
+  background: #e0f2fe;
+  color: #075985;
+  border-color: #bae6fd;
+}
+
+.categoria-comunidade {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+.categoria-eventos {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+.categoria-atividades {
+  background: #ede9fe;
+  color: #5b21b6;
+  border-color: #ddd6fe;
+}
+
+.categoria-convivencia {
+  background: #fce7f3;
+  color: #9d174d;
+  border-color: #fbcfe8;
+}
+
+.categoria-rotina {
+  background: #ccfbf1;
+  color: #0f766e;
+  border-color: #99f6e4;
+}
+
+.categoria-sem-categoria {
+  background: #e2e8f0;
+  color: #334155;
+  border-color: #cbd5e1;
+}
+
 .text-right,
 .table-wrap th.text-right,
 .table-wrap td.text-right {
