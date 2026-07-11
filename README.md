@@ -5,11 +5,11 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)
 ![Maven](https://img.shields.io/badge/Maven-Wrapper-orange)
 ![Security](https://img.shields.io/badge/Security-BCrypt%20%2B%20Access%20Filters-darkgreen)
-![Status](https://img.shields.io/badge/status-production%20preparation-yellow)
+![Status](https://img.shields.io/badge/status-deployment%20in%20progress-yellow)
 
 Sistema Asilo Vicentino is a full-stack web platform developed for a real charitable elderly care institution. The project combines a public institutional website with a protected internal management system, helping the organization present its mission online while supporting daily administrative and care-related workflows.
 
-The system includes public pages for news, transparency and donations, plus private dashboards for secretaries, coordinators and caregivers. It is currently being prepared for production deployment with a managed PostgreSQL database, environment-based configuration, cloud hosting and a custom domain.
+The system includes public pages for news, transparency and donations, plus private dashboards for secretaries, coordinators and caregivers. It is currently in the deployment phase with Railway cloud hosting, a managed PostgreSQL database, environment-based configuration and the official domain `asilovicentino.com.br` registered through Registro.br.
 
 ## Purpose
 
@@ -17,7 +17,7 @@ The goal of this project is to centralize the main digital processes of Asilo Vi
 
 The public area focuses on visibility, trust and community engagement. The internal area focuses on operational management, including residents, staff, rooms, medication boxes, schedules, occurrences, donations, expenses and reports.
 
-This project demonstrates practical full-stack development with Java, Spring Boot, PostgreSQL, authentication, role-based access control, file uploads, relational data modeling, administrative dashboards and deployment preparation for a real production environment.
+This project demonstrates practical full-stack development with Java, Spring Boot, PostgreSQL, authentication, role-based access control, file uploads, relational data modeling, administrative dashboards and a real deployment workflow for a charitable institution.
 
 ## Main Features
 
@@ -182,21 +182,22 @@ The database supports:
 
 The project includes SQL scripts for initial database creation and production updates for existing databases.
 
-## Production Preparation
+## Deployment Status
 
-This project is being prepared for a real deployment process, including:
+This project has moved from local development into a real deployment workflow.
 
-- Clean and organized GitHub repository.
-- Railway cloud hosting plan.
-- Managed PostgreSQL database.
-- Environment variables for sensitive configuration.
-- Custom domain planning through Registro.br.
-- Planned domain: `asilovicentino.com.br`.
-- HTTPS support in production.
-- Persistent upload strategy for images and documents.
-- Production update SQL script for existing databases.
+- GitHub repository cleaned and updated for deployment.
+- Official domain purchased: `asilovicentino.com.br`.
+- Railway project created for cloud hosting.
+- Railway PostgreSQL service created.
+- Initial PostgreSQL schema executed in the Railway database.
+- Environment variables configured for production behavior.
+- Temporary Railway public URL generated for validation.
+- HTTPS-ready session configuration with secure cookies.
+- Persistent upload strategy documented for images and transparency files.
+- Production SQL scripts documented for clean databases and future updates.
 
-This step is an important part of the project because it moves the application from a local development environment to a real public web system.
+The official domain is not the final public entry point yet. The current deployment is being validated through Railway before DNS configuration and public release.
 
 ## Technical Strengths
 
@@ -229,4 +230,4 @@ The `.env.example` file is kept only as a safe configuration model, without real
 
 ## Status
 
-The project is currently in its final improvement and production preparation phase. The main system structure is implemented, the security layer has been improved, and the next step is completing the deployment with managed hosting, a production database and a custom domain.
+The project is currently in deployment validation. The domain has been purchased, Railway hosting is active, PostgreSQL has been provisioned and the initial schema has been created. The next steps are validating the temporary Railway URL, creating real administrative users, testing uploads and protected workflows, rotating exposed database credentials and then pointing `asilovicentino.com.br` to the Railway deployment.
