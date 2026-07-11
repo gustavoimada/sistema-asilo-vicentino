@@ -15,6 +15,9 @@ ALTER TABLE tiposocorrencias ADD COLUMN IF NOT EXISTS ativo BOOLEAN NOT NULL DEF
 ALTER TABLE tipoatividade ADD COLUMN IF NOT EXISTS ativo BOOLEAN NOT NULL DEFAULT TRUE;
 ALTER TABLE tipodespesas ADD COLUMN IF NOT EXISTS ativo BOOLEAN NOT NULL DEFAULT TRUE;
 
+-- Permite descricoes maiores nas noticias publicas.
+ALTER TABLE noticia ALTER COLUMN descricao TYPE VARCHAR(500);
+
 -- Modulo antigo removido da interface.
 DROP TABLE IF EXISTS historicomorador;
 
