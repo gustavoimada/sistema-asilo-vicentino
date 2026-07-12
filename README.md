@@ -9,7 +9,7 @@
 
 Sistema Asilo Vicentino is a full-stack web platform developed for a real charitable elderly care institution. The project combines a public institutional website with a protected internal management system, helping the organization present its mission online while supporting daily administrative and care-related workflows.
 
-The system includes public pages for news, transparency and donations, plus private dashboards for secretaries, coordinators and caregivers. It is currently in the deployment phase with Railway cloud hosting, a managed PostgreSQL database, environment-based configuration and the official domain `asilovicentino.com.br` registered through Registro.br.
+The system includes public pages for news, transparency and donations, plus private dashboards for secretaries, coordinators and caregivers. It is currently live on Railway with a managed PostgreSQL database, environment-based configuration and the official domain `www.asilovicentino.com.br` connected through Registro.br.
 
 ## Purpose
 
@@ -193,12 +193,14 @@ This project has moved from local development into a real deployment workflow an
 - Initial PostgreSQL schema executed in the Railway database.
 - Environment variables configured for production behavior.
 - Railway public URL active for validation.
+- Official `www.asilovicentino.com.br` domain validated in Railway.
 - HTTPS-ready session configuration with secure cookies.
-- Persistent upload strategy documented for images and transparency files.
+- Persistent upload volume configured for images and transparency files.
+- Public news images validated through the production domain.
 - Production SQL scripts documented for clean databases and future updates.
-- Official domain DNS connection in progress through Registro.br.
+- Root domain redirect from `asilovicentino.com.br` to `www.asilovicentino.com.br` still needs final configuration.
 
-The application is live through Railway while the official domain `asilovicentino.com.br` is being connected and validated through DNS records.
+The application is live through Railway and available through the official `www.asilovicentino.com.br` domain. The remaining domain task is configuring the root domain without `www` to redirect to the official `www` address.
 
 ## Technical Strengths
 
@@ -231,4 +233,4 @@ The `.env.example` file is kept only as a safe configuration model, without real
 
 ## Status
 
-The project is currently live on Railway for deployment validation. The domain has been purchased, Railway hosting is active, PostgreSQL has been provisioned, the initial schema has been created and real administrative access has been configured. The next steps are finishing DNS validation for `asilovicentino.com.br`, confirming persistent uploads, reviewing production credentials, testing protected workflows end-to-end and preparing the final public release.
+The project is currently live on Railway for deployment validation. The domain has been purchased, Railway hosting is active, PostgreSQL has been provisioned, the initial schema has been created, real administrative access has been configured, the `www` domain is connected and persistent uploads have been validated for news images. The next steps are configuring the root-domain redirect, reviewing production credentials, testing protected workflows end-to-end and preparing the final public release.

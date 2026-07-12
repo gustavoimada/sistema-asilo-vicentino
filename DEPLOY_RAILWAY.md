@@ -2,6 +2,16 @@
 
 Este guia resume o caminho recomendado para publicar o sistema em producao usando Railway e o dominio `asilovicentino.com.br`.
 
+## Status atual
+
+- Aplicacao Spring Boot online no Railway.
+- Banco PostgreSQL online no Railway.
+- Dominio `www.asilovicentino.com.br` validado no Railway.
+- Volume persistente criado para uploads do servico web.
+- `UPLOAD_DIR=/data/uploads` configurado para salvar noticias e documentos fora do container temporario.
+- Imagens de noticias validadas em producao pelo endpoint `/noticia/download/{id}`.
+- Ainda falta configurar o dominio raiz `asilovicentino.com.br` para redirecionar para `www.asilovicentino.com.br`.
+
 ## 1. Preparar o GitHub
 
 1. Criar um repositorio novo no GitHub.
@@ -80,22 +90,25 @@ O sistema salva arquivos de noticias e transparencia no diretorio definido por `
 
 No Railway, `UPLOAD_DIR` deve apontar para o volume persistente, por exemplo `/data/uploads`. Sem volume persistente, arquivos enviados podem sumir quando o servico reiniciar ou for recriado.
 
-Depois do deploy, faca este teste antes de divulgar:
+Depois do deploy, faca este teste antes de divulgar ou depois de mexer no volume:
 
 1. Enviar uma imagem de noticia.
 2. Enviar um PDF de transparencia.
 3. Reiniciar o servico no Railway.
 4. Conferir se a imagem e o PDF continuam abrindo no site.
 
+Validacao atual: imagens de noticias ja foram testadas pelo dominio oficial `www.asilovicentino.com.br`. Ainda vale repetir o mesmo teste com PDFs da transparencia.
+
 ## 7. Dominio customizado
 
 1. No Railway, abrir o servico web.
-2. Adicionar o dominio customizado `asilovicentino.com.br`.
+2. Adicionar o dominio customizado `www.asilovicentino.com.br`.
 3. Copiar os registros DNS indicados pelo Railway.
 4. Entrar no Registro.br.
 5. Configurar os DNS/registros conforme o Railway pediu.
 6. Aguardar a propagacao.
-7. Testar `https://asilovicentino.com.br`.
+7. Testar `https://www.asilovicentino.com.br`.
+8. Configurar o dominio raiz `asilovicentino.com.br` para redirecionar para `www.asilovicentino.com.br`.
 
 ## 8. Checklist final
 
