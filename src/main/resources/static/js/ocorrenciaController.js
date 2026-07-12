@@ -155,11 +155,13 @@ function atualizarTopoPerfilOcorrencia()
 
 function mostrarMensagemOcorrencia(tipo, mensagem)
 {
-  const toast = elOcorrencia("mensagem-feedback");
+  let toast = elOcorrencia("mensagem-feedback");
   if (!toast)
 {
-    window.alert(mensagem);
-    return;
+    toast = document.createElement("div");
+    toast.id = "mensagem-feedback";
+    toast.className = "popup-msg";
+    document.body.appendChild(toast);
   }
 
   toast.className = `popup-msg ${tipo}`;

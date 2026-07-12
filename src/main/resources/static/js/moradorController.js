@@ -72,6 +72,62 @@ function exibirMensagem(tipo, mensagem) {
     }
 }
 
+function confirmarAcaoMorador(titulo, mensagem, textoConfirmar = 'Confirmar') {
+    let modal = document.getElementById('confirmacaoMoradorModal');
+
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'confirmacaoMoradorModal';
+        modal.className = 'confirm-overlay';
+        modal.innerHTML = `
+            <div class="confirm-box">
+                <h4 id="confirmacaoMoradorTitulo"></h4>
+                <p id="confirmacaoMoradorMensagem"></p>
+                <div class="confirm-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelarConfirmacaoMorador">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmarConfirmacaoMorador"></button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    document.getElementById('confirmacaoMoradorTitulo').textContent = titulo;
+    document.getElementById('confirmacaoMoradorMensagem').textContent = mensagem;
+    document.getElementById('confirmarConfirmacaoMorador').textContent = textoConfirmar;
+
+    return new Promise((resolve) => {
+        const cancelar = document.getElementById('cancelarConfirmacaoMorador');
+        const confirmar = document.getElementById('confirmarConfirmacaoMorador');
+
+        function fechar(confirmado) {
+            modal.classList.remove('show');
+            cancelar.removeEventListener('click', cancelarAcao);
+            confirmar.removeEventListener('click', confirmarAcao);
+            modal.removeEventListener('click', clicarFora);
+            resolve(confirmado);
+        }
+
+        function cancelarAcao() {
+            fechar(false);
+        }
+
+        function confirmarAcao() {
+            fechar(true);
+        }
+
+        function clicarFora(event) {
+            if (event.target === modal)
+                fechar(false);
+        }
+
+        cancelar.addEventListener('click', cancelarAcao);
+        confirmar.addEventListener('click', confirmarAcao);
+        modal.addEventListener('click', clicarFora);
+        modal.classList.add('show');
+    });
+}
+
 function somenteDigitos(valor) {
     return String(valor || '').replace(/\D/g, '');
 }
@@ -777,25 +833,28 @@ function editarMorador(morador) {
     carregarContatoResponsavelMorador(morador.idMorador);
 }
 
-function deletarMorador(id) {
-    if (confirm('Tem certeza que deseja excluir este morador?')) {
-        fetch(`${URL}/${id}`, { method: 'DELETE' })
-            .then(response => response.json())
-            .then(data => {
-                if (data && (data.error || data.descricao)) {
-                    if (data.descricao)
-                        exibirMensagem('error', data.descricao);
-                    else
-                        exibirMensagem('error', data.error);
-                }
+async function deletarMorador(id) {
+    const confirmado = await confirmarAcaoMorador('Excluir morador', 'Deseja realmente excluir este morador?', 'Excluir');
+    if (!confirmado)
+        return;
+
+    fetch(`${URL}/${id}`, { method: 'DELETE' })
+        .then(response => response.json())
+        .then(data => {
+            if (data && (data.error || data.descricao)) {
+                if (data.descricao)
+                    exibirMensagem('error', data.descricao);
                 else
-                {
-                    carregarMoradores();
-                    carregarQuartosDisponiveis();
-                }
-            })
-            .catch(error => console.error('Erro ao deletar:', error));
-    }
+                    exibirMensagem('error', data.error);
+            }
+            else
+            {
+                exibirMensagem('success', 'Morador excluido com sucesso.');
+                carregarMoradores();
+                carregarQuartosDisponiveis();
+            }
+        })
+        .catch(error => console.error('Erro ao deletar:', error));
 }
 
 function mostrarFormulario(titulo = 'Cadastrar Novo Morador') {

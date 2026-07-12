@@ -45,6 +45,61 @@ function exibirMensagem(mensagem, tipo = "info") {
     }
 }
 
+function confirmarAcaoNoticia(titulo, mensagem, textoConfirmar = "Confirmar") {
+    let modal = document.getElementById("confirmacaoNoticiaModal");
+
+    if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "confirmacaoNoticiaModal";
+        modal.className = "confirm-overlay";
+        modal.innerHTML = `
+            <div class="confirm-box">
+                <h4 id="confirmacaoNoticiaTitulo"></h4>
+                <p id="confirmacaoNoticiaMensagem"></p>
+                <div class="confirm-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelarConfirmacaoNoticia">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmarConfirmacaoNoticia"></button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    document.getElementById("confirmacaoNoticiaTitulo").textContent = titulo;
+    document.getElementById("confirmacaoNoticiaMensagem").textContent = mensagem;
+    document.getElementById("confirmarConfirmacaoNoticia").textContent = textoConfirmar;
+
+    return new Promise((resolve) => {
+        const cancelar = document.getElementById("cancelarConfirmacaoNoticia");
+        const confirmar = document.getElementById("confirmarConfirmacaoNoticia");
+
+        function fechar(confirmado) {
+            modal.classList.remove("show");
+            cancelar.removeEventListener("click", cancelarAcao);
+            confirmar.removeEventListener("click", confirmarAcao);
+            modal.removeEventListener("click", clicarFora);
+            resolve(confirmado);
+        }
+
+        function cancelarAcao() {
+            fechar(false);
+        }
+
+        function confirmarAcao() {
+            fechar(true);
+        }
+
+        function clicarFora(event) {
+            if (event.target === modal) fechar(false);
+        }
+
+        cancelar.addEventListener("click", cancelarAcao);
+        confirmar.addEventListener("click", confirmarAcao);
+        modal.addEventListener("click", clicarFora);
+        modal.classList.add("show");
+    });
+}
+
 function escaparHtml(valor) {
     return String(valor ?? "")
         .replace(/&/g, "&amp;")
@@ -340,7 +395,10 @@ async function salvarNoticia(event) {
 }
 
 async function excluirNoticia(id) {
-    if (!id || !window.confirm("Deseja realmente excluir esta notícia?")) return;
+    if (!id) return;
+
+    const confirmado = await confirmarAcaoNoticia("Excluir notícia", "Deseja realmente excluir esta notícia?", "Excluir");
+    if (!confirmado) return;
 
     try {
         const response = await fetch(`/noticia/deletar/${id}`, {

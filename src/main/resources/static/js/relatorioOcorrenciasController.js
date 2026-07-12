@@ -18,6 +18,24 @@ const estadoFiltroOcorrencias = {
     dataFinal: ""
 };
 
+function mostrarMensagemRelatorio(mensagem, tipo = "error") {
+    let toast = document.getElementById("mensagem-feedback");
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "mensagem-feedback";
+        toast.className = "popup-msg";
+        document.body.appendChild(toast);
+    }
+
+    toast.className = `popup-msg ${tipo}`;
+    toast.textContent = mensagem;
+    toast.classList.add("show");
+    window.clearTimeout(mostrarMensagemRelatorio._timer);
+    mostrarMensagemRelatorio._timer = window.setTimeout(function () {
+        toast.classList.remove("show");
+    }, 3200);
+}
+
 function normalizarTextoOcorrencias(valor) {
     if (valor == null) {
         return "";
@@ -1079,13 +1097,13 @@ async function carregarPerfilRelatorioOcorrencias() {
 
 function gerarPdfRelatorioOcorrencias() {
     if (!window.jspdf || !window.jspdf.jsPDF) {
-        alert("Biblioteca de PDF não carregou.");
+        mostrarMensagemRelatorio("Biblioteca de PDF não carregou.");
         return;
     }
 
     const tabela = document.getElementById("ocorrenciasRelatorio");
     if (!tabela) {
-        alert("Tabela de ocorrências não encontrada.");
+        mostrarMensagemRelatorio("Tabela de ocorrências não encontrada.");
         return;
     }
 
@@ -1107,7 +1125,7 @@ function gerarPdfRelatorioOcorrencias() {
     });
 
     if (body.length === 0) {
-        alert("Não há ocorrências listadas para gerar o PDF.");
+        mostrarMensagemRelatorio("Não há ocorrências listadas para gerar o PDF.");
         return;
     }
 

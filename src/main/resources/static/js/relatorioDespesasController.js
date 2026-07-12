@@ -19,6 +19,24 @@ const estadoFiltroDespesas = {
     quitacaoFim: ""
 };
 
+function mostrarMensagemRelatorio(mensagem, tipo = "error") {
+    let toast = document.getElementById("mensagem-feedback");
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "mensagem-feedback";
+        toast.className = "popup-msg";
+        document.body.appendChild(toast);
+    }
+
+    toast.className = `popup-msg ${tipo}`;
+    toast.textContent = mensagem;
+    toast.classList.add("show");
+    window.clearTimeout(mostrarMensagemRelatorio._timer);
+    mostrarMensagemRelatorio._timer = window.setTimeout(function () {
+        toast.classList.remove("show");
+    }, 3200);
+}
+
 function padronizarTextoDespesa(valor) {
     if (valor == null) return "";
     return String(valor)
@@ -755,13 +773,13 @@ function configurarFiltrosDespesaRelatorio() {
 
 function gerarPdfRelatorioDespesas() {
     if (!window.jspdf || !window.jspdf.jsPDF) {
-        alert("Biblioteca de PDF nao carregou.");
+        mostrarMensagemRelatorio("Biblioteca de PDF nao carregou.");
         return;
     }
 
     const tabela = document.getElementById("despesas");
     if (!tabela) {
-        alert("Tabela de despesas nao encontrada.");
+        mostrarMensagemRelatorio("Tabela de despesas nao encontrada.");
         return;
     }
 
@@ -787,7 +805,7 @@ function gerarPdfRelatorioDespesas() {
     });
 
     if (body.length === 0) {
-        alert("Nao ha despesas listadas para gerar o PDF.");
+        mostrarMensagemRelatorio("Nao ha despesas listadas para gerar o PDF.");
         return;
     }
 

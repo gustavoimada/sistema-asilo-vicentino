@@ -109,6 +109,62 @@ function exibirMensagem(tipo, mensagem) {
     }
 }
 
+function confirmarAcaoDespesa(titulo, mensagem, textoConfirmar = 'Confirmar') {
+    let modal = document.getElementById('confirmacaoDespesaModal');
+
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'confirmacaoDespesaModal';
+        modal.className = 'confirm-overlay';
+        modal.innerHTML = `
+            <div class="confirm-box">
+                <h4 id="confirmacaoDespesaTitulo"></h4>
+                <p id="confirmacaoDespesaMensagem"></p>
+                <div class="confirm-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelarConfirmacaoDespesa">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmarConfirmacaoDespesa"></button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+
+    document.getElementById('confirmacaoDespesaTitulo').textContent = titulo;
+    document.getElementById('confirmacaoDespesaMensagem').textContent = mensagem;
+    document.getElementById('confirmarConfirmacaoDespesa').textContent = textoConfirmar;
+
+    return new Promise((resolve) => {
+        const cancelar = document.getElementById('cancelarConfirmacaoDespesa');
+        const confirmar = document.getElementById('confirmarConfirmacaoDespesa');
+
+        function fechar(confirmado) {
+            modal.classList.remove('show');
+            cancelar.removeEventListener('click', cancelarAcao);
+            confirmar.removeEventListener('click', confirmarAcao);
+            modal.removeEventListener('click', clicarFora);
+            resolve(confirmado);
+        }
+
+        function cancelarAcao() {
+            fechar(false);
+        }
+
+        function confirmarAcao() {
+            fechar(true);
+        }
+
+        function clicarFora(event) {
+            if (event.target === modal)
+                fechar(false);
+        }
+
+        cancelar.addEventListener('click', cancelarAcao);
+        confirmar.addEventListener('click', confirmarAcao);
+        modal.addEventListener('click', clicarFora);
+        modal.classList.add('show');
+    });
+}
+
 function formatarData(data) {
     if (!data)
         return '';
@@ -531,53 +587,57 @@ function limparFiltros() {
     carregarDespesas();
 }
 
-function pagarDespesa(despesa) {
+async function pagarDespesa(despesa) {
     const hoje = new Date();
     const dataHoje = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
 
-    if (confirm('Registrar esta despesa como paga?')) {
-        const dtVencimentoEnvio = dataISO(despesa.dtVencimento);
-        let url = `${URL}/${despesa.idDespesa}?valor=${despesa.valor}&observacoes=${encodeURIComponent(despesa.observacoes)}&dtVencimento=${dtVencimentoEnvio}&dtQuitacao=${dataHoje}&tipo=${encodeURIComponent(despesa.tipoDespesa.tipo)}&fixa=${despesa.fixa}`;
+    const confirmado = await confirmarAcaoDespesa('Registrar pagamento', 'Deseja marcar esta despesa como paga?', 'Registrar');
+    if (!confirmado)
+        return;
 
-        if (despesa.periodicidade)
-            url += `&periodicidade=${encodeURIComponent(despesa.periodicidade)}`;
+    const dtVencimentoEnvio = dataISO(despesa.dtVencimento);
+    let url = `${URL}/${despesa.idDespesa}?valor=${despesa.valor}&observacoes=${encodeURIComponent(despesa.observacoes)}&dtVencimento=${dtVencimentoEnvio}&dtQuitacao=${dataHoje}&tipo=${encodeURIComponent(despesa.tipoDespesa.tipo)}&fixa=${despesa.fixa}`;
 
-        fetch(url, { method: 'PUT' })
-            .then(response => response.json().then(data => ({ ok: response.ok, data })))
-            .then(resultado => {
-                if (!resultado.ok) {
-                    if (resultado.data.descricao)
-                        exibirMensagem('error', resultado.data.descricao);
-                    else
-                        exibirMensagem('error', 'Nao foi possivel registrar o pagamento.');
-                }
-                else {
-                    exibirMensagem('success', 'Pagamento registrado com sucesso!');
-                    carregarDespesas();
-                }
-            })
-            .catch(error => console.error('Erro ao registrar pagamento:', error));
-    }
+    if (despesa.periodicidade)
+        url += `&periodicidade=${encodeURIComponent(despesa.periodicidade)}`;
+
+    fetch(url, { method: 'PUT' })
+        .then(response => response.json().then(data => ({ ok: response.ok, data })))
+        .then(resultado => {
+            if (!resultado.ok) {
+                if (resultado.data.descricao)
+                    exibirMensagem('error', resultado.data.descricao);
+                else
+                    exibirMensagem('error', 'Nao foi possivel registrar o pagamento.');
+            }
+            else {
+                exibirMensagem('success', 'Pagamento registrado com sucesso!');
+                carregarDespesas();
+            }
+        })
+        .catch(error => console.error('Erro ao registrar pagamento:', error));
 }
 
-function estornarDespesa(despesa) {
-    if (confirm('Estornar o pagamento desta despesa?')) {
-        fetch(`${URL}/${despesa.idDespesa}/estornar`, { method: 'PUT' })
-            .then(response => response.json().then(data => ({ ok: response.ok, data })))
-            .then(resultado => {
-                if (!resultado.ok) {
-                    if (resultado.data.descricao)
-                        exibirMensagem('error', resultado.data.descricao);
-                    else
-                        exibirMensagem('error', 'Nao foi possivel estornar a despesa.');
-                }
-                else {
-                    exibirMensagem('success', 'Pagamento estornado com sucesso!');
-                    carregarDespesas();
-                }
-            })
-            .catch(error => console.error('Erro ao estornar pagamento:', error));
-    }
+async function estornarDespesa(despesa) {
+    const confirmado = await confirmarAcaoDespesa('Estornar pagamento', 'Deseja remover a quitação desta despesa?', 'Estornar');
+    if (!confirmado)
+        return;
+
+    fetch(`${URL}/${despesa.idDespesa}/estornar`, { method: 'PUT' })
+        .then(response => response.json().then(data => ({ ok: response.ok, data })))
+        .then(resultado => {
+            if (!resultado.ok) {
+                if (resultado.data.descricao)
+                    exibirMensagem('error', resultado.data.descricao);
+                else
+                    exibirMensagem('error', 'Nao foi possivel estornar a despesa.');
+            }
+            else {
+                exibirMensagem('success', 'Pagamento estornado com sucesso!');
+                carregarDespesas();
+            }
+        })
+        .catch(error => console.error('Erro ao estornar pagamento:', error));
 }
 
 function salvarDespesa(event) {
@@ -656,22 +716,26 @@ function editarDespesa(despesa) {
     mostrarFormulario('Editar Despesa');
 }
 
-function deletarDespesa(id) {
-    if (confirm('Tem certeza que deseja excluir esta despesa?')) {
-        fetch(`${URL}/${id}`, { method: 'DELETE' })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error || data.descricao) {
-                    if (data.descricao)
-                        exibirMensagem('error', data.descricao);
-                    else
-                        exibirMensagem('error', 'Nao foi possivel excluir a despesa.');
-                }
+async function deletarDespesa(id) {
+    const confirmado = await confirmarAcaoDespesa('Excluir despesa', 'Deseja realmente excluir esta despesa?', 'Excluir');
+    if (!confirmado)
+        return;
+
+    fetch(`${URL}/${id}`, { method: 'DELETE' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error || data.descricao) {
+                if (data.descricao)
+                    exibirMensagem('error', data.descricao);
                 else
-                    carregarDespesas();
-            })
-            .catch(error => console.error('Erro ao deletar:', error));
-    }
+                    exibirMensagem('error', 'Nao foi possivel excluir a despesa.');
+            }
+            else {
+                exibirMensagem('success', 'Despesa excluida com sucesso.');
+                carregarDespesas();
+            }
+        })
+        .catch(error => console.error('Erro ao deletar:', error));
 }
 
 function mostrarFormulario(titulo = 'Cadastrar Nova Despesa') {

@@ -525,11 +525,13 @@ async function carregarUltimoTurnoFinalizado()
 
 function mostrarMensagemTurno(mensagem, tipo = "info")
 {
-    const toast = document.getElementById("mensagem-feedback");
+    let toast = document.getElementById("mensagem-feedback");
     if (!toast)
     {
-        window.alert(mensagem);
-        return;
+        toast = document.createElement("div");
+        toast.id = "mensagem-feedback";
+        toast.className = "popup-msg";
+        document.body.appendChild(toast);
     }
 
     toast.className = `popup-msg ${tipo}`;
