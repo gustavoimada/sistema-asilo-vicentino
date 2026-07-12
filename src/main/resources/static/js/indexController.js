@@ -385,6 +385,37 @@ function eventoTransparenciaPublica(arquivo) {
   return evento || "Outros";
 }
 
+function mesTransparenciaPublica(arquivo) {
+  const numero = Number(arquivo?.mes || 0);
+  if (Number.isInteger(numero) && numero >= 1 && numero <= 12) {
+    return numero;
+  }
+  return 1;
+}
+
+function nomeMesTransparenciaPublica(mes) {
+  const nomes = [
+    "Janeiro",
+    "Fevereiro",
+    "Março",
+    "Abril",
+    "Maio",
+    "Junho",
+    "Julho",
+    "Agosto",
+    "Setembro",
+    "Outubro",
+    "Novembro",
+    "Dezembro"
+  ];
+  return nomes[Number(mes) - 1] || "Mês não informado";
+}
+
+function rotuloMesTransparenciaPublica(mes) {
+  const numero = mesTransparenciaPublica({ mes });
+  return `${String(numero).padStart(2, "0")} - ${nomeMesTransparenciaPublica(numero)}`;
+}
+
 function nomeExibicaoArquivoTransparenciaPublica(arquivo) {
   const nome = String(arquivo?.nomeArquivo || "Documento PDF").trim();
   return nome.replace(/^[0-9][a-z0-9]{9,}-/i, "") || "Documento PDF";
@@ -434,17 +465,21 @@ function formatarDataUploadTransparenciaPublica(valor) {
 
 function prepararArquivoTransparenciaPublica(arquivo) {
   const idArquivo = Number(arquivo?.idTransparencia || arquivo?.id || 0);
+  const mes = mesTransparenciaPublica(arquivo);
   return {
     ...arquivo,
     idTransparencia: idArquivo,
     evento: eventoTransparenciaPublica(arquivo),
+    mes,
+    mesNome: nomeMesTransparenciaPublica(mes),
+    mesRotulo: rotuloMesTransparenciaPublica(mes),
     nomeExibicao: nomeExibicaoArquivoTransparenciaPublica(arquivo),
     dataUploadFormatada: formatarDataUploadTransparenciaPublica(arquivo?.dataUpload),
     url: `/transparencia/download/${idArquivo}`
   };
 }
 
-function agruparTransparenciaPublicaPorAnoEEvento(arquivos) {
+function agruparTransparenciaPublicaPorAnoMesEEvento(arquivos) {
   const pastas = [];
 
   arquivos.forEach(function (item) {
@@ -456,18 +491,31 @@ function agruparTransparenciaPublicaPorAnoEEvento(arquivos) {
       return p.ano === ano;
     });
     if (!pasta) {
-      pasta = { ano, eventos: [], arquivos: [] };
+      pasta = { ano, meses: [], arquivos: [] };
       pastas.push(pasta);
     }
 
     pasta.arquivos.push(arquivo);
 
-    let evento = pasta.eventos.find(function (p) {
+    let mes = pasta.meses.find(function (p) {
+      return Number(p.mes) === Number(arquivo.mes);
+    });
+    if (!mes) {
+      mes = { mes: arquivo.mes, nome: arquivo.mesNome, rotulo: arquivo.mesRotulo, eventos: [], arquivos: [] };
+      pasta.meses.push(mes);
+      pasta.meses.sort(function (a, b) {
+        return Number(b.mes) - Number(a.mes);
+      });
+    }
+
+    mes.arquivos.push(arquivo);
+
+    let evento = mes.eventos.find(function (p) {
       return p.evento.toLowerCase() === arquivo.evento.toLowerCase();
     });
     if (!evento) {
       evento = { evento: arquivo.evento, arquivos: [] };
-      pasta.eventos.push(evento);
+      mes.eventos.push(evento);
     }
 
     evento.arquivos.push(arquivo);
@@ -476,7 +524,7 @@ function agruparTransparenciaPublicaPorAnoEEvento(arquivos) {
   return pastas;
 }
 
-function renderizarTransparencia(filtro = "") {
+function renderizarTransparenciaLegado(filtro = "") {
   const lista = document.getElementById("listaTransparencia");
   if (!lista) return;
 
@@ -552,6 +600,117 @@ function renderizarTransparencia(filtro = "") {
   }).join("");
 }
 
+function renderizarTransparencia(filtro = "") {
+  const lista = document.getElementById("listaTransparencia");
+  if (!lista) return;
+
+  const termo = filtro
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase();
+
+  const pastasFiltradas = transparenciaPastas
+    .map(function (pasta) {
+      const mesesOriginais = Array.isArray(pasta.meses) && pasta.meses.length
+        ? pasta.meses
+        : [{ mes: 1, nome: "Janeiro", rotulo: "01 - Janeiro", eventos: [{ evento: "Outros", arquivos: pasta.arquivos || [] }], arquivos: pasta.arquivos || [] }];
+
+      const meses = mesesOriginais
+        .map(function (mes) {
+          const eventosOriginais = Array.isArray(mes.eventos) && mes.eventos.length
+            ? mes.eventos
+            : [{ evento: "Outros", arquivos: mes.arquivos || [] }];
+
+          const eventos = eventosOriginais
+            .map(function (evento) {
+              const arquivos = (evento.arquivos || []).filter(function (arquivo) {
+                const alvo = `${pasta.ano} ${mes.rotulo || ""} ${mes.nome || ""} ${evento.evento || ""} ${arquivo.nomeArquivo || ""} ${arquivo.nomeExibicao || ""} ${arquivo.caminhoArquivo || ""}`
+                  .normalize("NFD")
+                  .replace(/[\u0300-\u036f]/g, "")
+                  .toLowerCase();
+                return !termo || alvo.includes(termo);
+              });
+              return { evento: evento.evento || "Outros", arquivos };
+            })
+            .filter(function (evento) {
+              return evento.arquivos.length > 0;
+            });
+
+          return { ...mes, eventos };
+        })
+        .filter(function (mes) {
+          return mes.eventos.length > 0;
+        });
+
+      return { ano: pasta.ano, meses, arquivos: pasta.arquivos || [] };
+    })
+    .filter(function (pasta) {
+      return pasta.meses.length > 0;
+    });
+
+  if (!pastasFiltradas.length) {
+    lista.innerHTML = '<p class="transparencia-empty">Nenhum documento de transparencia encontrado.</p>';
+    return;
+  }
+
+  lista.innerHTML = pastasFiltradas.map(function (pasta, index) {
+    const meses = pasta.meses.map(function (mes) {
+      const eventos = mes.eventos.map(function (evento) {
+        const arquivos = evento.arquivos.map(function (arquivo) {
+          return `
+            <a class="transparencia-file" href="${arquivo.url}" download>
+              <span class="material-symbols-outlined">picture_as_pdf</span>
+              <span class="transparencia-file-info">
+                <strong>${arquivo.nomeExibicao || "Documento PDF"}</strong>
+                <span>${arquivo.dataUploadFormatada || "Data nao informada"}</span>
+              </span>
+              <span class="material-symbols-outlined transparencia-file-action">download</span>
+            </a>
+          `;
+        }).join("");
+
+        return `
+          <section class="transparencia-event">
+            <h4>${evento.evento || "Outros"}</h4>
+            <div class="transparencia-files">${arquivos}</div>
+          </section>
+        `;
+      }).join("");
+
+      const totalMes = mes.eventos.reduce(function (total, evento) {
+        return total + (evento.arquivos || []).length;
+      }, 0);
+
+      return `
+        <section class="transparencia-month">
+          <div class="transparencia-month-head">
+            <span class="material-symbols-outlined">calendar_month</span>
+            <div>
+              <strong>${mes.rotulo || rotuloMesTransparenciaPublica(mes.mes)}</strong>
+              <span>Documentos de ${mes.nome || nomeMesTransparenciaPublica(mes.mes)}</span>
+            </div>
+            <small>${totalMes} PDF(s)</small>
+          </div>
+          <div class="transparencia-events">${eventos}</div>
+        </section>
+      `;
+    }).join("");
+
+    return `
+      <details class="transparencia-year" ${index === 0 ? "open" : ""}>
+        <summary>
+          <span class="material-symbols-outlined">folder</span>
+          <span>${pasta.ano}</span>
+          <small class="year-meta">${(pasta.arquivos || []).length} documento(s)</small>
+          <span class="material-symbols-outlined expand">expand_more</span>
+        </summary>
+        <div class="transparencia-months">${meses}</div>
+      </details>
+    `;
+  }).join("");
+}
+
 function iniciarTransparencia() {
   const lista = document.getElementById("listaTransparencia");
   const busca = document.getElementById("buscaTransparencia");
@@ -563,7 +722,7 @@ function iniciarTransparencia() {
       return resposta.json();
     })
     .then(function (arquivos) {
-      transparenciaPastas = Array.isArray(arquivos) ? agruparTransparenciaPublicaPorAnoEEvento(arquivos) : [];
+      transparenciaPastas = Array.isArray(arquivos) ? agruparTransparenciaPublicaPorAnoMesEEvento(arquivos) : [];
       renderizarTransparencia(busca?.value || "");
     })
     .catch(function () {

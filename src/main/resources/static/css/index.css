@@ -1398,6 +1398,17 @@ main {
   transition: transform 0.2s ease;
 }
 
+.transparencia-year summary .year-meta {
+  margin-left: auto;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 800;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  padding: 5px 10px;
+}
+
 .transparencia-year[open] summary .expand {
   transform: rotate(180deg);
 }
@@ -1414,9 +1425,82 @@ main {
   padding: 0 18px 18px 52px;
 }
 
+.transparencia-months {
+  display: grid;
+  gap: 14px;
+  padding: 0 18px 18px 52px;
+}
+
+.transparencia-month {
+  border: 1px solid #dbe7fb;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.05);
+  padding: 14px;
+}
+
+.transparencia-month-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.transparencia-month-head > .material-symbols-outlined {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: #eaf3ff;
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 21px;
+}
+
+.transparencia-month-head div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.transparencia-month-head strong {
+  color: var(--primary);
+  font-size: 16px;
+}
+
+.transparencia-month-head span:not(.material-symbols-outlined) {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.transparencia-month-head small {
+  margin-left: auto;
+  white-space: nowrap;
+  color: #1e40af;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-weight: 900;
+}
+
 .transparencia-event {
   display: grid;
   gap: 8px;
+}
+
+.transparencia-month .transparencia-events {
+  padding: 0;
+  gap: 10px;
+}
+
+.transparencia-month .transparencia-event {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #f8fbff;
+  padding: 10px;
 }
 
 .transparencia-event h4 {
@@ -1447,6 +1531,18 @@ main {
 .transparencia-file:hover {
   border-color: #93c5fd;
   background: #eff6ff;
+}
+
+.transparencia-file-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: #eaf3ff;
+  color: var(--primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
 }
 
 .transparencia-file-info {
@@ -2473,6 +2569,32 @@ main {
   .transparencia-files {
     padding-left: 18px;
   }
+
+  .transparencia-months,
+  .transparencia-events {
+    padding-left: 18px;
+  }
+
+  .transparencia-year summary {
+    flex-wrap: wrap;
+  }
+
+  .transparencia-year summary .year-meta {
+    margin-left: 0;
+  }
+
+  .transparencia-year summary .expand {
+    margin-left: auto;
+  }
+
+  .transparencia-month-head {
+    align-items: flex-start;
+  }
+
+  .transparencia-month-head small {
+    margin-left: 0;
+  }
+
   .dayflow-head {
     grid-template-columns: 1fr;
     gap: 12px;

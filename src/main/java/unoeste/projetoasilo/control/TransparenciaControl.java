@@ -38,13 +38,19 @@ public class TransparenciaControl
     private final Path raizUpload = Paths.get(uploadDirBase(), "transparencia").toAbsolutePath().normalize();
     // Recebe o PDF enviado pelo coordenador e salva o arquivo no servidor.
     @PostMapping("upload")
-    public ResponseEntity<Object> upload(@RequestParam("arquivo") MultipartFile arquivo, @RequestParam("ano") String ano, @RequestParam("evento") String evento, HttpSession session)
+    public ResponseEntity<Object> upload(@RequestParam("arquivo") MultipartFile arquivo, @RequestParam("ano") String ano, @RequestParam(value = "mes", required = false) String mes, @RequestParam("evento") String evento, HttpSession session)
     {
         String anoLimpo = limparAno(ano);
+        int mesNumero = limparMes(mes);
         String eventoLimpo = limparEvento(evento);
         if (anoLimpo.isEmpty())
         {
             return ResponseEntity.badRequest().body(new Error("Erro", "Ano invalido"));
+        }
+
+        if (mesNumero <= 0)
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Mes invalido"));
         }
 
         if (eventoLimpo.isEmpty())
@@ -95,10 +101,11 @@ public class TransparenciaControl
             }
 
             String pastaEvento = limparNomePasta(eventoLimpo);
-            Files.createDirectories(raizUpload.resolve(anoLimpo).resolve(pastaEvento));
+            String pastaMes = String.format("%02d-%s", mesNumero, limparNomePasta(nomeMes(mesNumero)));
+            Files.createDirectories(raizUpload.resolve(anoLimpo).resolve(pastaMes).resolve(pastaEvento));
             String baseNome = limparNomeArquivo(nomeOriginal);
             String nomeArquivo = Instant.now().toEpochMilli() + "-" + baseNome + ".pdf";
-            Path destino = raizUpload.resolve(anoLimpo).resolve(pastaEvento).resolve(nomeArquivo).normalize();
+            Path destino = raizUpload.resolve(anoLimpo).resolve(pastaMes).resolve(pastaEvento).resolve(nomeArquivo).normalize();
 
             if (!destino.startsWith(raizUpload))
             {
@@ -109,6 +116,7 @@ public class TransparenciaControl
 
             Transparencia transparencia = new Transparencia();
             transparencia.setAno(Integer.parseInt(anoLimpo));
+            transparencia.setMes(mesNumero);
             transparencia.setNomeArquivo(nomeArquivo);
             transparencia.setEvento(eventoLimpo);
             transparencia.setCaminhoArquivo(raizUpload.relativize(destino).toString().replace("\\", "/"));
@@ -247,6 +255,47 @@ public class TransparenciaControl
             return valor;
         }
         return "";
+    }
+
+    private int limparMes(String mes)
+    {
+        if (mes == null)
+        {
+            return 0;
+        }
+
+        String valor = mes.replaceAll("[^0-9]", "");
+        if (!valor.matches("\\d{1,2}"))
+        {
+            return 0;
+        }
+
+        int numero = Integer.parseInt(valor);
+        if (numero < 1 || numero > 12)
+        {
+            return 0;
+        }
+        return numero;
+    }
+
+    private String nomeMes(int mes)
+    {
+        return switch (mes)
+        {
+            case 1 -> "Janeiro";
+            case 2 -> "Fevereiro";
+            case 3 -> "Marco";
+            case 4 -> "Abril";
+            case 5 -> "Maio";
+            case 6 -> "Junho";
+            case 7 -> "Julho";
+            case 8 -> "Agosto";
+            case 9 -> "Setembro";
+            case 10 -> "Outubro";
+            case 11 -> "Novembro";
+            case 12 -> "Dezembro";
+            default -> "Mes";
+        };
     }
 
     // Limpa o nome do arquivo para evitar caracteres ruins no caminho.

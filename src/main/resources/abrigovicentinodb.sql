@@ -307,8 +307,12 @@ CREATE TABLE transparencia (
                                caminhoarquivo VARCHAR(500) NOT NULL,
                                dataupload TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                ano INTEGER NOT NULL,
+                               mes INTEGER NOT NULL,
                                evento VARCHAR(80) NOT NULL DEFAULT 'Outros',
                                Funcionario_idFuncionario INTEGER NOT NULL,
+
+                               CONSTRAINT ck_transparencia_mes
+                                   CHECK (mes BETWEEN 1 AND 12),
 
                                CONSTRAINT fk_transparencia_funcionario
                                    FOREIGN KEY (Funcionario_idFuncionario)

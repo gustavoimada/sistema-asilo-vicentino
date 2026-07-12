@@ -996,6 +996,59 @@
   padding: 0 12px 12px;
 }
 
+.transparencia-months-admin {
+  display: grid;
+  gap: 12px;
+  padding: 0 12px 12px;
+}
+
+.transparencia-month-admin {
+  border: 1px solid #dbe7fb;
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 10px;
+}
+
+.transparencia-month-admin-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: #1e3a8a;
+}
+
+.transparencia-month-admin-head .material-symbols-outlined {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  background: #eaf3ff;
+  color: #1d4ed8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+.transparencia-month-admin-head strong {
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.transparencia-month-admin-head small {
+  margin-left: auto;
+  color: #1e40af;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 999px;
+  padding: 5px 8px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.transparencia-month-admin .transparencia-events-admin {
+  padding: 0;
+}
+
 .transparencia-event-admin {
   display: grid;
   gap: 8px;

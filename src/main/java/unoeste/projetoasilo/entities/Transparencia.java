@@ -15,6 +15,7 @@ public class Transparencia
     private String evento;
     private Timestamp dataUpload;
     private int ano;
+    private int mes;
     private Funcionario funcionario;
 
     public int getIdTransparencia()
@@ -77,6 +78,16 @@ public class Transparencia
         this.ano = ano;
     }
 
+    public int getMes()
+    {
+        return mes;
+    }
+
+    public void setMes(int mes)
+    {
+        this.mes = mes;
+    }
+
     public Funcionario getFuncionario()
     {
         return funcionario;
@@ -136,6 +147,11 @@ public class Transparencia
         if (ano < 2000 || ano > 2100)
         {
             throw new IllegalArgumentException("Ano invalido.");
+        }
+
+        if (mes < 1 || mes > 12)
+        {
+            throw new IllegalArgumentException("Mes invalido.");
         }
 
         if (evento == null || evento.isBlank())

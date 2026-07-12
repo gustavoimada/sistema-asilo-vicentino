@@ -116,7 +116,7 @@
                   <span class="material-symbols-outlined">upload_file</span>
                   <div>
                     <h4>Enviar prestação de contas</h4>
-                    <p>Publique PDFs para consulta pública na tela de login.</p>
+                    <p>Publique PDFs para consulta pública, separados por ano, mês e categoria.</p>
                   </div>
                 </div>
 
@@ -127,7 +127,26 @@
                   </div>
 
                   <div class="form-field">
-                    <label for="transparenciaEvento">Evento</label>
+                    <label for="transparenciaMes">Mês</label>
+                    <select id="transparenciaMes" name="mes" required>
+                      <option value="">Selecione</option>
+                      <option value="1">Janeiro</option>
+                      <option value="2">Fevereiro</option>
+                      <option value="3">Março</option>
+                      <option value="4">Abril</option>
+                      <option value="5">Maio</option>
+                      <option value="6">Junho</option>
+                      <option value="7">Julho</option>
+                      <option value="8">Agosto</option>
+                      <option value="9">Setembro</option>
+                      <option value="10">Outubro</option>
+                      <option value="11">Novembro</option>
+                      <option value="12">Dezembro</option>
+                    </select>
+                  </div>
+
+                  <div class="form-field">
+                    <label for="transparenciaEvento">Categoria</label>
                     <select id="transparenciaEvento" name="evento" required>
                       <option value="Outros">Outros</option>
                       <option value="Fejupi">Fejupi</option>
@@ -169,7 +188,7 @@
     </main>
   </div>
 
-  <script src="js/transparencia.js?v=20260524-3"></script>
+  <script src="js/transparencia.js?v=20260712-1"></script>
   <script src="js/sidebarRecolhivel.js?v=20260708-1"></script>
 </body>
 </html>

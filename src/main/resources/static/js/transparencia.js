@@ -174,13 +174,52 @@ function eventoTransparencia(arquivo)
     return evento || "Outros";
 }
 
+function mesTransparencia(arquivo)
+{
+    const numero = Number(arquivo?.mes || 0);
+    if (Number.isInteger(numero) && numero >= 1 && numero <= 12)
+    {
+        return numero;
+    }
+    return 1;
+}
+
+function nomeMesTransparencia(mes)
+{
+    const nomes = [
+        "Janeiro",
+        "Fevereiro",
+        "Março",
+        "Abril",
+        "Maio",
+        "Junho",
+        "Julho",
+        "Agosto",
+        "Setembro",
+        "Outubro",
+        "Novembro",
+        "Dezembro"
+    ];
+    return nomes[Number(mes) - 1] || "Mês não informado";
+}
+
+function rotuloMesTransparencia(mes)
+{
+    const numero = mesTransparencia({ mes });
+    return `${String(numero).padStart(2, "0")} - ${nomeMesTransparencia(numero)}`;
+}
+
 function prepararArquivoTransparencia(arquivo)
 {
     const idArquivo = Number(arquivo?.idTransparencia || arquivo?.id || 0);
+    const mes = mesTransparencia(arquivo);
     return {
         ...arquivo,
         idTransparencia: idArquivo,
         evento: eventoTransparencia(arquivo),
+        mes,
+        mesNome: nomeMesTransparencia(mes),
+        mesRotulo: rotuloMesTransparencia(mes),
         dataUpload: formatarDataUploadTransparencia(arquivo?.dataUpload),
         url: `/transparencia/download/${idArquivo}`
     };
@@ -242,7 +281,7 @@ function formatarDataUploadTransparencia(valor)
     return texto.replace("T", " ").replace(/Z$/i, "");
 }
 
-function agruparTransparenciaPorAnoEEvento(arquivos)
+function agruparTransparenciaPorAnoMesEEvento(arquivos)
 {
     const pastas = [];
 
@@ -253,17 +292,27 @@ function agruparTransparenciaPorAnoEEvento(arquivos)
         let pasta = pastas.find((p) => p.ano === ano);
         if (!pasta)
         {
-            pasta = { ano, eventos: [], arquivos: [] };
+            pasta = { ano, meses: [], arquivos: [] };
             pastas.push(pasta);
         }
 
         pasta.arquivos.push(arquivo);
 
-        let evento = pasta.eventos.find((p) => p.evento.toLowerCase() === arquivo.evento.toLowerCase());
+        let mes = pasta.meses.find((p) => Number(p.mes) === Number(arquivo.mes));
+        if (!mes)
+        {
+            mes = { mes: arquivo.mes, nome: arquivo.mesNome, rotulo: arquivo.mesRotulo, eventos: [], arquivos: [] };
+            pasta.meses.push(mes);
+            pasta.meses.sort((a, b) => Number(b.mes) - Number(a.mes));
+        }
+
+        mes.arquivos.push(arquivo);
+
+        let evento = mes.eventos.find((p) => p.evento.toLowerCase() === arquivo.evento.toLowerCase());
         if (!evento)
         {
             evento = { evento: arquivo.evento, arquivos: [] };
-            pasta.eventos.push(evento);
+            mes.eventos.push(evento);
         }
 
         evento.arquivos.push(arquivo);
@@ -272,7 +321,7 @@ function agruparTransparenciaPorAnoEEvento(arquivos)
     return pastas;
 }
 
-function renderizarTransparenciaCoordenador()
+function renderizarTransparenciaCoordenadorLegado()
 {
     const container = document.getElementById("listaTransparenciaCoordenador");
     if (!container) return;
@@ -283,11 +332,11 @@ function renderizarTransparenciaCoordenador()
         return;
     }
 
-    container.innerHTML = estadoTransparencia.transparencia.map((pasta, index) =>
+    container.innerHTML = estadoTransparencia.transparencia.map((pasta) =>
     {
-        const eventos = Array.isArray(pasta.eventos) && pasta.eventos.length
-            ? pasta.eventos
-            : [{ evento: "Outros", arquivos: pasta.arquivos || [] }];
+        const meses = Array.isArray(pasta.meses) && pasta.meses.length
+            ? pasta.meses
+            : [{ mes: 1, rotulo: "01 - Janeiro", eventos: [{ evento: "Outros", arquivos: pasta.arquivos || [] }], arquivos: pasta.arquivos || [] }];
 
         const eventosHtml = eventos.map((evento) =>
         {
@@ -332,6 +381,89 @@ function renderizarTransparenciaCoordenador()
                     <span class="material-symbols-outlined expand">expand_more</span>
                 </summary>
                 <div class="transparencia-events-admin">${eventosHtml}</div>
+            </details>
+        `;
+    }).join("");
+}
+
+function renderizarTransparenciaCoordenador()
+{
+    const container = document.getElementById("listaTransparenciaCoordenador");
+    if (!container) return;
+
+    if (!estadoTransparencia.transparencia.length)
+    {
+        container.innerHTML = '<p class="empty-text">Nenhum documento publicado.</p>';
+        return;
+    }
+
+    container.innerHTML = estadoTransparencia.transparencia.map((pasta) =>
+    {
+        const meses = Array.isArray(pasta.meses) && pasta.meses.length
+            ? pasta.meses
+            : [{ mes: 1, rotulo: "01 - Janeiro", eventos: [{ evento: "Outros", arquivos: pasta.arquivos || [] }], arquivos: pasta.arquivos || [] }];
+
+        const mesesHtml = meses.map((mes) =>
+        {
+            const eventos = Array.isArray(mes.eventos) && mes.eventos.length
+                ? mes.eventos
+                : [{ evento: "Outros", arquivos: mes.arquivos || [] }];
+
+            const eventosHtml = eventos.map((evento) =>
+            {
+                const arquivos = (evento.arquivos || []).map((arquivo) =>
+                {
+                    const idArquivo = arquivo.idTransparencia || arquivo.id || 0;
+                    const nomeExibicao = nomeExibicaoArquivoTransparencia(arquivo);
+                    return `
+                        <div class="transparencia-file-admin">
+                            <a class="transparencia-file-link" href="${arquivo.url}" download>
+                                <span class="material-symbols-outlined">picture_as_pdf</span>
+                                <span class="file-text">
+                                    <strong title="${nomeExibicao}">${nomeExibicao}</strong>
+                                    <span class="info">${evento.evento || "Outros"} • ${arquivo.dataUpload || "Data nao informada"}</span>
+                                </span>
+                                <span class="material-symbols-outlined">download</span>
+                            </a>
+                            <button
+                                type="button"
+                                class="transparencia-delete-btn"
+                                data-id="${idArquivo}"
+                                aria-label="Excluir arquivo">
+                                <span class="material-symbols-outlined">delete</span>
+                            </button>
+                        </div>
+                    `;
+                }).join("");
+
+                return `
+                    <section class="transparencia-event-admin">
+                        <h5>${evento.evento || "Outros"}</h5>
+                        <div class="transparencia-files-admin">${arquivos}</div>
+                    </section>
+                `;
+            }).join("");
+
+            return `
+                <section class="transparencia-month-admin">
+                    <div class="transparencia-month-admin-head">
+                        <span class="material-symbols-outlined">calendar_month</span>
+                        <strong>${mes.rotulo || rotuloMesTransparencia(mes.mes)}</strong>
+                        <small>${(mes.arquivos || []).length} documento(s)</small>
+                    </div>
+                    <div class="transparencia-events-admin">${eventosHtml}</div>
+                </section>
+            `;
+        }).join("");
+
+        return `
+            <details class="transparencia-year-admin">
+                <summary>
+                    <span class="material-symbols-outlined">folder</span>
+                    <span>${pasta.ano}</span>
+                    <span class="material-symbols-outlined expand">expand_more</span>
+                </summary>
+                <div class="transparencia-months-admin">${mesesHtml}</div>
             </details>
         `;
     }).join("");
@@ -420,7 +552,7 @@ async function carregarTransparenciaCoordenador()
         {
             throw new Error("Falha ao carregar transparencia");
         }
-        estadoTransparencia.transparencia = agruparTransparenciaPorAnoEEvento(data);
+        estadoTransparencia.transparencia = agruparTransparenciaPorAnoMesEEvento(data);
         renderizarTransparenciaCoordenador();
     }
     catch (error)
@@ -442,6 +574,7 @@ async function enviarTransparencia(event)
     const botao = form?.querySelector(".transparencia-submit");
     const arquivo = document.getElementById("transparenciaArquivo")?.files?.[0];
     const ano = document.getElementById("transparenciaAno")?.value || "";
+    const mes = document.getElementById("transparenciaMes")?.value || "";
     const evento = document.getElementById("transparenciaEvento")?.value || "";
     if (!arquivo)
     {
@@ -461,15 +594,23 @@ async function enviarTransparencia(event)
         return;
     }
 
+    const mesNumero = Number(mes);
+    if (!Number.isInteger(mesNumero) || mesNumero < 1 || mesNumero > 12)
+    {
+        mostrarMensagemTransparencia("Selecione o mês de referência.", "error");
+        return;
+    }
+
     if (!String(evento).trim())
     {
-        mostrarMensagemTransparencia("Selecione o evento do PDF.", "error");
+        mostrarMensagemTransparencia("Selecione a categoria do PDF.", "error");
         return;
     }
 
     const formData = new FormData();
     formData.append("arquivo", arquivo);
     formData.append("ano", ano);
+    formData.append("mes", mes);
     formData.append("evento", evento);
 
     if (botao)

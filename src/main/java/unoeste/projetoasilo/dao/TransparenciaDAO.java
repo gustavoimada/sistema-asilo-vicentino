@@ -14,7 +14,7 @@ import java.util.List;
 public class TransparenciaDAO
 {
     private static final String SQL_SELECT = """
-            SELECT t.idtransparencia, t.nomearquivo, t.caminhoarquivo, t.evento, t.dataupload, t.ano,
+            SELECT t.idtransparencia, t.nomearquivo, t.caminhoarquivo, t.evento, t.dataupload, t.ano, t.mes,
                    f.idfuncionario, f.nome
             FROM transparencia t
             INNER JOIN funcionario f ON f.idfuncionario = t.Funcionario_idFuncionario
@@ -22,18 +22,20 @@ public class TransparenciaDAO
 
     public boolean gravar(Transparencia transparencia, Banco conexao) throws SQLException
     {
+        garantirEstruturaMensal(conexao);
         String sql = """
                 INSERT INTO transparencia
-                    (nomearquivo, caminhoarquivo, evento, dataupload, ano, Funcionario_idFuncionario)
+                    (nomearquivo, caminhoarquivo, evento, dataupload, ano, mes, Funcionario_idFuncionario)
                 VALUES
-                    (#1, #2, #3, #4, #5, #6)
+                    (#1, #2, #3, #4, #5, #6, #7)
                 """;
         sql = sql.replace("#1", textoSql(transparencia.getNomeArquivo()));
         sql = sql.replace("#2", textoSql(transparencia.getCaminhoArquivo()));
         sql = sql.replace("#3", textoSql(transparencia.getEvento()));
         sql = sql.replace("#4", dataSql(transparencia.getDataUpload()));
         sql = sql.replace("#5", String.valueOf(transparencia.getAno()));
-        sql = sql.replace("#6", String.valueOf(transparencia.getFuncionario().getIdFuncionario()));
+        sql = sql.replace("#6", String.valueOf(transparencia.getMes()));
+        sql = sql.replace("#7", String.valueOf(transparencia.getFuncionario().getIdFuncionario()));
 
         if (!conexao.manipular(sql))
         {
@@ -50,6 +52,7 @@ public class TransparenciaDAO
 
     public Transparencia buscarPorId(int id, Banco conexao) throws SQLException
     {
+        garantirEstruturaMensal(conexao);
         String sql = SQL_SELECT + " WHERE t.idtransparencia = #1 LIMIT 1";
         sql = sql.replace("#1", String.valueOf(id));
         ResultSet rs = conexao.consultar(sql);
@@ -62,7 +65,8 @@ public class TransparenciaDAO
 
     public List<Transparencia> listar(Banco conexao) throws SQLException
     {
-        String sql = SQL_SELECT + " ORDER BY t.ano DESC, t.evento ASC, t.dataupload DESC, t.idtransparencia DESC";
+        garantirEstruturaMensal(conexao);
+        String sql = SQL_SELECT + " ORDER BY t.ano DESC, t.mes DESC, t.evento ASC, t.dataupload DESC, t.idtransparencia DESC";
         List<Transparencia> arquivos = new ArrayList<>();
         ResultSet rs = conexao.consultar(sql);
         if (rs != null)
@@ -95,8 +99,15 @@ public class TransparenciaDAO
         transparencia.setEvento(rs.getString("evento"));
         transparencia.setDataUpload(rs.getTimestamp("dataupload"));
         transparencia.setAno(rs.getInt("ano"));
+        transparencia.setMes(rs.getInt("mes"));
         transparencia.setFuncionario(funcionario);
         return transparencia;
+    }
+
+    private void garantirEstruturaMensal(Banco conexao)
+    {
+        conexao.manipular("ALTER TABLE transparencia ADD COLUMN IF NOT EXISTS mes INTEGER");
+        conexao.manipular("UPDATE transparencia SET mes = EXTRACT(MONTH FROM dataupload)::INTEGER WHERE mes IS NULL");
     }
 
     private String textoSql(String valor)

@@ -18,6 +18,36 @@ ALTER TABLE tipodespesas ADD COLUMN IF NOT EXISTS ativo BOOLEAN NOT NULL DEFAULT
 -- Permite descricoes maiores nas noticias publicas.
 ALTER TABLE noticia ALTER COLUMN descricao TYPE VARCHAR(500);
 
+-- Organiza documentos de transparencia por ano e mes de referencia.
+ALTER TABLE transparencia ADD COLUMN IF NOT EXISTS mes INTEGER;
+UPDATE transparencia
+SET mes = EXTRACT(MONTH FROM dataupload)::INTEGER
+WHERE mes IS NULL;
+ALTER TABLE transparencia ALTER COLUMN mes SET NOT NULL;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'ck_transparencia_mes'
+    ) THEN
+        ALTER TABLE transparencia
+            ADD CONSTRAINT ck_transparencia_mes
+            CHECK (mes BETWEEN 1 AND 12) NOT VALID;
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'ck_transparencia_mes'
+          AND NOT convalidated
+    ) THEN
+        ALTER TABLE transparencia VALIDATE CONSTRAINT ck_transparencia_mes;
+    END IF;
+END $$;
+
 -- Modulo antigo removido da interface.
 DROP TABLE IF EXISTS historicomorador;
 
