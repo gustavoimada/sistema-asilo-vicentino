@@ -3,41 +3,45 @@ package unoeste.projetoasilo.dao;
 import unoeste.projetoasilo.db.util.Banco;
 import unoeste.projetoasilo.entities.Morador;
 import unoeste.projetoasilo.entities.Quarto;
+
+import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MoradorDAO {
 
+    private static final String SQL_SELECT_COMPLETO = """
+            SELECT m.*, q.idquartos AS quarto_id, q.ala AS quarto_ala, q.idquartos AS quarto_numero
+            FROM morador m
+            LEFT JOIN quartos q ON q.idquartos = m.quartos_idquartos
+            """;
+
     public boolean gravar(Morador morador, Banco conexao) throws SQLException {
-        boolean gravou = false;
         String sql = """
                 INSERT INTO morador(
                     cpf, nome, genero, endereco, numero, dtnasc, cidade, estado, cep, telefone, quartos_idquartos)
-                    VALUES ('#1', '#2', '#3', '#4', #5, '#6', '#7', '#8', '#9', '#10', #11);
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
-        sql = sql.replace("#11", String.valueOf(morador.getQuartoId()));
-        sql = sql.replace("#10", morador.getTelefone().replace("'", "''"));
-        sql = sql.replace("#9", morador.getCep().replace("'", "''"));
-        sql = sql.replace("#8", morador.getEstado().replace("'", "''"));
-        sql = sql.replace("#7", morador.getCidade().replace("'", "''"));
-        sql = sql.replace("#6", morador.getDtNascimento().toString());
-        sql = sql.replace("#5", String.valueOf(morador.getNumero()));
-        sql = sql.replace("#4", morador.getEndereco().replace("'", "''"));
-        sql = sql.replace("#3", morador.getGenero().replace("'", "''"));
-        sql = sql.replace("#2", morador.getNome().replace("'", "''"));
-        sql = sql.replace("#1", morador.getCpf().replace("'", "''"));
 
-        if (conexao.manipular(sql)) {
-            int novoId = conexao.getMaxPK("morador", "idmorador");
-            if (novoId > 0) {
-                morador.setIdMorador(novoId);
-                gravou = true;
+        try (PreparedStatement ps = conexao.prepararComChaves(sql)) {
+            preencherCamposMorador(ps, morador, false);
+
+            if (ps.executeUpdate() > 0) {
+                try (ResultSet chaves = ps.getGeneratedKeys()) {
+                    if (chaves.next()) {
+                        morador.setIdMorador(chaves.getInt(1));
+                    }
+                }
+                return true;
             }
         }
-        return gravou;
+
+        return false;
     }
 
     public List<Morador> listar(Banco conexao) throws SQLException {
@@ -49,18 +53,12 @@ public class MoradorDAO {
     }
 
     public List<Morador> listar(String ordenacao, String direcao, Banco conexao) throws SQLException {
-        String sql = """
-                SELECT m.*, q.idquartos AS quarto_id, q.ala AS quarto_ala, q.idquartos AS quarto_numero
-                FROM morador m
-                LEFT JOIN quartos q ON q.idquartos = m.quartos_idquartos
-                """;
-        sql += montarClausulaOrdenacao(ordenacao, direcao);
-
-        return listarPorSql(sql, conexao);
+        String sql = SQL_SELECT_COMPLETO + montarClausulaOrdenacao(ordenacao, direcao);
+        return listarPorSql(sql, List.of(), conexao);
     }
 
     public List<Morador> filtrar(String nome, String cpf, LocalDate dtNascimento, String endereco, String cidade, String estado, String telefone, String ordenacao, Banco conexao) throws SQLException {
-        return filtrar(nome, cpf, dtNascimento, endereco, cidade, estado, telefone, ordenacao, null, conexao);
+        return filtrar(nome, cpf, dtNascimento, dtNascimento, endereco, cidade, estado, telefone, ordenacao, null, conexao);
     }
 
     public List<Morador> filtrar(String nome, String cpf, LocalDate dtNascimento, String endereco, String cidade, String estado, String telefone, String ordenacao, String direcao, Banco conexao) throws SQLException {
@@ -68,208 +66,216 @@ public class MoradorDAO {
     }
 
     public List<Morador> filtrar(String nome, String cpf, LocalDate dtNascimentoInicio, LocalDate dtNascimentoFim, String endereco, String cidade, String estado, String telefone, String ordenacao, String direcao, Banco conexao) throws SQLException {
-        String sql = """
-                SELECT m.*, q.idquartos AS quarto_id, q.ala AS quarto_ala, q.idquartos AS quarto_numero
-                FROM morador m
-                LEFT JOIN quartos q ON q.idquartos = m.quartos_idquartos
-                WHERE 1=1
-                """;
+        StringBuilder sql = new StringBuilder(SQL_SELECT_COMPLETO);
+        sql.append(" WHERE 1=1");
+
+        List<Object> params = new ArrayList<>();
 
         if (nome != null && !nome.isBlank()) {
-            sql += " AND LOWER(nome) LIKE '%" + nome.toLowerCase() + "%'";
+            sql.append(" AND LOWER(m.nome) LIKE ?");
+            params.add("%" + nome.toLowerCase() + "%");
         }
 
         if (cpf != null && !cpf.isBlank()) {
-            sql += " AND cpf LIKE '%" + cpf + "%'";
+            sql.append(" AND m.cpf LIKE ?");
+            params.add("%" + cpf + "%");
         }
 
         if (dtNascimentoInicio != null) {
-            sql += " AND dtnasc::date >= '" + dtNascimentoInicio + "'";
+            sql.append(" AND m.dtnasc::date >= ?");
+            params.add(Date.valueOf(dtNascimentoInicio));
         }
 
         if (dtNascimentoFim != null) {
-            sql += " AND dtnasc::date <= '" + dtNascimentoFim + "'";
+            sql.append(" AND m.dtnasc::date <= ?");
+            params.add(Date.valueOf(dtNascimentoFim));
         }
 
         if (endereco != null && !endereco.isBlank()) {
-            sql += " AND LOWER(endereco) LIKE '%" + endereco.toLowerCase() + "%'";
+            sql.append(" AND LOWER(m.endereco) LIKE ?");
+            params.add("%" + endereco.toLowerCase() + "%");
         }
 
         if (cidade != null && !cidade.isBlank()) {
-            sql += " AND LOWER(cidade) LIKE '%" + cidade.toLowerCase() + "%'";
+            sql.append(" AND LOWER(m.cidade) LIKE ?");
+            params.add("%" + cidade.toLowerCase() + "%");
         }
 
         if (estado != null && !estado.isBlank()) {
-            sql += " AND estado = '" + estado + "'";
+            sql.append(" AND m.estado = ?");
+            params.add(estado);
         }
 
         if (telefone != null && !telefone.isBlank()) {
-            sql += " AND telefone LIKE '%" + telefone + "%'";
+            sql.append(" AND m.telefone LIKE ?");
+            params.add("%" + telefone + "%");
         }
 
-        sql += montarClausulaOrdenacao(ordenacao, direcao);
+        sql.append(montarClausulaOrdenacao(ordenacao, direcao));
 
-        return listarPorSql(sql, conexao);
+        return listarPorSql(sql.toString(), params, conexao);
     }
 
     public boolean deletar(int id, Banco conexao) throws SQLException {
-        return conexao.manipular("DELETE FROM morador WHERE idmorador = " + id);
+        String sql = "DELETE FROM morador WHERE idmorador = ?";
+
+        try (PreparedStatement ps = conexao.preparar(sql)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        }
     }
 
     public boolean editar(Morador morador, Banco conexao) throws SQLException {
         String sql = """
                 UPDATE morador
-                SET cpf = '#1', nome = '#2', genero = '#3', endereco = '#4', numero = #5, dtnasc = '#6', cidade = '#7', estado = '#8', cep = '#9', telefone = '#10', quartos_idquartos = #11
-                WHERE idmorador = #12
+                SET cpf = ?, nome = ?, genero = ?, endereco = ?, numero = ?, dtnasc = ?, cidade = ?, estado = ?, cep = ?, telefone = ?, quartos_idquartos = ?
+                WHERE idmorador = ?
                 """;
-        sql = sql.replace("#12", String.valueOf(morador.getIdMorador()));
-        sql = sql.replace("#11", String.valueOf(morador.getQuartoId()));
-        sql = sql.replace("#10", morador.getTelefone().replace("'", "''"));
-        sql = sql.replace("#9", morador.getCep().replace("'", "''"));
-        sql = sql.replace("#8", morador.getEstado().replace("'", "''"));
-        sql = sql.replace("#7", morador.getCidade().replace("'", "''"));
-        sql = sql.replace("#6", morador.getDtNascimento().toString());
-        sql = sql.replace("#5", String.valueOf(morador.getNumero()));
-        sql = sql.replace("#4", morador.getEndereco().replace("'", "''"));
-        sql = sql.replace("#3", morador.getGenero().replace("'", "''"));
-        sql = sql.replace("#2", morador.getNome().replace("'", "''"));
-        sql = sql.replace("#1", morador.getCpf().replace("'", "''"));
 
-        return conexao.manipular(sql);
+        try (PreparedStatement ps = conexao.preparar(sql)) {
+            preencherCamposMorador(ps, morador, true);
+            return ps.executeUpdate() > 0;
+        }
     }
 
     public Morador buscarPorId(int id, Banco conexao) throws SQLException {
-        String sql = """
-                SELECT m.*, q.idquartos AS quarto_id, q.ala AS quarto_ala, q.idquartos AS quarto_numero
-                FROM morador m
-                LEFT JOIN quartos q ON q.idquartos = m.quartos_idquartos
-                WHERE m.idmorador =
-                """ + id;
-        ResultSet rs = conexao.consultar(sql);
-        Morador morador = null;
+        String sql = SQL_SELECT_COMPLETO + " WHERE m.idmorador = ?";
 
-        if (rs != null && rs.next()) {
-            morador = new Morador();
-            morador.setIdMorador(rs.getInt("idmorador"));
-            morador.setCpf(rs.getString("cpf"));
-            morador.setNome(rs.getString("nome"));
-            morador.setGenero(rs.getString("genero"));
-            morador.setEndereco(rs.getString("endereco"));
-            morador.setNumero(rs.getInt("numero"));
-            morador.setDtNascimento(rs.getDate("dtnasc").toLocalDate());
-            morador.setCidade(rs.getString("cidade"));
-            morador.setEstado(rs.getString("estado"));
-            morador.setCep(rs.getString("cep"));
-            morador.setTelefone(rs.getString("telefone"));
+        try (PreparedStatement ps = conexao.preparar(sql)) {
+            ps.setInt(1, id);
 
-            int quartoId = rs.getInt("quartos_idquartos");
-            if (!rs.wasNull()) {
-                morador.setQuartoId(quartoId);
-                preencherQuarto(morador, rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return montarMorador(rs);
+                }
             }
         }
 
-
-        return morador;
+        return null;
     }
 
     public Morador buscarPorCpf(String cpf, Banco conexao) throws SQLException {
-        if (cpf == null)
+        if (cpf == null) {
             return null;
+        }
 
-        String sql = """
-                SELECT m.*, q.idquartos AS quarto_id, q.ala AS quarto_ala, q.idquartos AS quarto_numero
-                FROM morador m
-                LEFT JOIN quartos q ON q.idquartos = m.quartos_idquartos
-                WHERE m.cpf =
-                """ + " '" + cpf.replace("'", "''") + "' LIMIT 1";
+        String sql = SQL_SELECT_COMPLETO + " WHERE m.cpf = ? LIMIT 1";
 
-        ResultSet rs = conexao.consultar(sql);
-        Morador morador = null;
+        try (PreparedStatement ps = conexao.preparar(sql)) {
+            ps.setString(1, cpf);
 
-        if (rs != null && rs.next()) {
-            morador = new Morador();
-            morador.setIdMorador(rs.getInt("idmorador"));
-            morador.setCpf(rs.getString("cpf"));
-            morador.setNome(rs.getString("nome"));
-            morador.setGenero(rs.getString("genero"));
-            morador.setEndereco(rs.getString("endereco"));
-            morador.setNumero(rs.getInt("numero"));
-            morador.setDtNascimento(rs.getDate("dtnasc").toLocalDate());
-            morador.setCidade(rs.getString("cidade"));
-            morador.setEstado(rs.getString("estado"));
-            morador.setCep(rs.getString("cep"));
-            morador.setTelefone(rs.getString("telefone"));
-
-            int quartoId = rs.getInt("quartos_idquartos");
-            if (!rs.wasNull()) {
-                morador.setQuartoId(quartoId);
-                preencherQuarto(morador, rs);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return montarMorador(rs);
+                }
             }
+        }
+
+        return null;
+    }
+
+    private void preencherCamposMorador(PreparedStatement ps, Morador morador, boolean incluirId) throws SQLException {
+        ps.setString(1, morador.getCpf());
+        ps.setString(2, morador.getNome());
+        ps.setString(3, morador.getGenero());
+        ps.setString(4, morador.getEndereco());
+        ps.setInt(5, morador.getNumero());
+        ps.setDate(6, Date.valueOf(morador.getDtNascimento()));
+        ps.setString(7, morador.getCidade());
+        ps.setString(8, morador.getEstado());
+        ps.setString(9, morador.getCep());
+        ps.setString(10, morador.getTelefone());
+
+        if (morador.getQuartoId() == null) {
+            ps.setNull(11, Types.INTEGER);
+        } else {
+            ps.setInt(11, morador.getQuartoId());
+        }
+
+        if (incluirId) {
+            ps.setInt(12, morador.getIdMorador());
+        }
+    }
+
+    private List<Morador> listarPorSql(String sql, List<Object> params, Banco conexao) throws SQLException {
+        List<Morador> moradores = new ArrayList<>();
+
+        try (PreparedStatement ps = conexao.preparar(sql)) {
+            aplicarParametros(ps, params);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    moradores.add(montarMorador(rs));
+                }
+            }
+        }
+
+        return moradores;
+    }
+
+    private void aplicarParametros(PreparedStatement ps, List<Object> params) throws SQLException {
+        for (int i = 0; i < params.size(); i++) {
+            Object valor = params.get(i);
+            if (valor instanceof Date data) {
+                ps.setDate(i + 1, data);
+            } else {
+                ps.setObject(i + 1, valor);
+            }
+        }
+    }
+
+    private Morador montarMorador(ResultSet rs) throws SQLException {
+        Morador morador = new Morador();
+        morador.setIdMorador(rs.getInt("idmorador"));
+        morador.setCpf(rs.getString("cpf"));
+        morador.setNome(rs.getString("nome"));
+        morador.setGenero(rs.getString("genero"));
+        morador.setEndereco(rs.getString("endereco"));
+        morador.setNumero(rs.getInt("numero"));
+        morador.setDtNascimento(rs.getDate("dtnasc").toLocalDate());
+        morador.setCidade(rs.getString("cidade"));
+        morador.setEstado(rs.getString("estado"));
+        morador.setCep(rs.getString("cep"));
+        morador.setTelefone(rs.getString("telefone"));
+
+        int quartoId = rs.getInt("quartos_idquartos");
+        if (!rs.wasNull()) {
+            morador.setQuartoId(quartoId);
+            preencherQuarto(morador, rs);
         }
 
         return morador;
-    }
-
-    private List<Morador> listarPorSql(String sql, Banco conexao) throws SQLException {
-        List<Morador> moradores = new ArrayList<>();
-        ResultSet rs = conexao.consultar(sql);
-
-        if (rs != null) {
-
-            while (rs.next()) {
-                Morador morador = new Morador();
-                morador.setIdMorador(rs.getInt("idmorador"));
-                morador.setCpf(rs.getString("cpf"));
-                morador.setNome(rs.getString("nome"));
-                morador.setGenero(rs.getString("genero"));
-                morador.setEndereco(rs.getString("endereco"));
-                morador.setNumero(rs.getInt("numero"));
-                morador.setDtNascimento(rs.getDate("dtnasc").toLocalDate());
-                morador.setCidade(rs.getString("cidade"));
-                morador.setEstado(rs.getString("estado"));
-                morador.setCep(rs.getString("cep"));
-                morador.setTelefone(rs.getString("telefone"));
-
-                int quartoId = rs.getInt("quartos_idquartos");
-                if (!rs.wasNull()) {
-                    morador.setQuartoId(quartoId);
-                    preencherQuarto(morador, rs);
-                }
-
-                moradores.add(morador);
-            }
-
-        }
-        return moradores;
     }
 
     private String montarClausulaOrdenacao(String ordenacao, String direcao) {
         String campoOrdenacao;
         String direcaoOrdenacao = "ASC";
 
-        if (direcao != null && direcao.equalsIgnoreCase("desc"))
+        if (direcao != null && direcao.equalsIgnoreCase("desc")) {
             direcaoOrdenacao = "DESC";
+        }
 
-        if (ordenacao != null && ordenacao.equalsIgnoreCase("id"))
+        if (ordenacao != null && ordenacao.equalsIgnoreCase("id")) {
             campoOrdenacao = "idmorador";
-        else if (ordenacao != null && ordenacao.equalsIgnoreCase("nome"))
+        } else if (ordenacao != null && ordenacao.equalsIgnoreCase("nome")) {
             campoOrdenacao = "nome";
-        else if (ordenacao != null && ordenacao.equalsIgnoreCase("cpf"))
+        } else if (ordenacao != null && ordenacao.equalsIgnoreCase("cpf")) {
             campoOrdenacao = "cpf";
-        else if (ordenacao != null && ordenacao.equalsIgnoreCase("dtNascimento"))
+        } else if (ordenacao != null && ordenacao.equalsIgnoreCase("dtNascimento")) {
             campoOrdenacao = "dtnasc";
-        else if (ordenacao != null && ordenacao.equalsIgnoreCase("endereco"))
+        } else if (ordenacao != null && ordenacao.equalsIgnoreCase("endereco")) {
             campoOrdenacao = "endereco";
-        else if (ordenacao != null && ordenacao.equalsIgnoreCase("cidade"))
+        } else if (ordenacao != null && ordenacao.equalsIgnoreCase("cidade")) {
             campoOrdenacao = "cidade";
-        else
+        } else {
             campoOrdenacao = "idmorador";
+        }
 
-        if (campoOrdenacao.equals("cidade"))
+        if (campoOrdenacao.equals("cidade")) {
             return " ORDER BY m.cidade " + direcaoOrdenacao + ", m.estado " + direcaoOrdenacao;
-        else
-            return " ORDER BY m." + campoOrdenacao + " " + direcaoOrdenacao;
+        }
+
+        return " ORDER BY m." + campoOrdenacao + " " + direcaoOrdenacao;
     }
 
     private void preencherQuarto(Morador morador, ResultSet rs) throws SQLException {

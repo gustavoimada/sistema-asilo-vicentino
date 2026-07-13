@@ -177,6 +177,10 @@ public class AccessFilter implements Filter
         {
             return ehCoordenador(categoria);
         }
+        if (rotaMin.startsWith("/backup/"))
+        {
+            return ehCoordenador(categoria);
+        }
         if (rotaMin.startsWith("/noticia/"))
         {
             return ehCoordenador(categoria) || ehSecretaria(categoria);

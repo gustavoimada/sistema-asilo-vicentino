@@ -44,3 +44,10 @@ logs/
 
 # Uploaded public files
 /uploads/
+
+# Local exports and backups
+/output/
+/backups/
+*.dump
+*.backup
+*.sql.gz

@@ -4,6 +4,7 @@ import unoeste.projetoasilo.db.util.Banco;
 import unoeste.projetoasilo.entities.Funcionario;
 import unoeste.projetoasilo.entities.User;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -11,29 +12,41 @@ import java.util.List;
 
 public class FuncionarioDAO
 {
+    private static final String SQL_SELECT = """
+            SELECT idfuncionario, nome, cpf, ctps_numero, telefone, categoria, ativo, User_idUser
+            FROM funcionario
+            """;
+
     public boolean gravar(Funcionario funcionario, Banco conexao) throws SQLException
     {
         String sql = """
                 INSERT INTO funcionario (nome, cpf, ctps_numero, telefone, categoria, User_idUser)
-                VALUES ('#1', '#2', '#3', '#4', '#5', #6)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """;
-        sql = sql.replace("#1", escaparSql(funcionario.getNome()));
-        sql = sql.replace("#2", escaparSql(funcionario.getCpf()));
-        sql = sql.replace("#3", escaparSql(funcionario.getCtps()));
-        sql = sql.replace("#4", escaparSql(funcionario.getTelefone()));
-        sql = sql.replace("#5", escaparSql(funcionario.getCategoria()));
-        sql = sql.replace("#6", String.valueOf(funcionario.getIdUser()));
 
-        if (!conexao.manipular(sql))
+        try (PreparedStatement ps = conexao.prepararComChaves(sql))
         {
-            return false;
+            ps.setString(1, funcionario.getNome());
+            ps.setString(2, funcionario.getCpf());
+            ps.setString(3, funcionario.getCtps());
+            ps.setString(4, funcionario.getTelefone());
+            ps.setString(5, funcionario.getCategoria());
+            ps.setInt(6, funcionario.getIdUser());
+
+            if (ps.executeUpdate() <= 0)
+            {
+                return false;
+            }
+
+            try (ResultSet chaves = ps.getGeneratedKeys())
+            {
+                if (chaves.next())
+                {
+                    funcionario.setIdFuncionario(chaves.getInt(1));
+                }
+            }
         }
 
-        int novoId = conexao.getMaxPK("funcionario", "idfuncionario");
-        if (novoId > 0)
-        {
-            funcionario.setIdFuncionario(novoId);
-        }
         return true;
     }
 
@@ -41,24 +54,31 @@ public class FuncionarioDAO
     {
         String sql = """
                 UPDATE funcionario
-                SET nome = '#1', cpf = '#2', ctps_numero = '#3', telefone = '#4', categoria = '#5'
-                WHERE idfuncionario = #6
+                SET nome = ?, cpf = ?, ctps_numero = ?, telefone = ?, categoria = ?
+                WHERE idfuncionario = ?
                 """;
-        sql = sql.replace("#1", escaparSql(funcionario.getNome()));
-        sql = sql.replace("#2", escaparSql(funcionario.getCpf()));
-        sql = sql.replace("#3", escaparSql(funcionario.getCtps()));
-        sql = sql.replace("#4", escaparSql(funcionario.getTelefone()));
-        sql = sql.replace("#5", escaparSql(funcionario.getCategoria()));
-        sql = sql.replace("#6", String.valueOf(funcionario.getIdFuncionario()));
 
-        return conexao.manipular(sql);
+        try (PreparedStatement ps = conexao.preparar(sql))
+        {
+            ps.setString(1, funcionario.getNome());
+            ps.setString(2, funcionario.getCpf());
+            ps.setString(3, funcionario.getCtps());
+            ps.setString(4, funcionario.getTelefone());
+            ps.setString(5, funcionario.getCategoria());
+            ps.setInt(6, funcionario.getIdFuncionario());
+            return ps.executeUpdate() > 0;
+        }
     }
 
     public boolean deletar(int id, Banco conexao) throws SQLException
     {
-        String sql = "DELETE FROM funcionario WHERE idfuncionario = #1";
-        sql = sql.replace("#1", String.valueOf(id));
-        return conexao.manipular(sql);
+        String sql = "DELETE FROM funcionario WHERE idfuncionario = ?";
+
+        try (PreparedStatement ps = conexao.preparar(sql))
+        {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        }
     }
 
     public boolean desativar(int id, Banco conexao) throws SQLException
@@ -66,11 +86,15 @@ public class FuncionarioDAO
         String sql = """
                 UPDATE funcionario
                 SET ativo = FALSE
-                WHERE idfuncionario = #1
+                WHERE idfuncionario = ?
                 AND ativo = TRUE
                 """;
-        sql = sql.replace("#1", String.valueOf(id));
-        return conexao.manipular(sql);
+
+        try (PreparedStatement ps = conexao.preparar(sql))
+        {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        }
     }
 
     public int contarEscalasFuturasOuAtivas(int id, Banco conexao) throws SQLException
@@ -78,7 +102,7 @@ public class FuncionarioDAO
         String sql = """
                 SELECT COUNT(*)
                 FROM funcionarioturnos
-                WHERE Funcionario_idFuncionario = #1
+                WHERE Funcionario_idFuncionario = ?
                   AND status IN ('pendente', 'ativo')
                   AND (
                         status = 'ativo'
@@ -91,12 +115,17 @@ public class FuncionarioDAO
                         ) >= CURRENT_TIMESTAMP
                   )
                 """;
-        sql = sql.replace("#1", String.valueOf(id));
 
-        ResultSet rs = conexao.consultar(sql);
-        if (rs != null && rs.next())
+        try (PreparedStatement ps = conexao.preparar(sql))
         {
-            return rs.getInt(1);
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery())
+            {
+                if (rs.next())
+                {
+                    return rs.getInt(1);
+                }
+            }
         }
 
         return 0;
@@ -104,7 +133,7 @@ public class FuncionarioDAO
 
     public int contarAtivosPorCategoria(String categoria, Banco conexao) throws SQLException
     {
-        String filtroCategoria = filtroSqlCategoria(categoria);
+        String filtroCategoria = filtroCategoria(categoria);
         if (filtroCategoria.isBlank())
         {
             return 0;
@@ -114,14 +143,19 @@ public class FuncionarioDAO
                 SELECT COUNT(*)
                 FROM funcionario
                 WHERE ativo = TRUE
-                  AND #FILTRO_CATEGORIA
+                  AND LOWER(categoria) LIKE ?
                 """;
-        sql = sql.replace("#FILTRO_CATEGORIA", filtroCategoria);
 
-        ResultSet rs = conexao.consultar(sql);
-        if (rs != null && rs.next())
+        try (PreparedStatement ps = conexao.preparar(sql))
         {
-            return rs.getInt(1);
+            ps.setString(1, filtroCategoria);
+            try (ResultSet rs = ps.executeQuery())
+            {
+                if (rs.next())
+                {
+                    return rs.getInt(1);
+                }
+            }
         }
 
         return 0;
@@ -129,64 +163,39 @@ public class FuncionarioDAO
 
     public List<Funcionario> listar(Banco conexao) throws SQLException
     {
-        String sql = """
-                SELECT idfuncionario, nome, cpf, ctps_numero, telefone, categoria, ativo, User_idUser
-                FROM funcionario
+        String sql = SQL_SELECT + """
                 WHERE ativo = TRUE
                 ORDER BY idfuncionario
                 """;
-        List<Funcionario> funcionarios = new ArrayList<>();
-        ResultSet rs = conexao.consultar(sql);
-
-        if (rs != null)
-        {
-            while (rs.next())
-            {
-                funcionarios.add(popularFuncionario(rs));
-            }
-        }
-
-        return funcionarios;
+        return listarPorSql(sql, List.of(), conexao);
     }
 
     public List<Funcionario> listarPorCategoria(String categoria, Banco conexao) throws SQLException
     {
-        String sql = """
-                SELECT idfuncionario, nome, cpf, ctps_numero, telefone, categoria, ativo, User_idUser
-                FROM funcionario
-                WHERE categoria = '#1'
+        String sql = SQL_SELECT + """
+                WHERE categoria = ?
                 AND ativo = TRUE
                 ORDER BY idfuncionario
                 """;
-        sql = sql.replace("#1", escaparSql(categoria));
-
-        List<Funcionario> funcionarios = new ArrayList<>();
-        ResultSet rs = conexao.consultar(sql);
-
-        if (rs != null)
-        {
-            while (rs.next())
-            {
-                funcionarios.add(popularFuncionario(rs));
-            }
-        }
-
-        return funcionarios;
+        List<Object> params = new ArrayList<>();
+        params.add(categoria);
+        return listarPorSql(sql, params, conexao);
     }
 
     public Funcionario buscarPorId(int id, Banco conexao) throws SQLException
     {
-        String sql = """
-                SELECT idfuncionario, nome, cpf, ctps_numero, telefone, categoria, ativo, User_idUser
-                FROM funcionario
-                WHERE idfuncionario = #1
-                """;
-        sql = sql.replace("#1", String.valueOf(id));
+        String sql = SQL_SELECT + " WHERE idfuncionario = ?";
 
-        ResultSet rs = conexao.consultar(sql);
-        if (rs != null && rs.next())
+        try (PreparedStatement ps = conexao.preparar(sql))
         {
-            return popularFuncionario(rs);
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery())
+            {
+                if (rs.next())
+                {
+                    return popularFuncionario(rs);
+                }
+            }
         }
 
         return null;
@@ -194,20 +203,23 @@ public class FuncionarioDAO
 
     public Funcionario buscarPorNome(String nome, Banco conexao) throws SQLException
     {
-        String sql = """
-                SELECT idfuncionario, nome, cpf, ctps_numero, telefone, categoria, ativo, User_idUser
-                FROM funcionario
-                WHERE LOWER(nome) = LOWER('#1')
+        String sql = SQL_SELECT + """
+                WHERE LOWER(nome) = LOWER(?)
                 AND ativo = TRUE
                 ORDER BY idfuncionario
                 LIMIT 1
                 """;
-        sql = sql.replace("#1", escaparSql(nome));
 
-        ResultSet rs = conexao.consultar(sql);
-        if (rs != null && rs.next())
+        try (PreparedStatement ps = conexao.preparar(sql))
         {
-            return popularFuncionario(rs);
+            ps.setString(1, nome);
+            try (ResultSet rs = ps.executeQuery())
+            {
+                if (rs.next())
+                {
+                    return popularFuncionario(rs);
+                }
+            }
         }
 
         return null;
@@ -215,18 +227,21 @@ public class FuncionarioDAO
 
     public Funcionario buscarPorUsuarioId(int idUser, Banco conexao) throws SQLException
     {
-        String sql = """
-                SELECT idfuncionario, nome, cpf, ctps_numero, telefone, categoria, ativo, User_idUser
-                FROM funcionario
-                WHERE User_idUser = #1
+        String sql = SQL_SELECT + """
+                WHERE User_idUser = ?
                 AND ativo = TRUE
                 """;
-        sql = sql.replace("#1", String.valueOf(idUser));
 
-        ResultSet rs = conexao.consultar(sql);
-        if (rs != null && rs.next())
+        try (PreparedStatement ps = conexao.preparar(sql))
         {
-            return popularFuncionario(rs);
+            ps.setInt(1, idUser);
+            try (ResultSet rs = ps.executeQuery())
+            {
+                if (rs.next())
+                {
+                    return popularFuncionario(rs);
+                }
+            }
         }
 
         return null;
@@ -234,69 +249,73 @@ public class FuncionarioDAO
 
     public boolean buscarPorCpf(String cpf, Banco conexao) throws SQLException
     {
-        String sql = """
-                SELECT idfuncionario
-                FROM funcionario
-                WHERE cpf = '#1'
-                """;
-        sql = sql.replace("#1", escaparSql(cpf));
-
-        ResultSet rs = conexao.consultar(sql);
-        return rs != null && rs.next();
+        return existePorCampo("cpf", cpf, null, conexao);
     }
 
     public boolean buscarPorCtps(String ctps, Banco conexao) throws SQLException
     {
-        String sql = """
-                SELECT idfuncionario
-                FROM funcionario
-                WHERE ctps_numero = '#1'
-                """;
-        sql = sql.replace("#1", escaparSql(ctps));
-
-        ResultSet rs = conexao.consultar(sql);
-        return rs != null && rs.next();
+        return existePorCampo("ctps_numero", ctps, null, conexao);
     }
 
     public boolean buscarPorCtpsExcluindoId(String ctps, int id, Banco conexao) throws SQLException
     {
-        String sql = """
-                SELECT idfuncionario
-                FROM funcionario
-                WHERE ctps_numero = '#1' AND idfuncionario <> #2
-                """;
-        sql = sql.replace("#1", escaparSql(ctps));
-        sql = sql.replace("#2", String.valueOf(id));
-
-        ResultSet rs = conexao.consultar(sql);
-        return rs != null && rs.next();
+        return existePorCampo("ctps_numero", ctps, id, conexao);
     }
 
     public boolean buscarPorTelefone(String telefone, Banco conexao) throws SQLException
     {
-        String sql = """
-                SELECT idfuncionario
-                FROM funcionario
-                WHERE telefone = '#1'
-                """;
-        sql = sql.replace("#1", escaparSql(telefone));
-
-        ResultSet rs = conexao.consultar(sql);
-        return rs != null && rs.next();
+        return existePorCampo("telefone", telefone, null, conexao);
     }
 
     public boolean buscarPorTelefoneExcluindoId(String telefone, int id, Banco conexao) throws SQLException
     {
-        String sql = """
-                SELECT idfuncionario
-                FROM funcionario
-                WHERE telefone = '#1' AND idfuncionario <> #2
-                """;
-        sql = sql.replace("#1", escaparSql(telefone));
-        sql = sql.replace("#2", String.valueOf(id));
+        return existePorCampo("telefone", telefone, id, conexao);
+    }
 
-        ResultSet rs = conexao.consultar(sql);
-        return rs != null && rs.next();
+    private boolean existePorCampo(String campo, String valor, Integer idIgnorado, Banco conexao) throws SQLException
+    {
+        String sql = "SELECT idfuncionario FROM funcionario WHERE " + campo + " = ?";
+        if (idIgnorado != null)
+        {
+            sql += " AND idfuncionario <> ?";
+        }
+
+        try (PreparedStatement ps = conexao.preparar(sql))
+        {
+            ps.setString(1, valor);
+            if (idIgnorado != null)
+            {
+                ps.setInt(2, idIgnorado);
+            }
+
+            try (ResultSet rs = ps.executeQuery())
+            {
+                return rs.next();
+            }
+        }
+    }
+
+    private List<Funcionario> listarPorSql(String sql, List<Object> params, Banco conexao) throws SQLException
+    {
+        List<Funcionario> funcionarios = new ArrayList<>();
+
+        try (PreparedStatement ps = conexao.preparar(sql))
+        {
+            for (int i = 0; i < params.size(); i++)
+            {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = ps.executeQuery())
+            {
+                while (rs.next())
+                {
+                    funcionarios.add(popularFuncionario(rs));
+                }
+            }
+        }
+
+        return funcionarios;
     }
 
     private Funcionario popularFuncionario(ResultSet rs) throws SQLException
@@ -316,17 +335,7 @@ public class FuncionarioDAO
         return funcionario;
     }
 
-    private String escaparSql(String valor)
-    {
-        if (valor == null)
-        {
-            return "";
-        }
-
-        return valor.replace("'", "''");
-    }
-
-    private String filtroSqlCategoria(String categoria)
+    private String filtroCategoria(String categoria)
     {
         if (categoria == null)
         {
@@ -336,18 +345,17 @@ public class FuncionarioDAO
         String valor = categoria.trim().toLowerCase();
         if (valor.startsWith("coord"))
         {
-            return "LOWER(categoria) LIKE 'coordenador%'";
+            return "coordenador%";
         }
         if (valor.startsWith("cuidad"))
         {
-            return "LOWER(categoria) LIKE 'cuidador%'";
+            return "cuidador%";
         }
         if (valor.startsWith("secret"))
         {
-            return "LOWER(categoria) LIKE 'secret%'";
+            return "secret%";
         }
 
         return "";
     }
-
 }

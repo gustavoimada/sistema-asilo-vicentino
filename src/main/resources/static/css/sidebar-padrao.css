@@ -424,8 +424,36 @@ body.sidebar-collapsible-demo.sidebar-collapsed .topbar {
   left: 0 !important;
 }
 
+body.sidebar-collapsible-demo .content,
+body.sidebar-collapsible-demo .content-wrap {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+body.sidebar-collapsible-demo.sidebar-collapsed .content {
+  padding-left: clamp(32px, 4vw, 56px) !important;
+  padding-right: clamp(24px, 3vw, 44px) !important;
+}
+
+body.sidebar-collapsible-demo .table-wrap,
+body.sidebar-collapsible-demo .table-container,
+body.sidebar-collapsible-demo .relatorio-table,
+body.sidebar-collapsible-demo .list-table {
+  max-width: 100% !important;
+}
+
 body.sidebar-collapsible-demo.sidebar-collapsed .sidebar-collapse-toggle .material-symbols-outlined {
   transform: rotate(180deg) !important;
+}
+
+@media (min-width: 1800px) {
+  body.sidebar-collapsible-demo .content-wrap,
+  body.sidebar-collapsible-demo .page-shell,
+  body.sidebar-collapsible-demo .dashboard-shell {
+    max-width: 1480px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
 }
 
 @media (max-width: 900px) {

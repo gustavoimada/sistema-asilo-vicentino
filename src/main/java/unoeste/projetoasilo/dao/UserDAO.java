@@ -16,18 +16,12 @@ public class UserDAO
     {
         List<User> userList = new ArrayList<>();
         String sql = "SELECT id, name, senha, email FROM usuario";
-        ResultSet rs = conexao.consultar(sql);
-
-        if (rs != null)
+        try (PreparedStatement statement = conexao.preparar(sql);
+             ResultSet rs = statement.executeQuery())
         {
             while (rs.next())
             {
-                User usuario = new User();
-                usuario.setIdUser(rs.getInt("id"));
-                usuario.setName(rs.getString("name"));
-                usuario.setSenha(rs.getString("senha"));
-                usuario.setEmail(rs.getString("email"));
-                userList.add(usuario);
+                userList.add(montarUsuario(rs));
             }
         }
         return userList;
@@ -122,19 +116,12 @@ public class UserDAO
 
     public boolean deletarPorId(int idUser, Banco conexao) throws SQLException
     {
-        String sql = "DELETE FROM usuario WHERE id = #1";
-        sql = sql.replace("#1", String.valueOf(idUser));
-        return conexao.manipular(sql);
-    }
-
-    private String escaparTextoSql(String valor)
-    {
-        if (valor == null)
+        String sql = "DELETE FROM usuario WHERE id = ?";
+        try (PreparedStatement statement = conexao.preparar(sql))
         {
-            return "";
+            statement.setInt(1, idUser);
+            return statement.executeUpdate() > 0;
         }
-
-        return valor.replace("'", "''");
     }
 
     private User montarUsuario(ResultSet rs) throws SQLException

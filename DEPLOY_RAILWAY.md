@@ -90,6 +90,8 @@ O sistema salva arquivos de noticias e transparencia no diretorio definido por `
 
 No Railway, `UPLOAD_DIR` deve apontar para o volume persistente, por exemplo `/data/uploads`. Sem volume persistente, arquivos enviados podem sumir quando o servico reiniciar ou for recriado.
 
+O procedimento de backup do banco e dos uploads esta documentado em [BACKUP_RAILWAY.md](BACKUP_RAILWAY.md).
+
 Depois do deploy, faca este teste antes de divulgar ou depois de mexer no volume:
 
 1. Enviar uma imagem de noticia.

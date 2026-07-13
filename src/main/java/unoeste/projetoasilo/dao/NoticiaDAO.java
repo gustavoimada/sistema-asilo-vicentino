@@ -3,6 +3,7 @@ package unoeste.projetoasilo.dao;
 import unoeste.projetoasilo.db.util.Banco;
 import unoeste.projetoasilo.entities.Noticia;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -17,22 +18,28 @@ public class NoticiaDAO {
 
         String sql = """
                 INSERT INTO noticia(titulo, descricao, nomeimagem, caminhoimagem, categoria)
-                VALUES ('#1', '#2', '#3', '#4', '#5')
+                VALUES (?, ?, ?, ?, ?)
                 """;
 
-        sql = sql.replace("#1", noticia.getTitulo().replace("'", "''"));
-        sql = sql.replace("#2", noticia.getDescricao().replace("'", "''"));
-        sql = sql.replace("#3", noticia.getNomeImagem().replace("'", "''"));
-        sql = sql.replace("#4", noticia.getImagemCaminho().replace("'", "''"));
-        sql = sql.replace("#5", noticia.getCategoria().replace("'", "''"));
+        try (PreparedStatement ps = conexao.prepararComChaves(sql)) {
+            ps.setString(1, noticia.getTitulo());
+            ps.setString(2, noticia.getDescricao());
+            ps.setString(3, noticia.getNomeImagem());
+            ps.setString(4, noticia.getImagemCaminho());
+            ps.setString(5, noticia.getCategoria());
 
-        if (conexao.manipular(sql)) {
-            int novoId = conexao.getMaxPK("noticia", "idnoticia");
-            if (novoId > 0) {
-                noticia.setIdNoticia(novoId);
+            if (ps.executeUpdate() > 0) {
+                try (ResultSet chaves = ps.getGeneratedKeys()) {
+                    if (chaves.next()) {
+                        noticia.setIdNoticia(chaves.getInt(1));
+                    }
+                }
                 return true;
             }
+        } catch (SQLException e) {
+            return false;
         }
+
         return false;
     }
 
@@ -43,62 +50,76 @@ public class NoticiaDAO {
 
         String sql = """
                 UPDATE noticia
-                SET titulo = '#1', descricao = '#2', nomeimagem = '#3', caminhoimagem = '#4', categoria = '#5'
-                WHERE idnoticia = #6
+                SET titulo = ?, descricao = ?, nomeimagem = ?, caminhoimagem = ?, categoria = ?
+                WHERE idnoticia = ?
                 """;
 
-        sql = sql.replace("#1", noticia.getTitulo().replace("'", "''"));
-        sql = sql.replace("#2", noticia.getDescricao().replace("'", "''"));
-        sql = sql.replace("#3", noticia.getNomeImagem().replace("'", "''"));
-        sql = sql.replace("#4", noticia.getImagemCaminho().replace("'", "''"));
-        sql = sql.replace("#5", noticia.getCategoria().replace("'", "''"));
-        sql = sql.replace("#6", String.valueOf(noticia.getIdNoticia()));
-
-        return conexao.manipular(sql);
+        try (PreparedStatement ps = conexao.preparar(sql)) {
+            ps.setString(1, noticia.getTitulo());
+            ps.setString(2, noticia.getDescricao());
+            ps.setString(3, noticia.getNomeImagem());
+            ps.setString(4, noticia.getImagemCaminho());
+            ps.setString(5, noticia.getCategoria());
+            ps.setInt(6, noticia.getIdNoticia());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            return false;
+        }
     }
 
-    /** Retorna true se já existe outra notícia com o mesmo título (ignorando a de id=ignorarId, -1 para nenhuma). */
     public boolean existeTitulo(String titulo, int ignorarId, Banco conexao) {
-        String tituloSafe = titulo.trim().replace("'", "''");
-        String sql = "SELECT 1 FROM noticia WHERE LOWER(titulo) = LOWER('" + tituloSafe + "') AND idnoticia <> " + ignorarId;
-        ResultSet rs = conexao.consultar(sql);
-        try {
-            return rs != null && rs.next();
+        String sql = "SELECT 1 FROM noticia WHERE LOWER(titulo) = LOWER(?) AND idnoticia <> ?";
+
+        try (PreparedStatement ps = conexao.preparar(sql)) {
+            ps.setString(1, titulo == null ? "" : titulo.trim());
+            ps.setInt(2, ignorarId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
         } catch (SQLException e) {
             return false;
         }
     }
 
     public boolean excluir(int id, Banco conexao) {
-        return conexao.manipular("DELETE FROM noticia WHERE idnoticia = " + id);
+        String sql = "DELETE FROM noticia WHERE idnoticia = ?";
+
+        try (PreparedStatement ps = conexao.preparar(sql)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            return false;
+        }
     }
 
     public Noticia buscarPorId(int id, Banco conexao) throws SQLException {
-        String sql = "SELECT * FROM noticia WHERE idnoticia = " + id;
-        ResultSet rs = conexao.consultar(sql);
+        String sql = "SELECT * FROM noticia WHERE idnoticia = ?";
 
-        if (rs == null) {
-            throw new SQLException(conexao.getMensagemErro());
+        try (PreparedStatement ps = conexao.preparar(sql)) {
+            ps.setInt(1, id);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return montarNoticia(rs);
+                }
+            }
         }
-        if (rs != null && rs.next()) {
-            return montarNoticia(rs);
-        }
+
         return null;
     }
 
     public List<Noticia> listar(Banco conexao) throws SQLException {
         String sql = "SELECT * FROM noticia ORDER BY dataupload DESC, idnoticia DESC";
-        ResultSet rs = conexao.consultar(sql);
         List<Noticia> noticias = new ArrayList<>();
 
-        if (rs == null) {
-            throw new SQLException(conexao.getMensagemErro());
-        }
-        if (rs != null) {
+        try (PreparedStatement ps = conexao.preparar(sql);
+             ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 noticias.add(montarNoticia(rs));
             }
         }
+
         return noticias;
     }
 

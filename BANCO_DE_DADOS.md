@@ -87,6 +87,8 @@ Para um banco que ja existia:
 3. Conferir se nao existem mais `turnos` e `historicomorador`.
 4. Conferir se nao sobraram usuarios, moradores, escalas, doacoes ou noticias de teste.
 
+Antes de qualquer limpeza manual em producao, rode tambem `src/main/resources/schema-review.sql`. Ele apenas consulta o banco e ajuda a enxergar tabelas legadas, volume de dados e possiveis inconsistencias, sem apagar nada.
+
 ## Observacao sobre uploads
 
 O banco guarda o caminho dos arquivos de `noticia` e `transparencia`, mas os arquivos em si ficam no diretorio `UPLOAD_DIR`. Em producao, esse diretorio precisa estar em volume persistente, por exemplo `/data/uploads` no Railway. Depois de configurar, reinicie o servico e confirme se imagens e PDFs continuam abrindo.

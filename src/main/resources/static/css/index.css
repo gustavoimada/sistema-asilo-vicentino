@@ -301,7 +301,7 @@ main {
   line-height: 1.08;
   font-weight: 900;
   color: var(--primary);
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
   margin-bottom: 24px;
 }
 
@@ -342,6 +342,13 @@ main {
   background: white;
   color: var(--primary);
   border: 1px solid var(--outline-variant);
+}
+
+.primary-btn-lg,
+.secondary-btn-lg {
+  max-width: 100%;
+  white-space: normal;
+  text-align: center;
 }
 
 .hero-visual {
@@ -2451,6 +2458,29 @@ main {
 }
 
 /* RESPONSIVO */
+@media (min-width: 1800px) {
+  .container {
+    max-width: 1420px;
+  }
+
+  .hero {
+    min-height: 640px;
+    padding: 56px 0 64px;
+  }
+
+  .hero-copy h1 {
+    font-size: 68px;
+  }
+
+  .hero-photo {
+    height: 520px;
+  }
+
+  .section {
+    padding: 88px 0;
+  }
+}
+
 @media (max-width: 1200px) {
   .hero-grid,
   .history-grid,
@@ -2475,6 +2505,12 @@ main {
 @media (max-width: 900px) {
   .topbar {
     padding: 0 16px;
+    max-width: 100vw;
+    overflow: hidden;
+  }
+
+  .topbar-brand {
+    min-width: 0;
   }
 
   .topbar-nav {
@@ -2498,10 +2534,16 @@ main {
     padding: 56px 0;
   }
 
+  .hero-grid {
+    width: 100%;
+    max-width: 100%;
+  }
+
   .hero-grid,
   .hero-copy,
   .hero-visual {
     min-width: 0;
+    max-width: 100%;
   }
 
   .hero-copy h1 {
@@ -2517,6 +2559,7 @@ main {
   }
 
   .hero-photo {
+    height: auto;
     aspect-ratio: 16 / 10;
     border-radius: 24px;
     transform: none !important;
@@ -2734,7 +2777,7 @@ main {
   .hero-copy,
   .hero-visual {
     width: 100%;
-    max-width: 358px;
+    max-width: 100%;
   }
 
   .hero-copy h1 {
