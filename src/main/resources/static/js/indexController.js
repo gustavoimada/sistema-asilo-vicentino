@@ -698,7 +698,7 @@ function renderizarTransparencia(filtro = "") {
     }).join("");
 
     return `
-      <details class="transparencia-year" ${index === 0 ? "open" : ""}>
+      <details class="transparencia-year">
         <summary>
           <span class="material-symbols-outlined">folder</span>
           <span>${pasta.ano}</span>
