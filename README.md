@@ -2,235 +2,106 @@
 
 ![Java](https://img.shields.io/badge/Java-21-red)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0-brightgreen)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)
-![Maven](https://img.shields.io/badge/Maven-Wrapper-orange)
-![Security](https://img.shields.io/badge/Security-BCrypt%20%2B%20Access%20Filters-darkgreen)
-![Status](https://img.shields.io/badge/status-live%20on%20Railway-brightgreen)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Railway-blue)
+![Security](https://img.shields.io/badge/Security-BCrypt%20%2B%20RBAC-darkgreen)
+![Deploy](https://img.shields.io/badge/Deploy-Railway-purple)
+![Status](https://img.shields.io/badge/Status-live-brightgreen)
 
-Sistema Asilo Vicentino is a full-stack web platform developed for a real charitable elderly care institution. The project combines a public institutional website with a protected internal management system, helping the organization present its mission online while supporting daily administrative and care-related workflows.
+Full-stack institutional and administrative platform built for **Asilo Vicentino Nossa Senhora da Penha**, a charitable elderly care institution in Pirapozinho, SP.
 
-The system includes public pages for news, transparency and donations, plus private dashboards for secretaries, coordinators and caregivers. It is currently live on Railway with a managed PostgreSQL database, environment-based configuration and the official domain `www.asilovicentino.com.br` connected through Registro.br.
+The project combines a public website for community visibility with a protected internal system for the institution's daily operations.
 
-## Purpose
+**Live website:** [www.asilovicentino.com.br](https://www.asilovicentino.com.br)
 
-The goal of this project is to centralize the main digital processes of Asilo Vicentino in a single application.
+## Highlights
 
-The public area focuses on visibility, trust and community engagement. The internal area focuses on operational management, including residents, staff, rooms, medication boxes, schedules, occurrences, donations, expenses and reports.
+- Public institutional website with news, transparency documents and donation flow.
+- Protected administrative area with role-based access for secretary, coordinator and caregiver users.
+- Resident, room, employee, activity, donation, expense and medication management.
+- Medication box workflow by resident, including dose schedules and caregiver usage records.
+- Weekly caregiver schedule templates with reusable models and manual exceptions.
+- Coordinator dashboard for shift tracking, occurrences and medication records.
+- Reports for donations, expenses, employees and occurrences, with PDF export support.
+- Production deployment on Railway with PostgreSQL, persistent uploads and custom domain.
 
-This project demonstrates practical full-stack development with Java, Spring Boot, PostgreSQL, authentication, role-based access control, file uploads, relational data modeling, administrative dashboards and a real deployment workflow for a charitable institution.
+## Screenshots
 
-## Main Features
+Screenshots will be added soon.
 
-### Public Website
+## User Roles
 
-- Institutional landing page for the elderly care home.
-- Public news section managed by the internal team.
-- Transparency area for accountability documents.
-- Donation section prepared for real-world fundraising.
-- Responsive public experience for desktop and mobile visitors.
+| Role | Main Responsibilities |
+| --- | --- |
+| Secretary | Manages residents, employees, rooms, donations, expenses, medicines, medication boxes, activities and news. |
+| Coordinator | Manages caregiver schedules, transparency documents, reports and shift supervision. |
+| Caregiver | Starts and closes shifts, records occurrences and registers medication usage. |
 
-### Administrative System
+## Security
 
-- Protected login area with session-based authentication.
-- Separate workflows for secretary, coordinator and caregiver profiles.
-- Administrative dashboards focused on daily institutional routines.
-- Access validation for protected pages.
-- Unauthorized access page for blocked resources.
+The system was prepared with production security in mind:
 
-### Resident and Room Management
+- Password hashing with **BCrypt**.
+- Session-based authentication.
+- Role-based access control through custom filters.
+- Protected private HTML pages.
+- Unauthorized-access screen for blocked routes.
+- Environment-based configuration for database and uploads.
+- `.env` ignored by Git.
+- Safe `.env.example` kept only as a configuration template.
+- Prepared statements in critical DAO operations.
+- Security headers for production, including CSP, HSTS, `nosniff`, frame protection and referrer policy.
 
-- Resident registration, editing and listing.
-- Responsible contact linked to each resident.
-- Room registration with capacity and availability control.
-- Gender-aware room assignment validation.
-- Cleaner resident list focused on useful operational information.
+## Tech Stack
 
-### Medication Box Workflow
-
-- Medication catalog management.
-- Medication boxes organized by resident.
-- Multiple medicines inside the same resident medication box.
-- Custom frequency configuration, such as every 8 or 12 hours.
-- Dose quantity, first schedule time, start date and end date.
-- Integration with caregiver medication usage records.
-
-### Staff, Schedules and Shifts
-
-- Employee registration and management.
-- Staff categories for secretary, coordinator and caregiver workflows.
-- Weekly schedule management.
-- Reusable weekly schedule templates.
-- Support for multiple schedule models.
-- Manual exceptions after applying a schedule template.
-- Shift tracking with clear status indicators.
-
-### Occurrences and Care Records
-
-- Occurrence type registration.
-- Occurrence registration by caregivers.
-- Residents linked to each occurrence.
-- Shift-based operational history.
-- Coordinator view for monitoring staff activity and care records.
-
-### Finance, Donations and Transparency
-
-- Donation registration and tracking.
-- Expense registration and categorization.
-- Transparency document upload and download.
-- Analytical reports for donations, expenses, employees and occurrences.
-- PDF export support for administrative reports.
-
-## Security Highlights
-
-Security was one of the most important improvement areas of the project.
-
-- Password hashing with BCrypt through Spring Security Crypto.
-- Session-based authentication for private areas.
-- Custom access control filter for protected pages.
-- Role-based authorization by employee category.
-- Public and private page separation.
-- Unauthorized access handling for restricted resources.
-- Sensitive configuration moved to environment variables.
-- `.env` ignored by Git to avoid exposing local credentials.
-- Prepared statements used in critical database operations.
-- Safer dynamic ordering with whitelisted fields.
-- Legacy plaintext password migration support.
-- Upload directory configurable outside the source code.
-
-## Technology Stack
-
-- Java 21
-- Spring Boot 4
-- Spring Web MVC
-- Spring Security Crypto
-- PostgreSQL
-- JDBC
-- Maven Wrapper
-- HTML
-- CSS
-- JavaScript
-- Bootstrap
-- Tailwind CDN
-- ApexCharts
-- jsPDF
-- Dotenv Java
-- pgAdmin
+| Layer | Technologies |
+| --- | --- |
+| Backend | Java 21, Spring Boot 4, Spring Web MVC, JDBC |
+| Security | Spring Security Crypto, BCrypt, custom servlet filters |
+| Database | PostgreSQL |
+| Frontend | HTML, CSS, JavaScript, Bootstrap, Tailwind CDN |
+| Charts/PDF | ApexCharts, jsPDF |
+| Deploy | Railway, Railway PostgreSQL, Registro.br custom domain |
 
 ## Architecture
 
-The backend follows a layered structure, separating controllers, DAOs, entities, database utilities, security configuration and static frontend assets.
-
 ```text
-src/
-  main/
-    java/
-      unoeste/
-        projetoasilo/
-          control/
-          dao/
-          db/
-            util/
-          entities/
-          security/
-          util/
-          ProjetoAsiloApplication.java
-    resources/
-      static/
-        assets/
-        css/
-        js/
-        *.html
-      application.properties
-      abrigovicentinodb.sql
-      atualizacao-producao.sql
+src/main/java/unoeste/projetoasilo
+  control/      HTTP controllers
+  dao/          JDBC persistence layer
+  db/util/      database connection utilities
+  entities/     domain entities
+  security/     authentication, authorization and headers
+  util/         shared helpers
+
+src/main/resources/static
+  assets/       images and visual assets
+  css/          page styles
+  js/           page controllers
+  *.html        public and private screens
 ```
 
-## System Areas
+## Production Status
 
-### Public Area
+The project is already running in a real deployment workflow:
 
-Designed for visitors, family members, donors and the local community. It presents the institution, its work, news, transparency documents and donation information.
-
-### Secretary Area
-
-Focused on administrative records such as residents, employees, rooms, medicines, medication boxes, activities, donations and expenses.
-
-### Coordinator Area
-
-Focused on supervision, schedules, transparency documents, reports and shift monitoring.
-
-### Caregiver Area
-
-Focused on daily care routines, including shift activity, occurrences and medication usage registration.
-
-## Database Highlights
-
-The system uses PostgreSQL as its relational database and JDBC for persistence.
-
-The database supports:
-
-- Users and employees.
-- Residents and responsible contacts.
-- Rooms and occupancy control.
-- Medication catalog.
-- Medication boxes and scheduled doses.
-- Medication usage records.
-- Occurrences and occurrence types.
-- Donations and expenses.
-- Activities and transparency documents.
-- Staff schedules and shift history.
-
-The project includes SQL scripts for initial database creation and production updates for existing databases.
-
-## Deployment Status
-
-This project has moved from local development into a real deployment workflow and is already running on Railway for production validation.
-
-- GitHub repository cleaned and updated for deployment.
-- Official domain purchased: `asilovicentino.com.br`.
-- Railway project created for cloud hosting.
-- Railway PostgreSQL service created.
-- Initial PostgreSQL schema executed in the Railway database.
-- Environment variables configured for production behavior.
-- Railway public URL active for validation.
-- Official `www.asilovicentino.com.br` domain validated in Railway.
-- HTTPS-ready session configuration with secure cookies.
-- Persistent upload volume configured for images and transparency files.
-- Public news images validated through the production domain.
-- Production SQL scripts documented for clean databases and future updates.
-- Root domain redirect from `asilovicentino.com.br` to `www.asilovicentino.com.br` still needs final configuration.
-
-The application is live through Railway and available through the official `www.asilovicentino.com.br` domain. The remaining domain task is configuring the root domain without `www` to redirect to the official `www` address.
-
-## Technical Strengths
-
-- Full-stack Java web application built around a real institution.
-- Public website and internal administrative system in the same project.
-- Role-based workflows for different staff responsibilities.
-- BCrypt password encryption and custom access filters.
-- PostgreSQL relational database integration.
-- File upload support for images and transparency documents.
-- Medication box workflow adapted to the institution's real routine.
-- Weekly schedule templates to reduce repetitive coordinator work.
-- Dashboard and report screens for operational decision-making.
-- Repository prepared for production deployment and continuous improvement.
+- Domain purchased through Registro.br.
+- Application deployed on Railway.
+- PostgreSQL provisioned on Railway.
+- Production schema created.
+- Persistent upload volume configured for images and transparency PDFs.
+- `www.asilovicentino.com.br` connected and validated.
+- Root-domain redirect without `www` is still pending.
 
 ## Repository Hygiene
 
-The repository is configured to avoid committing sensitive or generated files.
+The repository keeps only source code and safe documentation. Local credentials, uploaded files, build artifacts, logs, backups and temporary exports are ignored by Git.
 
-Ignored files include:
+The `.env.example` file is intentionally public because it documents the required environment variables without exposing real credentials.
 
-- `.env`
-- `.env.local`
-- IDE folders
-- build output
-- uploaded files
-- logs
-- temporary files
+## Next Improvements
 
-The `.env.example` file is kept only as a safe configuration model, without real credentials.
-
-## Status
-
-The project is currently live on Railway for deployment validation. The domain has been purchased, Railway hosting is active, PostgreSQL has been provisioned, the initial schema has been created, real administrative access has been configured, the `www` domain is connected and persistent uploads have been validated for news images. The next steps are configuring the root-domain redirect, reviewing production credentials, testing protected workflows end-to-end and preparing the final public release.
+- Add polished screenshots and short demo GIFs.
+- Finish root-domain redirect from `asilovicentino.com.br` to `www.asilovicentino.com.br`.
+- Improve public donation integration with the institution's official PIX details.
+- Continue replacing legacy SQL code with prepared statements across the remaining DAOs.
+- Expand automated tests for authentication, authorization and core workflows.
