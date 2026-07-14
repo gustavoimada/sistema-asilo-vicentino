@@ -1062,7 +1062,7 @@ function iniciarEntradaInicial() {
 
   for (let i = 0; i < alvos.length; i += 1) {
     alvos[i].classList.add("intro-reveal");
-    alvos[i].style.setProperty("--intro-delay", (i * 90) + "ms");
+    alvos[i].style.setProperty("--intro-delay", (i * 100) + "ms");
   }
 
   window.requestAnimationFrame(function () {
@@ -1082,7 +1082,7 @@ function iniciarEntradaInicial() {
 
     const hero = document.querySelector(".hero");
     if (hero) hero.classList.add("hero-motion-ready");
-  }, 1700);
+  }, 1900);
 }
 
 function validarCpfDoacao(cpf) {

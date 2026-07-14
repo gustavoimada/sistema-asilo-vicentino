@@ -42,18 +42,20 @@
   <link rel="icon" type="image/png" sizes="64x64" href="assets/favicon.png?v=2" />
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=2" />
 
-  <link rel="stylesheet" href="css/index.css?v=20260714-12" />
+  <link rel="stylesheet" href="css/index.css?v=20260714-13" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 </head>
 <body>
+  <noscript><style>.section-reveal,.reveal-on-scroll,.intro-reveal{opacity:1!important;transform:none!important;filter:none!important}</style></noscript>
+
   <nav class="topbar">
-    <a class="topbar-brand" href="#sobre-nos" aria-label="Voltar ao início">
+    <a class="topbar-brand intro-reveal" href="#sobre-nos" aria-label="Voltar ao início">
       <img src="assets/logo.webp" alt="Logo Asilo Vicentino" />
       <span>Asilo Vicentino</span>
     </a>
 
-    <div class="topbar-nav">
+    <div class="topbar-nav intro-reveal">
       <a href="#sobre-nos">Sobre</a>
       <a href="#historico">Histórico</a>
       <a href="#rotina">Rotina</a>
@@ -65,7 +67,7 @@
       <span class="topbar-nav-indicator" aria-hidden="true"></span>
     </div>
 
-    <div class="topbar-actions">
+    <div class="topbar-actions intro-reveal">
       <a class="mobile-contact-btn" href="#contato">
         <span class="material-symbols-outlined">call</span>
         <span>Contato</span>
@@ -82,24 +84,24 @@
 
       <div class="container hero-grid">
         <div class="hero-copy">
-          <span class="eyebrow">Excelência em Cuidado</span>
-          <h1>Dignidade e Cuidado para Cada Residente.</h1>
-          <p>Unimos a precisão técnica da medicina moderna com a ternura de um lar dedicado, criando um ambiente de serenidade inigualável.</p>
+          <span class="eyebrow intro-reveal">Excelência em Cuidado</span>
+          <h1 class="intro-reveal">Dignidade e Cuidado para Cada Residente.</h1>
+          <p class="intro-reveal">Unimos a precisão técnica da medicina moderna com a ternura de um lar dedicado, criando um ambiente de serenidade inigualável.</p>
 
           <div class="hero-actions">
-            <button id="btnDoarTopo" class="primary-btn-lg" type="button">
+            <button id="btnDoarTopo" class="primary-btn-lg intro-reveal" type="button">
               <span class="material-symbols-outlined">volunteer_activism</span>
               Fazer uma Doação
             </button>
           </div>
         </div>
 
-        <div class="hero-visual">
+        <div class="hero-visual intro-reveal">
           <div class="hero-photo">
             <img src="assets/inicial.webp" alt="Foto inicial do asilo" width="697" height="864" fetchpriority="high" decoding="async" />
           </div>
 
-          <div class="hero-floating-card glass-card">
+          <div class="hero-floating-card glass-card intro-reveal">
             <div class="hero-floating-head">
               <div class="hero-floating-icon">
                 <span class="material-symbols-outlined">verified_user</span>
@@ -113,7 +115,7 @@
     </section>
 
     <section id="historico" class="section white">
-      <div class="container history-grid">
+      <div class="container history-grid section-reveal">
         <div class="history-visual-grid">
           <div class="history-col">
             <img class="history-photo" src="assets/historico.webp" alt="História do asilo" width="694" height="864" loading="lazy" decoding="async" />
@@ -160,7 +162,7 @@
     </section>
 
     <section id="rotina" class="section soft dayflow-section">
-      <div class="container">
+      <div class="container section-reveal">
         <div class="dayflow-head">
           <div>
             <div class="eyebrow-text">Rotina e espaços de vida</div>
@@ -223,7 +225,7 @@
     </section>
 
     <section id="transparencia" class="section white transparencia-section">
-      <div class="container">
+      <div class="container section-reveal">
         <div class="section-head-center">
           <h2>Transparência</h2>
         </div>
@@ -252,7 +254,7 @@
     </section>
 
     <section id="novidades" class="section white">
-      <div class="container">
+      <div class="container section-reveal">
         <div class="section-head-center">
           <h2>Notícias</h2>
           <p id="newsLastUpdate" class="news-last-update">Última atualização: carregando...</p>
@@ -280,7 +282,7 @@
         <span class="material-symbols-outlined">format_quote</span>
       </div>
 
-      <div class="container">
+      <div class="container section-reveal">
         <div class="section-head-left">
           <div class="eyebrow-text">Reconhecimento</div>
           <h2>Feedback de quem acompanha nosso cuidado</h2>
@@ -319,7 +321,7 @@
     </section>
 
     <section id="doacao" class="section white">
-      <div class="container">
+      <div class="container section-reveal">
         <div class="cta-box">
           <div class="cta-bg">
             <img src="assets/foto1.webp" alt="Textura suave" width="644" height="805" loading="lazy" decoding="async" />
@@ -460,7 +462,7 @@
   </main>
 
   <footer id="contato" class="site-footer">
-    <div class="container">
+    <div class="container section-reveal">
       <div class="footer-grid">
         <div class="footer-brand">
           <img src="assets/logo.webp" alt="Logo Asilo Vicentino" />
@@ -515,7 +517,7 @@
     </div>
   </div>
 
-  <script src="js/indexController.js?v=20260714-7"></script>
+  <script src="js/indexController.js?v=20260714-8"></script>
   <script src="js/indexNoticias.js?v=20260714-3"></script>
 </body>
 </html>
