@@ -125,7 +125,24 @@ function obterIdNoticia(noticia) {
 
 function urlImagemNoticia(noticia) {
     const idNoticia = obterIdNoticia(noticia);
-    return idNoticia ? `/noticia/download/${idNoticia}` : "";
+    if (!idNoticia) return "";
+
+    // O nome muda a cada upload. Usá-lo na URL evita que o navegador reaproveite
+    // uma resposta antiga para uma imagem que já foi substituída.
+    const versao = String(noticia.imagemCaminho || noticia.nomeImagem || noticia.dataUpload || idNoticia).trim();
+    return `/noticia/download/${idNoticia}?v=${encodeURIComponent(versao)}`;
+}
+
+function recarregarImagemNoticia(imagem) {
+    if (imagem.dataset.retry === "1") {
+        imagem.parentElement?.classList.add("sem-imagem");
+        imagem.remove();
+        return;
+    }
+
+    imagem.dataset.retry = "1";
+    const separador = imagem.src.includes("?") ? "&" : "?";
+    imagem.src = `${imagem.src}${separador}retry=${Date.now()}`;
 }
 
 function resumirDescricao(descricao) {
@@ -163,7 +180,7 @@ function renderizarNoticias(lista = noticias) {
                 <td>
                   <div class="noticia-list-item">
                     <div class="noticia-thumb">
-                      ${imagem ? `<img src="${imagem}" alt="Imagem da noticia ${titulo}" loading="lazy" onerror="this.parentElement.classList.add('sem-imagem'); this.remove();">` : ""}
+                      ${imagem ? `<img src="${imagem}" alt="Imagem da noticia ${titulo}" decoding="async" onerror="recarregarImagemNoticia(this)">` : ""}
                       <span class="material-symbols-outlined">image</span>
                     </div>
                     <div class="noticia-list-text">

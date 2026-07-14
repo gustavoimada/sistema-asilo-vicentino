@@ -12,6 +12,22 @@ function escaparHtml(valor) {
         .replace(/'/g, "&#39;");
 }
 
+function urlImagemNoticiaIndex(noticia, id) {
+    const versao = String(noticia.imagemCaminho || noticia.nomeImagem || noticia.dataUpload || id).trim();
+    return `/noticia/download/${id}?v=${encodeURIComponent(versao)}`;
+}
+
+function recarregarImagemNoticiaIndex(imagem) {
+    if (imagem.dataset.retry === "1") {
+        imagem.closest(".news-card-thumb")?.classList.add("sem-imagem");
+        return;
+    }
+
+    imagem.dataset.retry = "1";
+    const separador = imagem.src.includes("?") ? "&" : "?";
+    imagem.src = `${imagem.src}${separador}retry=${Date.now()}`;
+}
+
 function _criarLightbox() {
     if (_lightboxEl) return;
 
@@ -153,7 +169,7 @@ async function carregarNoticiasIndex() {
             const id = Number(noticia.idNoticia || noticia.id);
             if (!Number.isInteger(id) || id <= 0) return "";
 
-            const src = `/noticia/download/${id}`;
+            const src = urlImagemNoticiaIndex(noticia, id);
             const titulo = escaparHtml(noticia.titulo || "Noticia");
             const categoria = escaparHtml(noticia.categoria || "Geral");
             const descricao = escaparHtml(noticia.descricao || "");
@@ -167,7 +183,7 @@ async function carregarNoticiasIndex() {
                      role="button"
                      aria-label="Ver notícia: ${titulo}">
               <div class="news-card-thumb">
-                <img src="${src}" alt="${titulo}" decoding="async" />
+                <img src="${src}" alt="${titulo}" decoding="async" onerror="recarregarImagemNoticiaIndex(this)" />
                 <div class="news-card-thumb-overlay">
                   <span class="tag">${categoria}</span>
                 </div>
