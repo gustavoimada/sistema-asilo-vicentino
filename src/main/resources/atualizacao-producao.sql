@@ -18,6 +18,37 @@ ALTER TABLE tipodespesas ADD COLUMN IF NOT EXISTS ativo BOOLEAN NOT NULL DEFAULT
 -- Permite descricoes maiores nas noticias publicas.
 ALTER TABLE noticia ALTER COLUMN descricao TYPE VARCHAR(500);
 
+-- Cada quarto do Asilo Vicentino possui duas vagas fixas.
+UPDATE quartos
+SET capacidademax = 2
+WHERE capacidademax IS DISTINCT FROM 2;
+
+ALTER TABLE quartos
+    ALTER COLUMN capacidademax SET DEFAULT 2;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'ck_quartos_capacidade_duas_vagas'
+    ) THEN
+        ALTER TABLE quartos
+            ADD CONSTRAINT ck_quartos_capacidade_duas_vagas
+            CHECK (capacidademax = 2) NOT VALID;
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'ck_quartos_capacidade_duas_vagas'
+          AND NOT convalidated
+    ) THEN
+        ALTER TABLE quartos VALIDATE CONSTRAINT ck_quartos_capacidade_duas_vagas;
+    END IF;
+END $$;
+
 -- Organiza documentos de transparencia por ano e mes de referencia.
 ALTER TABLE transparencia ADD COLUMN IF NOT EXISTS mes INTEGER;
 UPDATE transparencia

@@ -44,15 +44,15 @@ public class QuartoControl
 
 	@PostMapping("cadastrar")
 	public ResponseEntity<Object> cadastrarQuarto(@RequestParam String ala, @RequestParam int numero,
-		@RequestParam int capacidademax, @RequestParam String disponibilidade)
+		@RequestParam String disponibilidade)
 	{
 		String disponibilidadeNormalizada = normalizarDisponibilidade(disponibilidade);
-		Quarto quarto = new Quarto(ala, numero, capacidademax, 0, disponibilidadeNormalizada);
+		Quarto quarto = new Quarto(ala, numero, 0, disponibilidadeNormalizada);
 		quarto.setIdQuartos(numero);
 		Banco conexao = Banco.getConnection();
 		try
 		{
-			if (numero <= 0 || capacidademax <= 0 || ala == null || ala.isBlank()
+			if (numero <= 0 || ala == null || ala.isBlank()
 				|| disponibilidadeNormalizada == null || disponibilidadeNormalizada.isBlank())
 			{
 				return ResponseEntity.badRequest().body(new Error("Erro", "Dados invalidos para cadastro do quarto"));
@@ -124,7 +124,7 @@ public class QuartoControl
 
 	@PutMapping("editar")
 	public ResponseEntity<Object> editarQuarto(@RequestParam int id, @RequestParam String ala, @RequestParam int numero,
-		@RequestParam int capacidademax, @RequestParam String disponibilidade)
+		@RequestParam String disponibilidade)
 	{
 		Quarto quarto = new Quarto();
 		Banco conexao = Banco.getConnection();
@@ -132,7 +132,7 @@ public class QuartoControl
 		{
 			String disponibilidadeNormalizada = normalizarDisponibilidade(disponibilidade);
 
-			if (numero <= 0 || capacidademax <= 0 || ala == null || ala.trim().isEmpty()
+			if (numero <= 0 || ala == null || ala.trim().isEmpty()
 				|| disponibilidadeNormalizada == null || disponibilidadeNormalizada.trim().isEmpty())
 			{
 				return ResponseEntity.badRequest().body(new Error("Erro", "Dados invalidos para edicao do quarto"));
@@ -152,14 +152,14 @@ public class QuartoControl
 			quartoEncontrado.setIdQuartos(numero);
 			quartoEncontrado.setAla(ala);
 			quartoEncontrado.setNumero(numero);
-			quartoEncontrado.setCapacidademax(capacidademax);
+			quartoEncontrado.setCapacidademax(Quarto.CAPACIDADE_MAXIMA_POR_QUARTO);
 			int qtndHospedesAtual = quartoEncontrado.getQtndHospedes();
-			if (qtndHospedesAtual > capacidademax)
+			if (qtndHospedesAtual > Quarto.CAPACIDADE_MAXIMA_POR_QUARTO)
 			{
-				return ResponseEntity.badRequest().body(new Error("Erro", "Quantidade de hospedes maior que capacidade maxima"));
+				return ResponseEntity.badRequest().body(new Error("Erro", "O quarto possui mais moradores que o limite de duas vagas"));
 			}
 
-			if (qtndHospedesAtual == capacidademax)
+			if (qtndHospedesAtual == Quarto.CAPACIDADE_MAXIMA_POR_QUARTO)
 			{
 				quartoEncontrado.setDisponibilidade("N");
 			}

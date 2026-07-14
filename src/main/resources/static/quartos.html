@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="assets/favicon.png?v=2" />
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=2" />
 
-  <link rel="stylesheet" href="css/stylesQuartos.css?v=20260711-2" />
+  <link rel="stylesheet" href="css/stylesQuartos.css?v=20260714-1" />
   <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260708-3" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
@@ -129,7 +129,7 @@
           <div class="section-header-inline">
             <div class="section-header" style="margin-bottom:0;">
               <h2 id="quartoFormTitulo">Cadastrar quarto</h2>
-              <p>Preencha os dados do quarto para salvar no sistema.</p>
+              <p>Cada quarto possui duas vagas para moradores.</p>
             </div>
             <button type="button" id="cancelarQuartoBtn" class="close-panel-btn" aria-label="Fechar cadastro">
               <span class="material-symbols-outlined">close</span>
@@ -153,15 +153,10 @@
             </div>
 
             <div class="form-field">
-              <label for="capacidademax">Capacidade máxima</label>
-              <input id="capacidademax" name="capacidademax" type="number" min="1" required />
-            </div>
-
-            <div class="form-field">
-              <label for="disponibilidade">Disponibilidade</label>
+              <label for="disponibilidade">Situação do quarto</label>
               <select id="disponibilidade" name="disponibilidade" required>
-                <option value="D">Disponível</option>
-                <option value="I">Indisponível</option>
+                <option value="D">Disponível para ocupação</option>
+                <option value="I">Indisponível (manutenção ou reserva)</option>
               </select>
             </div>
 
@@ -178,7 +173,7 @@
           <div class="section-header-inline">
             <div class="section-header" style="margin-bottom:0;">
               <h2>Filtrar Quartos</h2>
-              <p>Pesquise por número, ala ou disponibilidade.</p>
+              <p>Encontre quartos pela ala ou pela disponibilidade.</p>
             </div>
             <button type="button" id="fecharFiltrosQuarto" class="close-panel-btn" aria-label="Fechar filtros">
               <span class="material-symbols-outlined">close</span>
@@ -204,11 +199,6 @@
               </select>
             </div>
 
-            <div class="form-field">
-              <label for="filtroNumeroQuarto">Número</label>
-              <input id="filtroNumeroQuarto" type="number" min="1" placeholder="Ex: 2" />
-            </div>
-
             <div class="form-actions form-actions-between">
               <button type="button" id="limparFiltrosQuarto" class="secondary-panel-btn">
                 <span class="material-symbols-outlined">cleaning_services</span>
@@ -224,17 +214,16 @@
               <table>
                 <thead>
                   <tr>
-                    <th data-sort="idquartos">Número</th>
+                    <th data-sort="idquartos">Quarto</th>
                     <th data-sort="ala">Ala</th>
-                    <th data-sort="capacidademax">Capacidade Máx</th>
-                    <th data-sort="qntdhospedes">Qtd Hóspedes</th>
-                    <th data-sort="disponibilidade">Disponibilidade</th>
+                    <th data-sort="qntdhospedes">Ocupação</th>
+                    <th data-sort="disponibilidade">Situação</th>
                     <th class="text-right">Ações</th>
                   </tr>
                 </thead>
                 <tbody id="tabelaQuartos">
                   <tr>
-                    <td colspan="6">
+                    <td colspan="5">
                       <div class="placeholder-table">Carregando quartos...</div>
                     </td>
                   </tr>
@@ -250,7 +239,7 @@
   </div>
 
   <script src="js/perfilTopo.js"></script>
-  <script src="js/quartoController.js?v=20260711-2"></script>
+  <script src="js/quartoController.js?v=20260714-1"></script>
   <script src="js/sidebarSecretaria.js?v=20260707-1"></script>
   <script src="js/sidebarRecolhivel.js?v=20260708-1"></script>
 </body>

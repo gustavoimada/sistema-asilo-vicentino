@@ -11,21 +11,22 @@ import java.util.List;
 
 public class Quarto {
 
+    public static final int CAPACIDADE_MAXIMA_POR_QUARTO = 2;
 
     private int idQuartos;
     private String ala;
     private Integer numero;
-    private int capacidademax;
+    private int capacidademax = CAPACIDADE_MAXIMA_POR_QUARTO;
     private int qtndHospedes;
     private String disponibilidade;
 
     public Quarto() {
     }
 
-    public Quarto(String ala, Integer numero, int capacidademax, int qtndHospedes, String disponibilidade) {
+    public Quarto(String ala, Integer numero, int qtndHospedes, String disponibilidade) {
         this.ala = ala;
         this.numero = numero;
-        this.capacidademax = capacidademax;
+        this.capacidademax = CAPACIDADE_MAXIMA_POR_QUARTO;
         this.qtndHospedes = qtndHospedes;
         this.disponibilidade = disponibilidade;
     }
@@ -55,11 +56,11 @@ public class Quarto {
     }
 
     public int getCapacidademax() {
-        return capacidademax;
+        return CAPACIDADE_MAXIMA_POR_QUARTO;
     }
 
     public void setCapacidademax(int capacidademax) {
-        this.capacidademax = capacidademax;
+        this.capacidademax = CAPACIDADE_MAXIMA_POR_QUARTO;
     }
 
     public int getQtndHospedes() {

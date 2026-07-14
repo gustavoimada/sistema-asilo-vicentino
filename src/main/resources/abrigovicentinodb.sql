@@ -9,7 +9,7 @@ CREATE TABLE quartos (
                          ala VARCHAR(2),
                          qntdHospedes INTEGER,
                          disponibilidade VARCHAR(1),
-                         capacidadeMax INTEGER
+                         capacidadeMax INTEGER NOT NULL DEFAULT 2 CHECK (capacidadeMax = 2)
 );
 
 -- =========================================
