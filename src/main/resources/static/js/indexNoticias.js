@@ -167,7 +167,7 @@ async function carregarNoticiasIndex() {
                      role="button"
                      aria-label="Ver notícia: ${titulo}">
               <div class="news-card-thumb">
-                <img src="${src}" alt="${titulo}" loading="lazy" />
+                <img src="${src}" alt="${titulo}" decoding="async" />
                 <div class="news-card-thumb-overlay">
                   <span class="tag">${categoria}</span>
                 </div>
