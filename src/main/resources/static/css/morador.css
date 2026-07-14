@@ -78,6 +78,19 @@
   min-width: 0;
 }
 
+/* Mantem os dados pessoais no inicio e deixa todo o endereco ao final. */
+#moradorForm .campo-cpf { order: 1; }
+#moradorForm .campo-cep { order: 2; }
+#moradorForm .campo-telefone { order: 3; }
+#moradorForm .campo-quarto { order: 4; }
+#moradorForm .campo-endereco { order: 5; }
+#moradorForm .campo-numero { order: 6; }
+#moradorForm .campo-cidade { order: 7; }
+#moradorForm .campo-estado { order: 8; }
+#moradorForm .contato-responsavel-title { order: 9; }
+#moradorForm .contato-responsavel-title ~ .form-field { order: 10; }
+#moradorForm .form-actions { order: 11; }
+
 .form-field input,
 .form-field select {
   min-height: 44px;
@@ -90,24 +103,44 @@
 }
 
 .cep-status {
-  display: block;
-  min-height: 18px;
-  margin-top: 6px;
+  display: none;
+  width: fit-content;
+  max-width: 100%;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  background: #f1f5f9;
   color: #64748b;
   font-size: 12px;
   font-weight: 600;
   line-height: 1.35;
 }
 
+.cep-status:not(:empty) {
+  display: inline-flex;
+}
+
+.cep-status::before {
+  content: "info";
+  font-family: "Material Symbols Outlined";
+  font-size: 16px;
+  font-variation-settings: "FILL" 1, "wght" 600;
+}
+
 .cep-status.is-loading {
+  background: #eff6ff;
   color: #1d4ed8;
 }
 
 .cep-status.is-success {
+  background: #ecfdf3;
   color: #15803d;
 }
 
 .cep-status.is-error {
+  background: #fff7ed;
   color: #b45309;
 }
 
