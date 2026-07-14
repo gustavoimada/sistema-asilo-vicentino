@@ -9,21 +9,32 @@ import unoeste.projetoasilo.entities.Error;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Set;
+
+import jakarta.servlet.http.HttpSession;
 
 @RestController
 @RequestMapping({"doacao", "doacoes"})
 public class DoacaoControl
 {
+    private static final Set<String> TIPOS_DOACAO_PERMITIDOS = Set.of("Financeiro", "Alimento", "Patrimônio");
+
     @PostMapping("cadastrar")
-    public ResponseEntity<Object> cadastrarDoacao(@RequestParam double valor, @RequestParam(required = false) String observacoes, @RequestParam(required = false) String cpfDoador, @RequestParam(required = false) String nomeDoador, @RequestParam(required = false) String dtDoacao, @RequestParam String tipo, @RequestParam(required = false) String pagEmail)
+    public ResponseEntity<Object> cadastrarDoacao(@RequestParam double valor, @RequestParam(required = false) String observacoes, @RequestParam(required = false) String cpfDoador, @RequestParam(required = false) String nomeDoador, @RequestParam(required = false) String dtDoacao, @RequestParam String tipo, @RequestParam(required = false) String pagEmail, HttpSession session)
     {
         Banco conexao = Banco.getConnection();
         try
         {
-            ResponseEntity<Object> erroValidacao = validarDados(valor, observacoes, cpfDoador, nomeDoador, tipo, pagEmail);
+            String tipoNormalizado = normalizarTipo(tipo);
+            ResponseEntity<Object> erroValidacao = validarDados(valor, observacoes, cpfDoador, nomeDoador, tipoNormalizado, pagEmail);
             if (erroValidacao != null)
             {
                 return erroValidacao;
+            }
+
+            if (!"Financeiro".equals(tipoNormalizado) && !sessaoAdministrativa(session))
+            {
+                return ResponseEntity.status(403).body(new Error("Erro", "Doações de alimentos e patrimônio devem ser registradas pela equipe do asilo."));
             }
 
             Timestamp data = resolverDataDoacao(dtDoacao);
@@ -32,7 +43,7 @@ public class DoacaoControl
                 return ResponseEntity.badRequest().body(new Error("Erro", "A data da doação está inválida. Verifique e tente novamente."));
             }
 
-            Doacao doacao = new Doacao(valor, observacoes, cpfDoador, padronizarTextoNulo(nomeDoador), data, tipo);
+            Doacao doacao = new Doacao(valor, observacoes, cpfDoador, padronizarTextoNulo(nomeDoador), data, tipoNormalizado);
             doacao.setStatus("Em_Analise");
             doacao.setPag_email(padronizarTextoNulo(pagEmail));
 
@@ -278,11 +289,19 @@ public class DoacaoControl
 
     private ResponseEntity<Object> validarDados(double valor, String observacoes, String cpfDoador, String nomeDoador, String tipo, String pagEmail)
     {
+        if (Double.isNaN(valor) || Double.isInfinite(valor))
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", "O valor da doação é inválido."));
+        }
+        if (valor < 0)
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", "O valor da doação não pode ser negativo."));
+        }
         if (!"Patrimônio".equalsIgnoreCase(tipo) && valor <= 0)
         {
             return ResponseEntity.badRequest().body(new Error("Erro", "O valor da doação deve ser maior que zero."));
         }
-        if (tipo == null || tipo.trim().isEmpty())
+        if (!TIPOS_DOACAO_PERMITIDOS.contains(tipo))
         {
             return ResponseEntity.badRequest().body(new Error("Erro", "Selecione o tipo da doação."));
         }
@@ -311,6 +330,46 @@ public class DoacaoControl
             }
         }
         return null;
+    }
+
+    private String normalizarTipo(String tipo)
+    {
+        if (tipo == null)
+        {
+            return "";
+        }
+
+        String valor = tipo.trim();
+        if ("financeiro".equalsIgnoreCase(valor))
+        {
+            return "Financeiro";
+        }
+        if ("alimento".equalsIgnoreCase(valor))
+        {
+            return "Alimento";
+        }
+        if ("patrimônio".equalsIgnoreCase(valor) || "patrimonio".equalsIgnoreCase(valor))
+        {
+            return "Patrimônio";
+        }
+        return valor;
+    }
+
+    private boolean sessaoAdministrativa(HttpSession session)
+    {
+        if (session == null)
+        {
+            return false;
+        }
+
+        Object categoria = session.getAttribute("categoria");
+        if (categoria == null)
+        {
+            return false;
+        }
+
+        String valor = String.valueOf(categoria).trim();
+        return "secretaria".equalsIgnoreCase(valor) || "coordenador".equalsIgnoreCase(valor);
     }
 
     private Timestamp resolverDataDoacao(String dtDoacao)

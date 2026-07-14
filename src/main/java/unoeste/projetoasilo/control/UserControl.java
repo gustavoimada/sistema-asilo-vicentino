@@ -13,6 +13,7 @@ import unoeste.projetoasilo.entities.Error;
 import unoeste.projetoasilo.entities.Funcionario;
 import unoeste.projetoasilo.entities.User;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.sql.SQLException;
 import java.util.List;
@@ -80,7 +81,7 @@ public class UserControl
     // ====================== FUNCOES AUXILIARES ===========================
 
     @PostMapping("entrar")
-    public ResponseEntity<Object> autenticar(@RequestParam String username, @RequestParam String password, HttpSession session)
+    public ResponseEntity<Object> autenticar(@RequestParam String username, @RequestParam String password, HttpServletRequest request)
     {
         Banco conexao = Banco.getConnection();
 
@@ -107,11 +108,18 @@ public class UserControl
                 return ResponseEntity.status(401).body(new Error("Erro", "Funcionario inativo ou nao encontrado"));
             }
 
-            session.setAttribute("idUser", usuario.getIdUser());
-            session.setAttribute("usuarioNome", usuario.getName());
-            session.setAttribute("idFuncionario", funcionario.getIdFuncionario());
-            session.setAttribute("funcionarioNome", funcionario.getNome());
-            session.setAttribute("categoria", funcionario.getCategoria());
+            HttpSession sessaoAnterior = request.getSession(false);
+            if (sessaoAnterior != null)
+            {
+                sessaoAnterior.invalidate();
+            }
+
+            HttpSession novaSessao = request.getSession(true);
+            novaSessao.setAttribute("idUser", usuario.getIdUser());
+            novaSessao.setAttribute("usuarioNome", usuario.getName());
+            novaSessao.setAttribute("idFuncionario", funcionario.getIdFuncionario());
+            novaSessao.setAttribute("funcionarioNome", funcionario.getNome());
+            novaSessao.setAttribute("categoria", funcionario.getCategoria());
 
             return ResponseEntity.ok().body(usuario);
         }

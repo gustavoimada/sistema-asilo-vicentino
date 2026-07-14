@@ -3,6 +3,15 @@ let _lightboxEl = null;
 let _lightboxImg = null;
 let _lightboxCaption = null;
 
+function escaparHtml(valor) {
+    return String(valor ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
 function _criarLightbox() {
     if (_lightboxEl) return;
 
@@ -141,11 +150,13 @@ async function carregarNoticiasIndex() {
         const ultimas = data.slice(0, 9);
 
         newsGrid.innerHTML = ultimas.map(noticia => {
-            const id        = noticia.idNoticia || noticia.id;
-            const src       = `/noticia/download/${id}`;
-            const titulo    = (noticia.titulo    || "").replace(/"/g, "&quot;");
-            const categoria = (noticia.categoria || "Geral").replace(/"/g, "&quot;");
-            const descricao = noticia.descricao  || "";
+            const id = Number(noticia.idNoticia || noticia.id);
+            if (!Number.isInteger(id) || id <= 0) return "";
+
+            const src = `/noticia/download/${id}`;
+            const titulo = escaparHtml(noticia.titulo || "Noticia");
+            const categoria = escaparHtml(noticia.categoria || "Geral");
+            const descricao = escaparHtml(noticia.descricao || "");
 
             return `
             <article class="news-card reveal-on-scroll"

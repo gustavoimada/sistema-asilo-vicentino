@@ -20,6 +20,7 @@ import unoeste.projetoasilo.entities.Transparencia;
 
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -35,6 +36,8 @@ import java.util.Locale;
 @RequestMapping("transparencia")
 public class TransparenciaControl
 {
+    private static final long TAMANHO_MAXIMO_PDF = 20L * 1024L * 1024L;
+
     private final Path raizUpload = Paths.get(uploadDirBase(), "transparencia").toAbsolutePath().normalize();
     // Recebe o PDF enviado pelo coordenador e salva o arquivo no servidor.
     @PostMapping("upload")
@@ -73,23 +76,19 @@ public class TransparenciaControl
             nomeOriginal = arquivo.getOriginalFilename();
         }
 
-        String contentType;
-        if (arquivo.getContentType() == null)
+        if (arquivo.getSize() > TAMANHO_MAXIMO_PDF)
         {
-            contentType = "";
+            return ResponseEntity.badRequest().body(new Error("Erro", "O PDF deve ter no maximo 20 MB"));
         }
-        else
-        {
-            contentType = arquivo.getContentType().toLowerCase(Locale.ROOT);
-        }
-        if (!nomeOriginal.toLowerCase(Locale.ROOT).endsWith(".pdf") && !contentType.contains("pdf"))
+
+        if (!nomeOriginal.toLowerCase(Locale.ROOT).endsWith(".pdf") || !arquivoEhPdf(arquivo))
         {
             return ResponseEntity.badRequest().body(new Error("Erro", "Somente arquivos PDF sao permitidos"));
         }
 
+        Banco conexao = Banco.getConnection();
         try
         {
-            Banco conexao = Banco.getConnection();
             Funcionario funcionario = buscarFuncionarioDaSessao(session, conexao);
             if (funcionario == null)
             {
@@ -112,7 +111,10 @@ public class TransparenciaControl
                 return ResponseEntity.badRequest().body(new Error("Erro", "Nome de arquivo invalido"));
             }
 
-            Files.copy(arquivo.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
+            try (InputStream stream = arquivo.getInputStream())
+            {
+                Files.copy(stream, destino, StandardCopyOption.REPLACE_EXISTING);
+            }
 
             Transparencia transparencia = new Transparencia();
             transparencia.setAno(Integer.parseInt(anoLimpo));
@@ -138,15 +140,19 @@ public class TransparenciaControl
         {
             return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao salvar arquivo"));
         }
+        finally
+        {
+            conexao.fechar();
+        }
     }
 
     // Exclui um arquivo de transparencia e tambem remove o registro do banco.
     @DeleteMapping("deletar/{id}")
     public ResponseEntity<Object> deletar(@PathVariable int id, HttpSession session)
     {
+        Banco conexao = Banco.getConnection();
         try
         {
-            Banco conexao = Banco.getConnection();
             Funcionario funcionario = buscarFuncionarioDaSessao(session, conexao);
             if (funcionario == null || !ehCoordenador(funcionario))
             {
@@ -165,14 +171,14 @@ public class TransparenciaControl
                 return ResponseEntity.badRequest().body(new Error("Erro", "Caminho de arquivo invalido"));
             }
 
-            if (Files.exists(caminho) && Files.isRegularFile(caminho))
-            {
-                Files.deleteIfExists(caminho);
-            }
-
             if (!transparencia.excluir(id, conexao))
             {
                 return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel excluir o registro no banco"));
+            }
+
+            if (Files.exists(caminho) && Files.isRegularFile(caminho))
+            {
+                Files.deleteIfExists(caminho);
             }
 
             return ResponseEntity.ok().build();
@@ -181,15 +187,19 @@ public class TransparenciaControl
         {
             return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao excluir arquivo"));
         }
+        finally
+        {
+            conexao.fechar();
+        }
     }
 
     // Faz o download publico do PDF salvo.
     @GetMapping("download/{id}")
     public ResponseEntity<Object> download(@PathVariable int id)
     {
+        Banco conexao = Banco.getConnection();
         try
         {
-            Banco conexao = Banco.getConnection();
             Transparencia transparencia = new Transparencia().buscarPorId(id, conexao);
             if (transparencia == null)
             {
@@ -213,6 +223,10 @@ public class TransparenciaControl
         catch (MalformedURLException | SQLException e)
         {
             return ResponseEntity.badRequest().body(new Error("Erro", "Arquivo invalido"));
+        }
+        finally
+        {
+            conexao.fechar();
         }
     }
 
@@ -348,6 +362,24 @@ public class TransparenciaControl
             valor = valor.substring(0, 80).trim();
         }
         return valor;
+    }
+
+    private boolean arquivoEhPdf(MultipartFile arquivo)
+    {
+        try (InputStream stream = arquivo.getInputStream())
+        {
+            byte[] cabecalho = stream.readNBytes(5);
+            return cabecalho.length == 5
+                    && cabecalho[0] == 0x25
+                    && cabecalho[1] == 0x50
+                    && cabecalho[2] == 0x44
+                    && cabecalho[3] == 0x46
+                    && cabecalho[4] == 0x2D;
+        }
+        catch (IOException e)
+        {
+            return false;
+        }
     }
 
     // Confere se o funcionario logado e coordenador.

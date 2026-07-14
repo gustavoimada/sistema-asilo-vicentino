@@ -21,7 +21,6 @@ public class AccessFilter implements Filter
             "/morador.html",
             "/medicamentos.html",
             "/caixinhas.html",
-            "/cadastrarPrescricao.html",
             "/tipoOcorrencia.html",
             "/doacao.html",
             "/quartos.html",
