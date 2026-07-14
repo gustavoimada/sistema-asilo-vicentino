@@ -256,6 +256,20 @@ input {
 .intro-reveal.is-visible {
   opacity: 1;
   transform: translateY(0);
+  animation: intro-reveal-in 0.7s ease both;
+  animation-delay: var(--intro-delay, 0ms);
+}
+
+@keyframes intro-reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* HERO */
@@ -1778,12 +1792,41 @@ main {
   opacity: 1;
   transform: translateY(0);
   filter: blur(0);
+  animation: section-reveal-in 0.68s ease both;
 }
 
 .reveal-on-scroll.is-visible {
   opacity: 1;
   transform: translateY(0);
   filter: blur(0);
+  animation: reveal-fade-in 0.7s ease both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+@keyframes section-reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+    filter: blur(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes reveal-fade-in {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
 }
 
 .history-visual-grid .reveal-on-scroll:nth-child(odd),
