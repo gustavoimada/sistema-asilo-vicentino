@@ -15,6 +15,7 @@ function iniciarMenu()
 {
   const links = document.querySelectorAll('.topbar-nav a[href^="#"]');
   const topbar = document.querySelector(".topbar");
+  const indicador = document.querySelector(".topbar-nav-indicator");
   if (!links.length)
     return;
 
@@ -28,11 +29,32 @@ function iniciarMenu()
 
   function marcarAtivo(id)
   {
+    let linkAtivo = null;
     for (let i = 0; i < links.length; i += 1)
     {
       const href = links[i].getAttribute("href");
-      links[i].classList.toggle("active", href === "#" + id);
+      const ativo = href === "#" + id;
+      links[i].classList.toggle("active", ativo);
+      if (ativo) linkAtivo = links[i];
     }
+    atualizarIndicador(linkAtivo);
+  }
+
+  function atualizarIndicador(linkAtivo)
+  {
+    if (!indicador) return;
+
+    const ativo = linkAtivo || document.querySelector(".topbar-nav a.active");
+    if (!ativo) return;
+
+    window.requestAnimationFrame(function () {
+      const nav = ativo.parentElement;
+      if (!nav) return;
+      const navRect = nav.getBoundingClientRect();
+      const linkRect = ativo.getBoundingClientRect();
+      indicador.style.width = linkRect.width + "px";
+      indicador.style.transform = "translateX(" + (linkRect.left - navRect.left) + "px)";
+    });
   }
 
   function alturaMenu()
@@ -92,6 +114,9 @@ function iniciarMenu()
   }
 
   window.addEventListener("scroll", atualizarPeloScroll, { passive: true });
+  window.addEventListener("resize", function () {
+    atualizarIndicador();
+  });
   atualizarPeloScroll();
 }
 
@@ -102,11 +127,32 @@ function iniciarRotinaAsilo()
   const horario = document.getElementById("dayflowTime");
   const titulo = document.getElementById("dayflowTitle");
   const texto = document.getElementById("dayflowText");
+  const indicador = document.getElementById("dayflowPosition");
+  const botaoPausa = document.getElementById("dayflowPause");
+  const listaPassos = document.querySelector(".dayflow-steps");
   let timerAutomatico = null;
   let indiceAtual = 0;
+  let pausado = false;
 
   if (!passos.length || !imagem)
     return;
+
+  function atualizarControles()
+  {
+    if (indicador) {
+      indicador.textContent = (indiceAtual + 1) + " de " + passos.length + " atividades";
+    }
+
+    if (botaoPausa) {
+      botaoPausa.setAttribute("aria-pressed", String(pausado));
+      botaoPausa.innerHTML = `
+        <span class="material-symbols-outlined">${pausado ? "play_arrow" : "pause"}</span>
+        <span>${pausado ? "Retomar" : "Pausar"}</span>
+      `;
+    }
+
+    if (listaPassos) listaPassos.classList.toggle("is-paused", pausado);
+  }
 
   function ativarPasso(passo, reiniciarTimer)
   {
@@ -126,9 +172,10 @@ function iniciarRotinaAsilo()
       if (titulo) titulo.textContent = passo.getAttribute("data-title") || titulo.textContent;
       if (texto) texto.textContent = passo.getAttribute("data-text") || texto.textContent;
       imagem.classList.remove("is-changing");
-    }, 150);
+    }, 180);
 
-    if (reiniciarTimer) iniciarTimer();
+    atualizarControles();
+    if (reiniciarTimer && !pausado) iniciarTimer();
   }
 
   function avancarAutomatico()
@@ -140,6 +187,7 @@ function iniciarRotinaAsilo()
   function iniciarTimer()
   {
     if (timerAutomatico) window.clearInterval(timerAutomatico);
+    if (pausado) return;
     timerAutomatico = window.setInterval(avancarAutomatico, 5600);
   }
 
@@ -151,6 +199,29 @@ function iniciarRotinaAsilo()
     });
   }
 
+  if (botaoPausa) {
+    botaoPausa.addEventListener("click", function () {
+      pausado = !pausado;
+      if (pausado) {
+        if (timerAutomatico) window.clearInterval(timerAutomatico);
+        timerAutomatico = null;
+      } else {
+        iniciarTimer();
+      }
+      atualizarControles();
+    });
+  }
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) {
+      if (timerAutomatico) window.clearInterval(timerAutomatico);
+      timerAutomatico = null;
+    } else if (!pausado) {
+      iniciarTimer();
+    }
+  });
+
+  atualizarControles();
   iniciarTimer();
 }
 
@@ -227,6 +298,8 @@ function iniciarNoticias() {
   const grid = document.getElementById("newsGrid");
   const btnVoltar = document.querySelector('.news-actions .circle-btn[data-news-dir="prev"]');
   const btnAvancar = document.querySelector('.news-actions .circle-btn[data-news-dir="next"]');
+  const posicao = document.getElementById("newsPosition");
+  const preenchimento = document.getElementById("newsProgressFill");
 
   iniciarAmpliaNoticias();
   if (grid) marcarElementosAnimados(grid.querySelectorAll(".news-card"));
@@ -239,10 +312,35 @@ function iniciarNoticias() {
     return card.getBoundingClientRect().width + espacamento;
   }
 
-  function atualizarBotoes() {
+  function atualizarNavegacaoNoticias() {
     const max = grid.scrollWidth - grid.clientWidth;
     btnVoltar.disabled = grid.scrollLeft <= 4;
     btnAvancar.disabled = grid.scrollLeft >= max - 4;
+
+    const cards = grid.querySelectorAll(".news-card");
+    if (!cards.length) {
+      if (posicao) posicao.textContent = "Carregando notícias";
+      if (preenchimento) preenchimento.style.width = "0%";
+      return;
+    }
+
+    const indice = Math.min(cards.length, Math.max(1, Math.round(grid.scrollLeft / Math.max(passo(), 1)) + 1));
+    if (posicao) posicao.textContent = "Notícia " + indice + " de " + cards.length;
+    if (preenchimento) preenchimento.style.width = ((indice / cards.length) * 100).toFixed(2) + "%";
+  }
+
+  function revelarNoticiasCarregadas() {
+    const cards = grid.querySelectorAll(".news-card");
+    const alturaTela = window.innerHeight || document.documentElement.clientHeight;
+    for (let i = 0; i < cards.length; i += 1) {
+      if (!cards[i].style.getPropertyValue("--reveal-delay")) {
+        cards[i].style.setProperty("--reveal-delay", ((i % 3) * 80) + "ms");
+      }
+      const rect = cards[i].getBoundingClientRect();
+      if (rect.top <= alturaTela * 0.88 && rect.bottom >= alturaTela * 0.12) {
+        cards[i].classList.add("is-visible");
+      }
+    }
   }
 
   btnVoltar.addEventListener("click", function () {
@@ -253,10 +351,13 @@ function iniciarNoticias() {
     grid.scrollBy({ left: passo(), behavior: "smooth" });
   });
 
-  grid.addEventListener("scroll", atualizarBotoes, { passive: true });
-  window.addEventListener("resize", atualizarBotoes);
-  new MutationObserver(atualizarBotoes).observe(grid, { childList: true });
-  atualizarBotoes();
+  grid.addEventListener("scroll", atualizarNavegacaoNoticias, { passive: true });
+  window.addEventListener("resize", atualizarNavegacaoNoticias);
+  new MutationObserver(function () {
+    atualizarNavegacaoNoticias();
+    window.requestAnimationFrame(revelarNoticiasCarregadas);
+  }).observe(grid, { childList: true });
+  atualizarNavegacaoNoticias();
 }
 
 function iniciarBotoesFinais() {
@@ -314,6 +415,11 @@ function iniciarBotoesFinais() {
         <p>${dados.texto}</p>
       </div>
     `;
+
+    impactoDoacao.classList.remove("is-updated");
+    window.requestAnimationFrame(function () {
+      impactoDoacao.classList.add("is-updated");
+    });
   }
 
   function prepararPainelDoacao()
@@ -349,7 +455,6 @@ function iniciarBotoesFinais() {
         chipsValorDoacao[j].classList.toggle("is-active", chipsValorDoacao[j] === this);
       }
       atualizarImpactoDoacao(Number(valor));
-      inputValorDoacao.focus();
     });
   }
 
@@ -381,6 +486,17 @@ function iniciarBotoesFinais() {
 }
 
 let transparenciaPastas = [];
+
+function mostrarCarregamentoTransparencia(lista) {
+  if (!lista) return;
+  lista.innerHTML = `
+    <div class="transparencia-skeleton" aria-label="Carregando documentos">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  `;
+}
 
 function eventoTransparenciaPublica(arquivo) {
   const evento = String(arquivo?.evento || "").trim();
@@ -718,6 +834,7 @@ function iniciarTransparencia() {
   const busca = document.getElementById("buscaTransparencia");
   if (!lista) return;
 
+  mostrarCarregamentoTransparencia(lista);
   fetch("/transparencia/listar")
     .then(function (resposta) {
       if (!resposta.ok) throw new Error("Falha ao listar transparencia");

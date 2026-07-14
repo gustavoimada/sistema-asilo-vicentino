@@ -155,6 +155,7 @@ input {
   justify-content: center;
   gap: clamp(14px, 1.45vw, 28px);
   min-width: 0;
+  position: relative;
 }
 
 .topbar-nav a {
@@ -164,13 +165,24 @@ input {
   border-bottom: 2px solid transparent;
   padding-bottom: 4px;
   white-space: nowrap;
-  transition: color 0.2s ease, border-color 0.2s ease;
+  transition: color 0.2s ease;
 }
 
 .topbar-nav a.active {
   color: var(--primary);
   font-weight: 800;
-  border-bottom-color: var(--primary);
+}
+
+.topbar-nav-indicator {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--primary);
+  pointer-events: none;
+  transition: width 0.3s cubic-bezier(.22,.8,.2,1), transform 0.3s cubic-bezier(.22,.8,.2,1);
 }
 
 .topbar-nav a:hover {
@@ -983,6 +995,46 @@ main {
   gap: 7px;
 }
 
+.dayflow-steps-head {
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 2px 2px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.dayflow-pause-btn {
+  border: 1px solid #dbe7fb;
+  border-radius: 999px;
+  background: #ffffff;
+  min-height: 32px;
+  padding: 0 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  color: var(--primary);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.dayflow-pause-btn:hover {
+  border-color: #93c5fd;
+  background: #eff6ff;
+  transform: translateY(-1px);
+}
+
+.dayflow-pause-btn .material-symbols-outlined {
+  font-size: 17px;
+}
+
 .dayflow-step {
   position: relative;
   border: 1px solid #dbe7fb;
@@ -1043,6 +1095,10 @@ main {
 .dayflow-step.is-active::after {
   opacity: 1;
   animation: dayflowProgress 5.6s linear forwards;
+}
+
+.dayflow-steps.is-paused .dayflow-step.is-active::after {
+  animation-play-state: paused;
 }
 
 @keyframes dayflowProgress {
@@ -1360,6 +1416,10 @@ main {
   pointer-events: auto;
 }
 
+.news-mobile-progress {
+  display: none;
+}
+
 .news-empty {
   grid-column: 1 / -1;
   color: #64748b;
@@ -1456,6 +1516,12 @@ main {
   gap: 10px;
   color: var(--on-surface);
   font-weight: 900;
+  transition: background 0.22s ease, color 0.22s ease;
+}
+
+.transparencia-year summary:hover {
+  background: #f8fbff;
+  color: var(--primary);
 }
 
 .transparencia-year summary::-webkit-details-marker {
@@ -1482,6 +1548,11 @@ main {
   transform: rotate(180deg);
 }
 
+.transparencia-year[open] summary {
+  background: #f8fbff;
+  color: var(--primary);
+}
+
 .transparencia-files {
   display: grid;
   gap: 10px;
@@ -1506,6 +1577,30 @@ main {
   background: #ffffff;
   box-shadow: 0 12px 24px rgba(15, 23, 42, 0.05);
   padding: 14px;
+}
+
+.transparencia-year[open] .transparencia-month {
+  animation: transparenciaExpand 0.34s cubic-bezier(.22,.8,.2,1) both;
+}
+
+.transparencia-year[open] .transparencia-month:nth-child(2) {
+  animation-delay: 50ms;
+}
+
+.transparencia-year[open] .transparencia-month:nth-child(3) {
+  animation-delay: 100ms;
+}
+
+@keyframes transparenciaExpand {
+  from {
+    opacity: 0;
+    transform: translateY(-7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .transparencia-month-head {
@@ -1644,6 +1739,29 @@ main {
   background: var(--surface-container-lowest);
 }
 
+.transparencia-skeleton {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  background: var(--surface-container-lowest);
+}
+
+.transparencia-skeleton span {
+  display: block;
+  height: 64px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: linear-gradient(100deg, #f1f5f9 20%, #ffffff 45%, #f1f5f9 70%);
+  background-size: 220% 100%;
+  animation: transparenciaShimmer 1.25s linear infinite;
+}
+
+@keyframes transparenciaShimmer {
+  to {
+    background-position: -220% 0;
+  }
+}
+
 .reveal-on-scroll {
   opacity: 0;
   transform: translateY(28px);
@@ -1763,6 +1881,32 @@ main {
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.1em;
+}
+
+.testimonial-card .stars,
+.testimonial-card .quote,
+.testimonial-card .testimonial-person {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.testimonial-card.is-visible .stars {
+  animation: testimonialDetailIn 0.38s ease 0.12s both;
+}
+
+.testimonial-card.is-visible .quote {
+  animation: testimonialDetailIn 0.48s ease 0.24s both;
+}
+
+.testimonial-card.is-visible .testimonial-person {
+  animation: testimonialDetailIn 0.42s ease 0.36s both;
+}
+
+@keyframes testimonialDetailIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* CTA */
@@ -2124,6 +2268,7 @@ main {
   border-color: var(--primary);
   color: #ffffff;
   box-shadow: 0 12px 24px rgba(0, 53, 127, 0.18);
+  transform: translateY(-2px) scale(1.02);
 }
 
 .donation-impact-preview {
@@ -2163,6 +2308,22 @@ main {
   color: var(--on-surface-variant);
   font-size: 13px;
   line-height: 1.55;
+}
+
+.donation-impact-preview.is-updated {
+  animation: donationImpactIn 0.34s cubic-bezier(.22,.8,.2,1);
+}
+
+@keyframes donationImpactIn {
+  0% {
+    opacity: 0.58;
+    transform: translateY(5px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .cta-form {
@@ -2751,6 +2912,34 @@ main {
     pointer-events: auto;
   }
 
+  .news-mobile-progress {
+    display: grid;
+    gap: 8px;
+    margin-top: 14px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 900;
+    text-align: center;
+  }
+
+  .news-mobile-progress-track {
+    display: block;
+    width: 100%;
+    height: 4px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #dbe7fb;
+  }
+
+  #newsProgressFill {
+    display: block;
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--primary), #38bdf8);
+    transition: width 0.28s ease;
+  }
+
   .transparencia-public-head {
     flex-direction: column;
   }
@@ -2816,6 +3005,10 @@ main {
   .dayflow-step small {
     min-width: 0;
     max-width: 100%;
+  }
+
+  .dayflow-steps-head {
+    padding: 4px 2px;
   }
 
   .circle-btn {

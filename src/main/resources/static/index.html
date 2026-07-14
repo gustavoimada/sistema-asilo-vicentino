@@ -13,14 +13,14 @@
   <meta property="og:url" content="https://www.asilovicentino.com.br/" />
   <meta property="og:image" content="https://www.asilovicentino.com.br/assets/inicial.jpg" />
 
-  <link rel="stylesheet" href="css/index.css?v=20260714-8" />
+  <link rel="stylesheet" href="css/index.css?v=20260714-9" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 </head>
 <body>
   <nav class="topbar">
     <a class="topbar-brand" href="#sobre-nos" aria-label="Voltar ao início">
-      <img src="assets/logo.png" alt="Logo Asilo Vicentino" />
+      <img src="assets/logo.webp" alt="Logo Asilo Vicentino" />
       <span>Asilo Vicentino</span>
     </a>
 
@@ -33,6 +33,7 @@
       <a href="#reconhecimento">Feedback</a>
       <a href="#doacao">Doações</a>
       <a href="#contato">Contato</a>
+      <span class="topbar-nav-indicator" aria-hidden="true"></span>
     </div>
 
     <div class="topbar-actions">
@@ -66,7 +67,7 @@
 
         <div class="hero-visual">
           <div class="hero-photo">
-            <img src="assets/inicial.jpg" alt="Foto inicial do asilo" width="697" height="864" fetchpriority="high" decoding="async" />
+            <img src="assets/inicial.webp" alt="Foto inicial do asilo" width="697" height="864" fetchpriority="high" decoding="async" />
           </div>
 
           <div class="hero-floating-card glass-card">
@@ -86,7 +87,7 @@
       <div class="container history-grid">
         <div class="history-visual-grid">
           <div class="history-col">
-            <img class="history-photo" src="assets/historico.jpg" alt="História do asilo" width="694" height="864" loading="lazy" decoding="async" />
+            <img class="history-photo" src="assets/historico.webp" alt="História do asilo" width="694" height="864" loading="lazy" decoding="async" />
             <div class="history-stat-card">
               <strong class="js-countup" data-count="60" data-suffix="+">60+</strong>
               <span>Anos de dedicação</span>
@@ -98,7 +99,7 @@
               <span class="material-symbols-outlined">auto_awesome</span>
               <p>Inovação Constante</p>
             </div>
-            <img class="history-photo" src="assets/historico2.jpg" alt="Evolução do cuidado" width="865" height="867" loading="lazy" decoding="async" />
+            <img class="history-photo" src="assets/historico2.webp" alt="Evolução do cuidado" width="865" height="867" loading="lazy" decoding="async" />
           </div>
         </div>
 
@@ -141,7 +142,7 @@
 
         <div class="dayflow">
           <div class="dayflow-visual">
-            <img id="dayflowImage" src="assets/diaadia.jpg" alt="Cuidados pela manhã" width="863" height="866" decoding="async" />
+            <img id="dayflowImage" src="assets/diaadia.webp" alt="Cuidados pela manhã" width="863" height="866" decoding="async" />
             <div class="dayflow-badge" id="dayflowTime">Rotina</div>
             <div class="dayflow-caption">
               <strong id="dayflowTitle">Refeições tranquilas</strong>
@@ -150,32 +151,39 @@
           </div>
 
           <div class="dayflow-steps">
-            <button class="dayflow-step is-active" type="button" data-image="assets/diaadia.jpg" data-title="Refeições tranquilas" data-text="Alimentação, conversa e presença da equipe em um ambiente calmo e familiar.">
+            <div class="dayflow-steps-head">
+              <span id="dayflowPosition" aria-live="polite">1 de 6 atividades</span>
+              <button id="dayflowPause" class="dayflow-pause-btn" type="button" aria-pressed="false">
+                <span class="material-symbols-outlined">pause</span>
+                <span>Pausar</span>
+              </button>
+            </div>
+            <button class="dayflow-step is-active" type="button" data-image="assets/diaadia.webp" data-title="Refeições tranquilas" data-text="Alimentação, conversa e presença da equipe em um ambiente calmo e familiar.">
               <span>01</span>
               <strong>Refeições tranquilas</strong>
               <small>Café, almoço e lanche com cuidado.</small>
             </button>
-            <button class="dayflow-step" type="button" data-image="assets/quebraCabeca.jpg" data-title="Atividades e memória" data-text="Jogos, estímulos cognitivos e atividades em grupo ajudam a manter autonomia, atenção e convivência.">
+            <button class="dayflow-step" type="button" data-image="assets/quebraCabeca.webp" data-title="Atividades e memória" data-text="Jogos, estímulos cognitivos e atividades em grupo ajudam a manter autonomia, atenção e convivência.">
               <span>02</span>
               <strong>Atividades e memória</strong>
               <small>Jogos, participação e autonomia.</small>
             </button>
-            <button class="dayflow-step" type="button" data-image="assets/rotina-missa.jpg" data-fit="contain" data-title="Missas e espiritualidade" data-text="Momentos de oração e missa fortalecem a espiritualidade, o pertencimento e a serenidade dos moradores.">
+            <button class="dayflow-step" type="button" data-image="assets/rotina-missa.webp" data-fit="contain" data-title="Missas e espiritualidade" data-text="Momentos de oração e missa fortalecem a espiritualidade, o pertencimento e a serenidade dos moradores.">
               <span>03</span>
               <strong>Missas e espiritualidade</strong>
               <small>Missa, oração e acolhimento.</small>
             </button>
-            <button class="dayflow-step" type="button" data-image="assets/rodaDeConversa.jpg" data-title="Rodas de conversa" data-text="Rodas de conversa fortalecem histórias, afetos e presença em grupo.">
+            <button class="dayflow-step" type="button" data-image="assets/rodaDeConversa.webp" data-title="Rodas de conversa" data-text="Rodas de conversa fortalecem histórias, afetos e presença em grupo.">
               <span>04</span>
               <strong>Rodas de conversa</strong>
               <small>Escuta, histórias e vínculos.</small>
             </button>
-            <button class="dayflow-step" type="button" data-image="assets/inicial2.jpg" data-title="Datas especiais" data-text="Comemorações aproximam famílias, equipe e moradores em momentos leves, afetuosos e cheios de memória.">
+            <button class="dayflow-step" type="button" data-image="assets/inicial2.webp" data-title="Datas especiais" data-text="Comemorações aproximam famílias, equipe e moradores em momentos leves, afetuosos e cheios de memória.">
               <span>05</span>
               <strong>Datas especiais</strong>
               <small>Afeto, família e celebração.</small>
             </button>
-            <button class="dayflow-step" type="button" data-image="assets/rotina-organizada.jpg" data-fit="contain" data-title="Descanso com segurança" data-text="A rotina organizada desacelera o dia com acompanhamento, medicação e ambiente preparado para descanso.">
+            <button class="dayflow-step" type="button" data-image="assets/rotina-organizada.webp" data-fit="contain" data-title="Descanso com segurança" data-text="A rotina organizada desacelera o dia com acompanhamento, medicação e ambiente preparado para descanso.">
               <span>06</span>
               <strong>Descanso com segurança</strong>
               <small>Organização, cuidado e descanso.</small>
@@ -203,8 +211,12 @@
             </div>
           </div>
 
-          <div id="listaTransparencia" class="transparencia-folders">
-            <p class="transparencia-empty">Carregando documentos...</p>
+          <div id="listaTransparencia" class="transparencia-folders" aria-live="polite">
+            <div class="transparencia-skeleton" aria-label="Carregando documentos">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
           </div>
         </div>
       </div>
@@ -225,6 +237,10 @@
           <div class="news-actions news-actions-overlay">
             <button class="circle-btn" type="button" data-news-dir="prev" aria-label="Voltar notícias"><span class="material-symbols-outlined">chevron_left</span></button>
             <button class="circle-btn" type="button" data-news-dir="next" aria-label="Avançar notícias"><span class="material-symbols-outlined">chevron_right</span></button>
+          </div>
+          <div class="news-mobile-progress" aria-live="polite">
+            <span id="newsPosition">Carregando notícias</span>
+            <span class="news-mobile-progress-track" aria-hidden="true"><span id="newsProgressFill"></span></span>
           </div>
         </div>
       </div>
@@ -248,7 +264,7 @@
             </div>
             <p class="quote">"No Asilo Vicentino, sentimos que nossa família ganhou mais uma casa. O cuidado diário e o carinho da equipe nos trazem tranquilidade de verdade."</p>
             <div class="testimonial-person">
-              <img src="assets/foto1.jpg" alt="Helena" width="644" height="805" loading="lazy" decoding="async" />
+              <img src="assets/foto1.webp" alt="Helena" width="644" height="805" loading="lazy" decoding="async" />
               <div>
                 <strong>Helena M. Cavalcanti</strong>
                 <span>Filha de Residente</span>
@@ -262,7 +278,7 @@
             </div>
             <p class="quote">"O que mais nos toca no Asilo Vicentino é a atenção com cada pessoa. Cada detalhe, da alimentação às atividades, é pensado com respeito e humanidade."</p>
             <div class="testimonial-person">
-              <img src="assets/rodaDeConversa.jpg" alt="Ricardo Almeida" width="643" height="807" loading="lazy" decoding="async" />
+              <img src="assets/rodaDeConversa.webp" alt="Ricardo Almeida" width="643" height="807" loading="lazy" decoding="async" />
               <div>
                 <strong>Ricardo S. Almeida</strong>
                 <span>Familiar de Residente</span>
@@ -277,7 +293,7 @@
       <div class="container">
         <div class="cta-box">
           <div class="cta-bg">
-            <img src="assets/foto1.jpg" alt="Textura suave" width="644" height="805" loading="lazy" decoding="async" />
+            <img src="assets/foto1.webp" alt="Textura suave" width="644" height="805" loading="lazy" decoding="async" />
           </div>
 
           <div class="cta-content">
@@ -352,7 +368,7 @@
                     <button type="button" class="cta-chip js-doacao-valor" data-value="200">R$ 200</button>
                   </div>
                 </div>
-                <div id="doacaoImpacto" class="donation-impact-preview">
+                <div id="doacaoImpacto" class="donation-impact-preview" aria-live="polite">
                   <span class="material-symbols-outlined">favorite</span>
                   <div>
                     <strong>Escolha um valor para ver o impacto</strong>
@@ -415,7 +431,7 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <img src="assets/logo.png" alt="Logo Asilo Vicentino" />
+          <img src="assets/logo.webp" alt="Logo Asilo Vicentino" />
           <div>
             <strong>Asilo Vicentino</strong>
             <p>Lar Nossa Senhora da Penha</p>
@@ -467,7 +483,7 @@
     </div>
   </div>
 
-  <script src="js/indexController.js?v=20260714-5"></script>
+  <script src="js/indexController.js?v=20260714-6"></script>
   <script src="js/indexNoticias.js?v=20260708-1"></script>
 </body>
 </html>
