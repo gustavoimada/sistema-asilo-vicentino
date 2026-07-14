@@ -183,7 +183,7 @@ function renderizarNoticias(lista = noticias) {
                 <td>
                   <div class="noticia-list-item">
                     <div class="noticia-thumb">
-                      ${imagem ? `<img src="${imagem}" alt="Imagem da noticia ${titulo}" decoding="async" onerror="recarregarImagemNoticia(this)">` : ""}
+                      ${imagem ? `<img src="${imagem}" alt="Imagem da noticia ${titulo}" loading="eager" fetchpriority="high" onerror="recarregarImagemNoticia(this)">` : ""}
                       <span class="material-symbols-outlined">image</span>
                     </div>
                     <div class="noticia-list-text">

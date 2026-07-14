@@ -216,7 +216,7 @@ async function carregarNoticiasIndex() {
                      role="button"
                      aria-label="Ver notícia: ${titulo}">
               <div class="news-card-thumb">
-                <img src="${src}" alt="${titulo}" decoding="async" onerror="recarregarImagemNoticiaIndex(this)" />
+                <img src="${src}" alt="${titulo}" loading="eager" fetchpriority="high" onerror="recarregarImagemNoticiaIndex(this)" />
                 <div class="news-card-thumb-overlay">
                   <span class="tag">${categoria}</span>
                 </div>

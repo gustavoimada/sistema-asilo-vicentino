@@ -232,7 +232,7 @@ public class NoticiaControl {
             if (mimeType == null) mimeType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
 
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CACHE_CONTROL, "no-cache, max-age=0, must-revalidate")
+                    .header(HttpHeaders.CACHE_CONTROL, "no-store, max-age=0")
                     .contentType(MediaType.parseMediaType(mimeType))
                     .body(recurso);
         } catch (IOException | SQLException e) {
