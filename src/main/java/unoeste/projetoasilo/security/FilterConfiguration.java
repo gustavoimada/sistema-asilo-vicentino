@@ -23,6 +23,16 @@ public class FilterConfiguration
         FilterRegistrationBean<AccessFilter> register = new FilterRegistrationBean<>();
         register.setFilter(new AccessFilter());
         register.addUrlPatterns("/*");
+        register.setOrder(2);
+        return register;
+    }
+
+    @Bean
+    public FilterRegistrationBean<RateLimitFilter> rateLimitFilter()
+    {
+        FilterRegistrationBean<RateLimitFilter> register = new FilterRegistrationBean<>();
+        register.setFilter(new RateLimitFilter());
+        register.addUrlPatterns("/*");
         register.setOrder(1);
         return register;
     }

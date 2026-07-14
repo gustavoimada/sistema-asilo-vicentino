@@ -2750,6 +2750,17 @@ main {
 }
 
 @media (max-width: 520px) {
+  .hero .container,
+  .hero-grid,
+  .hero-copy,
+  .hero-visual,
+  .hero-copy h1,
+  .hero-copy p,
+  .hero-actions {
+    min-width: 0;
+    max-width: calc(100vw - 32px);
+  }
+
   .topbar {
     height: 72px;
   }
@@ -2777,14 +2788,14 @@ main {
   .hero-copy,
   .hero-visual {
     width: 100%;
-    max-width: 100%;
+    max-width: calc(100vw - 32px);
   }
 
   .hero-copy h1 {
     font-size: 32px;
     line-height: 1.14;
     letter-spacing: 0;
-    max-width: 100%;
+    max-width: calc(100vw - 32px);
     overflow-wrap: anywhere;
     word-break: normal;
   }
