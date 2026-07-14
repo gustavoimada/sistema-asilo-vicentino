@@ -112,6 +112,8 @@ public class AccessFilter implements Filter
                 || "/index.html".equals(rota)
                 || "/error".equals(rota)
                 || "/favicon.ico".equals(rota)
+                || "/robots.txt".equals(rota)
+                || "/sitemap.xml".equals(rota)
                 || rota.startsWith("/css/")
                 || rota.startsWith("/js/")
                 || rota.startsWith("/assets/")

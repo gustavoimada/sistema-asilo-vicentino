@@ -35,4 +35,20 @@ class AccessFilterTest
         assertEquals(200, response.getStatus());
         assertEquals(true, chainCalled[0]);
     }
+
+    @Test
+    void allowsSearchEngineDiscoveryFilesWithoutSession() throws Exception
+    {
+        for (String rota : new String[]{"/robots.txt", "/sitemap.xml"})
+        {
+            MockHttpServletRequest request = new MockHttpServletRequest("GET", rota);
+            MockHttpServletResponse response = new MockHttpServletResponse();
+            boolean[] chainCalled = {false};
+
+            new AccessFilter().doFilter(request, response, (ignoredRequest, ignoredResponse) -> chainCalled[0] = true);
+
+            assertEquals(200, response.getStatus());
+            assertEquals(true, chainCalled[0]);
+        }
+    }
 }
