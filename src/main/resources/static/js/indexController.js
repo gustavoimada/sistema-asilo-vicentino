@@ -961,34 +961,47 @@ function marcarElementosAnimados(elementos) {
 }
 
 function iniciarAnimacoesScroll() {
-  const elementos = document.querySelectorAll(".section-head-left, .section-head-center, .dayflow, .testimonial-card, .cta-box, .history-photo, .history-stat-card, .history-blue-card, .history-mobile-summary, .cta-impact-card, .cta-panel, #btnEnviarDoacao");
+  const secoes = document.querySelectorAll("main > .section > .container, .site-footer > .container");
+  const elementos = document.querySelectorAll(".testimonial-card, .history-photo, .history-stat-card, .history-blue-card, .cta-impact-card");
+
+  for (let i = 0; i < secoes.length; i += 1) {
+    secoes[i].classList.add("section-reveal");
+  }
   marcarElementosAnimados(elementos);
 
-  function atualizarVisibilidade() {
-    const animados = document.querySelectorAll(".reveal-on-scroll");
-    for (let i = 0; i < animados.length; i += 1) {
-      const rect = animados[i].getBoundingClientRect();
-      const alturaTela = window.innerHeight || document.documentElement.clientHeight;
-      const entrouNaArea = rect.top <= alturaTela * 0.88 && rect.bottom >= alturaTela * 0.12;
-      if (entrouNaArea) {
-        animados[i].classList.add("is-visible");
+  function revelarUmaVez(alvos) {
+    if (!alvos.length) return;
+
+    function revelar(alvo) {
+      if (alvo.dataset.revealDone === "1") return;
+      alvo.dataset.revealDone = "1";
+      window.requestAnimationFrame(function () {
+        window.requestAnimationFrame(function () {
+          alvo.classList.add("is-visible");
+        });
+      });
+    }
+
+    if (!("IntersectionObserver" in window)) {
+      for (let i = 0; i < alvos.length; i += 1) revelar(alvos[i]);
+      return;
+    }
+
+    const observer = new IntersectionObserver(function (entradas) {
+      for (let i = 0; i < entradas.length; i += 1) {
+        if (!entradas[i].isIntersecting) continue;
+        revelar(entradas[i].target);
+        observer.unobserve(entradas[i].target);
       }
+    }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+
+    for (let i = 0; i < alvos.length; i += 1) {
+      observer.observe(alvos[i]);
     }
   }
 
-  let agendado = false;
-  function agendarAtualizacao() {
-    if (agendado) return;
-    agendado = true;
-    window.requestAnimationFrame(function () {
-      agendado = false;
-      atualizarVisibilidade();
-    });
-  }
-
-  window.addEventListener("scroll", agendarAtualizacao, { passive: true });
-  window.addEventListener("resize", agendarAtualizacao);
-  agendarAtualizacao();
+  revelarUmaVez(secoes);
+  revelarUmaVez(elementos);
 }
 
 function iniciarEfeitosScroll() {
@@ -1052,15 +1065,24 @@ function iniciarEntradaInicial() {
     alvos[i].style.setProperty("--intro-delay", (i * 90) + "ms");
   }
 
+  window.requestAnimationFrame(function () {
+    window.requestAnimationFrame(function () {
+      for (let i = 0; i < alvos.length; i += 1) {
+        alvos[i].classList.add("is-visible");
+      }
+    });
+  });
+
   window.setTimeout(function () {
     for (let i = 0; i < alvos.length; i += 1) {
       alvos[i].classList.remove("intro-reveal");
+      alvos[i].classList.remove("is-visible");
       alvos[i].style.removeProperty("--intro-delay");
     }
 
     const hero = document.querySelector(".hero");
     if (hero) hero.classList.add("hero-motion-ready");
-  }, 1550);
+  }, 1700);
 }
 
 function validarCpfDoacao(cpf) {
