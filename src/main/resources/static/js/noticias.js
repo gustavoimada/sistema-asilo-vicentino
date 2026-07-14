@@ -130,7 +130,10 @@ function urlImagemNoticia(noticia) {
     // O nome muda a cada upload. Usá-lo na URL evita que o navegador reaproveite
     // uma resposta antiga para uma imagem que já foi substituída.
     const versao = String(noticia.imagemCaminho || noticia.nomeImagem || noticia.dataUpload || idNoticia).trim();
-    return `/noticia/download/${idNoticia}?v=${encodeURIComponent(versao)}`;
+    const origemPublica = window.location.hostname === "asilovicentino.com.br"
+        ? "https://www.asilovicentino.com.br"
+        : "";
+    return `${origemPublica}/noticia/download/${idNoticia}?v=${encodeURIComponent(versao)}`;
 }
 
 function recarregarImagemNoticia(imagem) {

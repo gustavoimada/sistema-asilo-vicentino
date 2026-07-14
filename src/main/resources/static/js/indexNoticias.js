@@ -14,7 +14,10 @@ function escaparHtml(valor) {
 
 function urlImagemNoticiaIndex(noticia, id) {
     const versao = String(noticia.imagemCaminho || noticia.nomeImagem || noticia.dataUpload || id).trim();
-    return `/noticia/download/${id}?v=${encodeURIComponent(versao)}`;
+    const origemPublica = window.location.hostname === "asilovicentino.com.br"
+        ? "https://www.asilovicentino.com.br"
+        : "";
+    return `${origemPublica}/noticia/download/${id}?v=${encodeURIComponent(versao)}`;
 }
 
 function recarregarImagemNoticiaIndex(imagem) {

@@ -975,11 +975,11 @@ function iniciarAnimacoesScroll() {
     function revelar(alvo) {
       if (alvo.dataset.revealDone === "1") return;
       alvo.dataset.revealDone = "1";
-      window.requestAnimationFrame(function () {
-        window.requestAnimationFrame(function () {
-          alvo.classList.add("is-visible");
-        });
-      });
+      // Atraso curto garante um quadro renderizado no estado inicial, inclusive
+      // em computadores que agrupam varios requestAnimationFrame em uma pintura.
+      window.setTimeout(function () {
+        alvo.classList.add("is-visible");
+      }, 90);
     }
 
     if (!("IntersectionObserver" in window)) {
@@ -1065,13 +1065,13 @@ function iniciarEntradaInicial() {
     alvos[i].style.setProperty("--intro-delay", (i * 100) + "ms");
   }
 
-  window.requestAnimationFrame(function () {
-    window.requestAnimationFrame(function () {
-      for (let i = 0; i < alvos.length; i += 1) {
-        alvos[i].classList.add("is-visible");
-      }
-    });
-  });
+  // Em desktops rapidos, dois frames podem ser processados antes da primeira
+  // pintura. Este pequeno intervalo preserva o frame inicial do fade.
+  window.setTimeout(function () {
+    for (let i = 0; i < alvos.length; i += 1) {
+      alvos[i].classList.add("is-visible");
+    }
+  }, 140);
 
   window.setTimeout(function () {
     for (let i = 0; i < alvos.length; i += 1) {

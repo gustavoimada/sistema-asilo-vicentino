@@ -2,6 +2,7 @@ package unoeste.projetoasilo.control;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -231,6 +232,7 @@ public class NoticiaControl {
             if (mimeType == null) mimeType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
 
             return ResponseEntity.ok()
+                    .header(HttpHeaders.CACHE_CONTROL, "no-cache, max-age=0, must-revalidate")
                     .contentType(MediaType.parseMediaType(mimeType))
                     .body(recurso);
         } catch (IOException | SQLException e) {
