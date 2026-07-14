@@ -2867,7 +2867,24 @@ main {
   }
 
   .donation-use-grid {
-    grid-template-columns: 1fr;
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    padding: 2px;
+  }
+
+  .donation-use-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .donation-use-grid article {
+    flex: 0 0 calc(100% - 34px);
+    min-height: 104px;
+    scroll-snap-align: start;
   }
 
   .donation-goal-head {
