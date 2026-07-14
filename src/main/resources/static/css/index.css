@@ -178,6 +178,10 @@ input {
   gap: 16px;
 }
 
+.mobile-contact-btn {
+  display: none;
+}
+
 .text-btn {
   border: none;
   background: transparent;
@@ -661,6 +665,10 @@ main {
   color: var(--on-surface-variant);
   line-height: 1.8;
   margin-bottom: 22px;
+}
+
+.history-mobile-summary {
+  display: none;
 }
 
 .history-inline-stats {
@@ -2542,6 +2550,25 @@ main {
     gap: 10px;
   }
 
+  .mobile-contact-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 38px;
+    padding: 0 12px;
+    border: 1px solid #cfe0f7;
+    border-radius: 999px;
+    background: #ffffff;
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow: 0 8px 18px rgba(0, 53, 127, 0.1);
+  }
+
+  .mobile-contact-btn .material-symbols-outlined {
+    font-size: 18px;
+  }
+
   .desktop-login {
     display: none;
   }
@@ -2671,10 +2698,22 @@ main {
 
   .dayflow {
     grid-template-columns: 1fr;
+    width: 100%;
+    max-width: 100%;
   }
 
   .dayflow-visual {
     min-height: 320px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .dayflow-steps,
+  .dayflow-step,
+  .dayflow-step strong,
+  .dayflow-step small {
+    min-width: 0;
+    max-width: 100%;
   }
 
   .circle-btn {
@@ -2787,6 +2826,7 @@ main {
   }
 
   .topbar-brand {
+    flex: 1 1 auto;
     min-width: 0;
     font-size: 24px;
   }
@@ -2836,18 +2876,71 @@ main {
     justify-content: center;
   }
 
+  .hero-visual {
+    display: none;
+  }
+
+  .history-copy > p,
+  .history-inline-stats {
+    display: none;
+  }
+
+  .history-mobile-summary {
+    display: grid;
+    gap: 16px;
+    margin-top: -18px;
+  }
+
+  .history-mobile-summary > p {
+    display: block;
+    margin: 0;
+    color: var(--on-surface-variant);
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  .history-mobile-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .history-mobile-metrics span {
+    min-width: 0;
+    padding: 12px;
+    border: 1px solid #d5e3f8;
+    border-radius: 14px;
+    background: #f5f9ff;
+    color: #475569;
+    font-size: 11px;
+    line-height: 1.35;
+    font-weight: 800;
+  }
+
+  .history-mobile-metrics strong {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--primary);
+    font-size: 22px;
+    line-height: 1;
+  }
+
   .dayflow-visual {
+    width: 100%;
+    min-height: 0;
     height: auto;
-    min-height: 280px;
+    aspect-ratio: 4 / 3;
   }
 
   .dayflow-step {
-    grid-template-columns: 70px minmax(0, 1fr);
-    padding: 14px 14px 14px 18px;
+    width: 100%;
+    grid-template-columns: 34px minmax(0, 1fr);
+    padding: 12px 12px 12px 16px;
   }
 
-  .dayflow-step strong {
-    padding-right: 0;
+  .dayflow-step strong,
+  .dayflow-step small {
+    overflow-wrap: anywhere;
   }
 
   .dayflow-caption {
