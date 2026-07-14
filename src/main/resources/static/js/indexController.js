@@ -235,7 +235,8 @@ function iniciarNoticias() {
   function passo() {
     const card = grid.querySelector(".news-card");
     if (!card) return grid.clientWidth * 0.9;
-    return card.getBoundingClientRect().width + 24;
+    const espacamento = Number.parseFloat(window.getComputedStyle(grid).columnGap) || 24;
+    return card.getBoundingClientRect().width + espacamento;
   }
 
   function atualizarBotoes() {
@@ -254,6 +255,7 @@ function iniciarNoticias() {
 
   grid.addEventListener("scroll", atualizarBotoes, { passive: true });
   window.addEventListener("resize", atualizarBotoes);
+  new MutationObserver(atualizarBotoes).observe(grid, { childList: true });
   atualizarBotoes();
 }
 

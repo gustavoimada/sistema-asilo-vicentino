@@ -2638,15 +2638,35 @@ main {
   }
 
   .news-scroll {
-    grid-template-columns: 1fr;
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    padding: 2px;
+  }
+
+  .news-scroll::-webkit-scrollbar {
+    display: none;
   }
 
   .news-card {
+    flex: 0 0 100%;
     min-width: 0;
+    scroll-snap-align: start;
   }
 
   .news-actions-overlay {
-    padding: 0 8px;
+    position: static;
+    display: flex;
+    transform: none;
+    justify-content: center;
+    gap: 12px;
+    padding: 0;
+    margin-top: 16px;
+    pointer-events: auto;
   }
 
   .transparencia-public-head {
@@ -2955,6 +2975,135 @@ main {
 
   .dayflow-caption p {
     font-size: 13px;
+  }
+
+  .transparencia-public-card {
+    padding: 16px;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .transparencia-public-head {
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .transparencia-public-head h3 {
+    font-size: 20px;
+  }
+
+  .transparencia-public-head p {
+    font-size: 14px;
+  }
+
+  .transparencia-search input {
+    font-size: 13px;
+  }
+
+  .transparencia-year summary {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 6px 8px;
+    padding: 13px 12px;
+  }
+
+  .transparencia-year summary .year-meta {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: start;
+    margin: 0;
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+
+  .transparencia-year summary .expand {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    margin: 0;
+    align-self: center;
+  }
+
+  .transparencia-months {
+    gap: 10px;
+    padding: 0 10px 10px;
+  }
+
+  .transparencia-month {
+    min-width: 0;
+    padding: 10px;
+    border-radius: 14px;
+  }
+
+  .transparencia-month-head {
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 4px 9px;
+    margin-bottom: 10px;
+  }
+
+  .transparencia-month-head > .material-symbols-outlined {
+    grid-row: 1 / span 2;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    font-size: 18px;
+  }
+
+  .transparencia-month-head strong {
+    font-size: 14px;
+  }
+
+  .transparencia-month-head span:not(.material-symbols-outlined) {
+    font-size: 11px;
+    overflow-wrap: anywhere;
+  }
+
+  .transparencia-month-head small {
+    grid-column: 2;
+    width: max-content;
+    margin: 0;
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+
+  .transparencia-month .transparencia-event {
+    padding: 9px;
+    border-radius: 12px;
+  }
+
+  .transparencia-event h4 {
+    font-size: 13px;
+    overflow-wrap: anywhere;
+  }
+
+  .transparencia-file {
+    min-width: 0;
+    min-height: 44px;
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .transparencia-file > .material-symbols-outlined:first-child {
+    flex: 0 0 auto;
+    font-size: 19px;
+  }
+
+  .transparencia-file-info strong {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+  }
+
+  .transparencia-file-info span {
+    font-size: 11px;
+  }
+
+  .transparencia-file-action {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    font-size: 17px;
   }
 
   .donation-impact-preview {
