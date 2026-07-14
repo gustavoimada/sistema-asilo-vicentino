@@ -1,6 +1,7 @@
 const URL = '/morador';
 const URL_FAMILIAR = '/composicaoFamiliar';
 const URL_QUARTO = '/quarto';
+const CAPACIDADE_POR_QUARTO = 2;
 
 let moradores = [];
 let quartosDisponiveis = [];
@@ -363,10 +364,14 @@ function preencherSelectQuartos(quartoSelecionado = '') {
                 return;
 
             const option = document.createElement('option');
-            const restante = Math.max((quarto.capacidademax || 0) - (quarto.qtndHospedes || 0), 0);
+            const ocupacao = Math.min(Math.max(Number.parseInt(quarto.qtndHospedes, 10) || 0, 0), CAPACIDADE_POR_QUARTO);
+            const vagasLivres = CAPACIDADE_POR_QUARTO - ocupacao;
+            const descricaoVagas = vagasLivres === 0
+                ? 'Lotado'
+                : `${vagasLivres} ${vagasLivres === 1 ? 'vaga livre' : 'vagas livres'}`;
 
             option.value = quarto.idQuartos;
-            option.textContent = `Ala ${quarto.ala} - Quarto ${quarto.numero} - Restante ${restante}`;
+            option.textContent = `Ala ${quarto.ala} - Quarto ${quarto.numero} - ${descricaoVagas}`;
 
             if (String(quarto.idQuartos) === String(quartoSelecionado))
                 option.selected = true;
