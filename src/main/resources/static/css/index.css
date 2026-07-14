@@ -1920,8 +1920,10 @@ main {
   width: 0%;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--primary), var(--primary-container));
-  transition: width 0.9s ease;
+  background: linear-gradient(90deg, var(--primary) 0%, #1467cc 58%, #46a7f5 100%);
+  box-shadow: 0 1px 8px rgba(13, 71, 143, 0.28);
+  transition: width 1.65s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: width;
 }
 
 .donation-goal-note {

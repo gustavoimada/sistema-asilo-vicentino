@@ -785,11 +785,18 @@ function iniciarMetricasAnimadas() {
     const progresso = el.querySelector(".donation-goal-bar");
 
     if (valorMeta) valorMeta.textContent = formatarMoeda(meta);
+    if (barra) {
+      barra.style.width = "0%";
+      window.requestAnimationFrame(function () {
+        window.requestAnimationFrame(function () {
+          barra.style.width = porcentagem.toFixed(1) + "%";
+        });
+      });
+    }
+    if (progresso) progresso.setAttribute("aria-valuenow", porcentagem.toFixed(0));
 
-    animarValor(0, atual, 2600, function (valor, perc) {
+    animarValor(0, atual, 2200, function (valor) {
       if (valorAtual) valorAtual.textContent = formatarMoeda(valor);
-      if (barra) barra.style.width = (porcentagem * perc).toFixed(1) + "%";
-      if (progresso) progresso.setAttribute("aria-valuenow", (porcentagem * perc).toFixed(0));
     });
 
     if (faltante) {
