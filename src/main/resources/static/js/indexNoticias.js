@@ -31,6 +31,36 @@ function recarregarImagemNoticiaIndex(imagem) {
     imagem.src = `${imagem.src}${separador}retry=${Date.now()}`;
 }
 
+function revelarNoticiasRenderizadas(container) {
+    const cards = Array.from(container.querySelectorAll(".news-card"));
+    if (!cards.length) return;
+
+    function revelar(card) {
+        if (card.dataset.revealDone === "1") return;
+        card.dataset.revealDone = "1";
+        window.setTimeout(() => card.classList.add("is-visible"), 90);
+    }
+
+    cards.forEach((card, indice) => {
+        card.style.setProperty("--reveal-delay", `${(indice % 3) * 80}ms`);
+    });
+
+    if (!("IntersectionObserver" in window)) {
+        cards.forEach(revelar);
+        return;
+    }
+
+    const observer = new IntersectionObserver((entradas) => {
+        entradas.forEach((entrada) => {
+            if (!entrada.isIntersecting) return;
+            revelar(entrada.target);
+            observer.unobserve(entrada.target);
+        });
+    }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+
+    cards.forEach((card) => observer.observe(card));
+}
+
 function _criarLightbox() {
     if (_lightboxEl) return;
 
@@ -209,10 +239,7 @@ async function carregarNoticiasIndex() {
             card.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") abrir(); });
         });
 
-        // Animação de entrada
-        if (typeof window.inicializarZoomNoticias === "function") {
-            window.inicializarZoomNoticias();
-        }
+        revelarNoticiasRenderizadas(newsGrid);
 
     } catch (error) {
         atualizarUltimaAtualizacaoNoticias([], true);
