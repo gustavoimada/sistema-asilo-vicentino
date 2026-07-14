@@ -32,6 +32,11 @@ body::-webkit-scrollbar {
   -ms-overflow-style: none;
 }
 
+.sidebar,
+.sidebar * {
+  box-sizing: border-box !important;
+}
+
 .sidebar::-webkit-scrollbar {
   width: 0;
   height: 0;
@@ -95,10 +100,12 @@ body::-webkit-scrollbar {
 
 .sidebar-nav {
   flex: 1 !important;
+  min-width: 0 !important;
   display: flex !important;
   flex-direction: column !important;
   gap: 4px !important;
   padding: 0 !important;
+  overflow-x: hidden !important;
 }
 
 .sidebar-link,
@@ -149,6 +156,10 @@ body::-webkit-scrollbar {
 
 .sidebar-group {
   border: 0 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
 }
 
 .sidebar-group summary {
@@ -162,13 +173,19 @@ body::-webkit-scrollbar {
 
 .sidebar-group-toggle {
   justify-content: space-between !important;
+  min-width: 0 !important;
 }
 
 .sidebar-group-toggle > span:nth-child(2) {
   flex: 1 !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 .sidebar-group-arrow {
+  flex: 0 0 auto !important;
+  margin-left: auto !important;
   transition: transform 0.2s ease !important;
 }
 
@@ -184,6 +201,9 @@ body::-webkit-scrollbar {
   margin-top: 4px !important;
   margin-left: 16px !important;
   padding-left: 10px !important;
+  min-width: 0 !important;
+  max-width: calc(100% - 16px) !important;
+  overflow-x: hidden !important;
 }
 
 .sidebar-submenu::before {
@@ -200,6 +220,7 @@ body::-webkit-scrollbar {
   margin-left: 0 !important;
   padding-left: 12px !important;
   border-radius: 16px !important;
+  min-width: 0 !important;
 }
 
 .sidebar-sublink > span:not(.material-symbols-outlined) {
