@@ -798,6 +798,13 @@ function iniciarMetricasAnimadas() {
     }
   }
 
+  // Mantém os indicadores em zero até a seção entrar na tela.
+  for (let i = 0; i < numeros.length; i += 1) {
+    const prefixo = numeros[i].getAttribute("data-prefix") || "";
+    const sufixo = numeros[i].getAttribute("data-suffix") || "";
+    numeros[i].textContent = prefixo + formatarNumero(0) + sufixo;
+  }
+
   if (!("IntersectionObserver" in window)) {
     for (let i = 0; i < numeros.length; i += 1) animarNumero(numeros[i]);
     animarMetaDoacao(metaDoacao);
@@ -822,14 +829,15 @@ function marcarElementosAnimados(elementos) {
 
   for (let i = 0; i < elementos.length; i += 1) {
     elementos[i].classList.add("reveal-on-scroll");
-    if (!elementos[i].style.getPropertyValue("--reveal-delay")) {
+    const possuiAtrasoMobile = elementos[i].matches(".history-mobile-summary, .history-mobile-metrics span, #btnEnviarDoacao");
+    if (!elementos[i].style.getPropertyValue("--reveal-delay") && !possuiAtrasoMobile) {
       elementos[i].style.setProperty("--reveal-delay", ((i % 3) * 80) + "ms");
     }
   }
 }
 
 function iniciarAnimacoesScroll() {
-  const elementos = document.querySelectorAll(".section-head-left, .section-head-center, .dayflow, .testimonial-card, .cta-box, .history-photo, .history-stat-card, .history-blue-card, .cta-impact-card");
+  const elementos = document.querySelectorAll(".section-head-left, .section-head-center, .dayflow, .testimonial-card, .cta-box, .history-photo, .history-stat-card, .history-blue-card, .history-mobile-summary, .history-mobile-metrics span, .cta-impact-card, .cta-panel, #btnEnviarDoacao");
   marcarElementosAnimados(elementos);
 
   function atualizarVisibilidade() {

@@ -2632,6 +2632,36 @@ main {
     gap: 20px;
   }
 
+  .history-copy {
+    order: 1;
+  }
+
+  .history-visual-grid {
+    order: 2;
+    margin-top: 10px;
+  }
+
+  .history-mobile-summary {
+    --reveal-delay: 120ms;
+  }
+
+  .history-mobile-metrics span:nth-child(1) {
+    --reveal-delay: 220ms;
+  }
+
+  .history-mobile-metrics span:nth-child(2) {
+    --reveal-delay: 320ms;
+  }
+
+  #btnEnviarDoacao {
+    --reveal-delay: 220ms;
+  }
+
+  .reveal-on-scroll {
+    transition-duration: 0.85s;
+    transition-delay: calc(var(--reveal-delay, 0ms) + 70ms);
+  }
+
   .stats-grid,
   .testimonial-grid {
     grid-template-columns: 1fr;
