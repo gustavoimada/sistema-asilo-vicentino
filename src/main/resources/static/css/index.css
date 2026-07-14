@@ -418,6 +418,54 @@ main {
   line-height: 1.5;
 }
 
+@media (min-width: 901px) {
+  .hero.hero-motion-ready .eyebrow {
+    animation: hero-eyebrow-float 4.8s ease-in-out infinite;
+  }
+
+  .hero.hero-motion-ready #btnDoarTopo {
+    animation: hero-donation-glow 3.8s ease-in-out infinite;
+  }
+
+  .hero.hero-motion-ready #btnDoarTopo .material-symbols-outlined {
+    animation: hero-donation-icon 3.8s ease-in-out infinite;
+  }
+
+  .hero.hero-motion-ready .hero-floating-card {
+    animation: hero-care-card-glow 4.6s ease-in-out infinite;
+  }
+
+  .hero.hero-motion-ready .hero-floating-icon {
+    animation: hero-care-icon-pulse 3.2s ease-in-out infinite;
+  }
+
+  @keyframes hero-eyebrow-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+
+  @keyframes hero-donation-glow {
+    0%, 100% { box-shadow: 0 16px 28px rgba(0, 53, 127, 0.18); }
+    50% { box-shadow: 0 20px 34px rgba(0, 53, 127, 0.34); }
+  }
+
+  @keyframes hero-donation-icon {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    45% { transform: translateY(-2px) rotate(-7deg); }
+    60% { transform: translateY(0) rotate(5deg); }
+  }
+
+  @keyframes hero-care-card-glow {
+    0%, 100% { box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12); }
+    50% { box-shadow: 0 22px 42px rgba(0, 53, 127, 0.2); }
+  }
+
+  @keyframes hero-care-icon-pulse {
+    0%, 100% { transform: scale(1); background: rgba(0, 53, 127, 0.08); }
+    50% { transform: scale(1.09); background: rgba(0, 53, 127, 0.14); }
+  }
+}
+
 /* GENERIC SECTION */
 .section {
   padding: 96px 0;
@@ -3138,5 +3186,21 @@ main {
 
   .donation-impact-preview {
     flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
   }
 }

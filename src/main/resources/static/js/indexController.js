@@ -909,6 +909,7 @@ function iniciarEntradaInicial() {
   const heroEyebrow = document.querySelector(".hero-copy .eyebrow");
   const heroTitulo = document.querySelector(".hero-copy h1");
   const heroTexto = document.querySelector(".hero-copy p");
+  const heroDoacao = document.getElementById("btnDoarTopo");
   const heroVisual = document.querySelector(".hero-visual");
   const heroFloatCard = document.querySelector(".hero-floating-card");
 
@@ -918,6 +919,7 @@ function iniciarEntradaInicial() {
   if (heroEyebrow) alvos.push(heroEyebrow);
   if (heroTitulo) alvos.push(heroTitulo);
   if (heroTexto) alvos.push(heroTexto);
+  if (heroDoacao) alvos.push(heroDoacao);
   if (heroVisual) alvos.push(heroVisual);
   if (heroFloatCard) alvos.push(heroFloatCard);
 
@@ -925,6 +927,16 @@ function iniciarEntradaInicial() {
     alvos[i].classList.add("intro-reveal");
     alvos[i].style.setProperty("--intro-delay", (i * 90) + "ms");
   }
+
+  window.setTimeout(function () {
+    for (let i = 0; i < alvos.length; i += 1) {
+      alvos[i].classList.remove("intro-reveal");
+      alvos[i].style.removeProperty("--intro-delay");
+    }
+
+    const hero = document.querySelector(".hero");
+    if (hero) hero.classList.add("hero-motion-ready");
+  }, 1550);
 }
 
 function validarCpfDoacao(cpf) {
