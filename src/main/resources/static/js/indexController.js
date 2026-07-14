@@ -829,7 +829,7 @@ function marcarElementosAnimados(elementos) {
 
   for (let i = 0; i < elementos.length; i += 1) {
     elementos[i].classList.add("reveal-on-scroll");
-    const possuiAtrasoMobile = elementos[i].matches(".history-mobile-summary, .history-mobile-metrics span, #btnEnviarDoacao");
+    const possuiAtrasoMobile = elementos[i].matches(".history-mobile-summary, #btnEnviarDoacao");
     if (!elementos[i].style.getPropertyValue("--reveal-delay") && !possuiAtrasoMobile) {
       elementos[i].style.setProperty("--reveal-delay", ((i % 3) * 80) + "ms");
     }
@@ -837,7 +837,7 @@ function marcarElementosAnimados(elementos) {
 }
 
 function iniciarAnimacoesScroll() {
-  const elementos = document.querySelectorAll(".section-head-left, .section-head-center, .dayflow, .testimonial-card, .cta-box, .history-photo, .history-stat-card, .history-blue-card, .history-mobile-summary, .history-mobile-metrics span, .cta-impact-card, .cta-panel, #btnEnviarDoacao");
+  const elementos = document.querySelectorAll(".section-head-left, .section-head-center, .dayflow, .testimonial-card, .cta-box, .history-photo, .history-stat-card, .history-blue-card, .history-mobile-summary, .cta-impact-card, .cta-panel, #btnEnviarDoacao");
   marcarElementosAnimados(elementos);
 
   function atualizarVisibilidade() {

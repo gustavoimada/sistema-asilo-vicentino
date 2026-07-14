@@ -2699,14 +2699,6 @@ main {
     --reveal-delay: 120ms;
   }
 
-  .history-mobile-metrics span:nth-child(1) {
-    --reveal-delay: 220ms;
-  }
-
-  .history-mobile-metrics span:nth-child(2) {
-    --reveal-delay: 320ms;
-  }
-
   #btnEnviarDoacao {
     --reveal-delay: 220ms;
   }
@@ -2714,6 +2706,10 @@ main {
   .reveal-on-scroll {
     transition-duration: 0.85s;
     transition-delay: calc(var(--reveal-delay, 0ms) + 70ms);
+  }
+
+  .dayflow-caption {
+    display: none;
   }
 
   .stats-grid,
@@ -3003,32 +2999,6 @@ main {
     line-height: 1.65;
   }
 
-  .history-mobile-metrics {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-  }
-
-  .history-mobile-metrics span {
-    min-width: 0;
-    padding: 12px;
-    border: 1px solid #d5e3f8;
-    border-radius: 14px;
-    background: #f5f9ff;
-    color: #475569;
-    font-size: 11px;
-    line-height: 1.35;
-    font-weight: 800;
-  }
-
-  .history-mobile-metrics strong {
-    display: block;
-    margin-bottom: 2px;
-    color: var(--primary);
-    font-size: 22px;
-    line-height: 1;
-  }
-
   .dayflow-visual {
     width: 100%;
     min-height: 0;
@@ -3045,20 +3015,6 @@ main {
   .dayflow-step strong,
   .dayflow-step small {
     overflow-wrap: anywhere;
-  }
-
-  .dayflow-caption {
-    left: 18px;
-    right: 18px;
-    bottom: 16px;
-  }
-
-  .dayflow-caption strong {
-    font-size: 22px;
-  }
-
-  .dayflow-caption p {
-    font-size: 13px;
   }
 
   .transparencia-public-card {
