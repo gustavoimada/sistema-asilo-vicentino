@@ -13,6 +13,7 @@ import unoeste.projetoasilo.db.util.Banco;
 import unoeste.projetoasilo.entities.Atividades;
 import unoeste.projetoasilo.entities.Error;
 import unoeste.projetoasilo.entities.TiposAtividades;
+import unoeste.projetoasilo.util.TextoFormatador;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -31,8 +32,8 @@ public class TiposAtividadesControl
 		Banco conexao = Banco.getConnection();
 		try
 		{
-			String tipoNormalizado = tipo == null ? "" : tipo.trim().toUpperCase();
-			String orgNormalizada = org == null ? "" : org.trim().toUpperCase();
+			String tipoNormalizado = TextoFormatador.normalizarTitulo(tipo);
+			String orgNormalizada = TextoFormatador.normalizarTitulo(org);
 
 			if (tipoNormalizado.isEmpty() || orgNormalizada.isEmpty())
 			{
@@ -45,13 +46,11 @@ public class TiposAtividadesControl
 			{
 				for (TiposAtividades tipoExistente : tiposAtividades)
 				{
-					String tipoExistenteNormalizado =
-							tipoExistente.getTipo() == null ? "" : tipoExistente.getTipo().trim().toUpperCase();
-					String orgExistenteNormalizada =
-							tipoExistente.getOrg() == null ? "" : tipoExistente.getOrg().trim().toUpperCase();
+					String tipoExistenteNormalizado = TextoFormatador.chaveDeComparacao(tipoExistente.getTipo());
+					String orgExistenteNormalizada = TextoFormatador.chaveDeComparacao(tipoExistente.getOrg());
 
-					if (tipoExistenteNormalizado.equals(tipoNormalizado) &&
-							orgExistenteNormalizada.equals(orgNormalizada))
+					if (tipoExistenteNormalizado.equals(TextoFormatador.chaveDeComparacao(tipoNormalizado)) &&
+							orgExistenteNormalizada.equals(TextoFormatador.chaveDeComparacao(orgNormalizada)))
 					{
 						return ResponseEntity.badRequest()
 								.body(new Error("Erro", "Tipo de atividade ja cadastrado"));
@@ -119,8 +118,8 @@ public class TiposAtividadesControl
 		Banco conexao = Banco.getConnection();
 		try
 		{
-			String tipoNormalizado = tipo == null ? "" : tipo.trim().toUpperCase();
-			String orgNormalizada = org == null ? "" : org.trim().toUpperCase();
+			String tipoNormalizado = TextoFormatador.normalizarTitulo(tipo);
+			String orgNormalizada = TextoFormatador.normalizarTitulo(org);
 
 			if (id <= 0 || tipoNormalizado.isEmpty() || orgNormalizada.isEmpty())
 			{
@@ -150,13 +149,11 @@ public class TiposAtividadesControl
 						continue;
 					}
 
-					String tipoExistenteNormalizado =
-							tipoExistente.getTipo() == null ? "" : tipoExistente.getTipo().trim().toUpperCase();
-					String orgExistenteNormalizada =
-							tipoExistente.getOrg() == null ? "" : tipoExistente.getOrg().trim().toUpperCase();
+					String tipoExistenteNormalizado = TextoFormatador.chaveDeComparacao(tipoExistente.getTipo());
+					String orgExistenteNormalizada = TextoFormatador.chaveDeComparacao(tipoExistente.getOrg());
 
-					if (tipoExistenteNormalizado.equals(tipoNormalizado) &&
-							orgExistenteNormalizada.equals(orgNormalizada))
+					if (tipoExistenteNormalizado.equals(TextoFormatador.chaveDeComparacao(tipoNormalizado)) &&
+							orgExistenteNormalizada.equals(TextoFormatador.chaveDeComparacao(orgNormalizada)))
 					{
 						return ResponseEntity.badRequest()
 								.body(new Error("Erro", "Tipo de atividade ja cadastrado"));

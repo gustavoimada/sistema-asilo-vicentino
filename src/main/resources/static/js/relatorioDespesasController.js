@@ -19,6 +19,14 @@ const estadoFiltroDespesas = {
     quitacaoFim: ""
 };
 
+function formatarCategoriaDespesa(valor) {
+    if (typeof window.formatarTituloLegivel === "function") {
+        return window.formatarTituloLegivel(valor);
+    }
+
+    return String(valor || "");
+}
+
 function mostrarMensagemRelatorio(mensagem, tipo = "error") {
     let toast = document.getElementById("mensagem-feedback");
     if (!toast) {
@@ -112,11 +120,11 @@ function formatarDataFiltroDespesa(data) {
 function obterCategoriaDespesa(despesa) {
     if (despesa && despesa.tipoDespesa && despesa.tipoDespesa.tipo != null) {
         const categoria = String(despesa.tipoDespesa.tipo).trim();
-        if (categoria !== "") return categoria;
+        if (categoria !== "") return formatarCategoriaDespesa(categoria);
     }
     if (despesa && despesa.tipo != null) {
         const categoria = String(despesa.tipo).trim();
-        if (categoria !== "") return categoria;
+        if (categoria !== "") return formatarCategoriaDespesa(categoria);
     }
     return "Nao informado";
 }

@@ -3,6 +3,13 @@ const URL = '/despesa';
 let despesas = [];
 let direcaoOrdenacao = 'asc';
 
+function formatarTipoDespesaLegivel(valor) {
+    if (typeof window.formatarTituloLegivel === 'function')
+        return window.formatarTituloLegivel(valor);
+
+    return String(valor || '');
+}
+
 function carregarContextoUrl() {
     const params = new URLSearchParams(window.location.search);
     const parametrosContexto = ['idFuncionario', 'idUser', 'usuarioNome', 'funcionarioNome', 'categoria'];
@@ -464,7 +471,7 @@ function renderizarDespesas(listaDespesas) {
         let tipoDespesa = '';
 
         if (d.tipoDespesa && d.tipoDespesa.tipo)
-            tipoDespesa = d.tipoDespesa.tipo;
+            tipoDespesa = formatarTipoDespesaLegivel(d.tipoDespesa.tipo);
 
         row.insertCell(0).textContent = tipoDespesa;
 
@@ -772,14 +779,14 @@ function carregarTiposDespesa() {
                 if (selectTipo && selectTipo.tagName === 'SELECT') {
                     const opcaoForm = document.createElement('option');
                     opcaoForm.value = t.tipo;
-                    opcaoForm.textContent = t.tipo;
+                    opcaoForm.textContent = formatarTipoDespesaLegivel(t.tipo);
                     selectTipo.appendChild(opcaoForm);
                 }
 
                 if (selectFiltro && selectFiltro.tagName === 'SELECT') {
                     const opcaoFiltro = document.createElement('option');
                     opcaoFiltro.value = t.tipo;
-                    opcaoFiltro.textContent = t.tipo;
+                    opcaoFiltro.textContent = formatarTipoDespesaLegivel(t.tipo);
                     selectFiltro.appendChild(opcaoFiltro);
                 }
             });

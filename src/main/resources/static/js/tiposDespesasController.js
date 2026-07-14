@@ -5,6 +5,14 @@ let popupTimer;
 let ordenacaoAtualTiposDespesas = "tipo";
 let ordemAtualTiposDespesas = "asc";
 
+function formatarTipoDespesa(valor) {
+    if (typeof window.formatarTituloLegivel === "function") {
+        return window.formatarTituloLegivel(valor);
+    }
+
+    return String(valor || "");
+}
+
 function escaparApostrofo(valor) {
     return String(valor || "").replace(/'/g, "''");
 }
@@ -167,7 +175,7 @@ function renderizarTabela(tiposDespesas) {
         tiposDespesas.forEach(tipoDespesa => {
             linhas += `
                 <tr>
-                    <td>${tipoDespesa.tipo || ""}</td>
+                    <td>${formatarTipoDespesa(tipoDespesa.tipo)}</td>
                     <td class="text-right">
                         <div style="display:inline-flex; gap:8px;">
                             <button type="button" class="action-icon-btn edit" aria-label="Editar tipo de despesa" onclick="abrirEdicaoTipoDespesa(${tipoDespesa.idtiposDespesas})">
@@ -307,7 +315,7 @@ function carregarTipoDespesa(id) {
 
             exibirFormularioTipoDespesa("edicao");
             document.getElementById("idtipodespesas").value = body.idtiposDespesas;
-            document.getElementById("tipo").value = body.tipo || "";
+            document.getElementById("tipo").value = formatarTipoDespesa(body.tipo);
         })
         .catch(error => {
             mostrarPopup("Erro ao buscar tipo de despesa: " + error, "error");

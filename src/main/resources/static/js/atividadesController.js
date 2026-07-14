@@ -400,6 +400,14 @@ function escaparApostrofo(valor) {
     return String(valor || "").replace(/'/g, "''");
 }
 
+function formatarTipoAtividadeLegivel(valor) {
+    if (typeof window.formatarTituloLegivel === "function") {
+        return window.formatarTituloLegivel(valor);
+    }
+
+    return String(valor || "");
+}
+
 function obterDescricaoTipoAtividade(idTipoAtividade) {
     const tipo = tiposAtividadesCarregados.find(function (item) {
         return String(item.idtipoatividades) === String(idTipoAtividade);
@@ -409,11 +417,12 @@ function obterDescricaoTipoAtividade(idTipoAtividade) {
         return "Tipo " + idTipoAtividade;
     }
 
+    const descricao = formatarTipoAtividadeLegivel(tipo.tipo);
     if (tipo.org) {
-        return tipo.tipo + " (" + tipo.org + ")";
+        return descricao + " (" + formatarTipoAtividadeLegivel(tipo.org) + ")";
     }
 
-    return tipo.tipo || ("Tipo " + idTipoAtividade);
+    return descricao || ("Tipo " + idTipoAtividade);
 }
 
 function atualizarContadorMoradores() {
@@ -519,9 +528,9 @@ function renderizarSelectTiposAtividades() {
     let opcoes = `<option value="">Selecione...</option>`;
     let opcoesFiltro = `<option value="">Todos</option>`;
     tiposAtividadesCarregados.forEach(function (tipoAtividade) {
-        let texto = tipoAtividade.tipo;
+        let texto = formatarTipoAtividadeLegivel(tipoAtividade.tipo);
         if (tipoAtividade.org) {
-            texto = tipoAtividade.tipo + " (" + tipoAtividade.org + ")";
+            texto = texto + " (" + formatarTipoAtividadeLegivel(tipoAtividade.org) + ")";
         }
         opcoes += `<option value="${tipoAtividade.idtipoatividades}">${texto}</option>`;
         opcoesFiltro += `<option value="${tipoAtividade.idtipoatividades}">${texto}</option>`;

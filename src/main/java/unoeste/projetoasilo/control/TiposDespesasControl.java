@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import unoeste.projetoasilo.db.util.Banco;
 import unoeste.projetoasilo.entities.Error;
 import unoeste.projetoasilo.entities.TiposDespesas;
+import unoeste.projetoasilo.util.TextoFormatador;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -26,7 +27,7 @@ public class TiposDespesasControl
 		Banco conexao = Banco.getConnection();
 		try
 		{
-			String tipoNormalizado = tipo == null ? "" : tipo.trim().toUpperCase();
+			String tipoNormalizado = TextoFormatador.normalizarTitulo(tipo);
 			if (tipoNormalizado.isEmpty())
 			{
 				return ResponseEntity.badRequest().body(new Error("Erro", "Tipo de despesa obrigatorio"));
@@ -85,7 +86,7 @@ public class TiposDespesasControl
 		Banco conexao = Banco.getConnection();
 		try
 		{
-			String tipoNormalizado = tipo == null ? "" : tipo.trim().toUpperCase();
+			String tipoNormalizado = TextoFormatador.normalizarTitulo(tipo);
 			if (tipoNormalizado.isEmpty())
 			{
 				return ResponseEntity.badRequest().body(new Error("Erro", "Tipo de despesa obrigatorio"));

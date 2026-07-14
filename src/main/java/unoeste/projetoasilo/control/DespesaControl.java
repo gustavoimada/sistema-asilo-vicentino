@@ -15,6 +15,7 @@ import unoeste.projetoasilo.entities.Despesa;
 import unoeste.projetoasilo.entities.Error;
 import unoeste.projetoasilo.entities.TipoDespesa;
 import unoeste.projetoasilo.entities.TiposDespesas;
+import unoeste.projetoasilo.util.TextoFormatador;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -233,10 +234,7 @@ public class DespesaControl {
         String tipo = despesa.getTipoDespesa().getTipo();
         String tipoNormalizado;
 
-        if (tipo == null)
-            tipoNormalizado = "";
-        else
-            tipoNormalizado = tipo.trim().toUpperCase();
+        tipoNormalizado = TextoFormatador.normalizarTitulo(tipo);
 
         TiposDespesas tipoDespesa = new TiposDespesas();
         TiposDespesas tipoExistente = tipoDespesa.buscarPorTipo(tipoNormalizado, conexao);

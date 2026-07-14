@@ -225,7 +225,10 @@ function renderizarTabela() {
     const nomeDoador = obterNomeDoador(doacao);
     const estaConcluida = doacao.status === "Concluida";
     const valorFormatado = formatarValorDoacao(doacao) || "-";
-    const tipoFormatado = doacao.tipoDoacaoNome || doacao.tipo || "Não informado";
+    const tipoBruto = doacao.tipoDoacaoNome || doacao.tipo;
+    const tipoFormatado = tipoBruto && typeof window.formatarTituloLegivel === "function"
+      ? window.formatarTituloLegivel(tipoBruto)
+      : (tipoBruto || "Não informado");
     const emailFormatado = doacao.pagEmail || "E-mail não informado";
     const cpfFormatado = formatarCpf(doacao.cpfDoador || "") || "CPF não informado";
     const dataFormatada = formatarDataDoacao(doacao.dtDoacao) || "-";

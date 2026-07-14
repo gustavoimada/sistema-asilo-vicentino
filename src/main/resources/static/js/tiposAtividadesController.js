@@ -5,6 +5,14 @@ let popupTimer;
 let ordenacaoAtualTiposAtividades = "tipo";
 let ordemAtualTiposAtividades = "asc";
 
+function formatarTipoAtividade(valor) {
+    if (typeof window.formatarTituloLegivel === "function") {
+        return window.formatarTituloLegivel(valor);
+    }
+
+    return String(valor || "");
+}
+
 function escaparApostrofo(valor) {
     return String(valor || "").replace(/'/g, "''");
 }
@@ -167,8 +175,8 @@ function renderizarTabela(tiposAtividades) {
         tiposAtividades.forEach(tipoAtividade => {
             linhas += `
                 <tr>
-                    <td>${tipoAtividade.tipo || ""}</td>
-                    <td>${tipoAtividade.org || ""}</td>
+                    <td>${formatarTipoAtividade(tipoAtividade.tipo)}</td>
+                    <td>${formatarTipoAtividade(tipoAtividade.org)}</td>
                     <td class="text-right">
                         <div style="display:inline-flex; gap:8px;">
                             <button type="button" class="action-icon-btn edit" aria-label="Editar tipo de atividade" onclick="abrirEdicaoTipoAtividade(${tipoAtividade.idtipoatividades})">
@@ -308,8 +316,8 @@ function carregarTipoAtividade(id) {
 
             exibirFormularioTipoAtividade("edicao");
             document.getElementById("idtipoatividades").value = body.idtipoatividades;
-            document.getElementById("tipo").value = body.tipo || "";
-            document.getElementById("org").value = body.org || "";
+            document.getElementById("tipo").value = formatarTipoAtividade(body.tipo);
+            document.getElementById("org").value = formatarTipoAtividade(body.org);
         })
         .catch(error => {
             mostrarPopup("Erro ao buscar tipo de atividade: " + error, "error");
