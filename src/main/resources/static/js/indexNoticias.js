@@ -34,6 +34,7 @@ function recarregarImagemNoticiaIndex(imagem) {
 function revelarNoticiasRenderizadas(container) {
     const cards = Array.from(container.querySelectorAll(".news-card"));
     if (!cards.length) return;
+    const repetirNoDesktop = window.matchMedia("(min-width: 901px)").matches;
 
     function revelar(card) {
         if (card.dataset.revealDone === "1") return;
@@ -47,6 +48,29 @@ function revelarNoticiasRenderizadas(container) {
 
     if (!("IntersectionObserver" in window)) {
         cards.forEach(revelar);
+        return;
+    }
+
+    if (repetirNoDesktop) {
+        const timers = new WeakMap();
+        const observer = new IntersectionObserver((entradas) => {
+            entradas.forEach((entrada) => {
+                const card = entrada.target;
+                const timerAtual = timers.get(card);
+                if (timerAtual) window.clearTimeout(timerAtual);
+
+                if (!entrada.isIntersecting) {
+                    card.classList.remove("is-visible");
+                    return;
+                }
+
+                card.classList.remove("is-visible");
+                void card.offsetWidth;
+                timers.set(card, window.setTimeout(() => card.classList.add("is-visible"), 70));
+            });
+        }, { threshold: 0.18, rootMargin: "0px 0px -4% 0px" });
+
+        cards.forEach((card) => observer.observe(card));
         return;
     }
 

@@ -963,6 +963,7 @@ function marcarElementosAnimados(elementos) {
 function iniciarAnimacoesScroll() {
   const secoes = document.querySelectorAll("main > .section > .container, .site-footer > .container");
   const elementos = document.querySelectorAll(".testimonial-card, .history-photo, .history-stat-card, .history-blue-card, .cta-impact-card");
+  const repetirNoDesktop = window.matchMedia("(min-width: 901px)").matches;
 
   for (let i = 0; i < secoes.length; i += 1) {
     secoes[i].classList.add("section-reveal");
@@ -998,6 +999,41 @@ function iniciarAnimacoesScroll() {
     for (let i = 0; i < alvos.length; i += 1) {
       observer.observe(alvos[i]);
     }
+  }
+
+  function revelarAoEntrarENaVolta(alvos) {
+    if (!alvos.length) return;
+
+    const timers = new WeakMap();
+    const observer = new IntersectionObserver(function (entradas) {
+      for (let i = 0; i < entradas.length; i += 1) {
+        const alvo = entradas[i].target;
+        const timerAtual = timers.get(alvo);
+        if (timerAtual) window.clearTimeout(timerAtual);
+
+        if (!entradas[i].isIntersecting) {
+          alvo.classList.remove("is-visible");
+          continue;
+        }
+
+        // Reinicia o keyframe a cada entrada na area visivel, inclusive ao subir a pagina.
+        alvo.classList.remove("is-visible");
+        void alvo.offsetWidth;
+        timers.set(alvo, window.setTimeout(function () {
+          alvo.classList.add("is-visible");
+        }, 70));
+      }
+    }, { threshold: 0.18, rootMargin: "0px 0px -4% 0px" });
+
+    for (let i = 0; i < alvos.length; i += 1) {
+      observer.observe(alvos[i]);
+    }
+  }
+
+  if (repetirNoDesktop) {
+    revelarAoEntrarENaVolta(secoes);
+    revelarAoEntrarENaVolta(elementos);
+    return;
   }
 
   revelarUmaVez(secoes);
