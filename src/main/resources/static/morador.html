@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/cadastroTipoOcorrencia.css?v=12" />
   <link rel="stylesheet" href="css/funcionario.css" />
   <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260708-3" />
-  <link rel="stylesheet" href="css/morador.css?v=5" />
+  <link rel="stylesheet" href="css/morador.css?v=6" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 </head>
@@ -214,7 +214,8 @@
 
                 <div class="form-field">
                   <label for="cep">CEP</label>
-                  <input id="cep" type="text" placeholder="00000-000" oninput="this.value = formatarCep(this.value)" />
+                  <input id="cep" type="text" placeholder="00000-000" inputmode="numeric" autocomplete="postal-code" aria-describedby="cepStatus" oninput="this.value = formatarCep(this.value)" />
+                  <small id="cepStatus" class="cep-status" aria-live="polite"></small>
                 </div>
 
                 <div class="form-field">
@@ -405,7 +406,7 @@
     </div>
   </div>
 
-  <script src="js/moradorController.js?v=20260712-1"></script>
+  <script src="js/moradorController.js?v=20260714-2"></script>
   <script src="js/sidebarSecretaria.js?v=20260707-1"></script>
   <script src="js/sidebarRecolhivel.js?v=20260708-1"></script>
 </body>

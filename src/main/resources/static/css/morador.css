@@ -89,6 +89,28 @@
   letter-spacing: 0.08em;
 }
 
+.cep-status {
+  display: block;
+  min-height: 18px;
+  margin-top: 6px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.cep-status.is-loading {
+  color: #1d4ed8;
+}
+
+.cep-status.is-success {
+  color: #15803d;
+}
+
+.cep-status.is-error {
+  color: #b45309;
+}
+
 .table-card .table-wrap table {
   min-width: 900px;
   table-layout: auto;

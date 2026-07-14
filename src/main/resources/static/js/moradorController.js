@@ -7,6 +7,8 @@ let quartosDisponiveis = [];
 let ordenacaoMoradores = '';
 let direcaoOrdenacaoMoradores = 'asc';
 let funcionarioLogado = null;
+let ultimoCepConsultado = '';
+let cepEmConsulta = '';
 
 function parseJsonSeguro(response) {
     return response.json().catch(function () {
@@ -154,6 +156,89 @@ function formatarCep(valor) {
         return numeros;
     else
         return numeros.replace(/(\d{5})(\d{1,3})$/, '$1-$2');
+}
+
+function atualizarStatusCep(mensagem = '', tipo = '') {
+    const status = document.getElementById('cepStatus');
+
+    if (!status)
+        return;
+
+    status.textContent = mensagem;
+    status.className = `cep-status${tipo ? ` is-${tipo}` : ''}`;
+}
+
+function preencherEnderecoPorCep(endereco) {
+    const campoEndereco = document.getElementById('endereco');
+    const campoCidade = document.getElementById('cidade');
+    const campoEstado = document.getElementById('estado');
+
+    if (campoEndereco && endereco.logradouro)
+        campoEndereco.value = endereco.logradouro;
+
+    if (campoCidade && endereco.localidade)
+        campoCidade.value = endereco.localidade;
+
+    if (campoEstado && endereco.uf && campoEstado.querySelector(`option[value="${endereco.uf}"]`))
+        campoEstado.value = endereco.uf;
+}
+
+async function consultarEnderecoPorCep() {
+    const campoCep = document.getElementById('cep');
+    if (!campoCep)
+        return;
+
+    const cep = somenteDigitos(campoCep.value);
+    if (cep.length !== 8) {
+        ultimoCepConsultado = '';
+        cepEmConsulta = '';
+        atualizarStatusCep('');
+        return;
+    }
+
+    if (cep === ultimoCepConsultado || cep === cepEmConsulta)
+        return;
+
+    cepEmConsulta = cep;
+    campoCep.setAttribute('aria-busy', 'true');
+    atualizarStatusCep('Buscando endereço...', 'loading');
+
+    try {
+        const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`, {
+            headers: { Accept: 'application/json' }
+        });
+
+        if (!response.ok)
+            throw new Error('Falha ao consultar CEP');
+
+        const endereco = await response.json();
+
+        if (cep !== somenteDigitos(campoCep.value))
+            return;
+
+        ultimoCepConsultado = cep;
+
+        if (endereco.erro) {
+            atualizarStatusCep('CEP não encontrado. Preencha o endereço manualmente.', 'error');
+            return;
+        }
+
+        preencherEnderecoPorCep(endereco);
+        if (endereco.logradouro)
+            atualizarStatusCep('Endereço preenchido automaticamente. Confira o número.', 'success');
+        else
+            atualizarStatusCep('Cidade e estado preenchidos. Informe a rua e o número.', 'success');
+    }
+    catch (error) {
+        if (cep === somenteDigitos(campoCep.value))
+            atualizarStatusCep('Não foi possível consultar o CEP. Preencha o endereço manualmente.', 'error');
+    }
+    finally {
+        if (cep === cepEmConsulta) {
+            cepEmConsulta = '';
+            campoCep.removeAttribute('aria-busy');
+        }
+    }
 }
 
 function formatarData(data) {
@@ -871,6 +956,9 @@ function esconderFormulario() {
     document.getElementById('formContainer').style.display = 'none';
     document.getElementById('moradorForm').reset();
     document.getElementById('id').value = '';
+    ultimoCepConsultado = '';
+    cepEmConsulta = '';
+    atualizarStatusCep('');
     limparContatoResponsavel();
     carregarQuartosDisponiveis();
 }
@@ -879,6 +967,12 @@ document.addEventListener('DOMContentLoaded', async function () {
     await carregarFuncionarioSessao();
     preencherPerfilTopo();
     inicializarPaginaMorador();
+
+    const campoCep = document.getElementById('cep');
+    if (campoCep) {
+        campoCep.addEventListener('input', consultarEnderecoPorCep);
+        campoCep.addEventListener('blur', consultarEnderecoPorCep);
+    }
 
     const modalDetalhes = document.getElementById('moradorDetalhesModal');
 

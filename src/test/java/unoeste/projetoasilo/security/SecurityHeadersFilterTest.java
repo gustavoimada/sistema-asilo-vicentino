@@ -22,6 +22,7 @@ class SecurityHeadersFilterTest
         assertEquals("nosniff", response.getHeader("X-Content-Type-Options"));
         assertEquals("SAMEORIGIN", response.getHeader("X-Frame-Options"));
         assertTrue(response.getHeader("Content-Security-Policy").contains("default-src 'self'"));
+        assertTrue(response.getHeader("Content-Security-Policy").contains("connect-src 'self' https://viacep.com.br"));
         assertEquals("max-age=31536000; includeSubDomains", response.getHeader("Strict-Transport-Security"));
         assertTrue(chainCalled[0]);
     }
