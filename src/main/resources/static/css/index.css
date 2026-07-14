@@ -1891,27 +1891,41 @@ main {
   background: #ffffff;
   border: 1px solid #d9e4f4;
   border-radius: 14px;
-  padding: 12px;
+  min-height: 112px;
+  padding: 14px;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  column-gap: 9px;
+  row-gap: 5px;
+  align-items: start;
 }
 
 .donation-use .material-symbols-outlined {
   color: var(--primary);
-  font-size: 22px;
-  margin-bottom: 6px;
+  font-size: 21px;
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  margin-top: 1px;
 }
 
 .donation-use strong {
   display: block;
   color: var(--primary);
   font-size: 14px;
-  margin-bottom: 6px;
+  line-height: 1.25;
+  grid-column: 2;
+  grid-row: 1;
 }
 
 .donation-use p {
   margin: 0;
   color: #475569;
   font-size: 12px;
-  line-height: 1.42;
+  line-height: 1.45;
+  grid-column: 2;
+  grid-row: 2;
+  align-self: start;
 }
 
 .cta-impact-grid {
@@ -1927,18 +1941,21 @@ main {
   background: rgba(255, 255, 255, 0.78);
   border: 1px solid #d9e4f4;
   border-radius: 14px;
-  padding: 11px 12px;
+  min-height: 112px;
+  padding: 14px;
   text-align: left;
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: 24px minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
   align-items: start;
-  gap: 9px;
+  column-gap: 9px;
+  row-gap: 5px;
 }
 
 .cta-impact-card .material-symbols-outlined {
   font-size: 21px;
   color: var(--primary);
-  margin-bottom: 0;
+  grid-column: 1;
   grid-row: 1 / span 2;
   margin-top: 1px;
 }
@@ -1946,17 +1963,21 @@ main {
 .cta-impact-card strong {
   display: block;
   color: var(--primary);
-  font-size: 13px;
-  line-height: 1.2;
-  margin-bottom: 3px;
+  font-size: 14px;
+  line-height: 1.25;
+  grid-column: 2;
+  grid-row: 1;
 }
 
 .cta-impact-card p {
   display: block;
   margin: 0;
   color: #64748b;
-  font-size: 11px;
-  line-height: 1.35;
+  font-size: 12px;
+  line-height: 1.45;
+  grid-column: 2;
+  grid-row: 2;
+  align-self: start;
 }
 
 .cta-actions {
