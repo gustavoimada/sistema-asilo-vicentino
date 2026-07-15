@@ -81,6 +81,16 @@ function somenteDigitos(valor)
     return String(valor || "").replace(/\D/g, "");
 }
 
+function escaparHtml(valor)
+{
+    return String(valor ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 function formatarCpf(valor)
 {
     const numeros = somenteDigitos(valor).slice(0, 11);
@@ -260,7 +270,7 @@ function renderizarTabela()
 
     if (dados.length === 0)
     {
-        corpo.innerHTML = '<tr><td colspan="6" class="empty-row">Nenhum funcionário encontrado.</td></tr>';
+        corpo.innerHTML = '<tr><td colspan="5" class="empty-row">Nenhum funcionário encontrado.</td></tr>';
         return;
     }
 
@@ -272,11 +282,25 @@ function renderizarTabela()
 
         return `
     <tr>
-      <td>${funcionario.nome || ""}</td>
-      <td><span class="categoria-badge ${classeCategoria(funcionario.categoria)}">${formatarCargoInclusivo(funcionario.categoria) || ""}</span></td>
-      <td>${formatarCpf(funcionario.cpf || "")}</td>
-      <td>${formatarCtps(funcionario.ctps || "")}</td>
-      <td>${formatarTelefone(funcionario.telefone || "")}</td>
+      <td>
+        <div class="funcionario-primary">
+          <strong>${escaparHtml(funcionario.nome || "Sem nome")}</strong>
+          <span>CPF ${escaparHtml(formatarCpf(funcionario.cpf || "") || "-")}</span>
+        </div>
+      </td>
+      <td><span class="categoria-badge ${classeCategoria(funcionario.categoria)}">${escaparHtml(formatarCargoInclusivo(funcionario.categoria) || "Nao informada")}</span></td>
+      <td>
+        <div class="funcionario-info-block">
+          <strong>${escaparHtml(formatarCtps(funcionario.ctps || "") || "-")}</strong>
+          <span>Carteira de trabalho</span>
+        </div>
+      </td>
+      <td>
+        <div class="funcionario-info-block">
+          <strong>${escaparHtml(formatarTelefone(funcionario.telefone || "") || "-")}</strong>
+          <span>Contato</span>
+        </div>
+      </td>
       <td class="text-right">
         <div class="acoes">
           <button type="button" class="action-icon-btn edit" data-action="editar" data-id="${funcionario.idFuncionario}" title="Editar">
@@ -297,7 +321,7 @@ async function carregarFuncionarios()
     const corpo = el("tabelaFuncionarios");
     if (corpo)
     {
-        corpo.innerHTML = '<tr><td colspan="6" class="empty-row">Carregando funcionários...</td></tr>';
+        corpo.innerHTML = '<tr><td colspan="5" class="empty-row">Carregando funcionários...</td></tr>';
     }
 
     try
@@ -317,7 +341,7 @@ async function carregarFuncionarios()
     {
         if (corpo)
         {
-            corpo.innerHTML = '<tr><td colspan="6" class="empty-row">Erro ao carregar os dados.</td></tr>';
+            corpo.innerHTML = '<tr><td colspan="5" class="empty-row">Erro ao carregar os dados.</td></tr>';
         }
         showToast("error", "Não foi possível listar os funcionários.");
     }
