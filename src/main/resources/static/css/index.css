@@ -2070,6 +2070,12 @@ main {
   text-decoration: underline;
 }
 
+@media (min-width: 901px) {
+  .donation-kind-card {
+    align-self: start;
+  }
+}
+
 .donation-goal {
   grid-column: 2;
   grid-row: 1;
