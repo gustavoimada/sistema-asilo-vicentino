@@ -6,6 +6,7 @@ import unoeste.projetoasilo.entities.Medicamento;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +20,8 @@ public class MedicamentoDAO {
         try (PreparedStatement ps = conexao.prepararComChaves(sql)) {
             ps.setString(1, medicamento.getNome());
             ps.setString(2, medicamento.getTipoMedicamento());
-            ps.setInt(3, medicamento.getDosagemValor());
-            ps.setString(4, medicamento.getDosagemUnidade());
+            definirInteiroOpcional(ps, 3, medicamento.getDosagemValor());
+            definirTextoOpcional(ps, 4, medicamento.getDosagemUnidade());
 
             if (ps.executeUpdate() > 0) {
                 try (ResultSet chaves = ps.getGeneratedKeys()) {
@@ -63,8 +64,8 @@ public class MedicamentoDAO {
         try (PreparedStatement ps = conexao.preparar(sql)) {
             ps.setString(1, medicamento.getNome());
             ps.setString(2, medicamento.getTipoMedicamento());
-            ps.setInt(3, medicamento.getDosagemValor());
-            ps.setString(4, medicamento.getDosagemUnidade());
+            definirInteiroOpcional(ps, 3, medicamento.getDosagemValor());
+            definirTextoOpcional(ps, 4, medicamento.getDosagemUnidade());
             ps.setInt(5, medicamento.getIdMedicamento());
             return ps.executeUpdate() > 0;
         }
@@ -90,17 +91,25 @@ public class MedicamentoDAO {
         return null;
     }
 
-    public boolean buscarMedicamento(String nome, String dosagemUnidade, Integer dosagemValor, Banco conexao) throws SQLException {
+    public boolean buscarMedicamento(String nome, String tipoMedicamento, String dosagemUnidade,
+                                     Integer dosagemValor, int idIgnorado, Banco conexao) throws SQLException {
         String sql = """
                 SELECT 1
                 FROM medicamento
-                WHERE nome = ? AND dosagemvalor = ? AND dosagemunidade = ?
+                WHERE LOWER(nome) = LOWER(?)
+                  AND LOWER(tipomedicamento) = LOWER(?)
+                  AND dosagemvalor IS NOT DISTINCT FROM ?
+                  AND dosagemunidade IS NOT DISTINCT FROM ?
+                  AND (? = 0 OR idmedicamento <> ?)
                 """;
 
         try (PreparedStatement ps = conexao.preparar(sql)) {
             ps.setString(1, nome);
-            ps.setInt(2, dosagemValor == null ? 0 : dosagemValor);
-            ps.setString(3, dosagemUnidade);
+            ps.setString(2, tipoMedicamento);
+            definirInteiroOpcional(ps, 3, dosagemValor);
+            definirTextoOpcional(ps, 4, dosagemUnidade);
+            ps.setInt(5, idIgnorado);
+            ps.setInt(6, idIgnorado);
 
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
@@ -126,9 +135,25 @@ public class MedicamentoDAO {
         medicamento.setIdMedicamento(rs.getInt("idmedicamento"));
         medicamento.setNome(rs.getString("nome"));
         medicamento.setTipoMedicamento(rs.getString("tipomedicamento"));
-        medicamento.setDosagemValor(rs.getInt("dosagemvalor"));
+        medicamento.setDosagemValor(rs.getObject("dosagemvalor", Integer.class));
         medicamento.setDosagemUnidade(rs.getString("dosagemunidade"));
         return medicamento;
+    }
+
+    private void definirInteiroOpcional(PreparedStatement ps, int indice, Integer valor) throws SQLException {
+        if (valor == null) {
+            ps.setNull(indice, Types.INTEGER);
+        } else {
+            ps.setInt(indice, valor);
+        }
+    }
+
+    private void definirTextoOpcional(PreparedStatement ps, int indice, String valor) throws SQLException {
+        if (valor == null) {
+            ps.setNull(indice, Types.VARCHAR);
+        } else {
+            ps.setString(indice, valor);
+        }
     }
 
     private String colunaOrdenacao(String valor) {

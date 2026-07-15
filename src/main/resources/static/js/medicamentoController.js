@@ -208,24 +208,6 @@ function configurarCampoDosagem(tipoSelect, grupoValorId, grupoUnidadeId, select
             tipo = String(tipoSelect.value).toLowerCase();
         }
 
-        if (tipo === "pomada") {
-            grupoValor.hidden = true;
-            grupoUnidade.hidden = true;
-            inputValor.value = "";
-            selectUnidade.innerHTML = '<option value=""></option>';
-            selectUnidade.disabled = false;
-            return;
-        }
-
-        if (tipo === "xarope") {
-            grupoValor.hidden = true;
-            grupoUnidade.hidden = true;
-            inputValor.value = "";
-            selectUnidade.innerHTML = '<option value=""></option>';
-            selectUnidade.disabled = false;
-            return;
-        }
-
         grupoValor.hidden = false;
         grupoUnidade.hidden = false;
 
@@ -245,12 +227,19 @@ function configurarCampoDosagem(tipoSelect, grupoValorId, grupoUnidadeId, select
             return;
         }
 
+        if (tipo === "pomada") {
+            preencherSelectUnidade(selectUnidade, ["g"], "g", true);
+            return;
+        }
+
         if (tipo === "xarope") {
             preencherSelectUnidade(selectUnidade, ["mL"], "mL", true);
+            return;
         }
 
         if (tipo === "injecao") {
             preencherSelectUnidade(selectUnidade, ["mL"], "mL", true);
+            return;
         }
     };
 
@@ -382,16 +371,11 @@ function confirmarAcao(mensagem) {
     });
 }
 
-function validarCamposCadastro(form){
-    let nome = form.nome.value;
-    let tipoMedicamento = form.tipoMedicamento.value;
-    let dosagemValor = form.dosagemValor.value;
-    let dosagemUnidade = form.dosagemUnidade.value;
-
-    nome = nome.trim();
-    tipoMedicamento = tipoMedicamento.trim().toLowerCase();
-    dosagemValor = dosagemValor.trim();
-    dosagemUnidade = dosagemUnidade.trim();
+function validarDadosMedicamento(nome, tipoMedicamento, dosagemValor, dosagemUnidade) {
+    nome = String(nome || "").trim();
+    tipoMedicamento = String(tipoMedicamento || "").trim().toLowerCase();
+    dosagemValor = String(dosagemValor || "").trim();
+    dosagemUnidade = String(dosagemUnidade || "").trim();
 
     if (nome === "") {
         mostrarPopup("Nome do medicamento e obrigatorio", "error");
@@ -408,33 +392,66 @@ function validarCamposCadastro(form){
         return false;
     }
 
-    if (tipoMedicamento !== "pomada" && tipoMedicamento !== "xarope") {
-        if (dosagemValor === "") {
-            mostrarPopup("Dosagem deve ser informada", "error");
-            return false;
-        }
+    if (dosagemValor === "") {
+        mostrarPopup("Dosagem deve ser informada", "error");
+        return false;
+    }
 
-        if (Number(dosagemValor) <= 0) {
-            mostrarPopup("Dosagem deve ser maior que zero", "error");
-            return false;
-        }
+    if (!Number.isInteger(Number(dosagemValor)) || Number(dosagemValor) <= 0) {
+        mostrarPopup("Dosagem deve ser um numero inteiro maior que zero", "error");
+        return false;
+    }
 
-        if (tipoMedicamento === "comprimido") {
-            if (dosagemUnidade !== "mg" && dosagemUnidade !== "g") {
-                mostrarPopup("Comprimido deve usar mg ou g", "error");
-                return false;
-            }
-        }
+    if (tipoMedicamento === "comprimido" && dosagemUnidade !== "mg" && dosagemUnidade !== "g") {
+        mostrarPopup("Comprimido deve usar mg ou g", "error");
+        return false;
+    }
 
-        if (tipoMedicamento === "injecao") {
-            if (dosagemUnidade !== "mL") {
-                mostrarPopup("Injecao deve usar mL", "error");
-                return false;
-            }
-        }
+    if (tipoMedicamento === "pomada" && dosagemUnidade !== "g") {
+        mostrarPopup("Pomada deve usar g", "error");
+        return false;
+    }
+
+    if ((tipoMedicamento === "xarope" || tipoMedicamento === "injecao") && dosagemUnidade !== "mL") {
+        mostrarPopup("Xarope e injecao devem usar mL", "error");
+        return false;
     }
 
     return true;
+}
+
+function validarCamposCadastro(form) {
+    return validarDadosMedicamento(
+        form.nome.value,
+        form.tipoMedicamento.value,
+        form.dosagemValor.value,
+        form.dosagemUnidade.value
+    );
+}
+
+async function obterMensagemErroMedicamento(response, mensagemPadrao) {
+    let erro = null;
+
+    try {
+        erro = await response.json();
+    } catch (e) {
+        return mensagemPadrao;
+    }
+
+    const descricao = erro && (erro.descricao || erro.detail || erro.message);
+    const titulo = erro && erro.title;
+
+    if (titulo && descricao) {
+        return `${titulo} - ${descricao}`;
+    }
+    if (descricao) {
+        return descricao;
+    }
+    if (titulo) {
+        return titulo;
+    }
+
+    return mensagemPadrao;
 }
 
 function cadastrarMedicamento() {
@@ -445,16 +462,7 @@ function cadastrarMedicamento() {
     }
 
     const dadosCadastro = new FormData(medicamento);
-    const tipoCadastro = String(document.getElementById("tipoMedicamento").value).toLowerCase();
-    if (tipoCadastro === "pomada") {
-        dadosCadastro.set("dosagemUnidade", "");
-        dadosCadastro.set("dosagemValor", "");
-    } else if (tipoCadastro === "xarope") {
-        dadosCadastro.set("dosagemUnidade", "");
-        dadosCadastro.set("dosagemValor", "");
-    } else {
-        dadosCadastro.set("dosagemUnidade", document.getElementById("dosagemUnidade").value);
-    }
+    dadosCadastro.set("dosagemUnidade", document.getElementById("dosagemUnidade").value);
 
     const requestOptions = {
         method: "POST",
@@ -462,23 +470,23 @@ function cadastrarMedicamento() {
     };
 
     fetch("/medicamentos/cadastrar", requestOptions)
-        .then(response => {
-            if (response.status === 200) {
-                return response.json()
-                    .then(medicamentoCadastrado => {
-                        mostrarPopup(medicamentoCadastrado.nome + " cadastrado", "success");
-                        listarMedicamentos();
-                        document.forms[0].reset();
-                        document.getElementById("cadastroMedicamento").hidden = true;
-                    });
+        .then(async response => {
+            if (!response.ok) {
+                throw new Error(await obterMensagemErroMedicamento(
+                    response,
+                    "Nao foi possivel cadastrar o medicamento."
+                ));
             }
 
-            return response.json().then(erro => {
-                mostrarPopup(erro.title + " - " + erro.descricao, "error");
-            });
+            const medicamentoCadastrado = await response.json();
+            mostrarPopup(medicamentoCadastrado.nome + " cadastrado", "success");
+            listarMedicamentos();
+            medicamento.reset();
+            document.getElementById("tipoMedicamento").dispatchEvent(new Event("change"));
+            document.getElementById("cadastroMedicamento").hidden = true;
         })
         .catch(error => {
-            mostrarPopup(error.message, "error");
+            mostrarPopup(error.message || "Nao foi possivel cadastrar o medicamento.", "error");
         });
 }
 
@@ -674,11 +682,20 @@ function editarMedicamento(id, nome, tipoMedicamento, dosagemValor, dosagemUnida
 }
 
 function salvarEdicaoMedicamento(id) {
+    const nome = document.getElementById("nomeEditar").value;
+    const tipoMedicamento = document.getElementById("tipoMedicamentoEditar").value;
+    const dosagemValor = document.getElementById("dosagemValorEditar").value;
+    const dosagemUnidade = document.getElementById("dosagemUnidadeEditar").value;
+
+    if (!validarDadosMedicamento(nome, tipoMedicamento, dosagemValor, dosagemUnidade)) {
+        return;
+    }
+
     const medicamento = new URLSearchParams();
-    medicamento.append("nome", document.getElementById("nomeEditar").value);
-    medicamento.append("tipoMedicamento", document.getElementById("tipoMedicamentoEditar").value);
-    medicamento.append("dosagemValor", document.getElementById("dosagemValorEditar").value);
-    medicamento.append("dosagemUnidade", document.getElementById("dosagemUnidadeEditar").value);
+    medicamento.append("nome", nome);
+    medicamento.append("tipoMedicamento", tipoMedicamento);
+    medicamento.append("dosagemValor", dosagemValor);
+    medicamento.append("dosagemUnidade", dosagemUnidade);
 
     fetch("/medicamentos/" + id, {
         method: "PUT",
@@ -687,22 +704,21 @@ function salvarEdicaoMedicamento(id) {
         },
         body: medicamento.toString()
     })
-        .then(response => {
-            if (response.status === 200) {
-                return response.json()
-                    .then(medicamentoEditado => {
-                        mostrarPopup(medicamentoEditado.nome + " editado", "success");
-                        document.getElementById("editorMedicamento").hidden = true;
-                        listarMedicamentos();
-                    });
+        .then(async response => {
+            if (!response.ok) {
+                throw new Error(await obterMensagemErroMedicamento(
+                    response,
+                    "Nao foi possivel editar o medicamento."
+                ));
             }
 
-            return response.json().then(erro => {
-                mostrarPopup(erro.title + " - " + erro.descricao, "error");
-            });
+            const medicamentoEditado = await response.json();
+            mostrarPopup(medicamentoEditado.nome + " editado", "success");
+            document.getElementById("editorMedicamento").hidden = true;
+            listarMedicamentos();
         })
         .catch(error => {
-            mostrarPopup(error.message, "error");
+            mostrarPopup(error.message || "Nao foi possivel editar o medicamento.", "error");
         });
 }
 

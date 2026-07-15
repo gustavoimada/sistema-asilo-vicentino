@@ -102,6 +102,7 @@ public class Medicamento {
 
 	public boolean buscaMedicamento(Banco conexao) throws SQLException{
 		MedicamentoDAO medicamentoDAO = new MedicamentoDAO();
-		return medicamentoDAO.buscarMedicamento(this.nome, this.dosagemUnidade, this.dosagemValor, conexao);
+		return medicamentoDAO.buscarMedicamento(this.nome, this.tipoMedicamento, this.dosagemUnidade,
+				this.dosagemValor, this.idMedicamento, conexao);
 	}
 }

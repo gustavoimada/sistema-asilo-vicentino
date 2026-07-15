@@ -21,11 +21,16 @@ import java.util.List;
 public class MedicamentoControl {
     @PostMapping("cadastrar")
     public ResponseEntity<Object> cadastroMedicamento(@RequestParam String nome,@RequestParam String tipoMedicamento,@RequestParam(required = false) Integer dosagemValor,@RequestParam(required = false) String dosagemUnidade) {
+        String erroValidacao = validarDadosMedicamento(nome, tipoMedicamento, dosagemValor, dosagemUnidade);
+        if (erroValidacao != null) {
+            return ResponseEntity.badRequest().body(new Error("Dados invalidos", erroValidacao));
+        }
+
         Medicamento medicamento = new Medicamento();
-        medicamento.setNome(nome);
-        medicamento.setTipoMedicamento(tipoMedicamento);
+        medicamento.setNome(nome.trim());
+        medicamento.setTipoMedicamento(tipoMedicamento.trim().toLowerCase());
         medicamento.setDosagemValor(dosagemValor);
-        medicamento.setDosagemUnidade(dosagemUnidade);
+        medicamento.setDosagemUnidade(normalizarUnidade(dosagemUnidade));
         Banco conexao = Banco.getConnection();
         try {
             if(medicamento.buscaMedicamento(conexao)){
@@ -69,16 +74,21 @@ public class MedicamentoControl {
                                                     @RequestParam String tipoMedicamento,
                                                     @RequestParam(required = false) Integer dosagemValor,
                                                     @RequestParam(required = false) String dosagemUnidade) {
+        String erroValidacao = validarDadosMedicamento(nome, tipoMedicamento, dosagemValor, dosagemUnidade);
+        if (erroValidacao != null) {
+            return ResponseEntity.badRequest().body(new Error("Dados invalidos", erroValidacao));
+        }
+
         Medicamento medicamento = new Medicamento();
         Banco conexao = Banco.getConnection();
 
         try {
             Medicamento medicamentoEncontrado = medicamento.buscarId(id, conexao);
             if (medicamentoEncontrado != null) {
-                medicamentoEncontrado.setNome(nome);
-                medicamentoEncontrado.setTipoMedicamento(tipoMedicamento);
+                medicamentoEncontrado.setNome(nome.trim());
+                medicamentoEncontrado.setTipoMedicamento(tipoMedicamento.trim().toLowerCase());
                 medicamentoEncontrado.setDosagemValor(dosagemValor);
-                medicamentoEncontrado.setDosagemUnidade(dosagemUnidade);
+                medicamentoEncontrado.setDosagemUnidade(normalizarUnidade(dosagemUnidade));
                 if(medicamentoEncontrado.buscaMedicamento(conexao))
                     return ResponseEntity.badRequest().body(new Error("Erro", "Medicamento já cadastrado"));
                 if (medicamentoEncontrado.editar(conexao)) {
@@ -150,5 +160,38 @@ public class MedicamentoControl {
         {
         	conexao.fechar();
         }
+    }
+
+    private String validarDadosMedicamento(String nome, String tipoMedicamento, Integer dosagemValor,
+                                            String dosagemUnidade) {
+        if (nome == null || nome.isBlank()) {
+            return "Nome do medicamento e obrigatorio";
+        }
+        if (tipoMedicamento == null || tipoMedicamento.isBlank()) {
+            return "Tipo do medicamento e obrigatorio";
+        }
+        if (dosagemValor == null || dosagemValor <= 0) {
+            return "Dosagem deve ser um numero inteiro maior que zero";
+        }
+
+        String tipo = tipoMedicamento.trim().toLowerCase();
+        String unidade = normalizarUnidade(dosagemUnidade);
+        return switch (tipo) {
+            case "comprimido" -> ("mg".equals(unidade) || "g".equals(unidade))
+                    ? null : "Comprimido deve usar mg ou g";
+            case "pomada" -> "g".equals(unidade) ? null : "Pomada deve usar g";
+            case "xarope", "injecao" -> "mL".equals(unidade)
+                    ? null : "Xarope e injecao devem usar mL";
+            default -> "Tipo de medicamento invalido";
+        };
+    }
+
+    private String normalizarUnidade(String dosagemUnidade) {
+        if (dosagemUnidade == null) {
+            return null;
+        }
+
+        String unidade = dosagemUnidade.trim();
+        return "ml".equalsIgnoreCase(unidade) ? "mL" : unidade.toLowerCase();
     }
 }
