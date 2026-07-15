@@ -607,7 +607,6 @@ function renderizarMoradores(moradores) {
         row.insertCell(2).innerHTML = `
             <div class="morador-info-block">
                 <strong>${escaparHtml(m.telefone || '-')}</strong>
-                <span>Respons&aacute;vel nos detalhes</span>
             </div>
         `;
 
