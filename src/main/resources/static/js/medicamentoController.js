@@ -420,6 +420,31 @@ function validarDadosMedicamento(nome, tipoMedicamento, dosagemValor, dosagemUni
     return true;
 }
 
+function escaparHtmlMedicamento(valor) {
+    return String(valor ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function obterApresentacaoMedicamento(tipoMedicamento) {
+    const tipo = String(tipoMedicamento || "").trim().toLowerCase();
+    const apresentacoes = {
+        comprimido: { rotulo: "Comprimido", icone: "pill", cor: "blue" },
+        injecao: { rotulo: "Injeção", icone: "vaccines", cor: "amber" },
+        xarope: { rotulo: "Xarope", icone: "science", cor: "purple" },
+        pomada: { rotulo: "Pomada", icone: "healing", cor: "green" }
+    };
+
+    return apresentacoes[tipo] || {
+        rotulo: tipo ? tipo.charAt(0).toUpperCase() + tipo.slice(1) : "Não informado",
+        icone: "medication",
+        cor: "blue"
+    };
+}
+
 function validarCamposCadastro(form) {
     return validarDadosMedicamento(
         form.nome.value,
@@ -557,39 +582,23 @@ function listarMedicamentos(nomeFiltro, tipoFiltro) {
 
                 medicamentosFiltrados.forEach(medicamento => {
                     const dosagemTexto = formatarDosagemMedicamento(medicamento);
-                    let icone = "pill";
-                    let cor = "blue";
-
-                    const tipo = (medicamento.tipoMedicamento).toLowerCase();
-
-                    if (tipo === "comprimido") {
-                        icone = "pill";
-                        cor = "blue";
-                    }
-                    else if (tipo === "injecao") {
-                        icone = "vaccines";
-                        cor = "amber";
-                    }
-                    else if (tipo === "xarope") {
-                        icone = "science";
-                        cor = "purple";
-                    }
-                    else if (tipo === "pomada") {
-                        icone = "healing";
-                        cor = "green";
-                    }
+                    const apresentacao = obterApresentacaoMedicamento(medicamento.tipoMedicamento);
+                    const nomeMedicamento = escaparHtmlMedicamento(medicamento.nome || "Sem nome");
+                    const tipoMedicamento = escaparHtmlMedicamento(apresentacao.rotulo);
 
                     linhas += `
                         <tr>
                             <td>
                                 <div class="medicamento-info">
-                                    <div class="medicamento-icon ${cor}">
-                                        <span class="material-symbols-outlined">${icone}</span>
-                                    </div>
-                                    <span class="medicamento-name">${medicamento.nome}</span>
+                                    <span class="medicamento-name">${nomeMedicamento}</span>
                                 </div>
                             </td>
-                            <td>${medicamento.tipoMedicamento}</td>
+                            <td>
+                                <span class="medicamento-tipo-badge ${apresentacao.cor}">
+                                    <span class="material-symbols-outlined" aria-hidden="true">${apresentacao.icone}</span>
+                                    ${tipoMedicamento}
+                                </span>
+                            </td>
                             <td>${dosagemTexto}</td>
                             <td style="text-align: right;">
                                 <div style="display: inline-flex; gap: 8px;">

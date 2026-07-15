@@ -692,6 +692,46 @@ body.sidebar-collapsible-demo.sidebar-collapsed.caixinhas-page .content {
   font-size: 14px;
 }
 
+.medicamento-tipo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 11px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.medicamento-tipo-badge .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.medicamento-tipo-badge.blue {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1d4ed8;
+}
+
+.medicamento-tipo-badge.amber {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #b45309;
+}
+
+.medicamento-tipo-badge.purple {
+  background: #f3e8ff;
+  border-color: #ddd6fe;
+  color: #7e22ce;
+}
+
+.medicamento-tipo-badge.green {
+  background: #dcfce7;
+  border-color: #bbf7d0;
+  color: #15803d;
+}
+
 .text-muted {
   color: var(--on-surface-variant);
 }
