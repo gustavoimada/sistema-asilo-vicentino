@@ -5,6 +5,15 @@ let popupTimer;
 let ordenacaoAtualTiposDespesas = "tipo";
 let ordemAtualTiposDespesas = "asc";
 
+function escaparHtmlTipo(valor) {
+    return String(valor ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 function formatarTipoDespesa(valor) {
     if (typeof window.formatarTituloLegivel === "function") {
         return window.formatarTituloLegivel(valor);
@@ -173,9 +182,20 @@ function renderizarTabela(tiposDespesas) {
         `;
     } else {
         tiposDespesas.forEach(tipoDespesa => {
+            const tipoFormatado = escaparHtmlTipo(formatarTipoDespesa(tipoDespesa.tipo) || "Sem nome");
             linhas += `
                 <tr>
-                    <td>${formatarTipoDespesa(tipoDespesa.tipo)}</td>
+                    <td>
+                        <div class="tipo-item tipo-item--despesa">
+                            <span class="tipo-item-icon" aria-hidden="true">
+                                <span class="material-symbols-outlined">receipt_long</span>
+                            </span>
+                            <div class="tipo-item-copy">
+                                <strong>${tipoFormatado}</strong>
+                                <small>Classificação de despesa</small>
+                            </div>
+                        </div>
+                    </td>
                     <td class="text-right">
                         <div style="display:inline-flex; gap:8px;">
                             <button type="button" class="action-icon-btn edit" aria-label="Editar tipo de despesa" onclick="abrirEdicaoTipoDespesa(${tipoDespesa.idtiposDespesas})">

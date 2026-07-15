@@ -2,6 +2,16 @@ let tiposOcorrencia = [];
 let tipoPendenteExclusao = null;
 let ordenacaoAtual = { chave: "descricao", direcao: "asc" };
 
+function escaparHtmlTipo(valor)
+{
+  return String(valor ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 function preencherPerfilTopo()
 {
   const nome = (localStorage.getItem("funcionarioNome") || localStorage.getItem("usuarioNome") || "Usuário").trim();
@@ -137,9 +147,21 @@ function renderizarTabela()
       textoGravidade = "Média";
     }
 
+    const descricao = escaparHtmlTipo(item.descricao || "Sem descrição");
+
     html += `
       <tr>
-        <td>${item.descricao || ""}</td>
+        <td>
+          <div class="tipo-item tipo-item--ocorrencia ${classeGravidade}">
+            <span class="tipo-item-icon" aria-hidden="true">
+              <span class="material-symbols-outlined">warning</span>
+            </span>
+            <div class="tipo-item-copy">
+              <strong>${descricao}</strong>
+              <small>Tipo de ocorrência</small>
+            </div>
+          </div>
+        </td>
         <td><span class="gravidade-badge ${classeGravidade}">${textoGravidade}</span></td>
         <td class="text-right">
           <div class="acoes">

@@ -5,6 +5,15 @@ let popupTimer;
 let ordenacaoAtualTiposAtividades = "tipo";
 let ordemAtualTiposAtividades = "asc";
 
+function escaparHtmlTipo(valor) {
+    return String(valor ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 function formatarTipoAtividade(valor) {
     if (typeof window.formatarTituloLegivel === "function") {
         return window.formatarTituloLegivel(valor);
@@ -173,10 +182,27 @@ function renderizarTabela(tiposAtividades) {
         `;
     } else {
         tiposAtividades.forEach(tipoAtividade => {
+            const tipoFormatado = escaparHtmlTipo(formatarTipoAtividade(tipoAtividade.tipo) || "Sem nome");
+            const organizacaoFormatada = escaparHtmlTipo(formatarTipoAtividade(tipoAtividade.org) || "Não informada");
             linhas += `
                 <tr>
-                    <td>${formatarTipoAtividade(tipoAtividade.tipo)}</td>
-                    <td>${formatarTipoAtividade(tipoAtividade.org)}</td>
+                    <td>
+                        <div class="tipo-item tipo-item--atividade">
+                            <span class="tipo-item-icon" aria-hidden="true">
+                                <span class="material-symbols-outlined">event_available</span>
+                            </span>
+                            <div class="tipo-item-copy">
+                                <strong>${tipoFormatado}</strong>
+                                <small>Tipo de atividade</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="tipo-organizacao">
+                            <span class="material-symbols-outlined" aria-hidden="true">groups</span>
+                            ${organizacaoFormatada}
+                        </span>
+                    </td>
                     <td class="text-right">
                         <div style="display:inline-flex; gap:8px;">
                             <button type="button" class="action-icon-btn edit" aria-label="Editar tipo de atividade" onclick="abrirEdicaoTipoAtividade(${tipoAtividade.idtipoatividades})">
