@@ -123,6 +123,12 @@ public class FuncionarioControl
                 return ResponseEntity.badRequest().body(new Error("Erro", "Funcionario nao encontrado"));
             }
 
+            ResponseEntity<Object> erroPermissaoEdicao = validarPermissaoEdicaoFuncionario(funcionarioEncontrado, categoriaPadronizada, session);
+            if (erroPermissaoEdicao != null)
+            {
+                return erroPermissaoEdicao;
+            }
+
             User usuario = new User().buscarPorId(funcionarioEncontrado.getIdUser(), conexao);
             if (usuario == null)
             {
@@ -382,6 +388,28 @@ public class FuncionarioControl
         if (!"coordenador".equals(categoriaAlvo) && !"cuidador".equals(categoriaAlvo) && !"secretaria".equals(categoriaAlvo))
         {
             return ResponseEntity.badRequest().body(new Error("Erro", "Categoria do funcionario invalida para exclusao."));
+        }
+
+        return null;
+    }
+
+    private ResponseEntity<Object> validarPermissaoEdicaoFuncionario(Funcionario funcionario, String categoriaSolicitada, HttpSession session)
+    {
+        String categoriaLogada = chaveCategoria(obterCategoriaSessao(session));
+        if (!"secretaria".equals(categoriaLogada))
+        {
+            return null;
+        }
+
+        String categoriaAlvo = chaveCategoria(funcionario.getCategoria());
+        if ("coordenador".equals(categoriaAlvo))
+        {
+            return ResponseEntity.status(403).body(new Error("Erro", "Secretarias podem editar apenas cuidadores e outras secretarias."));
+        }
+
+        if ("coordenador".equals(chaveCategoria(categoriaSolicitada)))
+        {
+            return ResponseEntity.status(403).body(new Error("Erro", "Secretarias nao podem alterar um funcionario para a categoria de coordenador."));
         }
 
         return null;

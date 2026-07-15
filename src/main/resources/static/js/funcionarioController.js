@@ -235,6 +235,19 @@ function motivoBloqueioExclusao(funcionario)
     return "";
 }
 
+function motivoBloqueioEdicao(funcionario)
+{
+    const categoriaLogada = padronizarCategoriaValor(localStorage.getItem("funcionarioCategoria") || "");
+    const categoriaAlvo = padronizarCategoriaValor(funcionario.categoria || "");
+
+    if (categoriaLogada === "Secretaria" && categoriaAlvo === "Coordenador")
+    {
+        return "Secretárias só podem editar cuidadores e outras secretárias";
+    }
+
+    return "";
+}
+
 async function parseJsonSegura(response)
 {
     try
@@ -278,9 +291,12 @@ function renderizarTabela()
 
     corpo.innerHTML = dados.map((funcionario) =>
     {
-        const motivoBloqueio = motivoBloqueioExclusao(funcionario);
-        const deleteDisabled = motivoBloqueio ? "disabled" : "";
-        const deleteTitle = motivoBloqueio || "Excluir";
+        const motivoBloqueioDelete = motivoBloqueioExclusao(funcionario);
+        const motivoBloqueioEdit = motivoBloqueioEdicao(funcionario);
+        const deleteDisabled = motivoBloqueioDelete ? "disabled" : "";
+        const deleteTitle = motivoBloqueioDelete || "Excluir";
+        const editDisabled = motivoBloqueioEdit ? "disabled" : "";
+        const editTitle = motivoBloqueioEdit || "Editar";
 
         return `
     <tr>
@@ -305,7 +321,7 @@ function renderizarTabela()
       </td>
       <td class="text-right">
         <div class="acoes">
-          <button type="button" class="action-icon-btn edit" data-action="editar" data-id="${funcionario.idFuncionario}" title="Editar">
+          <button type="button" class="action-icon-btn edit" data-action="editar" data-id="${funcionario.idFuncionario}" title="${editTitle}" ${editDisabled}>
             <span class="material-symbols-outlined">edit</span>
           </button>
           <button type="button" class="action-icon-btn delete" data-action="deletar" data-id="${funcionario.idFuncionario}" title="${deleteTitle}" ${deleteDisabled}>
@@ -494,6 +510,13 @@ function abrirParaEditar(id)
     if (!funcionario)
     {
         showToast("error", "Funcionário não encontrado.");
+        return;
+    }
+
+    const motivoBloqueio = motivoBloqueioEdicao(funcionario);
+    if (motivoBloqueio)
+    {
+        showToast("error", motivoBloqueio + ".");
         return;
     }
 
