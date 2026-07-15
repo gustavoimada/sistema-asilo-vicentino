@@ -3541,3 +3541,28 @@ main {
     transition-delay: 0ms !important;
   }
 }
+
+/* O Windows pode ativar reduced-motion mesmo quando o usuario espera os fades.
+   No desktop preservamos apenas opacidade, sem deslocamento ou desfoque. */
+@media (min-width: 901px) and (prefers-reduced-motion: reduce) {
+  .intro-reveal,
+  .section-reveal,
+  .reveal-on-scroll {
+    transform: none !important;
+    filter: none !important;
+    transition: opacity 0.52s ease !important;
+    transition-delay: var(--reveal-delay, var(--intro-delay, 0ms)) !important;
+  }
+
+  .intro-reveal.is-visible,
+  .section-reveal.is-visible,
+  .reveal-on-scroll.is-visible {
+    animation: desktop-soft-fade 0.52s ease both !important;
+    animation-delay: var(--reveal-delay, var(--intro-delay, 0ms)) !important;
+  }
+
+  @keyframes desktop-soft-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
