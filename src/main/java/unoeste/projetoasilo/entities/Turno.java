@@ -2,6 +2,7 @@ package unoeste.projetoasilo.entities;
 
 import unoeste.projetoasilo.dao.TurnoDAO;
 import unoeste.projetoasilo.db.util.Banco;
+import unoeste.projetoasilo.util.TurnosPadrao;
 
 import java.sql.SQLException;
 import java.time.LocalTime;
@@ -84,7 +85,7 @@ public class Turno
             return "Funcionário não está escalado para este turno";
         }
 
-        LocalTime agora = LocalTime.now();
+        LocalTime agora = LocalTime.now(TurnosPadrao.FUSO_HORARIO_ASILO);
         LocalTime inicio = escala.getHoraIni();
         LocalTime fim = escala.getHoraFim();
         if (inicio == null || fim == null)

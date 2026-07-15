@@ -4,18 +4,19 @@ import unoeste.projetoasilo.db.util.Banco;
 import unoeste.projetoasilo.entities.Funcionario;
 import unoeste.projetoasilo.entities.FuncionarioTurnos;
 import unoeste.projetoasilo.entities.Turno;
+import unoeste.projetoasilo.util.TurnosPadrao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TurnoDAO
 {
+    private static final DateTimeFormatter FORMATO_HORA = DateTimeFormatter.ofPattern("HH:mm:ss");
     private static final String SQL_HORA_INICIO_PREVISTA = " CASE WHEN ft.Turnos_idTurnos = 2 THEN TIME '19:00' ELSE TIME '07:00' END ";
     private static final String SQL_HORA_FIM_PREVISTA = " CASE WHEN ft.Turnos_idTurnos = 2 THEN TIME '07:00' ELSE TIME '19:00' END ";
     private static final String SQL_HORA_INICIO_EFETIVA = " COALESCE(NULLIF(ft.horaInicio, '')::time, " + SQL_HORA_INICIO_PREVISTA + ") ";
@@ -61,7 +62,7 @@ public class TurnoDAO
                 ft.dataEscala
                 + CASE WHEN ft.Turnos_idTurnos = 2 THEN INTERVAL '1 day' ELSE INTERVAL '0 day' END
                 + """ + SQL_HORA_FIM_PREVISTA + """
-            ) < CURRENT_TIMESTAMP
+            ) < (CURRENT_TIMESTAMP AT TIME ZONE 'America/Sao_Paulo')
             """;
 
     public Turno buscarTurnoAtivoPorFuncionario(int idFuncionario, Banco conexao) throws SQLException
@@ -109,7 +110,8 @@ public class TurnoDAO
 
     public Turno buscarEscalaPendenteHoje(int idFuncionario, Banco conexao) throws SQLException
     {
-        String dataHoje = new SimpleDateFormat("yyyy-MM-dd").format(new Timestamp(System.currentTimeMillis()));
+        int idTurnoAtual = TurnosPadrao.turnoAtual();
+        String dataEscalaAtual = TurnosPadrao.dataEscalaAtual().toString();
         String sql = """
                 SELECT ft.Turnos_idTurnos,
                        """ + SQL_HORA_INICIO_EFETIVA + """
@@ -118,11 +120,13 @@ public class TurnoDAO
                        AS horaFim
                 FROM funcionarioturnos ft
                 WHERE ft.Funcionario_idFuncionario = #1
-                AND ft.dataEscala = '#2'
+                AND ft.Turnos_idTurnos = #2
+                AND ft.dataEscala = '#3'
                 AND ft.status = 'pendente'
                 """;
         sql = sql.replace("#1", String.valueOf(idFuncionario));
-        sql = sql.replace("#2", dataHoje);
+        sql = sql.replace("#2", String.valueOf(idTurnoAtual));
+        sql = sql.replace("#3", dataEscalaAtual);
         ResultSet rs = conexao.consultar(sql);
 
         if (rs == null || !rs.next())
@@ -135,7 +139,7 @@ public class TurnoDAO
 
     public boolean escalarFuncionarioTurno(int idFuncionario, int idTurno, Banco conexao) throws SQLException
     {
-        String dataHoje = new SimpleDateFormat("yyyy-MM-dd").format(new Timestamp(System.currentTimeMillis()));
+        String dataHoje = LocalDate.now(TurnosPadrao.FUSO_HORARIO_ASILO).toString();
         String sql = """
                 INSERT INTO funcionarioturnos (Funcionario_idFuncionario, Turnos_idTurnos, dataEscala, status)
                 VALUES (#1, #2, '#3', 'pendente')
@@ -261,27 +265,8 @@ public class TurnoDAO
 
     public FuncionarioTurnos buscarTurnoAnteriorPeloHorarioAtual(Banco conexao) throws SQLException
     {
-        LocalTime agora = LocalTime.now();
-        LocalDate dataTurnoAtual;
-        int turnoAtual;
-
-        if (!agora.isBefore(LocalTime.of(7, 0)) && agora.isBefore(LocalTime.of(19, 0)))
-        {
-            turnoAtual = 1;
-            dataTurnoAtual = LocalDate.now();
-        }
-        else
-        {
-            turnoAtual = 2;
-            if (agora.isBefore(LocalTime.of(7, 0)))
-            {
-                dataTurnoAtual = LocalDate.now().minusDays(1);
-            }
-            else
-            {
-                dataTurnoAtual = LocalDate.now();
-            }
-        }
+        int turnoAtual = TurnosPadrao.turnoAtual();
+        LocalDate dataTurnoAtual = TurnosPadrao.dataEscalaAtual();
 
         int turnoAnterior;
         LocalDate dataAnterior;
@@ -357,20 +342,22 @@ public class TurnoDAO
 
     public boolean iniciarTurno(int idFuncionario, String descricao, Banco conexao) throws SQLException
     {
-        Timestamp agora = new Timestamp(System.currentTimeMillis());
-        String horaAgora = new SimpleDateFormat("HH:mm:ss").format(agora);
-        String dataHoje = new SimpleDateFormat("yyyy-MM-dd").format(agora);
+        String horaAgora = LocalTime.now(TurnosPadrao.FUSO_HORARIO_ASILO).format(FORMATO_HORA);
+        String dataEscalaAtual = TurnosPadrao.dataEscalaAtual().toString();
+        int idTurnoAtual = TurnosPadrao.turnoAtual();
 
         String sql = """
                 UPDATE funcionarioturnos
                 SET status = 'ativo', horaInicio = '#1'
                 WHERE Funcionario_idFuncionario = #2
-                AND dataEscala = '#3'
+                AND Turnos_idTurnos = #3
+                AND dataEscala = '#4'
                 AND status = 'pendente'
                 """;
         sql = sql.replace("#1", horaAgora);
         sql = sql.replace("#2", String.valueOf(idFuncionario));
-        sql = sql.replace("#3", dataHoje);
+        sql = sql.replace("#3", String.valueOf(idTurnoAtual));
+        sql = sql.replace("#4", dataEscalaAtual);
 
         return conexao.manipular(sql);
     }
@@ -389,7 +376,7 @@ public class TurnoDAO
             return false;
         }
 
-        String horaAgora = new SimpleDateFormat("HH:mm:ss").format(new Timestamp(System.currentTimeMillis()));
+        String horaAgora = LocalTime.now(TurnosPadrao.FUSO_HORARIO_ASILO).format(FORMATO_HORA);
         String sql = """
                 UPDATE funcionarioturnos
                 SET horaFim = '#1', status = 'finalizado', descricao = #5
