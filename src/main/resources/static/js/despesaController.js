@@ -466,6 +466,15 @@ function renderizarDespesas(listaDespesas) {
     if (Array.isArray(listaDespesas))
         listaRenderizacao = listaDespesas;
 
+    if (listaRenderizacao.length === 0) {
+        const rowVazia = tbody.insertRow();
+        const celulaVazia = rowVazia.insertCell(0);
+        celulaVazia.colSpan = 10;
+        celulaVazia.classList.add('empty-row');
+        celulaVazia.textContent = 'Nenhuma despesa encontrada para os filtros selecionados.';
+        return;
+    }
+
     listaRenderizacao.forEach(d => {
         const row = tbody.insertRow();
         let tipoDespesa = '';
@@ -473,32 +482,58 @@ function renderizarDespesas(listaDespesas) {
         if (d.tipoDespesa && d.tipoDespesa.tipo)
             tipoDespesa = formatarTipoDespesaLegivel(d.tipoDespesa.tipo);
 
-        row.insertCell(0).textContent = tipoDespesa;
+        const tipoCell = row.insertCell(0);
+        const tipoInfo = document.createElement('div');
+        tipoInfo.classList.add('despesa-tipo-info');
+        const tipoIcone = document.createElement('span');
+        tipoIcone.classList.add('material-symbols-outlined', 'despesa-tipo-icone');
+        tipoIcone.textContent = 'receipt_long';
+        const tipoTexto = document.createElement('div');
+        const tipoNome = document.createElement('strong');
+        tipoNome.textContent = tipoDespesa || 'Sem tipo informado';
+        const tipoLegenda = document.createElement('small');
+        tipoLegenda.textContent = 'Classificação de despesa';
+        tipoTexto.append(tipoNome, tipoLegenda);
+        tipoInfo.append(tipoIcone, tipoTexto);
+        tipoCell.appendChild(tipoInfo);
 
-        //status da despesa
         const statusCell = row.insertCell(1);
         const statusSpan = document.createElement('span');
-        statusSpan.textContent = obterStatusDespesa(d);
+        const status = obterStatusDespesa(d);
+        statusSpan.textContent = status;
         statusSpan.classList.add('despesa-status');
         if (d.dtQuitacao)
             statusSpan.classList.add('pago');
-        else if (obterStatusDespesa(d) === 'Vencido')
+        else if (status === 'Vencido')
             statusSpan.classList.add('vencido');
         else
             statusSpan.classList.add('pendente');
         statusCell.appendChild(statusSpan);
 
-        row.insertCell(2).textContent = formatarMoeda(d.valor);
+        const valorCell = row.insertCell(2);
+        const valorInfo = document.createElement('div');
+        valorInfo.classList.add('despesa-valor-info');
+        const valorPrincipal = document.createElement('strong');
+        valorPrincipal.textContent = formatarMoeda(d.valor);
+        const valorLegenda = document.createElement('small');
+        valorLegenda.textContent = 'Valor previsto';
+        valorInfo.append(valorPrincipal, valorLegenda);
+        valorCell.appendChild(valorInfo);
 
-        if (d.fixa)
-            row.insertCell(3).textContent = 'Sim';
-        else
-            row.insertCell(3).textContent = 'Não';
+        const fixaCell = row.insertCell(3);
+        const fixaBadge = document.createElement('span');
+        fixaBadge.classList.add('despesa-fixa-badge', d.fixa ? 'fixa' : 'avulsa');
+        fixaBadge.textContent = d.fixa ? 'Fixa' : 'Avulsa';
+        fixaCell.appendChild(fixaBadge);
 
-        if (d.fixa && d.periodicidade)
-            row.insertCell(4).textContent = d.periodicidade;
-        else
-            row.insertCell(4).textContent = '-';
+        const periodicidadeCell = row.insertCell(4);
+        const periodicidade = d.fixa && d.periodicidade
+            ? formatarTipoDespesaLegivel(d.periodicidade)
+            : 'Não recorrente';
+        const periodicidadeBadge = document.createElement('span');
+        periodicidadeBadge.classList.add('despesa-periodicidade', d.fixa && d.periodicidade ? 'recorrente' : 'unica');
+        periodicidadeBadge.textContent = periodicidade;
+        periodicidadeCell.appendChild(periodicidadeBadge);
 
         row.insertCell(5).textContent = formatarData(d.dtVencimento);
 
@@ -517,7 +552,11 @@ function renderizarDespesas(listaDespesas) {
         else
             row.insertCell(7).textContent = '-';
 
-        row.insertCell(8).textContent = d.observacoes || '';
+        const observacaoCell = row.insertCell(8);
+        const observacao = document.createElement('span');
+        observacao.classList.add('despesa-observacao');
+        observacao.textContent = d.observacoes || 'Sem observações.';
+        observacaoCell.appendChild(observacao);
 
         const acoes = row.insertCell(9);
         acoes.classList.add('morador-actions-cell');

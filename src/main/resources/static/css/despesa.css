@@ -25,6 +25,95 @@
   color: #991b1b;
 }
 
+.despesa-tipo-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 180px;
+}
+
+.despesa-tipo-icone {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #fff3df;
+  color: #c56a09;
+  font-size: 19px;
+}
+
+.despesa-tipo-info > div,
+.despesa-valor-info {
+  display: grid;
+  gap: 3px;
+}
+
+.despesa-tipo-info strong,
+.despesa-valor-info strong {
+  color: #183d7c;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.despesa-tipo-info small,
+.despesa-valor-info small {
+  color: #71829d;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.despesa-fixa-badge,
+.despesa-periodicidade {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.despesa-fixa-badge.fixa {
+  background: #e8f0ff;
+  color: #1d4ed8;
+}
+
+.despesa-fixa-badge.avulsa {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.despesa-periodicidade.recorrente {
+  background: #e7f7ef;
+  color: #15803d;
+}
+
+.despesa-periodicidade.unica {
+  background: #f8fafc;
+  color: #64748b;
+}
+
+.despesa-observacao {
+  display: block;
+  max-width: 230px;
+  color: #52647e;
+  font-size: 13px;
+  line-height: 1.45;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.empty-row {
+  padding: 28px 24px !important;
+  color: #64748b;
+  text-align: center;
+}
+
 .despesa-pay-btn {
   color: #166534;
 }
