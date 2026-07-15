@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", function ()
 {
   iniciarEntradaInicial();
-  iniciarExperienciaDesktop();
   iniciarMenu();
   iniciarRotinaAsilo();
   iniciarNoticias();
@@ -1120,52 +1119,6 @@ function iniciarEntradaInicial() {
     const hero = document.querySelector(".hero");
     if (hero) hero.classList.add("hero-motion-ready");
   }, 1900);
-}
-
-function iniciarExperienciaDesktop() {
-  const consultaDesktop = window.matchMedia("(min-width: 901px)");
-  if (!consultaDesktop.matches) return;
-
-  document.body.classList.add("desktop-experience");
-
-  function repetirEntradaDoHero() {
-    const alvos = document.querySelectorAll(
-      ".topbar-brand, .topbar-nav, .topbar-actions, .hero-copy .eyebrow, .hero-copy h1, .hero-copy p, #btnDoarTopo, .hero-visual, .hero-floating-card"
-    );
-    const hero = document.querySelector(".hero");
-
-    if (!alvos.length) return;
-    if (hero) hero.classList.remove("hero-motion-ready");
-
-    for (let i = 0; i < alvos.length; i += 1) {
-      alvos[i].classList.add("intro-reveal");
-      alvos[i].classList.remove("is-visible");
-      alvos[i].style.setProperty("--intro-delay", (i * 85) + "ms");
-    }
-
-    window.requestAnimationFrame(function () {
-      window.requestAnimationFrame(function () {
-        for (let i = 0; i < alvos.length; i += 1) {
-          alvos[i].classList.add("is-visible");
-        }
-      });
-    });
-
-    window.setTimeout(function () {
-      for (let i = 0; i < alvos.length; i += 1) {
-        alvos[i].classList.remove("intro-reveal");
-        alvos[i].classList.remove("is-visible");
-        alvos[i].style.removeProperty("--intro-delay");
-      }
-      if (hero) hero.classList.add("hero-motion-ready");
-    }, 1800);
-  }
-
-  window.addEventListener("pageshow", function (evento) {
-    if (evento.persisted && consultaDesktop.matches) {
-      repetirEntradaDoHero();
-    }
-  });
 }
 
 function validarCpfDoacao(cpf) {
