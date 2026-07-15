@@ -124,6 +124,18 @@ public class UserDAO
         }
     }
 
+    public boolean atualizarAcesso(int idUser, String nome, String senha, Banco conexao) throws SQLException
+    {
+        String sql = "UPDATE usuario SET name = ?, senha = ? WHERE id = ?";
+        try (PreparedStatement statement = conexao.preparar(sql))
+        {
+            statement.setString(1, nome);
+            statement.setString(2, senha);
+            statement.setInt(3, idUser);
+            return statement.executeUpdate() > 0;
+        }
+    }
+
     private User montarUsuario(ResultSet rs) throws SQLException
     {
         User usuario = new User();

@@ -95,7 +95,7 @@ public class FuncionarioControl
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Object> editarFuncionario(@PathVariable int id, @RequestParam String nome, @RequestParam String cpf, @RequestParam String ctps, @RequestParam String telefone, @RequestParam String categoria)
+    public ResponseEntity<Object> editarFuncionario(@PathVariable int id, @RequestParam String nome, @RequestParam String cpf, @RequestParam String ctps, @RequestParam String telefone, @RequestParam String categoria, @RequestParam(required = false) String username, @RequestParam(required = false) String senha, HttpSession session)
     {
         Banco conexao = Banco.getConnection();
 
@@ -123,6 +123,30 @@ public class FuncionarioControl
                 return ResponseEntity.badRequest().body(new Error("Erro", "Funcionario nao encontrado"));
             }
 
+            User usuario = new User().buscarPorId(funcionarioEncontrado.getIdUser(), conexao);
+            if (usuario == null)
+            {
+                return ResponseEntity.badRequest().body(new Error("Erro", "Usuario de acesso do funcionario nao encontrado"));
+            }
+
+            String usernameAtualizado = username == null || username.trim().isEmpty()
+                    ? usuario.getName()
+                    : username.trim();
+            String senhaAtualizada = senha == null || senha.trim().isEmpty()
+                    ? usuario.getSenha()
+                    : passwordEncoder.encode(senha.trim());
+
+            if (usernameAtualizado.length() > 60)
+            {
+                return ResponseEntity.badRequest().body(new Error("Erro", "Usuario deve ter no maximo 60 caracteres"));
+            }
+
+            User usuarioComMesmoNome = new User().buscarPorNome(usernameAtualizado, conexao);
+            if (usuarioComMesmoNome != null && usuarioComMesmoNome.getIdUser() != usuario.getIdUser())
+            {
+                return ResponseEntity.badRequest().body(new Error("Erro", "Usuario ja existe"));
+            }
+
             String cpfPadronizado = limparNumeros(cpf);
             if (cpfJaExisteEmOutroFuncionario(funcionarioEncontrado, cpfPadronizado, conexao))
             {
@@ -148,6 +172,15 @@ public class FuncionarioControl
 
             if (editarFuncionarioComCategoriaAlternativa(funcionarioEncontrado, conexao))
             {
+                if (!usuario.atualizarAcesso(usernameAtualizado, senhaAtualizada, conexao))
+                {
+                    return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel atualizar o acesso do funcionario"));
+                }
+
+                if (session != null && Integer.toString(usuario.getIdUser()).equals(String.valueOf(session.getAttribute("idUser"))))
+                {
+                    session.setAttribute("usuarioNome", usernameAtualizado);
+                }
                 return ResponseEntity.ok(funcionarioEncontrado);
             }
 

@@ -177,6 +177,8 @@ function limparFormulario()
     el("telefone").value = "";
     if (el("username")) el("username").value = "";
     if (el("senhaUsuario")) el("senhaUsuario").value = "";
+    if (el("username")) el("username").placeholder = "Ex: maria.silva";
+    if (el("senhaUsuario")) el("senhaUsuario").placeholder = "Defina uma senha";
 
     if (titulo) titulo.textContent = "Cadastrar Novo Funcionário";
     if (btn) btn.innerHTML = '<span class="material-symbols-outlined">save</span>Salvar Funcionário';
@@ -431,15 +433,6 @@ async function salvarFuncionario(event)
 
     try
     {
-        const params = new URLSearchParams(
-        {
-            id,
-            nome,
-            cpf,
-            ctps,
-            telefone,
-            categoria
-        });
         let response;
 
         if (!id)
@@ -461,7 +454,17 @@ async function salvarFuncionario(event)
         }
         else
         {
-            response = await fetch(`/funcionario/${id}?${params.toString()}`,
+            const editParams = new URLSearchParams(
+            {
+                nome,
+                cpf,
+                ctps,
+                telefone,
+                categoria,
+                username,
+                senha: senhaUsuario
+            });
+            response = await fetch(`/funcionario/${id}?${editParams.toString()}`,
             {
                 method: "PUT"
             });
@@ -500,8 +503,16 @@ function abrirParaEditar(id)
     el("cpf").value = formatarCpf(funcionario.cpf || "");
     el("ctps").value = formatarCtps(funcionario.ctps || "");
     el("telefone").value = formatarTelefone(funcionario.telefone || "");
-    if (el("username")) el("username").value = "";
-    if (el("senhaUsuario")) el("senhaUsuario").value = "";
+    if (el("username"))
+    {
+        el("username").value = "";
+        el("username").placeholder = "Preencha apenas para alterar o usuário";
+    }
+    if (el("senhaUsuario"))
+    {
+        el("senhaUsuario").value = "";
+        el("senhaUsuario").placeholder = "Deixe em branco para manter a senha atual";
+    }
     el("formTitulo").textContent = "Editar Funcionário";
     el("salvarBtn").innerHTML = '<span class="material-symbols-outlined">save</span>Salvar Alteração';
     togglePainel("cadastroFuncionario", true);

@@ -107,4 +107,10 @@ public class User
         UserDAO userDAO = new UserDAO();
         return userDAO.atualizarSenha(this.idUser, senha, conexao);
     }
+
+    public boolean atualizarAcesso(String nome, String senha, Banco conexao) throws SQLException
+    {
+        UserDAO userDAO = new UserDAO();
+        return userDAO.atualizarAcesso(this.idUser, nome, senha, conexao);
+    }
 }
