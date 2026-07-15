@@ -37,6 +37,13 @@ BEGIN
     END IF;
 END $$;
 
+ALTER TABLE atividades
+    ADD COLUMN IF NOT EXISTS datafim DATE;
+
+UPDATE atividades
+SET datafim = data::date
+WHERE datafim IS NULL;
+
 DO $$
 BEGIN
     IF EXISTS (

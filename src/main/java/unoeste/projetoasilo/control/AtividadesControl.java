@@ -25,18 +25,24 @@ import java.util.List;
 public class AtividadesControl
 {
 	@PostMapping("cadastrar")
-	public ResponseEntity<Object> cadastrarAtividade(@RequestParam String nome, @RequestParam String descricao, @RequestParam LocalDate date, @RequestParam LocalTime horainicio, @RequestParam LocalTime horafim, @RequestParam int idtipoatividade)
+	public ResponseEntity<Object> cadastrarAtividade(@RequestParam String nome, @RequestParam String descricao,
+			@RequestParam LocalDate date, @RequestParam(required = false) LocalDate datafim,
+			@RequestParam LocalTime horainicio, @RequestParam LocalTime horafim,
+			@RequestParam int idtipoatividade)
 	{
 		Atividades atividade = new Atividades();
 		TiposAtividades tipoAtividade = new TiposAtividades();
 		Banco conexao = Banco.getConnection();
 		try
 		{
+			LocalDate dataFinal = datafim == null ? date : datafim;
 			if (nome == null || nome.isBlank() ||
 					descricao == null || descricao.isBlank() ||
 					date == null ||
+					dataFinal == null ||
 					horainicio == null ||
 					horafim == null ||
+					dataFinal.isBefore(date) ||
 					!horafim.isAfter(horainicio) ||
 					idtipoatividade <= 0)
 			{
@@ -64,7 +70,7 @@ public class AtividadesControl
 						.body(new Error("Erro", "Tipo de atividade inativo para novos cadastros"));
 			}
 
-			if (atividade.existeNoMesmoHorario(date, horainicio, horafim, null, conexao))
+			if (atividade.existeNoMesmoHorario(date, dataFinal, horainicio, horafim, null, conexao))
 			{
 				return ResponseEntity.badRequest()
 						.body(new Error("Erro", "Já existe atividade nesse horário"));
@@ -73,6 +79,7 @@ public class AtividadesControl
 			atividade.setNome(nome.trim());
 			atividade.setDescricao(descricao.trim());
 			atividade.setDate(date);
+			atividade.setDataFim(dataFinal);
 			atividade.setHorainicio(horainicio);
 			atividade.setHorafim(horafim);
 			atividade.setTipoatividades(tipoAtividadeEncontrado);
@@ -145,19 +152,24 @@ public class AtividadesControl
 	}
 
 	@PutMapping("editar")
-	public ResponseEntity<Object> editarAtividade(@RequestParam int id, @RequestParam String nome, @RequestParam String descricao, @RequestParam LocalDate date, @RequestParam LocalTime horainicio, @RequestParam LocalTime horafim, @RequestParam int idtipoatividade)
+	public ResponseEntity<Object> editarAtividade(@RequestParam int id, @RequestParam String nome,
+			@RequestParam String descricao, @RequestParam LocalDate date,
+			@RequestParam(required = false) LocalDate datafim, @RequestParam LocalTime horainicio,
+			@RequestParam LocalTime horafim, @RequestParam int idtipoatividade)
 	{
 		Atividades atividade = new Atividades();
 		TiposAtividades tipoAtividade = new TiposAtividades();
 		Banco conexao = Banco.getConnection();
 		try
 		{
+			LocalDate dataFinal = datafim == null ? date : datafim;
 			if (nome == null || nome.trim().isEmpty() || descricao == null || descricao.trim().isEmpty())
 			{
 				return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao acessar banco de dados"));
 			}
 
-			if (date == null || horainicio == null || horafim == null || !horafim.isAfter(horainicio))
+			if (date == null || dataFinal == null || horainicio == null || horafim == null
+					|| dataFinal.isBefore(date) || !horafim.isAfter(horainicio))
 			{
 				return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao acessar banco de dados"));
 			}
@@ -171,7 +183,7 @@ public class AtividadesControl
 			TiposAtividades tipoAtividadeEncontrado = tipoAtividade.buscarPorId(idtipoatividade, conexao);
 			if (atividadeEncontrada == null || tipoAtividadeEncontrado == null
 				|| !tipoAtividadeEncontrado.isAtivo()
-				|| atividade.existeNoMesmoHorario(date, horainicio, horafim, id, conexao))
+				|| atividade.existeNoMesmoHorario(date, dataFinal, horainicio, horafim, id, conexao))
 			{
 				return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao acessar banco de dados"));
 			}
@@ -179,6 +191,7 @@ public class AtividadesControl
 			atividadeEncontrada.setNome(nome);
 			atividadeEncontrada.setDescricao(descricao);
 			atividadeEncontrada.setDate(date);
+			atividadeEncontrada.setDataFim(dataFinal);
 			atividadeEncontrada.setHorainicio(horainicio);
 			atividadeEncontrada.setHorafim(horafim);
 			atividadeEncontrada.setTipoatividades(tipoAtividadeEncontrado);

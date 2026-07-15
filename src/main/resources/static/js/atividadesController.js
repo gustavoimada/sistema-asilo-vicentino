@@ -261,6 +261,23 @@ function formatarData(valor) {
     return partes[2] + "/" + partes[1] + "/" + partes[0];
 }
 
+function obterDataFimAtividade(atividade) {
+    return String(atividade.dataFim || atividade.datafim || atividade.date || "").slice(0, 10);
+}
+
+function formatarPeriodoAtividade(atividade) {
+    const dataInicio = String(atividade.date || "").slice(0, 10);
+    const dataFim = obterDataFimAtividade(atividade);
+
+    if (!dataInicio) {
+        return "";
+    }
+    if (!dataFim || dataFim === dataInicio) {
+        return formatarData(dataInicio);
+    }
+    return formatarData(dataInicio) + " a " + formatarData(dataFim);
+}
+
 function formatarHora(valor) {
     if (!valor) {
         return "";
@@ -308,24 +325,33 @@ function obterDataHojeIso() {
 }
 
 function validarDataFormularioAtividade(exibirMensagem) {
-    const campoData = document.getElementById("date");
-    if (!campoData || !campoData.value) {
-        if (campoData) {
-            campoData.setCustomValidity("");
-        }
+    const campoDataInicio = document.getElementById("date");
+    const campoDataFim = document.getElementById("datafim");
+    if (!campoDataInicio || !campoDataFim || !campoDataInicio.value || !campoDataFim.value) {
+        if (campoDataInicio) campoDataInicio.setCustomValidity("");
+        if (campoDataFim) campoDataFim.setCustomValidity("");
         return true;
     }
 
     const hoje = obterDataHojeIso();
-    if (campoData.value < hoje) {
-        campoData.setCustomValidity("Data da atividade nao pode ser passada");
+    if (campoDataInicio.value < hoje) {
+        campoDataInicio.setCustomValidity("Data inicial da atividade nao pode ser passada");
         if (exibirMensagem) {
-            mostrarPopup("Data da atividade nao pode ser passada", "error");
+            mostrarPopup("Data inicial da atividade nao pode ser passada", "error");
         }
         return false;
     }
 
-    campoData.setCustomValidity("");
+    campoDataInicio.setCustomValidity("");
+    if (campoDataFim.value < campoDataInicio.value) {
+        campoDataFim.setCustomValidity("Data final deve ser igual ou posterior a data inicial");
+        if (exibirMensagem) {
+            mostrarPopup("Data final deve ser igual ou posterior a data inicial", "error");
+        }
+        return false;
+    }
+
+    campoDataFim.setCustomValidity("");
     return true;
 }
 
@@ -353,20 +379,29 @@ function validarHorarioFormularioAtividade(exibirMensagem) {
 }
 
 function configurarRestricaoDataAtividade() {
-    const campoData = document.getElementById("date");
-    if (!campoData) {
+    const campoDataInicio = document.getElementById("date");
+    const campoDataFim = document.getElementById("datafim");
+    if (!campoDataInicio || !campoDataFim) {
         return;
     }
 
-    campoData.min = obterDataHojeIso();
-    campoData.addEventListener("input", function () {
-        campoData.min = obterDataHojeIso();
+    const sincronizarDatas = function () {
+        const hoje = obterDataHojeIso();
+        campoDataInicio.min = hoje;
+        campoDataFim.min = campoDataInicio.value || hoje;
+
+        if (campoDataInicio.value && (!campoDataFim.value || campoDataFim.value < campoDataInicio.value)) {
+            campoDataFim.value = campoDataInicio.value;
+        }
         validarDataFormularioAtividade(false);
-    });
-    campoData.addEventListener("change", function () {
-        campoData.min = obterDataHojeIso();
-        validarDataFormularioAtividade(false);
-    });
+        validarHorarioFormularioAtividade(false);
+    };
+
+    sincronizarDatas();
+    campoDataInicio.addEventListener("input", sincronizarDatas);
+    campoDataInicio.addEventListener("change", sincronizarDatas);
+    campoDataFim.addEventListener("input", sincronizarDatas);
+    campoDataFim.addEventListener("change", sincronizarDatas);
 }
 
 function configurarValidacaoHorarioAtividade() {
@@ -455,8 +490,6 @@ function renderizarListaMoradores() {
     lista.forEach(function (morador) {
         const idMorador = obterIdMorador(morador);
         const nomeMorador = morador.nome || "Sem nome";
-        const cpf = morador.cpf || "";
-        const cidade = morador.cidade || "";
 
         if (idMorador === null || idMorador === undefined || idMorador === "") {
             return;
@@ -466,22 +499,11 @@ function renderizarListaMoradores() {
         if (moradoresSelecionados.has(Number(idMorador))) {
             checked = "checked";
         }
-        let cpfTexto = "";
-        if (cpf) {
-            cpfTexto = "CPF: " + cpf;
-        }
-        let cidadeTexto = "";
-        if (cidade) {
-            cidadeTexto = cidade;
-        }
-        const detalhes = [cpfTexto, cidadeTexto].filter(Boolean).join(" | ") || "Sem dados complementares";
-
         linhas += `
             <div class="morador-item">
                 <label>
                     <div class="morador-info">
-                        <strong>${nomeMorador}</strong>
-                        <span>${detalhes}</span>
+                        <strong>${escaparHtml(nomeMorador)}</strong>
                     </div>
                     <input class="morador-checkbox" type="checkbox" ${checked} onchange="alternarMoradorSelecionado(${idMorador}, this.checked)" />
                 </label>
@@ -569,7 +591,7 @@ function renderizarTabela(atividades) {
             linhas += `
                 <tr>
                     <td>${atividade.nome || ""}</td>
-                    <td>${formatarData(atividade.date)}</td>
+                    <td>${formatarPeriodoAtividade(atividade)}</td>
                     <td>${horario}</td>
                     <td>${obterDescricaoTipoAtividade(idTipo)}</td>
                     <td class="text-right">
@@ -909,6 +931,7 @@ function obterParamsFormularioAtividade(incluirId) {
     params.append("nome", escaparApostrofo(form.nome.value.trim()));
     params.append("descricao", escaparApostrofo(form.descricao.value.trim()));
     params.append("date", form.date.value);
+    params.append("datafim", form.datafim.value);
     params.append("horainicio", form.horainicio.value);
     params.append("horafim", form.horafim.value);
     params.append("idtipoatividade", form.idtipoatividade.value);
@@ -1177,6 +1200,7 @@ async function abrirEdicaoAtividade(idAtividade) {
     document.getElementById("nome").value = atividade.nome || "";
     document.getElementById("descricao").value = atividade.descricao || "";
     document.getElementById("date").value = atividade.date || "";
+    document.getElementById("datafim").value = obterDataFimAtividade(atividade);
     document.getElementById("horainicio").value = formatarHora(atividade.horainicio);
     document.getElementById("horafim").value = formatarHora(atividade.horafim);
     document.getElementById("idtipoatividade").value = String(obterIdTipoAtividade(atividade) || "");
@@ -1189,9 +1213,11 @@ window.visualizarParticipantesAtividade = visualizarParticipantesAtividade;
 
 function abrirCadastroAtividade() {
     limparFormularioAtividade();
-    const campoData = document.getElementById("date");
-    if (campoData) {
-        campoData.min = obterDataHojeIso();
+    const campoDataInicio = document.getElementById("date");
+    const campoDataFim = document.getElementById("datafim");
+    if (campoDataInicio && campoDataFim) {
+        campoDataInicio.min = obterDataHojeIso();
+        campoDataFim.min = obterDataHojeIso();
     }
     exibirFormularioAtividade("cadastro");
 }
@@ -1223,6 +1249,7 @@ async function buscarAtividades() {
 
     const atividadesFiltradas = atividadesBase.filter(function (atividade) {
         const dataAtividade = String(atividade.date || "").slice(0, 10);
+        const dataFimAtividade = obterDataFimAtividade(atividade);
         const idTipo = String(obterIdTipoAtividade(atividade) || "");
 
         if (nomeFiltro && !String(atividade.nome || "").toLowerCase().includes(nomeFiltro)) {
@@ -1233,7 +1260,7 @@ async function buscarAtividades() {
             return false;
         }
 
-        if (dataInicioFiltro && (!dataAtividade || dataAtividade < dataInicioFiltro)) {
+        if (dataInicioFiltro && (!dataFimAtividade || dataFimAtividade < dataInicioFiltro)) {
             return false;
         }
 
@@ -1241,7 +1268,7 @@ async function buscarAtividades() {
             return false;
         }
 
-        if (situacaoFiltro === "proximas" && (!dataAtividade || dataAtividade < hoje)) {
+        if (situacaoFiltro === "proximas" && (!dataFimAtividade || dataFimAtividade < hoje)) {
             return false;
         }
 

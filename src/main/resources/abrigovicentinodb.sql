@@ -279,6 +279,7 @@ CREATE TABLE atividades (
                             descricao VARCHAR(45),
                             TipoAtividade_idTipoAtividade INTEGER,
                             data TIMESTAMP,
+                            dataFim DATE,
                             horaIni VARCHAR(45),
                             horaFim VARCHAR(45),
                             FOREIGN KEY (TipoAtividade_idTipoAtividade)

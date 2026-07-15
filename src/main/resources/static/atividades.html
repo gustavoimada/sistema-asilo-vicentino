@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="assets/favicon.png?v=2" />
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=2" />
 
-  <link rel="stylesheet" href="css/stylesAtividades.css?v=20260711-2" />
+  <link rel="stylesheet" href="css/stylesAtividades.css?v=20260715-1" />
   <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260708-3" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
@@ -160,19 +160,26 @@
               <textarea id="descricao" name="descricao" rows="3" maxlength="255" placeholder="Descreva a atividade..." required></textarea>
             </div>
 
-            <div class="form-field">
-              <label for="date">Data</label>
-              <input id="date" name="date" type="date" required />
-            </div>
+            <div class="atividade-periodo">
+              <div class="form-field">
+                <label for="date">Data inicial</label>
+                <input id="date" name="date" type="date" required />
+              </div>
 
-            <div class="form-field">
-              <label for="horainicio">Hora Início</label>
-              <input id="horainicio" name="horainicio" type="time" required />
-            </div>
+              <div class="form-field">
+                <label for="datafim">Data final</label>
+                <input id="datafim" name="datafim" type="date" required />
+              </div>
 
-            <div class="form-field">
-              <label for="horafim">Hora Fim</label>
-              <input id="horafim" name="horafim" type="time" required />
+              <div class="form-field">
+                <label for="horainicio">Hora Início</label>
+                <input id="horainicio" name="horainicio" type="time" required />
+              </div>
+
+              <div class="form-field">
+                <label for="horafim">Hora Fim</label>
+                <input id="horafim" name="horafim" type="time" required />
+              </div>
             </div>
 
             <div class="form-field span-3">
@@ -252,7 +259,7 @@
                 <thead>
                   <tr>
                     <th data-sort="nome">Nome</th>
-                    <th data-sort="date">Data</th>
+                    <th data-sort="date">Período</th>
                     <th data-sort="horainicio">Horário</th>
                     <th data-sort="idtipoatividade">Tipo</th>
                     <th class="text-right">Ações</th>
@@ -276,7 +283,7 @@
 
   <script src="js/perfilTopo.js"></script>
   <script src="js/textoFormatador.js"></script>
-  <script src="js/atividadesController.js?v=20260714-1"></script>
+  <script src="js/atividadesController.js?v=20260715-1"></script>
   <script src="js/sidebarSecretaria.js?v=20260707-1"></script>
   <script src="js/sidebarRecolhivel.js?v=20260708-1"></script>
 </body>

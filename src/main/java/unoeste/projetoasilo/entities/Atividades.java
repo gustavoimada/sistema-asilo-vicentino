@@ -13,6 +13,7 @@ public class Atividades {
     private String nome;
     private String descricao;
     private LocalDate date;
+    private LocalDate dataFim;
     private LocalTime horainicio;
     private LocalTime horafim;
     private TiposAtividades tipoatividades;
@@ -59,6 +60,14 @@ public class Atividades {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public LocalDate getDataFim() {
+        return dataFim;
+    }
+
+    public void setDataFim(LocalDate dataFim) {
+        this.dataFim = dataFim;
     }
 
     public LocalTime getHorainicio() {
@@ -121,13 +130,14 @@ public class Atividades {
         return atividadesDAO.buscarPorId(id, conexao);
     }
 
-    public boolean existeNoMesmoHorario(LocalDate data, LocalTime horainicio, LocalTime horafim, Integer idIgnorar, Banco conexao) throws SQLException {
+    public boolean existeNoMesmoHorario(LocalDate data, LocalDate dataFim, LocalTime horainicio,
+                                         LocalTime horafim, Integer idIgnorar, Banco conexao) throws SQLException {
         AtividadesDAO atividadesDAO = new AtividadesDAO();
         if (conexao == null)
         {
             throw new SQLException("Nao foi possivel abrir conexao com banco de dados");
         }
-        return atividadesDAO.existeNoMesmoHorario(data, horainicio, horafim, idIgnorar, conexao);
+        return atividadesDAO.existeNoMesmoHorario(data, dataFim, horainicio, horafim, idIgnorar, conexao);
     }
 
     public boolean existeParaTipoAtividade(int idTipoAtividade, Banco conexao) throws SQLException {
