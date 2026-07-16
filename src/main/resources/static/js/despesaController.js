@@ -173,18 +173,15 @@ function confirmarAcaoDespesa(titulo, mensagem, textoConfirmar = 'Confirmar') {
 }
 
 function formatarData(data) {
-    if (!data)
-        return '';
+    const apenasData = dataISO(data);
+    const dataPartes = apenasData.match(/^(\d{4})-(\d{2})-(\d{2})$/);
 
-    const apenasData = data.split('T')[0];
-    return apenasData.replace(/(\d{4})-(\d{2})-(\d{2})/, '$3/$2/$1');
+    return dataPartes ? `${dataPartes[3]}/${dataPartes[2]}/${dataPartes[1]}` : '-';
 }
 
 function dataISO(data) {
-    if (!data)
-        return '';
-    else
-        return data.split('T')[0];
+    const dataEncontrada = String(data || '').match(/\d{4}-\d{2}-\d{2}/);
+    return dataEncontrada ? dataEncontrada[0] : '';
 }
 
 function formatarValor(v) {
@@ -485,9 +482,6 @@ function renderizarDespesas(listaDespesas) {
         const tipoCell = row.insertCell(0);
         const tipoInfo = document.createElement('div');
         tipoInfo.classList.add('despesa-tipo-info');
-        const tipoIcone = document.createElement('span');
-        tipoIcone.classList.add('material-symbols-outlined', 'despesa-tipo-icone');
-        tipoIcone.textContent = 'receipt_long';
         const tipoTexto = document.createElement('div');
         const tipoNome = document.createElement('strong');
         tipoNome.textContent = tipoDespesa || 'Sem tipo informado';
@@ -495,7 +489,7 @@ function renderizarDespesas(listaDespesas) {
         tipoLegenda.textContent = 'Classificação de despesa';
         tipoTexto.append(tipoNome, tipoLegenda);
         tipoLegenda.textContent = d.observacoes || 'Sem observacoes informadas.';
-        tipoInfo.append(tipoIcone, tipoTexto);
+        tipoInfo.appendChild(tipoTexto);
         tipoCell.appendChild(tipoInfo);
 
         const statusCell = row.insertCell(1);
@@ -535,7 +529,6 @@ function renderizarDespesas(listaDespesas) {
         periodicidadeBadge.classList.add('despesa-periodicidade', d.fixa && d.periodicidade ? 'recorrente' : 'unica');
         periodicidadeBadge.textContent = periodicidade;
         periodicidadeCell.appendChild(periodicidadeBadge);
-        fixaCell.appendChild(periodicidadeBadge);
 
         const vencimentoCell = row.insertCell(5);
         vencimentoCell.textContent = formatarData(d.dtVencimento);
@@ -549,7 +542,6 @@ function renderizarDespesas(listaDespesas) {
             diasRestantesSpan.classList.add('dias-restantes-badge', classeDiasRestantes);
 
         diasRestantesCell.appendChild(diasRestantesSpan);
-        vencimentoCell.appendChild(diasRestantesSpan);
 
         if (d.dtQuitacao)
             row.insertCell(7).textContent = formatarData(d.dtQuitacao);
@@ -563,7 +555,7 @@ function renderizarDespesas(listaDespesas) {
         observacaoCell.appendChild(observacao);
 
         const acoes = row.insertCell(9);
-        acoes.classList.add('morador-actions-cell');
+        acoes.classList.add('despesa-actions-cell');
 
         if (!d.dtQuitacao) {
             const btnPagar = document.createElement('button');
