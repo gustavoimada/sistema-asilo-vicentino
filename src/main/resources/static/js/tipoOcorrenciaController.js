@@ -151,17 +151,7 @@ function renderizarTabela()
 
     html += `
       <tr>
-        <td>
-          <div class="tipo-item tipo-item--ocorrencia ${classeGravidade}">
-            <span class="tipo-item-icon" aria-hidden="true">
-              <span class="material-symbols-outlined">warning</span>
-            </span>
-            <div class="tipo-item-copy">
-              <strong>${descricao}</strong>
-              <small>Tipo de ocorrência</small>
-            </div>
-          </div>
-        </td>
+        <td><strong class="tipo-ocorrencia-nome">${descricao}</strong></td>
         <td><span class="gravidade-badge ${classeGravidade}">${textoGravidade}</span></td>
         <td class="text-right">
           <div class="acoes">

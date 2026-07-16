@@ -461,6 +461,13 @@ select {
   color: #991b1b;
 }
 
+.tipo-ocorrencia-nome {
+  color: #1f2937;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
 .tipo-item {
   display: inline-flex;
   align-items: center;
