@@ -79,13 +79,16 @@ public class DespesaControl {
     }
 
     @PostMapping("cadastrar")
-    public ResponseEntity<Object> cadastrarDespesa(@RequestParam double valor, @RequestParam String observacoes, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtVencimento, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtQuitacao, @RequestParam String tipo, @RequestParam(defaultValue = "false") boolean fixa, @RequestParam(required = false) String periodicidade) {
+    public ResponseEntity<Object> cadastrarDespesa(@RequestParam double valor, @RequestParam String observacoes, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtVencimento, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtQuitacao, @RequestParam String tipo, @RequestParam(defaultValue = "false") boolean fixa, @RequestParam(required = false) String periodicidade) {
         Banco conexao = Banco.getConnection();
-        if (fixa && (periodicidade == null || periodicidade.isBlank()))
-            return ResponseEntity.badRequest().body(new Error("Erro", "Informe a periodicidade da despesa fixa"));
+        if (fixa && (dtVencimento == null || periodicidade == null || periodicidade.isBlank()))
+            return ResponseEntity.badRequest().body(new Error("Erro", "Despesa fixa precisa de vencimento e periodicidade"));
 
         if (!fixa)
             periodicidade = null;
+
+        if (dtVencimento == null && dtQuitacao == null)
+            dtQuitacao = LocalDate.now();
 
         Despesa despesa = new Despesa(valor, observacoes, dtVencimento, dtQuitacao, fixa, periodicidade, new TipoDespesa(tipo));
         try {
@@ -128,7 +131,7 @@ public class DespesaControl {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Object> editarDespesa(@PathVariable int id, @RequestParam double valor, @RequestParam String observacoes, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtVencimento, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtQuitacao, @RequestParam String tipo, @RequestParam(required = false) Boolean fixa, @RequestParam(required = false) String periodicidade) {
+    public ResponseEntity<Object> editarDespesa(@PathVariable int id, @RequestParam double valor, @RequestParam String observacoes, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtVencimento, @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dtQuitacao, @RequestParam String tipo, @RequestParam(required = false) Boolean fixa, @RequestParam(required = false) String periodicidade) {
         Banco conexao = Banco.getConnection();
 
         try {
@@ -147,11 +150,14 @@ public class DespesaControl {
                     if (periodicidade != null)
                         despesa.setPeriodicidade(periodicidade);
 
-                    if (despesa.getPeriodicidade() == null || despesa.getPeriodicidade().isBlank())
-                        return ResponseEntity.badRequest().body(new Error("Erro", "Informe a periodicidade da despesa fixa"));
+                    if (despesa.getDtVencimento() == null || despesa.getPeriodicidade() == null || despesa.getPeriodicidade().isBlank())
+                        return ResponseEntity.badRequest().body(new Error("Erro", "Despesa fixa precisa de vencimento e periodicidade"));
                 }
                 else
                     despesa.setPeriodicidade(null);
+
+                if (despesa.getDtVencimento() == null && despesa.getDtQuitacao() == null)
+                    despesa.setDtQuitacao(LocalDate.now());
 
                 prepararTipoDespesa(despesa, conexao);
 

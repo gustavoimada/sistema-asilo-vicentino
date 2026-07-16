@@ -306,6 +306,41 @@ function atualizarCamposDespesaFixa() {
         periodicidade.value = '';
         campoPeriodicidade.classList.add('is-disabled');
     }
+
+    atualizarCamposVencimento();
+}
+
+function atualizarCamposVencimento() {
+    const fixa = document.getElementById('fixa');
+    const possuiVencimento = document.getElementById('possuiVencimento');
+    const campoVencimento = document.getElementById('campoVencimento');
+    const dtVencimento = document.getElementById('dtVencimento');
+    const dtQuitacao = document.getElementById('dtQuitacao');
+    const textoPossuiVencimento = document.getElementById('textoPossuiVencimento');
+
+    if (fixa.value === 'true') {
+        possuiVencimento.checked = true;
+        possuiVencimento.disabled = true;
+        textoPossuiVencimento.textContent = 'Obrigatorio para despesa fixa';
+    }
+    else {
+        possuiVencimento.disabled = false;
+        textoPossuiVencimento.textContent = possuiVencimento.checked
+            ? 'Sim, possui vencimento'
+            : 'Nao, ja foi quitada';
+    }
+
+    const temVencimento = possuiVencimento.checked;
+    dtVencimento.disabled = !temVencimento;
+    dtVencimento.required = temVencimento;
+    campoVencimento.classList.toggle('is-disabled', !temVencimento);
+
+    if (!temVencimento) {
+        dtVencimento.value = '';
+
+        if (!dtQuitacao.value)
+            dtQuitacao.value = dataAtualFormatada();
+    }
 }
 
 function limparIndicadoresOrdenacao() {
@@ -688,33 +723,51 @@ function salvarDespesa(event) {
     const id = document.getElementById('id').value;
     const tipo = document.getElementById('tipo').value;
     const valor = valorParaNumero(document.getElementById('valor').value);
-    const dtVencimento = document.getElementById('dtVencimento').value;
-    const dtQuitacao = document.getElementById('dtQuitacao').value;
+    const possuiVencimento = document.getElementById('possuiVencimento').checked;
+    const dtVencimento = possuiVencimento ? document.getElementById('dtVencimento').value : '';
+    let dtQuitacao = document.getElementById('dtQuitacao').value;
     const observacoes = document.getElementById('observacoes').value;
     const fixa = document.getElementById('fixa').value;
     const periodicidade = document.getElementById('periodicidade').value;
 
-    if (dtQuitacao !== '' && dtQuitacao > dtVencimento)
-        exibirMensagem('error', 'A data de quitacao nao pode ser maior que a data de vencimento.');
+    if (!possuiVencimento && dtQuitacao === '') {
+        dtQuitacao = dataAtualFormatada();
+        document.getElementById('dtQuitacao').value = dtQuitacao;
+    }
+
+    if (possuiVencimento && dtVencimento === '')
+        exibirMensagem('error', 'Informe a data de vencimento da despesa.');
+    else if (fixa === 'true' && !possuiVencimento)
+        exibirMensagem('error', 'Uma despesa fixa precisa ter data de vencimento.');
     else if (fixa === 'true' && periodicidade === '')
         exibirMensagem('error', 'Informe a periodicidade da despesa fixa.');
     else {
+        const parametros = new URLSearchParams({
+            valor: String(valor),
+            observacoes,
+            tipo,
+            fixa
+        });
+
+        if (dtVencimento)
+            parametros.set('dtVencimento', dtVencimento);
+
+        if (dtQuitacao)
+            parametros.set('dtQuitacao', dtQuitacao);
+
+        if (periodicidade)
+            parametros.set('periodicidade', periodicidade);
+
         let url;
         let method;
 
         if (id) {
-            url = `${URL}/${id}?valor=${valor}&observacoes=${encodeURIComponent(observacoes)}&dtVencimento=${dtVencimento}&tipo=${encodeURIComponent(tipo)}&fixa=${fixa}`;
+            url = `${URL}/${id}?${parametros.toString()}`;
             method = 'PUT';
         } else {
-            url = `${URL}/cadastrar?valor=${valor}&observacoes=${encodeURIComponent(observacoes)}&dtVencimento=${dtVencimento}&tipo=${encodeURIComponent(tipo)}&fixa=${fixa}`;
+            url = `${URL}/cadastrar?${parametros.toString()}`;
             method = 'POST';
         }
-
-        if (dtQuitacao !== '')
-            url += `&dtQuitacao=${dtQuitacao}`;
-
-        if (periodicidade !== '')
-            url += `&periodicidade=${encodeURIComponent(periodicidade)}`;
 
         fetch(url, { method })
             .then(response => response.json().then(data => ({ ok: response.ok, data })))
@@ -745,6 +798,7 @@ function editarDespesa(despesa) {
     document.getElementById('valor').value = formatarValor(Number(despesa.valor).toFixed(2));
     document.getElementById('dtVencimento').value = dataISO(despesa.dtVencimento);
     document.getElementById('dtQuitacao').value = dataISO(despesa.dtQuitacao);
+    document.getElementById('possuiVencimento').checked = Boolean(dataISO(despesa.dtVencimento));
     document.getElementById('observacoes').value = despesa.observacoes;
     document.getElementById('fixa').value = String(despesa.fixa);
 
@@ -790,6 +844,7 @@ function esconderFormulario() {
     document.getElementById('despesaForm').reset();
     document.getElementById('id').value = '';
     document.getElementById('fixa').value = 'false';
+    document.getElementById('possuiVencimento').checked = true;
     atualizarCamposDespesaFixa();
 }
 

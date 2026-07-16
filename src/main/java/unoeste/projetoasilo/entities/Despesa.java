@@ -99,10 +99,10 @@ public class Despesa {
     public boolean gravar(Banco conexao) throws SQLException {
         if (valor > 0
                 && observacoes != null
-                && dtVencimento != null
+                && (dtVencimento != null || dtQuitacao != null)
                 && tipoDespesa != null
                 && tipoDespesa.getTipo() != null
-                && (!fixa || periodicidade != null)) {
+                && (!fixa || (dtVencimento != null && periodicidade != null && !periodicidade.isBlank()))) {
             DespesaDAO dao = new DespesaDAO();
             return dao.gravar(this, conexao);
         }
@@ -115,7 +115,7 @@ public class Despesa {
     }
 
     public boolean editar(Banco conexao) throws SQLException {
-        if (idDespesa > 0 && valor > 0 && observacoes != null && dtVencimento != null && tipoDespesa != null && tipoDespesa.getTipo() != null && (!fixa || periodicidade != null)) {
+        if (idDespesa > 0 && valor > 0 && observacoes != null && (dtVencimento != null || dtQuitacao != null) && tipoDespesa != null && tipoDespesa.getTipo() != null && (!fixa || (dtVencimento != null && periodicidade != null && !periodicidade.isBlank()))) {
             DespesaDAO dao = new DespesaDAO();
             return dao.editar(this, conexao);
         }
