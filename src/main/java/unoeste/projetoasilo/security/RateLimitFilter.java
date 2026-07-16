@@ -54,11 +54,23 @@ public class RateLimitFilter implements Filter
 
         if ("POST".equalsIgnoreCase(request.getMethod()) && "/login/entrar".equals(route))
         {
-            if (!limiter.allow("login:" + clientIdentifier(request), loginMaximum, loginWindow))
+            String loginKey = "login:" + clientIdentifier(request);
+            if (limiter.isBlocked(loginKey, loginMaximum, loginWindow))
             {
                 reject(response, loginWindow);
                 return;
             }
+
+            filterChain.doFilter(servletRequest, servletResponse);
+            if (response.getStatus() == HttpServletResponse.SC_UNAUTHORIZED)
+            {
+                limiter.registerFailure(loginKey, loginWindow);
+            }
+            else if (response.getStatus() >= 200 && response.getStatus() < 300)
+            {
+                limiter.reset(loginKey);
+            }
+            return;
         }
         else if ("POST".equalsIgnoreCase(request.getMethod()) && isPublicDonation(route, request))
         {

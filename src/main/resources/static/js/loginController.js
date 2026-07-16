@@ -124,12 +124,32 @@ function logar(evento)
     })
         .then(function (resposta)
         {
-            if (!resposta.ok)
-            {
-                mostrarMensagem("error", "Dados incorretos. Verifique usuário e senha.");
-                return null;
-            }
-            return resposta.json();
+            return resposta.json()
+                .catch(function ()
+                {
+                    return null;
+                })
+                .then(function (conteudo)
+                {
+                    if (resposta.ok)
+                    {
+                        return conteudo;
+                    }
+
+                    if (resposta.status === 429)
+                    {
+                        mostrarMensagem("error", conteudo?.descricao || "Muitas tentativas. Aguarde alguns minutos e tente novamente.");
+                    }
+                    else if (resposta.status === 401)
+                    {
+                        mostrarMensagem("error", "Usuário ou senha incorretos.");
+                    }
+                    else
+                    {
+                        mostrarMensagem("error", conteudo?.descricao || "Não foi possível entrar. Tente novamente em instantes.");
+                    }
+                    return null;
+                });
         })
         .then(function (usuario)
         {
