@@ -3646,3 +3646,49 @@ main {
     animation-delay: 0.9s !important;
   }
 }
+
+@media (min-width: 901px) and (hover: hover) and (pointer: fine) {
+  .topbar-brand {
+    transition: transform 0.24s ease, filter 0.24s ease !important;
+  }
+
+  .topbar-brand img {
+    transition: transform 0.28s ease, box-shadow 0.28s ease !important;
+  }
+
+  .topbar-brand:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.06);
+  }
+
+  .topbar-brand:hover img {
+    transform: rotate(-6deg) scale(1.08);
+    box-shadow: 0 8px 20px rgba(0, 53, 127, 0.3);
+  }
+
+  .hero #btnDoarTopo {
+    transition: translate 0.24s ease, filter 0.24s ease !important;
+  }
+
+  .hero #btnDoarTopo:hover {
+    translate: 0 -3px;
+    filter: brightness(1.08) saturate(1.08);
+    animation-duration: 2.9s !important;
+  }
+
+  .hero .hero-floating-card {
+    transition: translate 0.26s ease, scale 0.26s ease, filter 0.26s ease, border-color 0.26s ease !important;
+  }
+
+  .hero .hero-floating-card:hover {
+    translate: 0 -3px;
+    scale: 1.02;
+    filter: brightness(1.035);
+    border-color: rgba(111, 177, 255, 0.72);
+    animation-duration: 3.4s !important;
+  }
+
+  .hero .hero-floating-card:hover .hero-floating-icon {
+    box-shadow: 0 7px 16px rgba(0, 53, 127, 0.16);
+  }
+}
