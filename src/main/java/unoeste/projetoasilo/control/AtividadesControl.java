@@ -13,6 +13,7 @@ import unoeste.projetoasilo.entities.Atividades;
 import unoeste.projetoasilo.entities.AtividadesMorador;
 import unoeste.projetoasilo.entities.Error;
 import unoeste.projetoasilo.entities.TiposAtividades;
+import unoeste.projetoasilo.util.TurnosPadrao;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -50,7 +51,8 @@ public class AtividadesControl
 						.body(new Error("Erro", "Dados inválidos para cadastro da atividade"));
 			}
 
-			if (!LocalDateTime.of(date, horainicio).isAfter(LocalDateTime.now()))
+			if (!LocalDateTime.of(date, horainicio)
+					.isAfter(LocalDateTime.now(TurnosPadrao.FUSO_HORARIO_ASILO)))
 			{
 				return ResponseEntity.badRequest()
 						.body(new Error("Erro", "A atividade deve ser agendada para um horário futuro"));
@@ -174,7 +176,8 @@ public class AtividadesControl
 				return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao acessar banco de dados"));
 			}
 
-			if (!LocalDateTime.of(date, horainicio).isAfter(LocalDateTime.now()))
+			if (!LocalDateTime.of(date, horainicio)
+					.isAfter(LocalDateTime.now(TurnosPadrao.FUSO_HORARIO_ASILO)))
 			{
 				return ResponseEntity.badRequest().body(new Error("Erro", "A atividade deve ser agendada para um horário futuro"));
 			}
