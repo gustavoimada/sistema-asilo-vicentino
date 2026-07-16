@@ -15,7 +15,7 @@ const estadoOcorrencia = {
 };
 
 let ordenacaoOcorrencia = { chave: "data", direcao: "desc" };
-let filtrosOcorrencia = { tipo: "", morador: "", cuidador: "", dataInicial: "", dataFinal: "", gravidade: "" };
+let filtrosOcorrencia = { tipo: "", morador: "", cuidador: "", dataInicial: "", dataFinal: "", gravidade: "", somenteMinhas: false };
 
 function elOcorrencia(id)
 {
@@ -338,7 +338,7 @@ function renderMoradoresEnvolvidosOcorrencia(item)
   const moradores = Array.isArray(item.moradoresEnvolvidos) ? item.moradoresEnvolvidos : [];
   if (!moradores.length)
 {
-    return '<span class="morador-chip">Nenhum</span>';
+    return '<span class="morador-chip vazio">Nenhum morador</span>';
   }
 
   let chips = "";
@@ -349,7 +349,7 @@ function renderMoradoresEnvolvidosOcorrencia(item)
     chips += `<span class="morador-chip">${escaparHtmlOcorrencia(nome)}</span>`;
   }
 
-  return `<div class="moradores-envolvidos">${chips}</div>`;
+  return `<div class="moradores-envolvidos"><span class="moradores-label">Moradores</span><div class="moradores-chips">${chips}</div></div>`;
 }
 
 function preencherTiposOcorrencia()
@@ -578,12 +578,12 @@ function renderizarTabelaOcorrencias(ocorrencias)
     const item = ocorrencias[i];
     html += `
       <tr>
-        <td>${formatarDataOcorrencia(item.dtOcorrencia)}</td>
-        <td>${formatarHoraOcorrencia(item.dtOcorrencia)}</td>
-        <td>${escaparHtmlOcorrencia(item.funcionario?.nome || "-")}</td>
-        <td><span class="tipo-chip ${classeTipoOcorrencia(item)}">${escaparHtmlOcorrencia(item.tipoOcorrencia?.descricao || "-")}</span></td>
+        <td><div class="ocorrencia-data-cell"><strong>${formatarDataOcorrencia(item.dtOcorrencia)}</strong><span>Registro</span></div></td>
+        <td><span class="ocorrencia-hora-chip">${formatarHoraOcorrencia(item.dtOcorrencia)}</span></td>
+        <td><div class="ocorrencia-funcionario-cell"><strong>${escaparHtmlOcorrencia(item.funcionario?.nome || "-")}</strong><span>Cuidador(a)</span></div></td>
+        <td><div class="ocorrencia-tipo-cell"><span class="tipo-chip ${classeTipoOcorrencia(item)}">${escaparHtmlOcorrencia(item.tipoOcorrencia?.descricao || "-")}</span><span class="gravidade-texto">Gravidade ${Number(item.tipoOcorrencia?.gravidade || 0) === 1 ? "baixa" : Number(item.tipoOcorrencia?.gravidade || 0) === 2 ? "media" : "alta"}</span></div></td>
         <td>${renderMoradoresEnvolvidosOcorrencia(item)}</td>
-        <td>${escaparHtmlOcorrencia(item.observacoes || "-")}</td>
+        <td><p class="ocorrencia-observacao">${escaparHtmlOcorrencia(item.observacoes || "Sem observacoes registradas.")}</p></td>
         <td class="text-right">
           <div class="acoes">
             <button type="button" class="action-icon-btn edit" data-acao="editar" data-id="${item.idOcorrencia}" title="Editar">
@@ -650,6 +650,12 @@ function aplicarFiltrosEOrdenacaoOcorrencia()
 {
         incluir = dataItem <= filtrosOcorrencia.dataFinal;
       }
+    }
+
+    if (incluir && filtrosOcorrencia.somenteMinhas)
+    {
+      const idFuncionarioAtual = Number(estadoOcorrencia.funcionario?.idFuncionario || estadoOcorrencia.idFuncionarioContexto || 0);
+      incluir = idFuncionarioAtual > 0 && Number(item.funcionario?.idFuncionario || 0) === idFuncionarioAtual;
     }
 
     if (incluir && filtrosOcorrencia.gravidade)
@@ -920,13 +926,14 @@ function fecharFiltrosOcorrencia()
 
 function limparFiltrosOcorrencia()
 {
-  filtrosOcorrencia = { tipo: "", morador: "", cuidador: "", dataInicial: "", dataFinal: "", gravidade: "" };
+  filtrosOcorrencia = { tipo: "", morador: "", cuidador: "", dataInicial: "", dataFinal: "", gravidade: "", somenteMinhas: false };
   if (elOcorrencia("filtroTipo")) elOcorrencia("filtroTipo").value = "";
   if (elOcorrencia("filtroMorador")) elOcorrencia("filtroMorador").value = "";
   if (elOcorrencia("filtroCuidador")) elOcorrencia("filtroCuidador").value = "";
   if (elOcorrencia("filtroDataInicial")) elOcorrencia("filtroDataInicial").value = "";
   if (elOcorrencia("filtroDataFinal")) elOcorrencia("filtroDataFinal").value = "";
   if (elOcorrencia("filtroGravidade")) elOcorrencia("filtroGravidade").value = "";
+  if (elOcorrencia("somenteMinhasOcorrencias")) elOcorrencia("somenteMinhasOcorrencias").checked = false;
   aplicarFiltrosEOrdenacaoOcorrencia();
 }
 
@@ -1192,6 +1199,11 @@ function configurarEventosOcorrencia()
 
   elOcorrencia("filtroGravidade")?.addEventListener("change", function () {
     filtrosOcorrencia.gravidade = elOcorrencia("filtroGravidade").value;
+    aplicarFiltrosEOrdenacaoOcorrencia();
+  });
+
+  elOcorrencia("somenteMinhasOcorrencias")?.addEventListener("change", function () {
+    filtrosOcorrencia.somenteMinhas = elOcorrencia("somenteMinhasOcorrencias").checked;
     aplicarFiltrosEOrdenacaoOcorrencia();
   });
 

@@ -295,6 +295,60 @@ select {
   flex-wrap: wrap;
 }
 
+.minhas-ocorrencias-toggle {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 1px solid #cfe0fb;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #31506f;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.minhas-ocorrencias-toggle:hover {
+  border-color: #8cb8f5;
+  background: #f6faff;
+}
+
+.minhas-ocorrencias-toggle input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toggle-check-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #9db8dc;
+  border-radius: 6px;
+  color: transparent;
+  font-size: 15px;
+  line-height: 1;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.minhas-ocorrencias-toggle:has(input:checked) {
+  border-color: #0d55b8;
+  background: #edf5ff;
+  color: #073f91;
+  box-shadow: 0 6px 14px rgba(13, 85, 184, 0.12);
+}
+
+.minhas-ocorrencias-toggle:has(input:checked) .toggle-check-icon {
+  border-color: #0d55b8;
+  background: #0d55b8;
+  color: #ffffff;
+}
+
 .card {
   background: var(--surface-container-lowest);
   border-radius: 28px;
@@ -621,7 +675,7 @@ select {
 
 .table-wrap table {
   width: 100%;
-  min-width: 1140px;
+  min-width: 1040px;
   border-collapse: collapse;
   text-align: left;
 }
@@ -663,9 +717,51 @@ select {
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  padding: 4px 6px;
+  padding: 5px 10px;
   font-size: 11px;
   font-weight: 700;
+}
+
+.ocorrencia-data-cell,
+.ocorrencia-funcionario-cell,
+.ocorrencia-tipo-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ocorrencia-data-cell strong,
+.ocorrencia-funcionario-cell strong {
+  color: #17395f;
+  font-size: 14px;
+}
+
+.ocorrencia-data-cell span,
+.ocorrencia-funcionario-cell span,
+.gravidade-texto,
+.moradores-label {
+  color: #7487a1;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ocorrencia-hora-chip {
+  display: inline-flex;
+  padding: 6px 9px;
+  border-radius: 9px;
+  background: #f1f6fd;
+  color: #31577f;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ocorrencia-observacao {
+  max-width: 220px;
+  margin: 0;
+  color: #405a76;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .tipo-chip.baixa {
@@ -685,6 +781,13 @@ select {
 
 .moradores-envolvidos {
   display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.moradores-chips {
+  display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
@@ -703,6 +806,11 @@ select {
 .morador-chip.more {
   background: #eef2ff;
   color: #4338ca;
+}
+
+.morador-chip.vazio {
+  background: #f4f6f8;
+  color: #718096;
 }
 
 .text-right,
@@ -894,7 +1002,8 @@ select {
   }
 
   .secondary-open-btn,
-  .filter-open-btn {
+  .filter-open-btn,
+  .minhas-ocorrencias-toggle {
     width: 100%;
     justify-content: center;
   }
