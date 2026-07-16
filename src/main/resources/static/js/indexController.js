@@ -916,7 +916,6 @@ function iniciarMetricasAnimadas() {
 
     const atual = Number(el.getAttribute("data-current") || "0");
     const meta = Number(el.getAttribute("data-goal") || "1");
-    const porcentagem = Math.max(0, Math.min((atual / meta) * 100, 100));
     const valorAtual = el.querySelector(".js-donation-current");
     const valorMeta = el.querySelector(".js-donation-goal");
     const barra = el.querySelector(".js-donation-fill");
@@ -924,24 +923,15 @@ function iniciarMetricasAnimadas() {
     const progresso = el.querySelector(".donation-goal-bar");
 
     if (valorMeta) valorMeta.textContent = formatarMoeda(meta);
-    if (barra) {
-      barra.style.width = "0%";
-      window.requestAnimationFrame(function () {
-        window.requestAnimationFrame(function () {
-          barra.style.width = porcentagem.toFixed(1) + "%";
-        });
-      });
-    }
-    if (progresso) progresso.setAttribute("aria-valuenow", porcentagem.toFixed(0));
-
     animarValor(0, atual, 2200, function (valor) {
       if (valorAtual) valorAtual.textContent = formatarMoeda(valor);
+      const percentualAtual = Math.max(0, Math.min((valor / meta) * 100, 100));
+      if (barra) barra.style.width = percentualAtual.toFixed(2) + "%";
+      if (progresso) progresso.setAttribute("aria-valuenow", percentualAtual.toFixed(0));
+      if (faltante) {
+        faltante.textContent = "Faltam " + formatarMoeda(Math.max(meta - valor, 0)) + " para bater a meta.";
+      }
     });
-
-    if (faltante) {
-      const restante = Math.max(meta - atual, 0);
-      faltante.textContent = "Faltam " + formatarMoeda(restante) + " para bater a meta.";
-    }
   }
 
   // Mantém os indicadores em zero até a seção entrar na tela.
@@ -949,6 +939,21 @@ function iniciarMetricasAnimadas() {
     const prefixo = numeros[i].getAttribute("data-prefix") || "";
     const sufixo = numeros[i].getAttribute("data-suffix") || "";
     numeros[i].textContent = prefixo + formatarNumero(0) + sufixo;
+  }
+
+  if (metaDoacao) {
+    const meta = Number(metaDoacao.getAttribute("data-goal") || "0");
+    const valorAtual = metaDoacao.querySelector(".js-donation-current");
+    const valorMeta = metaDoacao.querySelector(".js-donation-goal");
+    const barra = metaDoacao.querySelector(".js-donation-fill");
+    const faltante = metaDoacao.querySelector(".js-donation-left");
+    const progresso = metaDoacao.querySelector(".donation-goal-bar");
+
+    if (valorAtual) valorAtual.textContent = formatarMoeda(0);
+    if (valorMeta) valorMeta.textContent = formatarMoeda(meta);
+    if (barra) barra.style.width = "0%";
+    if (faltante) faltante.textContent = "Faltam " + formatarMoeda(meta) + " para bater a meta.";
+    if (progresso) progresso.setAttribute("aria-valuenow", "0");
   }
 
   if (!("IntersectionObserver" in window)) {
