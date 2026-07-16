@@ -510,6 +510,37 @@ function escalaPendenteVencidaSemInicio(escala)
     return status === "pendente" && semInicio && fimEscala && fimEscala.getTime() < Date.now();
 }
 
+function obterFimRealEscala(escala)
+{
+    const dataEscala = escala?.dataEscala;
+    const horaFim = escala?.horaFim;
+    if (!dataEscala || !horaFim) return null;
+
+    const horaNormalizada = String(horaFim).trim().length === 5
+        ? `${String(horaFim).trim()}:00`
+        : String(horaFim).trim();
+    const dataFim = new Date(`${dataEscala}T${horaNormalizada}`);
+    if (Number.isNaN(dataFim.getTime())) return null;
+
+    const minutosInicio = obterMinutosHoraCoordenador(escala?.horaInicio);
+    const minutosFim = obterMinutosHoraCoordenador(horaFim);
+    if (minutosInicio !== null && minutosFim !== null && minutosFim <= minutosInicio)
+    {
+        dataFim.setDate(dataFim.getDate() + 1);
+    }
+
+    return dataFim;
+}
+
+function escalaFinalizadaComAtraso(escala)
+{
+    if (String(escala?.status || "").toLowerCase() !== "finalizado") return false;
+
+    const fimPrevisto = obterFimEscala(escala);
+    const fimReal = obterFimRealEscala(escala);
+    return fimPrevisto && fimReal && fimReal.getTime() > fimPrevisto.getTime();
+}
+
 function statusExibicaoEscala(escala)
 {
     if (escalaPendenteVencidaSemInicio(escala))
@@ -543,6 +574,16 @@ function statusExibicaoEscala(escala)
     }
     if (valor === "finalizado")
     {
+        if (escalaFinalizadaComAtraso(escala))
+        {
+            return {
+                classe: "finalizado-atraso",
+                texto: "Finalizado com atraso",
+                titulo: "Turno encerrado após o horário previsto.",
+                descricao: "Encerrado com atraso"
+            };
+        }
+
         return {
             classe: "finalizado",
             texto: "Finalizado",
@@ -653,6 +694,7 @@ function atualizarResumoStatusTurnos(turnos)
         { classe: "pendente", texto: "Pendentes" },
         { classe: "andamento", texto: "Em andamento" },
         { classe: "finalizado", texto: "Finalizados" },
+        { classe: "finalizado-atraso", texto: "Com atraso" },
         { classe: "sem-inicio", texto: "Sem in\u00edcio" }
     ];
     const totais = ordem.reduce((acc, item) =>

@@ -122,6 +122,11 @@
   color: #15803d;
 }
 
+.status-chip.finalizado-atraso {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
 .status-chip.sem-inicio {
   background: #fee2e2;
   color: #b91c1c;
@@ -161,7 +166,7 @@
 
 .turnos-status-resumo {
   display: grid;
-  grid-template-columns: repeat(4, minmax(86px, 1fr));
+  grid-template-columns: repeat(5, minmax(86px, 1fr));
   gap: 8px;
   margin: 0;
   align-self: end;
@@ -223,6 +228,10 @@
   background: #16a34a;
 }
 
+.turnos-status-card.finalizado-atraso::before {
+  background: #ea580c;
+}
+
 .turnos-status-card.sem-inicio::before {
   background: #dc2626;
 }
@@ -274,6 +283,10 @@
 
 .turno-historico-item.status-finalizado::before {
   background: #16a34a;
+}
+
+.turno-historico-item.status-finalizado-atraso::before {
+  background: #ea580c;
 }
 
 .turno-historico-item.status-sem-inicio::before {
@@ -400,6 +413,15 @@
 
 .turno-detail-hero.status-finalizado::before {
   background: #16a34a;
+}
+
+.turno-detail-hero.status-finalizado-atraso {
+  border-color: #fed7aa;
+  background: linear-gradient(135deg, #fff7ed 0%, #ffffff 100%);
+}
+
+.turno-detail-hero.status-finalizado-atraso::before {
+  background: #ea580c;
 }
 
 .turno-detail-hero.status-sem-inicio::before {
@@ -612,7 +634,7 @@
   }
 
   .turnos-status-resumo {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
   .bloco-turnos {
