@@ -749,6 +749,28 @@ main {
   }
 }
 
+@media (min-width: 901px) {
+  .history-stat-card {
+    animation: history-stat-card-float 4.4s ease-in-out infinite;
+    will-change: transform;
+  }
+
+  .history-blue-card {
+    animation: history-blue-card-float 4.9s ease-in-out 0.45s infinite;
+    will-change: transform;
+  }
+
+  @keyframes history-stat-card-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+  }
+
+  @keyframes history-blue-card-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+}
+
 .history-copy p {
   font-size: 18px;
   color: var(--on-surface-variant);
@@ -3567,7 +3589,7 @@ main {
 @media (min-width: 901px) and (prefers-reduced-motion: reduce) {
   .intro-reveal,
   .section-reveal,
-  .reveal-on-scroll {
+  .reveal-on-scroll:not(.history-stat-card):not(.history-blue-card) {
     transform: none !important;
     filter: none !important;
     transition: opacity 0.52s ease !important;
@@ -3576,7 +3598,7 @@ main {
 
   .intro-reveal.is-visible,
   .section-reveal.is-visible,
-  .reveal-on-scroll.is-visible {
+  .reveal-on-scroll.is-visible:not(.history-stat-card):not(.history-blue-card) {
     animation: desktop-soft-fade 0.52s ease both !important;
     animation-delay: var(--reveal-delay, var(--intro-delay, 0ms)) !important;
   }
@@ -3593,5 +3615,34 @@ main {
 
   .hero .hero-floating-card {
     animation: hero-care-card-float 4.6s ease-in-out 0.55s infinite !important;
+  }
+
+  .history-stat-card {
+    animation: history-stat-card-float 4.4s ease-in-out infinite !important;
+  }
+
+  .history-blue-card {
+    animation: history-blue-card-float 4.9s ease-in-out 0.45s infinite !important;
+  }
+
+  .history-stat-card::after {
+    animation: stat-luz 3.2s ease-in-out infinite !important;
+  }
+
+  .history-stat-card strong {
+    animation: stat-pulso 2.4s ease-in-out infinite !important;
+  }
+
+  .history-blue-card .material-symbols-outlined {
+    animation: brilho-flutuante 2.2s ease-in-out infinite !important;
+  }
+
+  .history-blue-card::before,
+  .history-blue-card::after {
+    animation: brilho-particula 2.8s ease-in-out infinite !important;
+  }
+
+  .history-blue-card::after {
+    animation-delay: 0.9s !important;
   }
 }
