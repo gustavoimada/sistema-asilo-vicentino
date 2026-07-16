@@ -880,14 +880,12 @@ function renderizarOcorrenciasRelatorio() {
                 <td>
                     <div class="relatorio-cell-main">
                         <strong>${tipo}</strong>
-                        <span class="relatorio-muted">Tipo</span>
                     </div>
                 </td>
                 <td><span class="gravidade-chip ${obterClasseGravidade(gravidadeNumero)}">${gravidade}</span></td>
                 <td>
                     <div class="relatorio-cell-main">
                         <strong>${funcionario}</strong>
-                        <span class="relatorio-muted">Funcionário</span>
                     </div>
                 </td>
                 <td><span class="relatorio-chip neutro">${escaparHtmlOcorrencias(turno)}</span></td>

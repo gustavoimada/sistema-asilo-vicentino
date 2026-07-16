@@ -14,7 +14,7 @@
 
 </head>
 
-<body class="bg-background text-on-surface sidebar-collapsible-demo">
+<body class="bg-background text-on-surface sidebar-collapsible-demo" data-relatorio="Despesas">
 <div class="page">
 
 <aside class="sidebar">
@@ -113,10 +113,20 @@
                 </p>
             </div>
 
-            <button class="btn-pdf" id="btnGerarPdfDespesas" type="button">
-                <span class="material-symbols-outlined">picture_as_pdf</span>
-                <span>Exportar PDF</span>
-            </button>
+            <div class="report-actions">
+                <button class="btn-voltar-relatorio" type="button" onclick="voltarAoRelatorio()">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    <span>Voltar ao relatório</span>
+                </button>
+                <button class="btn-graficos" type="button" onclick="abrirVisaoGraficos()">
+                    <span class="material-symbols-outlined">monitoring</span>
+                    <span>Ver gráficos</span>
+                </button>
+                <button class="btn-pdf" id="btnGerarPdfDespesas" type="button">
+                    <span class="material-symbols-outlined">picture_as_pdf</span>
+                    <span>Exportar PDF</span>
+                </button>
+            </div>
         </div>
 
         <div class="relatorio-layout">
@@ -282,7 +292,8 @@
 <script src="vendor/jspdf-autotable-3.8.2.min.js"></script>
 <script src="vendor/apexcharts-3.54.1.min.js"></script>
 <script src="js/textoFormatador.js"></script>
-<script src="js/relatorioDespesasController.js?v=20260714-1"></script>
+<script src="js/relatorioGraficos.js?v=20260716-1"></script>
+<script src="js/relatorioDespesasController.js?v=20260716-1"></script>
   <script src="js/sidebarRecolhivel.js?v=20260708-1"></script>
 </body>
 </html>

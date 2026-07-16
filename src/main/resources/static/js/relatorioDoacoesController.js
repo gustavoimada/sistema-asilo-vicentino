@@ -669,7 +669,6 @@ function renderizarDoacoes() {
                 <td>
                     <div class="relatorio-cell-main">
                         <strong>${nomeDoador}</strong>
-                        <span class="relatorio-muted">Doador</span>
                     </div>
                 </td>
                 <td><span class="relatorio-muted">${doador}</span></td>

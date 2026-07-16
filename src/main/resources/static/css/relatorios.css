@@ -182,6 +182,44 @@ body {
     transform: translateY(-1px);
 }
 
+.report-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.btn-graficos,
+.btn-voltar-relatorio {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 0 18px;
+    border: 1px solid #dbeafe;
+    border-radius: 12px;
+    background: #ffffff;
+    color: #1e3a8a;
+    font-weight: 800;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-graficos:hover,
+.btn-voltar-relatorio:hover {
+    border-color: #93c5fd;
+    background: #eff6ff;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(30, 58, 138, 0.1);
+}
+
+.btn-voltar-relatorio {
+    display: none;
+}
+
 .relatorio-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 430px;
@@ -695,6 +733,50 @@ body {
     font-weight: 800;
 }
 
+body.modo-graficos .content-area {
+    max-width: 1480px;
+    margin: 0 auto;
+}
+
+body.modo-graficos .relatorio-layout {
+    display: block;
+}
+
+body.modo-graficos .relatorio-main {
+    display: none;
+}
+
+body.modo-graficos .charts-column {
+    position: static;
+    max-width: none;
+    padding: 0;
+}
+
+body.modo-graficos .charts-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+body.modo-graficos .chart-card {
+    min-height: 360px;
+    padding: 24px;
+}
+
+body.modo-graficos .chart-card h4 {
+    margin-bottom: 18px;
+    font-size: 17px;
+}
+
+body.modo-graficos .btn-graficos,
+body.modo-graficos .btn-pdf {
+    display: none;
+}
+
+body.modo-graficos .btn-voltar-relatorio {
+    display: inline-flex;
+}
+
 .apex-line-chart,
 .apex-donut-chart,
 .apex-bar-chart {
@@ -732,6 +814,16 @@ body {
 @media (max-width: 900px) {
     .main-area {
         margin-left: 0;
+    }
+
+    .report-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    body.modo-graficos .charts-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
     }
 
     .topbar {
@@ -797,6 +889,8 @@ body {
     aside,
     .topbar,
     .btn-pdf,
+    .btn-graficos,
+    .btn-voltar-relatorio,
     .filter-open-btn,
     .filter-panel,
     .charts-grid {

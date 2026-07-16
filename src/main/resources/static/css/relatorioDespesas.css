@@ -1,4 +1,4 @@
-@import url("relatorios.css?v=20260712-1");
+@import url("relatorios.css?v=20260716-1");
 
 .filtro-grid-despesas {
     grid-template-columns: repeat(3, minmax(0, 1fr));

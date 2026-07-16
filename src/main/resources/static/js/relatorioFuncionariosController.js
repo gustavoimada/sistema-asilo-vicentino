@@ -591,7 +591,6 @@ function renderizarRegistrosFuncionarios() {
                 <td>
                     <div class="relatorio-cell-main">
                         <strong>${funcionario}</strong>
-                        <span class="relatorio-muted">Funcionário</span>
                     </div>
                 </td>
                 <td><span class="relatorio-date">${data}</span></td>

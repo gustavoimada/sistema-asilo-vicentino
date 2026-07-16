@@ -635,7 +635,6 @@ function renderizarDespesasRelatorio() {
                 <td>
                     <div class="relatorio-cell-main">
                         <strong>${escaparHtmlDespesa(categoria)}</strong>
-                        <span class="relatorio-muted">Categoria</span>
                     </div>
                 </td>
                 <td><span class="status-pill ${status.chave}">${status.label}</span></td>
