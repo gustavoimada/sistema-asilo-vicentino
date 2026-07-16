@@ -136,9 +136,79 @@ body.sidebar-collapsible-demo.sidebar-collapsed.despesas-page .content {
   padding-right: 32px;
 }
 
-.table-wrap table {
+.despesas-page .table-wrap table {
   width: 100%;
-  min-width: 1650px;
+  min-width: 1040px;
+  table-layout: fixed;
+}
+
+.despesas-page .table-wrap th:nth-child(5),
+.despesas-page .table-wrap td:nth-child(5),
+.despesas-page .table-wrap th:nth-child(7),
+.despesas-page .table-wrap td:nth-child(7),
+.despesas-page .table-wrap th:nth-child(8),
+.despesas-page .table-wrap td:nth-child(8),
+.despesas-page .table-wrap th:nth-child(9),
+.despesas-page .table-wrap td:nth-child(9) {
+  display: none;
+}
+
+.despesas-page .table-wrap th:nth-child(1),
+.despesas-page .table-wrap td:nth-child(1) {
+  width: 30%;
+}
+
+.despesas-page .table-wrap th:nth-child(2),
+.despesas-page .table-wrap td:nth-child(2) {
+  width: 17%;
+}
+
+.despesas-page .table-wrap th:nth-child(3),
+.despesas-page .table-wrap td:nth-child(3) {
+  width: 18%;
+}
+
+.despesas-page .table-wrap th:nth-child(4),
+.despesas-page .table-wrap td:nth-child(4) {
+  width: 18%;
+}
+
+.despesas-page .table-wrap th:nth-child(6),
+.despesas-page .table-wrap td:nth-child(6) {
+  width: 17%;
+}
+
+.despesas-page .table-wrap th:nth-child(10),
+.despesas-page .table-wrap td:nth-child(10) {
+  width: 120px;
+}
+
+.despesas-page .table-wrap td:nth-child(1),
+.despesas-page .table-wrap td:nth-child(4),
+.despesas-page .table-wrap td:nth-child(6) {
+  white-space: normal;
+}
+
+.despesas-page .despesa-fixa-badge,
+.despesas-page .despesa-periodicidade,
+.despesas-page .dias-restantes-badge {
+  margin: 2px 4px 2px 0;
+}
+
+.despesas-page .despesa-tipo-info {
+  min-width: 0;
+}
+
+.despesas-page .despesa-tipo-info small {
+  display: -webkit-box;
+  max-width: 260px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.despesas-page .morador-actions-cell {
+  min-width: 120px;
 }
 
 .dias-restantes-badge {
