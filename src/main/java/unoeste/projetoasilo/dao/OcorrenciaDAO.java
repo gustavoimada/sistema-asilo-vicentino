@@ -253,7 +253,10 @@ public class OcorrenciaDAO
         }
 
         LocalDate dataBase = turno.getDataEscala();
-        if (turno.getIdTurno() == 2 && turno.getHoraInicio() != null && !turno.getHoraFim().isAfter(turno.getHoraInicio()))
+        LocalTime horaInicio = turno.getHoraInicio() != null
+                ? turno.getHoraInicio()
+                : TurnosPadrao.horaInicio(turno.getIdTurno());
+        if (horaInicio != null && !turno.getHoraFim().isAfter(horaInicio))
         {
             dataBase = dataBase.plusDays(1);
         }

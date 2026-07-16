@@ -8,6 +8,7 @@ import unoeste.projetoasilo.entities.Morador;
 import unoeste.projetoasilo.entities.Prescricao;
 import unoeste.projetoasilo.entities.PrescricaoDose;
 import unoeste.projetoasilo.entities.RegistrarUsoMedicacao;
+import unoeste.projetoasilo.util.TurnosPadrao;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -248,7 +249,10 @@ public class RegistrarUsoMedicacaoDAO {
         }
 
         LocalDate dataBase = turno.getDataEscala();
-        if (turno.getIdTurno() == 2 && turno.getHoraInicio() != null && !turno.getHoraFim().isAfter(turno.getHoraInicio()))
+        LocalTime horaInicio = turno.getHoraInicio() != null
+                ? turno.getHoraInicio()
+                : TurnosPadrao.horaInicio(turno.getIdTurno());
+        if (horaInicio != null && !turno.getHoraFim().isAfter(horaInicio))
         {
             dataBase = dataBase.plusDays(1);
         }
