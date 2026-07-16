@@ -2112,6 +2112,42 @@ main {
   }
 }
 
+@media (min-width: 901px) {
+  .dayflow-step::before {
+    background: #dbe7f7;
+  }
+
+  .dayflow-step::after {
+    left: 0;
+    right: auto;
+    bottom: 10px;
+    width: 4px;
+    height: calc(100% - 20px);
+    border-radius: 0 999px 999px 0;
+    background: linear-gradient(180deg, #49a7ff 0%, var(--primary) 100%);
+    transform: scaleY(0);
+    transform-origin: bottom center;
+  }
+
+  .dayflow-step.is-active::before {
+    background: #c7ddf8;
+  }
+
+  .dayflow-step.is-active::after {
+    animation-name: dayflowVerticalProgress;
+  }
+}
+
+@keyframes dayflowVerticalProgress {
+  from {
+    transform: scaleY(0);
+  }
+
+  to {
+    transform: scaleY(1);
+  }
+}
+
 .donation-goal {
   grid-column: 2;
   grid-row: 1;

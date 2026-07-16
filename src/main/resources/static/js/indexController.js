@@ -130,9 +130,12 @@ function iniciarRotinaAsilo()
   const indicador = document.getElementById("dayflowPosition");
   const botaoPausa = document.getElementById("dayflowPause");
   const listaPassos = document.querySelector(".dayflow-steps");
+  const duracaoRotina = 5600;
   let timerAutomatico = null;
   let indiceAtual = 0;
   let pausado = false;
+  let inicioTimer = 0;
+  let tempoRestante = duracaoRotina;
 
   if (!passos.length || !imagem)
     return;
@@ -156,6 +159,11 @@ function iniciarRotinaAsilo()
 
   function ativarPasso(passo, reiniciarTimer)
   {
+    if (passo.classList.contains("is-active")) {
+      passo.classList.remove("is-active");
+      void passo.offsetWidth;
+    }
+
     for (let i = 0; i < passos.length; i += 1)
     {
       passos[i].classList.toggle("is-active", passos[i] === passo);
@@ -175,20 +183,36 @@ function iniciarRotinaAsilo()
     }, 180);
 
     atualizarControles();
-    if (reiniciarTimer && !pausado) iniciarTimer();
+    if (reiniciarTimer) {
+      tempoRestante = duracaoRotina;
+      if (!pausado) iniciarTimer();
+    }
   }
 
   function avancarAutomatico()
   {
     const proximoIndice = (indiceAtual + 1) % passos.length;
     ativarPasso(passos[proximoIndice], false);
+    tempoRestante = duracaoRotina;
+    iniciarTimer();
   }
 
   function iniciarTimer()
   {
-    if (timerAutomatico) window.clearInterval(timerAutomatico);
+    if (timerAutomatico) window.clearTimeout(timerAutomatico);
     if (pausado) return;
-    timerAutomatico = window.setInterval(avancarAutomatico, 5600);
+    inicioTimer = Date.now();
+    timerAutomatico = window.setTimeout(avancarAutomatico, tempoRestante);
+  }
+
+  function pausarTimer()
+  {
+    if (!timerAutomatico) return;
+
+    const tempoDecorrido = Date.now() - inicioTimer;
+    tempoRestante = Math.max(0, tempoRestante - tempoDecorrido);
+    window.clearTimeout(timerAutomatico);
+    timerAutomatico = null;
   }
 
   for (let i = 0; i < passos.length; i += 1)
@@ -203,8 +227,7 @@ function iniciarRotinaAsilo()
     botaoPausa.addEventListener("click", function () {
       pausado = !pausado;
       if (pausado) {
-        if (timerAutomatico) window.clearInterval(timerAutomatico);
-        timerAutomatico = null;
+        pausarTimer();
       } else {
         iniciarTimer();
       }
@@ -214,8 +237,7 @@ function iniciarRotinaAsilo()
 
   document.addEventListener("visibilitychange", function () {
     if (document.hidden) {
-      if (timerAutomatico) window.clearInterval(timerAutomatico);
-      timerAutomatico = null;
+      pausarTimer();
     } else if (!pausado) {
       iniciarTimer();
     }
