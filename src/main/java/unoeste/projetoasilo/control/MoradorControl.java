@@ -229,7 +229,10 @@ public class MoradorControl {
                 morador.setCep(cep);
                 morador.setTelefone(telefone);
                 morador.setQuartoId(quartoId);
-                morador.setFamiliares(montarFamiliares(familiares));
+                boolean deveAtualizarFamiliares = familiares != null;
+
+                if (deveAtualizarFamiliares)
+                    morador.setFamiliares(montarFamiliares(familiares));
 
                 if (!morador.validarCpf())
                     return ResponseEntity.badRequest().body(new Error("Erro", "CPF invalido"));
@@ -244,9 +247,12 @@ public class MoradorControl {
                     return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel editar o morador"));
                 else {
                     atualizarQuartoMorador(quartoAnterior, morador.getQuartoId(), conexao);
-                    new ComposicaoFamiliar().desvincularTodosPorMorador(id, conexao);
+                    String mensagemErro = null;
 
-                    String mensagemErro = salvarFamiliaresMorador(morador, conexao);
+                    if (deveAtualizarFamiliares) {
+                        new ComposicaoFamiliar().desvincularTodosPorMorador(id, conexao);
+                        mensagemErro = salvarFamiliaresMorador(morador, conexao);
+                    }
 
                     if (mensagemErro == null)
                         return ResponseEntity.ok(morador);

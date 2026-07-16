@@ -156,6 +156,12 @@ public class ComposicaoFamiliar implements Serializable
         return dao.listarPorMorador(moradorId, conexao);
     }
 
+    public ComposicaoFamiliarMorador buscarResponsavelPorMorador(int moradorId, Banco conexao) throws SQLException
+    {
+        ComposicaoFamiliarDAO dao = new ComposicaoFamiliarDAO();
+        return dao.buscarResponsavelPorMorador(moradorId, conexao);
+    }
+
     public List<ComposicaoFamiliarMorador> listarTodosVinculos(String ordenacao, String direcao, Banco conexao) throws SQLException
     {
         ComposicaoFamiliarDAO dao = new ComposicaoFamiliarDAO();

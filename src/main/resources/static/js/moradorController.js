@@ -10,6 +10,7 @@ let direcaoOrdenacaoMoradores = 'asc';
 let funcionarioLogado = null;
 let ultimoCepConsultado = '';
 let cepEmConsulta = '';
+let estadoContatoResponsavel = 'pronto';
 
 function parseJsonSeguro(response) {
     return response.json().catch(function () {
@@ -525,34 +526,44 @@ function inicializarPaginaMorador() {
     }, 400);
 }
 
-function carregarContatoResponsavelMorador(idMorador) {
-    fetch(`${URL_FAMILIAR}/listar?moradorId=${idMorador}`)
-        .then(response => {
-            if (!response.ok)
-                throw new Error('Nao foi possivel carregar o contato responsavel.');
+async function buscarContatoResponsavel(idMorador) {
+    const response = await fetch(`${URL_FAMILIAR}/responsavel/${idMorador}`);
 
-            return response.json();
-        })
-        .then(lista => {
-            limparContatoResponsavel();
+    if (response.status === 204)
+        return null;
 
-            if (Array.isArray(lista) && lista.length > 0)
-                preencherContatoResponsavel(lista[0]);
-        })
-        .catch(error => {
-            console.error('Erro ao carregar contato responsavel:', error);
-            exibirMensagem('error', 'Nao foi possivel carregar o contato responsavel.');
-        });
+    if (!response.ok) {
+        const erro = await parseJsonSeguro(response);
+        throw new Error(erro.descricao || 'Nao foi possivel carregar o contato responsavel.');
+    }
+
+    return response.json();
 }
 
-function preencherContatoResponsavel(vinculo) {
-    const familiar = vinculo.composicaoFamiliar || {};
+async function carregarContatoResponsavelMorador(idMorador) {
+    estadoContatoResponsavel = 'carregando';
 
-    document.getElementById('responsavelId').value = familiar.idComposicaoFamiliar || 0;
-    document.getElementById('responsavelNome').value = familiar.nome || '';
-    document.getElementById('responsavelTelefone').value = familiar.telefone || '';
-    document.getElementById('responsavelCpf').value = familiar.cpf || '';
-    document.getElementById('responsavelVinculo').value = vinculo.vinculo || '';
+    try {
+        const contato = await buscarContatoResponsavel(idMorador);
+        limparContatoResponsavel();
+
+        if (contato)
+            preencherContatoResponsavel(contato);
+
+        estadoContatoResponsavel = 'pronto';
+    } catch (error) {
+        estadoContatoResponsavel = 'erro';
+        console.error('Erro ao carregar contato responsavel:', error);
+        exibirMensagem('error', error.message || 'Nao foi possivel carregar o contato responsavel.');
+    }
+}
+
+function preencherContatoResponsavel(contato) {
+    document.getElementById('responsavelId').value = contato.id || 0;
+    document.getElementById('responsavelNome').value = contato.nome || '';
+    document.getElementById('responsavelTelefone').value = contato.telefone || '';
+    document.getElementById('responsavelCpf').value = contato.cpf || '';
+    document.getElementById('responsavelVinculo').value = contato.vinculo || '';
 }
 
 function renderizarMoradores(moradores) {
@@ -669,28 +680,22 @@ function renderizarResponsaveisDetalhes(vinculos) {
     }
 
     return vinculos.map(function (vinculo) {
-        const familiar = vinculo.composicaoFamiliar || {};
         return `
             <div class="morador-responsavel-card">
                 <div>
                     <span>${escaparHtml(vinculo.vinculo || 'Responsavel')}</span>
-                    <strong>${escaparHtml(familiar.nome || 'Sem nome')}</strong>
+                    <strong>${escaparHtml(vinculo.nome || 'Sem nome')}</strong>
                 </div>
-                <p>${escaparHtml(familiar.telefone || 'Telefone nao informado')}</p>
-                <p>CPF ${escaparHtml(familiar.cpf || '-')}</p>
+                <p>${escaparHtml(vinculo.telefone || 'Telefone nao informado')}</p>
+                <p>CPF ${escaparHtml(vinculo.cpf || '-')}</p>
             </div>
         `;
     }).join('');
 }
 
-function carregarResponsaveisMorador(idMorador) {
-    return fetch(`${URL_FAMILIAR}/listar?moradorId=${idMorador}`)
-        .then(response => {
-            if (!response.ok)
-                throw new Error('Nao foi possivel carregar o responsavel.');
-
-            return response.json();
-        });
+async function carregarResponsaveisMorador(idMorador) {
+    const contato = await buscarContatoResponsavel(idMorador);
+    return contato ? [contato] : [];
 }
 
 async function abrirDetalhesMorador(idMorador) {
@@ -868,6 +873,14 @@ function salvarMorador(event) {
             return;
         }
 
+        if (id && estadoContatoResponsavel !== 'pronto') {
+            const mensagem = estadoContatoResponsavel === 'carregando'
+                ? 'Aguarde o carregamento do contato responsavel.'
+                : 'Reabra a edicao para carregar o contato responsavel antes de salvar.';
+            exibirMensagem('error', mensagem);
+            return;
+        }
+
         if (id) {
             url = `${URL}/editarCompleto/${id}?nome=${encodeURIComponent(nome)}&cpf=${encodeURIComponent(cpf)}&genero=${encodeURIComponent(genero)}&dtNascimento=${dtNascimento}&endereco=${encodeURIComponent(endereco)}&numero=${numero}&cidade=${encodeURIComponent(cidade)}&estado=${estado}&cep=${encodeURIComponent(cep)}&telefone=${encodeURIComponent(telefone)}&quartoId=${quartoId}`;
             method = 'PUT';
@@ -876,7 +889,7 @@ function salvarMorador(event) {
             method = 'POST';
         }
 
-        if (contatoResponsavel.valor !== '')
+        if (id || contatoResponsavel.valor !== '')
             url += `&familiares=${encodeURIComponent(contatoResponsavel.valor)}`;
 
         fetch(url, { method })
@@ -904,6 +917,7 @@ function salvarMorador(event) {
 }
 
 function editarMorador(morador) {
+    estadoContatoResponsavel = 'carregando';
     document.getElementById('id').value = morador.idMorador;
     document.getElementById('nome').value = morador.nome;
     document.getElementById('cpf').value = morador.cpf;
@@ -962,6 +976,7 @@ function esconderFormulario() {
     document.getElementById('id').value = '';
     ultimoCepConsultado = '';
     cepEmConsulta = '';
+    estadoContatoResponsavel = 'pronto';
     atualizarStatusCep('');
     limparContatoResponsavel();
     carregarQuartosDisponiveis();

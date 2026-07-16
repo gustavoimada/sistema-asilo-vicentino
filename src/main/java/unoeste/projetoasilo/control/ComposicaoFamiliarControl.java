@@ -9,7 +9,9 @@ import unoeste.projetoasilo.entities.Error;
 import unoeste.projetoasilo.entities.Morador;
 
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("composicaoFamiliar")
@@ -55,6 +57,31 @@ public class ComposicaoFamiliarControl {
         try {
             List<ComposicaoFamiliarMorador> lista = new ComposicaoFamiliar().listarPorMorador(moradorId, conexao);
             return ResponseEntity.ok(lista);
+        } catch (SQLException e) {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao acessar banco de dados"));
+        } finally {
+            conexao.fechar();
+        }
+    }
+
+    @GetMapping("responsavel/{moradorId}")
+    public ResponseEntity<Object> buscarResponsavelPorMorador(@PathVariable int moradorId) {
+        Banco conexao = Banco.getConnection();
+        try {
+            ComposicaoFamiliarMorador vinculo =
+                    new ComposicaoFamiliar().buscarResponsavelPorMorador(moradorId, conexao);
+
+            if (vinculo == null)
+                return ResponseEntity.noContent().build();
+
+            ComposicaoFamiliar familiar = vinculo.getComposicaoFamiliar();
+            Map<String, Object> resposta = new LinkedHashMap<>();
+            resposta.put("id", familiar.getIdComposicaoFamiliar());
+            resposta.put("nome", familiar.getNome());
+            resposta.put("telefone", familiar.getTelefone());
+            resposta.put("cpf", familiar.getCpf());
+            resposta.put("vinculo", vinculo.getVinculo());
+            return ResponseEntity.ok(resposta);
         } catch (SQLException e) {
             return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao acessar banco de dados"));
         } finally {

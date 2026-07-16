@@ -6,6 +6,7 @@ import unoeste.projetoasilo.entities.ComposicaoFamiliarMorador;
 import unoeste.projetoasilo.entities.Morador;
 
 import java.sql.ResultSet;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -164,6 +165,40 @@ public class ComposicaoFamiliarDAO {
         }
 
         return null;
+    }
+
+    public ComposicaoFamiliarMorador buscarResponsavelPorMorador(int moradorId, Banco conexao) throws SQLException {
+        String sql = "SELECT l.morador_idmorador, l.composicaofamiliar_idcomposicaofamiliar, "
+                + "l.vinculo, cf.nome, cf.telefone, cf.cpf "
+                + "FROM composicaofamiliarmorador l "
+                + "JOIN composicaofamiliar cf "
+                + "ON cf.idcomposicaofamiliar = l.composicaofamiliar_idcomposicaofamiliar "
+                + "WHERE l.morador_idmorador = ? "
+                + "ORDER BY cf.idcomposicaofamiliar LIMIT 1";
+
+        try (PreparedStatement statement = conexao.preparar(sql)) {
+            statement.setInt(1, moradorId);
+
+            try (ResultSet rs = statement.executeQuery()) {
+                if (!rs.next())
+                    return null;
+
+                ComposicaoFamiliarMorador vinculo = new ComposicaoFamiliarMorador();
+                Morador morador = new Morador();
+                ComposicaoFamiliar familiar = new ComposicaoFamiliar();
+
+                morador.setIdMorador(rs.getInt("morador_idmorador"));
+                familiar.setIdComposicaoFamiliar(rs.getInt("composicaofamiliar_idcomposicaofamiliar"));
+                familiar.setNome(rs.getString("nome"));
+                familiar.setTelefone(rs.getString("telefone"));
+                familiar.setCpf(rs.getString("cpf"));
+
+                vinculo.setMorador(morador);
+                vinculo.setComposicaoFamiliar(familiar);
+                vinculo.setVinculo(rs.getString("vinculo"));
+                return vinculo;
+            }
+        }
     }
 
     public List<ComposicaoFamiliarMorador> listarPorMorador(int moradorId, Banco conexao) throws SQLException {
