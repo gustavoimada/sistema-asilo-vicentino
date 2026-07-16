@@ -587,22 +587,41 @@ function renderizarTabela(atividades) {
         atividades.forEach(function (atividade) {
             const idTipo = obterIdTipoAtividade(atividade);
             const horario = formatarHora(atividade.horainicio) + " - " + formatarHora(atividade.horafim);
+            const nome = escaparHtml(atividade.nome || "Atividade sem nome");
+            const descricao = escaparHtml(atividade.descricao || "Sem descricao informada");
+            const periodo = escaparHtml(formatarPeriodoAtividade(atividade));
+            const tipo = escaparHtml(obterDescricaoTipoAtividade(idTipo));
 
             linhas += `
                 <tr>
-                    <td>${atividade.nome || ""}</td>
-                    <td>${formatarPeriodoAtividade(atividade)}</td>
-                    <td>${horario}</td>
-                    <td>${obterDescricaoTipoAtividade(idTipo)}</td>
+                    <td>
+                        <div class="atividade-primary">
+                            <strong>${nome}</strong>
+                            <span>${descricao}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="atividade-meta atividade-periodo-badge">
+                            <span class="material-symbols-outlined">calendar_month</span>
+                            ${periodo}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="atividade-meta atividade-horario-badge">
+                            <span class="material-symbols-outlined">schedule</span>
+                            ${escaparHtml(horario)}
+                        </span>
+                    </td>
+                    <td><span class="atividade-tipo-badge">${tipo}</span></td>
                     <td class="text-right">
-                        <div style="display:inline-flex; gap:8px;">
-                            <button type="button" class="action-icon-btn view" aria-label="Ver moradores participantes" onclick="visualizarParticipantesAtividade(${atividade.idatividade})">
+                        <div class="atividade-acoes">
+                            <button type="button" class="action-icon-btn view" title="Visualizar participantes" aria-label="Ver moradores participantes" onclick="visualizarParticipantesAtividade(${atividade.idatividade})">
                                 <span class="material-symbols-outlined">visibility</span>
                             </button>
-                            <button type="button" class="action-icon-btn edit" aria-label="Editar atividade" onclick="abrirEdicaoAtividade(${atividade.idatividade})">
+                            <button type="button" class="action-icon-btn edit" title="Editar" aria-label="Editar atividade" onclick="abrirEdicaoAtividade(${atividade.idatividade})">
                                 <span class="material-symbols-outlined">edit</span>
                             </button>
-                            <button type="button" class="action-icon-btn delete" aria-label="Excluir atividade" onclick="deletarAtividade(${atividade.idatividade})">
+                            <button type="button" class="action-icon-btn delete" title="Excluir" aria-label="Excluir atividade" onclick="deletarAtividade(${atividade.idatividade})">
                                 <span class="material-symbols-outlined">delete</span>
                             </button>
                         </div>
