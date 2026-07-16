@@ -118,6 +118,7 @@ public class AccessFilter implements Filter
                 || rota.startsWith("/js/")
                 || rota.startsWith("/assets/")
                 || rota.startsWith("/images/")
+                || rota.startsWith("/vendor/")
                 || "/login/entrar".equals(rota)
                 || rota.startsWith("/login/sair")
                 || rota.startsWith("/transparencia/listar")
