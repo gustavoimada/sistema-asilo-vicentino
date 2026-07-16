@@ -349,7 +349,7 @@ function renderMoradoresEnvolvidosOcorrencia(item)
     chips += `<span class="morador-chip">${escaparHtmlOcorrencia(nome)}</span>`;
   }
 
-  return `<div class="moradores-envolvidos"><span class="moradores-label">Moradores</span><div class="moradores-chips">${chips}</div></div>`;
+  return `<div class="moradores-envolvidos"><div class="moradores-chips">${chips}</div></div>`;
 }
 
 function preencherTiposOcorrencia()
@@ -578,10 +578,10 @@ function renderizarTabelaOcorrencias(ocorrencias)
     const item = ocorrencias[i];
     html += `
       <tr>
-        <td><div class="ocorrencia-data-cell"><strong>${formatarDataOcorrencia(item.dtOcorrencia)}</strong><span>Registro</span></div></td>
+        <td><strong>${formatarDataOcorrencia(item.dtOcorrencia)}</strong></td>
         <td><span class="ocorrencia-hora-chip">${formatarHoraOcorrencia(item.dtOcorrencia)}</span></td>
-        <td><div class="ocorrencia-funcionario-cell"><strong>${escaparHtmlOcorrencia(item.funcionario?.nome || "-")}</strong><span>Cuidador(a)</span></div></td>
-        <td><div class="ocorrencia-tipo-cell"><span class="tipo-chip ${classeTipoOcorrencia(item)}">${escaparHtmlOcorrencia(item.tipoOcorrencia?.descricao || "-")}</span><span class="gravidade-texto">Gravidade ${Number(item.tipoOcorrencia?.gravidade || 0) === 1 ? "baixa" : Number(item.tipoOcorrencia?.gravidade || 0) === 2 ? "media" : "alta"}</span></div></td>
+        <td><strong>${escaparHtmlOcorrencia(item.funcionario?.nome || "-")}</strong></td>
+        <td><span class="tipo-chip ${classeTipoOcorrencia(item)}">${escaparHtmlOcorrencia(item.tipoOcorrencia?.descricao || "-")}</span></td>
         <td>${renderMoradoresEnvolvidosOcorrencia(item)}</td>
         <td><p class="ocorrencia-observacao">${escaparHtmlOcorrencia(item.observacoes || "Sem observacoes registradas.")}</p></td>
         <td class="text-right">
