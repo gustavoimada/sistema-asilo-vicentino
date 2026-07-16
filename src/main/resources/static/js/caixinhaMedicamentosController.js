@@ -76,7 +76,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const filtro = document.getElementById("filtroPrescricao");
     const moradorFiltroPrescricao = document.getElementById("moradorFiltroPrescricao");
     const medicamentoFiltroPrescricao = document.getElementById("medicamentoFiltroPrescricao");
-    const selectMedicamento = document.getElementById("idMedicamento");
     const tabela = document.getElementById("tabelaPrescricao")
 
     if (!botaoAbrir) {
@@ -145,18 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    if (selectMedicamento) {
-        selectMedicamento.addEventListener("change", function () {
-            atualizarQtdDosePorTipoMedicamento();
-        });
-    }
-
-    const selectMedicamentoEditar = document.getElementById("idMedicamentoEditar");
-    if (selectMedicamentoEditar) {
-        selectMedicamentoEditar.addEventListener("change", function () {
-            atualizarQtdDosePorTipoMedicamento("idMedicamentoEditar", "grupoQtdDoseEditar", "labelQtdDoseEditar", "qtdDoseEditar");
-        });
-    }
+    configurarCamposFrequencia();
 
     if(tabela){
         configurarOrdenacaoPrescricao()
@@ -178,9 +166,6 @@ function carregarMedicamentos(selectId = "idMedicamento"){
                     medicamentotexto += " " + medicamento.dosagemValor +" "+  medicamento.dosagemUnidade
                 linha += `<option value="${medicamento.idMedicamento}" data-tipo="${medicamento.tipoMedicamento}">${medicamentotexto}</option>`;            })
             html.innerHTML = linha;
-            if (selectId === "idMedicamento") {
-                atualizarQtdDosePorTipoMedicamento();
-            }
         })
         .catch(error => {
             mostrarPopup("Erro ao listar medicamentos: " + error.message, "error");
@@ -204,74 +189,97 @@ function carregarMorador(selectId = "idMorador"){
         });
 }
 
-function atualizarQtdDosePorTipoMedicamento(selectId = "idMedicamento", grupoId = "grupoQtdDose", labelId = "labelQtdDose", inputId = "qtdDose") {
-    const selectMedicamento = document.getElementById(selectId);
-    const grupoQtdDose = document.getElementById(grupoId);
-    const labelQtdDose = document.getElementById(labelId);
-    const inputQtdDose = document.getElementById(inputId);
+const nomesDiasSemana = ["", "segunda-feira", "terca-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sabado", "domingo"];
 
-    if (selectMedicamento == null) {
-        return;
-    }
-    if (grupoQtdDose == null) {
-        return;
-    }
-    if (labelQtdDose == null) {
-        return;
-    }
-    if (inputQtdDose == null) {
-        return;
-    }
+function configurarCamposFrequencia() {
+    configurarCamposFrequenciaFormulario("");
+    configurarCamposFrequenciaFormulario("Editar");
+}
 
-    const opcaoSelecionada = selectMedicamento.options[selectMedicamento.selectedIndex];
-    let tipoMedicamento = "";
-    if (opcaoSelecionada != null) {
-        if (opcaoSelecionada.dataset != null) {
-            if (opcaoSelecionada.dataset.tipo != null) {
-                tipoMedicamento = String(opcaoSelecionada.dataset.tipo).toLowerCase();
-            }
-        }
-    }
+function configurarCamposFrequenciaFormulario(sufixo) {
+    const unidade = el("frequenciaUnidade" + sufixo);
+    const valor = el("frequenciaValor" + sufixo);
+    const dataInicio = el("dtInicio" + sufixo);
+    const horario = el("primeiraDose" + sufixo);
+    const diaSemana = el("diaSemana" + sufixo);
 
-    if (tipoMedicamento === "pomada") {
-        grupoQtdDose.hidden = true;
-        inputQtdDose.value = "0";
-        inputQtdDose.disabled = true;
-        return;
-    }
+    [unidade, valor, dataInicio, horario, diaSemana].forEach((campo) => {
+        if (campo) campo.addEventListener("change", () => atualizarResumoFrequencia(sufixo));
+    });
+    if (valor) valor.addEventListener("input", () => atualizarResumoFrequencia(sufixo));
 
-    grupoQtdDose.hidden = false;
-    inputQtdDose.disabled = false;
+    atualizarResumoFrequencia(sufixo);
+}
 
-    if (tipoMedicamento === "xarope") {
-        labelQtdDose.textContent = "Quantidade por dose (mL)";
-        inputQtdDose.placeholder = "Ex: 10";
-        inputQtdDose.min = "1";
-        inputQtdDose.step = "1";
-        if (inputQtdDose.value === "0") {
-            inputQtdDose.value = "";
-        }
-        return;
+function atualizarResumoFrequencia(sufixo = "") {
+    const unidade = el("frequenciaUnidade" + sufixo);
+    const valor = el("frequenciaValor" + sufixo);
+    const dataInicio = el("dtInicio" + sufixo);
+    const horario = el("primeiraDose" + sufixo);
+    const diaSemana = el("diaSemana" + sufixo);
+    const grupoDiaSemana = el("grupoDiaSemana" + sufixo);
+    const resumo = el("resumoFrequencia" + (sufixo ? "Editar" : "Cadastro"));
+
+    if (!unidade || !valor || !grupoDiaSemana || !diaSemana || !resumo) return;
+
+    const ehSemanal = normalizarUnidadeFrequencia(unidade.value) === "Semana";
+    grupoDiaSemana.hidden = !ehSemanal;
+    diaSemana.disabled = !ehSemanal;
+
+    if (ehSemanal && !diaSemana.value && dataInicio && dataInicio.value) {
+        diaSemana.value = String(obterDiaSemanaIso(dataInicio.value));
     }
 
-    if (tipoMedicamento === "injecao") {
-        labelQtdDose.textContent = "Quantidade por dose (mL)";
-        inputQtdDose.placeholder = "Ex: 10";
-        inputQtdDose.min = "1";
-        inputQtdDose.step = "1";
-        if (inputQtdDose.value === "0") {
-            inputQtdDose.value = "";
-        }
-        return;
-    }
+    const texto = montarResumoFrequencia(
+        valor.value,
+        unidade.value,
+        dataInicio ? dataInicio.value : "",
+        horario ? horario.value : "",
+        diaSemana.value
+    );
 
-    labelQtdDose.textContent = "Quantidade por dose";
-    inputQtdDose.placeholder = "Ex: 1";
-    inputQtdDose.min = "1";
-    inputQtdDose.step = "1";
-    if (inputQtdDose.value === "0") {
-        inputQtdDose.value = "";
+    resumo.hidden = texto === "";
+    resumo.textContent = texto;
+}
+
+function montarResumoFrequencia(valor, unidade, dataInicio, horario, diaSemana) {
+    const quantidade = Number(valor);
+    if (!Number.isInteger(quantidade) || quantidade <= 0 || !unidade) return "";
+
+    const horarioTexto = horario || "o horario informado";
+    const unidadeNormalizada = normalizarUnidadeFrequencia(unidade);
+
+    if (unidadeNormalizada === "Hora") {
+        return `A aplicacao sera repetida a cada ${quantidade} hora(s), a partir de ${horarioTexto}.`;
     }
+    if (unidadeNormalizada === "Dia") {
+        return `${formatarFrequencia(quantidade, unidade)} a partir de ${horarioTexto}; o sistema distribui os horarios ao longo do dia.`;
+    }
+    if (unidadeNormalizada === "Semana") {
+        const numeroDia = Number(diaSemana);
+        if (!numeroDia) return "Selecione o dia da semana para definir a aplicacao semanal.";
+        const diaTexto = nomesDiasSemana[numeroDia] || "dia selecionado";
+        const primeiraData = calcularPrimeiraDataSemanal(dataInicio, numeroDia);
+        const dataTexto = primeiraData ? ` A primeira aplicacao sera em ${formatarData(primeiraData)}.` : "";
+        return `${formatarFrequencia(quantidade, unidade)}, toda ${diaTexto}, as ${horarioTexto}.${dataTexto}`;
+    }
+    return "";
+}
+
+function obterDiaSemanaIso(dataTexto) {
+    if (!dataTexto) return 0;
+    const data = new Date(`${dataTexto}T12:00:00`);
+    if (Number.isNaN(data.getTime())) return 0;
+    return data.getDay() === 0 ? 7 : data.getDay();
+}
+
+function calcularPrimeiraDataSemanal(dataTexto, diaSemana) {
+    if (!dataTexto || !diaSemana) return "";
+    const data = new Date(`${dataTexto}T12:00:00`);
+    if (Number.isNaN(data.getTime())) return "";
+    const diaAtual = data.getDay() === 0 ? 7 : data.getDay();
+    data.setDate(data.getDate() + ((Number(diaSemana) - diaAtual + 7) % 7));
+    return data.toISOString().slice(0, 10);
 }
 
 function formatarFrequencia(valor, unidade) {
@@ -299,6 +307,16 @@ function formatarFrequencia(valor, unidade) {
     }
 
     return "A cada " + valor + " " + unidade;
+}
+
+function formatarFrequenciaComAgenda(prescricao) {
+    const textoBase = formatarFrequencia(prescricao.frequenciaValor, prescricao.frequenciaUnidade);
+    if (normalizarUnidadeFrequencia(prescricao.frequenciaUnidade) !== "Semana") {
+        return textoBase;
+    }
+
+    const diaSemana = nomesDiasSemana[obterDiaSemanaIso(prescricao.dtInicio)];
+    return diaSemana ? `${textoBase}, toda ${diaSemana}` : textoBase;
 }
 
 function normalizarUnidadeFrequencia(unidade) {
@@ -388,11 +406,6 @@ function obterTextoMedicamentoCaixinha(prescricao) {
         medicamentoAtual = prescricao.medicamento;
     }
 
-    let tipoMedicamento = "";
-    if (medicamentoAtual.tipoMedicamento != null) {
-        tipoMedicamento = String(medicamentoAtual.tipoMedicamento).toLowerCase();
-    }
-
     let tipoMedicamentoTexto = "-";
     if (medicamentoAtual.tipoMedicamento != null && String(medicamentoAtual.tipoMedicamento).trim() !== "") {
         tipoMedicamentoTexto = medicamentoAtual.tipoMedicamento;
@@ -403,15 +416,15 @@ function obterTextoMedicamentoCaixinha(prescricao) {
         medicamentoTexto = medicamentoAtual.nome;
     }
 
-    if (tipoMedicamento !== "pomada" && tipoMedicamento !== "xarope") {
-        if (medicamentoAtual.dosagemValor != null && medicamentoAtual.dosagemUnidade != null && String(medicamentoAtual.dosagemUnidade).trim() !== "") {
-            medicamentoTexto += " " + medicamentoAtual.dosagemValor + " " + medicamentoAtual.dosagemUnidade;
-        }
+    let dosagemTexto = "Dosagem nao informada";
+    if (medicamentoAtual.dosagemValor != null && medicamentoAtual.dosagemUnidade != null && String(medicamentoAtual.dosagemUnidade).trim() !== "") {
+        dosagemTexto = medicamentoAtual.dosagemValor + " " + medicamentoAtual.dosagemUnidade;
     }
 
     return {
         nome: medicamentoTexto,
-        tipo: tipoMedicamentoTexto
+        tipo: tipoMedicamentoTexto,
+        dosagem: dosagemTexto
     };
 }
 
@@ -439,16 +452,11 @@ function agruparPrescricoesPorMorador(prescricoes) {
 
 function renderizarMedicamentoCaixinha(prescricao) {
     const primeiraDoseFormatada = String(prescricao.primeiraDose || "").slice(0, 5) || "-";
-    const frequenciaTexto = formatarFrequencia(prescricao.frequenciaValor, prescricao.frequenciaUnidade);
+    const frequenciaTexto = formatarFrequenciaComAgenda(prescricao);
     const dtInicioFormatada = formatarData(prescricao.dtInicio);
     const dtFimFormatada = formatarData(prescricao.dtFim);
     const medicamento = obterTextoMedicamentoCaixinha(prescricao);
     const prescricaoJson = escapeHtml(JSON.stringify(prescricao));
-
-    let qtdDoseTexto = "-";
-    if (prescricao.qtdDose != null) {
-        qtdDoseTexto = prescricao.qtdDose;
-    }
 
     return `
         <div class="caixinha-med-item">
@@ -463,7 +471,7 @@ function renderizarMedicamentoCaixinha(prescricao) {
                 </span>
                 <span>
                     <span class="material-symbols-outlined">pill</span>
-                    ${escapeHtml(qtdDoseTexto)} dose(s)
+                    ${escapeHtml(medicamento.dosagem)}
                 </span>
                 <span>
                     <span class="material-symbols-outlined">alarm</span>
@@ -638,31 +646,19 @@ function validarCamposCadastroPrescricao(form) {
     let idMedicamento = form.idMedicamento.value;
     let frequenciaValor = form.frequenciaValor.value;
     let frequenciaUnidade = form.frequenciaUnidade.value;
-    let qtdDose = form.qtdDose.value;
+    let diaSemana = form.diaSemana.value;
     let primeiraDose = form.primeiraDose.value;
     let dtInicio = form.dtInicio.value;
     let dtFim = form.dtFim.value;
-    const selectMedicamento = document.getElementById("idMedicamento");
-    let tipoMedicamentoSelecionado = "";
 
     idMorador = idMorador.trim();
     idMedicamento = idMedicamento.trim();
     frequenciaValor = frequenciaValor.trim();
     frequenciaUnidade = frequenciaUnidade.trim();
-    qtdDose = qtdDose.trim();
+    diaSemana = diaSemana.trim();
     primeiraDose = primeiraDose.trim();
     dtInicio = dtInicio.trim();
     dtFim = dtFim.trim();
-    if (selectMedicamento != null) {
-        const opcaoSelecionada = selectMedicamento.options[selectMedicamento.selectedIndex];
-        if (opcaoSelecionada != null) {
-            if (opcaoSelecionada.dataset != null) {
-                if (opcaoSelecionada.dataset.tipo != null) {
-                    tipoMedicamentoSelecionado = String(opcaoSelecionada.dataset.tipo).toLowerCase();
-                }
-            }
-        }
-    }
 
     if (idMorador === "") {
         mostrarPopup("Morador e obrigatorio", "error");
@@ -699,16 +695,9 @@ function validarCamposCadastroPrescricao(form) {
         return false;
     }
 
-    if (tipoMedicamentoSelecionado !== "pomada") {
-        if (qtdDose === "") {
-            mostrarPopup("Quantidade da dose e obrigatoria", "error");
-            return false;
-        }
-
-        if (Number(qtdDose) <= 0) {
-            mostrarPopup("Quantidade da dose deve ser maior que zero", "error");
-            return false;
-        }
+    if (normalizarUnidadeFrequencia(frequenciaUnidade) === "Semana" && diaSemana === "") {
+        mostrarPopup("Selecione o dia da semana da aplicacao", "error");
+        return false;
     }
     if (primeiraDose === "") {
         mostrarPopup("Primeiro horario e obrigatorio", "error");
@@ -748,6 +737,7 @@ function cadastrar(){
                         mostrarPopup("Medicamento adicionado a caixinha", "success");
                         carregarTabela();
                         document.forms[0].reset();
+                        atualizarResumoFrequencia();
                         document.getElementById("cadastroPrescricao").hidden = true;
                     })
                 }
@@ -763,6 +753,31 @@ function cadastrar(){
         return;
     }
 
+}
+
+function validarCamposEdicaoPrescricao() {
+    const frequenciaUnidade = document.getElementById("frequenciaUnidadeEditar").value;
+    const diaSemana = document.getElementById("diaSemanaEditar").value;
+    const primeiraDose = document.getElementById("primeiraDoseEditar").value;
+    const dtInicio = document.getElementById("dtInicioEditar").value;
+    const dtFim = document.getElementById("dtFimEditar").value;
+
+    if (!primeiraDose || !dtInicio || !dtFim) {
+        mostrarPopup("Preencha o horario e o periodo da caixinha", "error");
+        return false;
+    }
+
+    if (dtFim < dtInicio) {
+        mostrarPopup("Data de fim nao pode ser menor que a primeira aplicacao", "error");
+        return false;
+    }
+
+    if (normalizarUnidadeFrequencia(frequenciaUnidade) === "Semana" && !diaSemana) {
+        mostrarPopup("Selecione o dia da semana da aplicacao", "error");
+        return false;
+    }
+
+    return true;
 }
 
 function confirmarAcao(mensagem) {
@@ -837,16 +852,11 @@ function prepararEdicaoPrescricao(prescricao) {
     document.getElementById("idMedicamentoEditar").value = prescricao.medicamento.idMedicamento;
     document.getElementById("frequenciaValorEditar").value = prescricao.frequenciaValor;
     document.getElementById("frequenciaUnidadeEditar").value = normalizarUnidadeFrequencia(prescricao.frequenciaUnidade);
-    if (prescricao.qtdDose != null) {
-        document.getElementById("qtdDoseEditar").value = prescricao.qtdDose;
-    } else {
-        document.getElementById("qtdDoseEditar").value = "";
-    }
     document.getElementById("primeiraDoseEditar").value = prescricao.primeiraDose;
     document.getElementById("dtInicioEditar").value = prescricao.dtInicio;
     document.getElementById("dtFimEditar").value = prescricao.dtFim;
-
-    atualizarQtdDosePorTipoMedicamento("idMedicamentoEditar", "grupoQtdDoseEditar", "labelQtdDoseEditar", "qtdDoseEditar");
+    document.getElementById("diaSemanaEditar").value = String(obterDiaSemanaIso(prescricao.dtInicio));
+    atualizarResumoFrequencia("Editar");
     
     editor.hidden = false;
 
@@ -860,12 +870,16 @@ function prepararEdicaoPrescricao(prescricao) {
 }
 
 function salvarEdicaoPrescricao(id) {
+    if (!validarCamposEdicaoPrescricao()) return;
+
     const params = new URLSearchParams();
     params.append("idMorador", document.getElementById("idMoradorEditar").value);
     params.append("idMedicamento", document.getElementById("idMedicamentoEditar").value);
     params.append("frequenciaValor", document.getElementById("frequenciaValorEditar").value);
     params.append("frequenciaUnidade", document.getElementById("frequenciaUnidadeEditar").value);
-    params.append("qtdDose", document.getElementById("qtdDoseEditar").value);
+    if (normalizarUnidadeFrequencia(document.getElementById("frequenciaUnidadeEditar").value) === "Semana") {
+        params.append("diaSemana", document.getElementById("diaSemanaEditar").value);
+    }
     params.append("primeiraDose", document.getElementById("primeiraDoseEditar").value);
     params.append("dtInicio", document.getElementById("dtInicioEditar").value);
     params.append("dtFim", document.getElementById("dtFimEditar").value);

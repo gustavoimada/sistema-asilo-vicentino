@@ -9,7 +9,7 @@
 
   <link rel="stylesheet" href="css/funcionario.css" />
   <link rel="stylesheet" href="css/cadastroMedicamento.css?v=3" />
-  <link rel="stylesheet" href="css/caixinhas.css?v=20260708-1" />
+  <link rel="stylesheet" href="css/caixinhas.css?v=20260716-1" />
   <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260708-3" />
 
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -167,25 +167,36 @@
                 </div>
               </div>
 
-              <div class="form-field" id="grupoQtdDose">
-                <label id="labelQtdDose" for="qtdDose">Quantidade por dose</label>
-                <input type="number" min="1" placeholder="Ex: 1" id="qtdDose" name="qtdDose" />
-              </div>
-
               <div class="form-field">
                 <label for="primeiraDose">Primeiro horário</label>
                 <input type="time" id="primeiraDose" name="primeiraDose" />
               </div>
 
               <div class="form-field">
-                <label for="dtInicio">Data de início</label>
+                <label for="dtInicio">Primeira aplicação</label>
                 <input type="date" id="dtInicio" name="dtInicio" />
+              </div>
+
+              <div class="form-field" id="grupoDiaSemana" hidden>
+                <label for="diaSemana">Dia da semana</label>
+                <select id="diaSemana" name="diaSemana" disabled>
+                  <option value="">Selecione o dia</option>
+                  <option value="1">Segunda-feira</option>
+                  <option value="2">Terça-feira</option>
+                  <option value="3">Quarta-feira</option>
+                  <option value="4">Quinta-feira</option>
+                  <option value="5">Sexta-feira</option>
+                  <option value="6">Sábado</option>
+                  <option value="7">Domingo</option>
+                </select>
               </div>
 
               <div class="form-field">
                 <label for="dtFim">Data de fim</label>
                 <input type="date" id="dtFim" name="dtFim" />
               </div>
+
+              <div class="frequency-summary" id="resumoFrequenciaCadastro" aria-live="polite" hidden></div>
 
               <div class="form-actions">
                 <button type="submit" class="primary-action">
@@ -264,25 +275,36 @@
                 </div>
               </div>
 
-              <div class="form-field" id="grupoQtdDoseEditar">
-                <label id="labelQtdDoseEditar" for="qtdDoseEditar">Quantidade por dose</label>
-                <input type="number" min="1" placeholder="Ex: 1" id="qtdDoseEditar" />
-              </div>
-
               <div class="form-field">
                 <label for="primeiraDoseEditar">Primeiro horário</label>
                 <input type="time" id="primeiraDoseEditar" />
               </div>
 
               <div class="form-field">
-                <label for="dtInicioEditar">Data de início</label>
+                <label for="dtInicioEditar">Primeira aplicação</label>
                 <input type="date" id="dtInicioEditar" />
+              </div>
+
+              <div class="form-field" id="grupoDiaSemanaEditar" hidden>
+                <label for="diaSemanaEditar">Dia da semana</label>
+                <select id="diaSemanaEditar" disabled>
+                  <option value="">Selecione o dia</option>
+                  <option value="1">Segunda-feira</option>
+                  <option value="2">Terça-feira</option>
+                  <option value="3">Quarta-feira</option>
+                  <option value="4">Quinta-feira</option>
+                  <option value="5">Sexta-feira</option>
+                  <option value="6">Sábado</option>
+                  <option value="7">Domingo</option>
+                </select>
               </div>
 
               <div class="form-field">
                 <label for="dtFimEditar">Data de fim</label>
                 <input type="date" id="dtFimEditar" />
               </div>
+
+              <div class="frequency-summary" id="resumoFrequenciaEditar" aria-live="polite" hidden></div>
 
               <div class="form-actions">
                 <button type="button" id="salvarEdicaoPrescricao" class="primary-action">
@@ -301,7 +323,7 @@
                     <th data-col="morador_idmorador">Morador</th>
                     <th data-col="medicamento_idmedicamento">Medicamento</th>
                     <th data-col="frequenciavalor">Frequência</th>
-                    <th data-col="qtddose">Qtd. Dose</th>
+                    <th>Dosagem</th>
                     <th data-col="primeiradose">Primeiro Horário</th>
                     <th data-col="dtinicio">Início</th>
                     <th data-col="dtfim">Fim</th>
@@ -317,7 +339,7 @@
     </main>
   </div>
 
-  <script src="js/caixinhaMedicamentosController.js?v=20260707-2"></script>
+  <script src="js/caixinhaMedicamentosController.js?v=20260716-1"></script>
   <script src="js/sidebarSecretaria.js?v=20260707-1"></script>
   <script src="js/sidebarRecolhivel.js?v=20260708-1"></script>
 </body>

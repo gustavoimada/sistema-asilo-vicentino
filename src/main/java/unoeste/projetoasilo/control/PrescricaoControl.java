@@ -17,8 +17,9 @@ import java.util.List;
 @RequestMapping({"prescricao", "caixinha"})
 public class PrescricaoControl {
     @PostMapping("cadastrar")
-    public ResponseEntity<Object> gravar(@RequestParam int idMorador, @RequestParam int idMedicamento, @RequestParam int frequenciaValor, @RequestParam String frequenciaUnidade, @RequestParam(required = false) Integer qtdDose, @RequestParam LocalDate dtInicio, @RequestParam LocalDate dtFim, @RequestParam LocalTime primeiraDose) {
-        String erroValidacao = validarDadosCaixinha(frequenciaValor, frequenciaUnidade, dtInicio, dtFim, primeiraDose);
+    public ResponseEntity<Object> gravar(@RequestParam int idMorador, @RequestParam int idMedicamento, @RequestParam int frequenciaValor, @RequestParam String frequenciaUnidade, @RequestParam(required = false) Integer qtdDose, @RequestParam(required = false) Integer diaSemana, @RequestParam LocalDate dtInicio, @RequestParam LocalDate dtFim, @RequestParam LocalTime primeiraDose) {
+        dtInicio = ajustarDataInicioSemanal(dtInicio, frequenciaUnidade, diaSemana);
+        String erroValidacao = validarDadosCaixinha(frequenciaValor, frequenciaUnidade, dtInicio, dtFim, primeiraDose, diaSemana);
         if (erroValidacao != null) {
             return ResponseEntity.badRequest().body(new Error("Erro", erroValidacao));
         }
@@ -27,7 +28,7 @@ public class PrescricaoControl {
         medicamento.setIdMedicamento(idMedicamento);
         Morador morador = new Morador();
         morador.setIdMorador(idMorador);
-        Prescricao prescricao = new Prescricao(morador, medicamento, qtdDose, dtInicio, dtFim, primeiraDose, frequenciaValor, frequenciaUnidade);
+        Prescricao prescricao = new Prescricao(morador, medicamento, normalizarQtdDose(qtdDose), dtInicio, dtFim, primeiraDose, frequenciaValor, frequenciaUnidade);
         Banco conexao = Banco.getConnection();
         try {
             if (prescricao.gravar(conexao)) {
@@ -83,8 +84,9 @@ public class PrescricaoControl {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Object> editarPrescricao(@PathVariable int id, @RequestParam int idMorador, @RequestParam int idMedicamento, @RequestParam int frequenciaValor, @RequestParam String frequenciaUnidade, @RequestParam(required = false) Integer qtdDose, @RequestParam LocalDate dtInicio, @RequestParam LocalDate dtFim, @RequestParam LocalTime primeiraDose) {
-        String erroValidacao = validarDadosCaixinha(frequenciaValor, frequenciaUnidade, dtInicio, dtFim, primeiraDose);
+    public ResponseEntity<Object> editarPrescricao(@PathVariable int id, @RequestParam int idMorador, @RequestParam int idMedicamento, @RequestParam int frequenciaValor, @RequestParam String frequenciaUnidade, @RequestParam(required = false) Integer qtdDose, @RequestParam(required = false) Integer diaSemana, @RequestParam LocalDate dtInicio, @RequestParam LocalDate dtFim, @RequestParam LocalTime primeiraDose) {
+        dtInicio = ajustarDataInicioSemanal(dtInicio, frequenciaUnidade, diaSemana);
+        String erroValidacao = validarDadosCaixinha(frequenciaValor, frequenciaUnidade, dtInicio, dtFim, primeiraDose, diaSemana);
         if (erroValidacao != null) {
             return ResponseEntity.badRequest().body(new Error("Erro", erroValidacao));
         }
@@ -106,7 +108,7 @@ public class PrescricaoControl {
                 prescricaoEncontrada.setMedicamento(medicamento);
                 prescricaoEncontrada.setFrequenciaValor(frequenciaValor);
                 prescricaoEncontrada.setFrequenciaUnidade(frequenciaUnidade);
-                prescricaoEncontrada.setQtdDose(qtdDose);
+                prescricaoEncontrada.setQtdDose(normalizarQtdDose(qtdDose));
                 prescricaoEncontrada.setDtInicio(dtInicio);
                 prescricaoEncontrada.setDtFim(dtFim);
                 prescricaoEncontrada.setPrimeiraDose(primeiraDose);
@@ -163,12 +165,15 @@ public class PrescricaoControl {
         }
     }
 
-    private String validarDadosCaixinha(int frequenciaValor, String frequenciaUnidade, LocalDate dtInicio, LocalDate dtFim, LocalTime primeiraDose) {
+    private String validarDadosCaixinha(int frequenciaValor, String frequenciaUnidade, LocalDate dtInicio, LocalDate dtFim, LocalTime primeiraDose, Integer diaSemana) {
         if (frequenciaValor <= 0) {
             return "Frequencia deve ser maior que zero";
         }
         if (!unidadeFrequenciaValida(frequenciaUnidade)) {
             return "Periodo da frequencia invalido";
+        }
+        if (ehFrequenciaSemanal(frequenciaUnidade) && (diaSemana == null || diaSemana < 1 || diaSemana > 7)) {
+            return "Dia da semana invalido";
         }
         if (dtInicio == null) {
             return "Data de inicio obrigatoria";
@@ -191,5 +196,22 @@ public class PrescricaoControl {
         }
         String unidade = frequenciaUnidade.trim().toLowerCase();
         return unidade.startsWith("hora") || unidade.startsWith("dia") || unidade.startsWith("semana");
+    }
+
+    private boolean ehFrequenciaSemanal(String frequenciaUnidade) {
+        return frequenciaUnidade != null && frequenciaUnidade.trim().toLowerCase().startsWith("semana");
+    }
+
+    private LocalDate ajustarDataInicioSemanal(LocalDate dtInicio, String frequenciaUnidade, Integer diaSemana) {
+        if (dtInicio == null || !ehFrequenciaSemanal(frequenciaUnidade) || diaSemana == null) {
+            return dtInicio;
+        }
+
+        int diferenca = Math.floorMod(diaSemana - dtInicio.getDayOfWeek().getValue(), 7);
+        return dtInicio.plusDays(diferenca);
+    }
+
+    private int normalizarQtdDose(Integer qtdDose) {
+        return qtdDose != null && qtdDose > 0 ? qtdDose : 1;
     }
 }
