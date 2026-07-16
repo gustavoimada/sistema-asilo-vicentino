@@ -450,16 +450,18 @@ main {
     animation: hero-eyebrow-float 4.8s ease-in-out infinite;
   }
 
-  .hero.hero-motion-ready #btnDoarTopo {
-    animation: hero-donation-glow 3.8s ease-in-out infinite;
+  .hero #btnDoarTopo {
+    animation: hero-donation-float 3.8s ease-in-out infinite;
+    will-change: transform, box-shadow;
   }
 
   .hero.hero-motion-ready #btnDoarTopo .material-symbols-outlined {
     animation: hero-donation-icon 3.8s ease-in-out infinite;
   }
 
-  .hero.hero-motion-ready .hero-floating-card {
-    animation: hero-care-card-glow 4.6s ease-in-out infinite;
+  .hero .hero-floating-card {
+    animation: hero-care-card-float 4.6s ease-in-out 0.55s infinite;
+    will-change: transform, box-shadow;
   }
 
   .hero.hero-motion-ready .hero-floating-icon {
@@ -471,9 +473,15 @@ main {
     50% { transform: translateY(-5px); }
   }
 
-  @keyframes hero-donation-glow {
-    0%, 100% { box-shadow: 0 16px 28px rgba(0, 53, 127, 0.18); }
-    50% { box-shadow: 0 20px 34px rgba(0, 53, 127, 0.34); }
+  @keyframes hero-donation-float {
+    0%, 100% {
+      transform: translateY(0);
+      box-shadow: 0 16px 28px rgba(0, 53, 127, 0.18);
+    }
+    50% {
+      transform: translateY(-7px);
+      box-shadow: 0 24px 38px rgba(0, 53, 127, 0.31);
+    }
   }
 
   @keyframes hero-donation-icon {
@@ -482,9 +490,15 @@ main {
     60% { transform: translateY(0) rotate(5deg); }
   }
 
-  @keyframes hero-care-card-glow {
-    0%, 100% { box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12); }
-    50% { box-shadow: 0 22px 42px rgba(0, 53, 127, 0.2); }
+  @keyframes hero-care-card-float {
+    0%, 100% {
+      transform: translateY(0);
+      box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12);
+    }
+    50% {
+      transform: translateY(8px);
+      box-shadow: 0 24px 42px rgba(0, 53, 127, 0.2);
+    }
   }
 
   @keyframes hero-care-icon-pulse {
@@ -3570,5 +3584,14 @@ main {
   @keyframes desktop-soft-fade {
     from { opacity: 0; }
     to { opacity: 1; }
+  }
+
+  /* Destaques solicitados para a capa institucional continuam perceptiveis no desktop. */
+  .hero #btnDoarTopo {
+    animation: hero-donation-float 3.8s ease-in-out infinite !important;
+  }
+
+  .hero .hero-floating-card {
+    animation: hero-care-card-float 4.6s ease-in-out 0.55s infinite !important;
   }
 }
