@@ -23,10 +23,8 @@ The project combines a public website for community visibility with a protected 
 - Coordinator dashboard for shift tracking, occurrences and medication records.
 - Reports for donations, expenses, employees and occurrences, with PDF export support.
 - Production deployment on Railway with PostgreSQL, persistent uploads and custom domain.
-
-## Screenshots
-
-Screenshots will be added soon.
+- Continuous deployment from GitHub, with more than 100 commits documenting the product evolution.
+- Public discoverability through Google Search Console, XML sitemap, structured data and indexed HTTPS pages.
 
 ## User Roles
 

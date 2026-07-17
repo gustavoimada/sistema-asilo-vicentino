@@ -3598,6 +3598,24 @@ main {
   }
 }
 
+.cta-privacy-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #52627a;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  cursor: pointer;
+}
+
+.cta-privacy-consent input {
+  width: 18px;
+  height: 18px;
+  margin: 1px 0 0;
+  flex: 0 0 auto;
+  accent-color: #0d478f;
+}
+
 /* O Windows pode ativar reduced-motion mesmo quando o usuario espera os fades.
    No desktop preservamos apenas opacidade, sem deslocamento ou desfoque. */
 @media (min-width: 901px) and (prefers-reduced-motion: reduce) {
