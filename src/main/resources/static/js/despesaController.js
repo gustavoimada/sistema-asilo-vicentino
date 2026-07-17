@@ -310,6 +310,16 @@ function atualizarCamposDespesaFixa() {
     atualizarCamposVencimento();
 }
 
+function definirPossuiVencimento(valor) {
+    const possuiVencimento = document.getElementById('possuiVencimento');
+
+    if (possuiVencimento.disabled)
+        return;
+
+    possuiVencimento.checked = valor;
+    atualizarCamposVencimento();
+}
+
 function atualizarCamposVencimento() {
     const fixa = document.getElementById('fixa');
     const possuiVencimento = document.getElementById('possuiVencimento');
@@ -317,20 +327,28 @@ function atualizarCamposVencimento() {
     const dtVencimento = document.getElementById('dtVencimento');
     const dtQuitacao = document.getElementById('dtQuitacao');
     const textoPossuiVencimento = document.getElementById('textoPossuiVencimento');
+    const opcaoSim = document.getElementById('opcaoVencimentoSim');
+    const opcaoNao = document.getElementById('opcaoVencimentoNao');
 
     if (fixa.value === 'true') {
         possuiVencimento.checked = true;
         possuiVencimento.disabled = true;
-        textoPossuiVencimento.textContent = 'Obrigatorio para despesa fixa';
+        textoPossuiVencimento.textContent = 'Despesas fixas precisam ter uma data de vencimento.';
     }
     else {
         possuiVencimento.disabled = false;
         textoPossuiVencimento.textContent = possuiVencimento.checked
-            ? 'Sim, possui vencimento'
-            : 'Nao, ja foi quitada';
+            ? 'Informe quando a despesa vence.'
+            : 'Sem vencimento: a quitação será registrada com a data de hoje.';
     }
 
     const temVencimento = possuiVencimento.checked;
+    opcaoSim.classList.toggle('is-active', temVencimento);
+    opcaoNao.classList.toggle('is-active', !temVencimento);
+    opcaoSim.setAttribute('aria-pressed', String(temVencimento));
+    opcaoNao.setAttribute('aria-pressed', String(!temVencimento));
+    opcaoSim.disabled = possuiVencimento.disabled;
+    opcaoNao.disabled = possuiVencimento.disabled;
     dtVencimento.disabled = !temVencimento;
     dtVencimento.required = temVencimento;
     campoVencimento.classList.toggle('is-disabled', !temVencimento);
