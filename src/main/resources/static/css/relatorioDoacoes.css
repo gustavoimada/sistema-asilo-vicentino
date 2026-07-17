@@ -1,1 +1,16 @@
 @import url("relatorios.css?v=20260716-1");
+
+@media (min-width: 1200px) {
+    body.relatorio-doacoes-page.modo-graficos .charts-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        align-items: stretch;
+    }
+
+    body.relatorio-doacoes-page.modo-graficos .chart-card {
+        min-height: 390px;
+    }
+}
+
+.relatorio-doacoes-page .chart-card-distribuicao .apexcharts-legend {
+    gap: 8px;
+}

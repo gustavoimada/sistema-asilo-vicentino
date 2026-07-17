@@ -5,7 +5,6 @@ let qtdPatrimonio = 0;
 let doacoesRelatorio = [];
 let graficoFinanceiroMes = null;
 let graficoAlimentoMes = null;
-let graficoPatrimonioMes = null;
 let graficoPizzaTipos = null;
 
 const labelsMeses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
@@ -396,7 +395,7 @@ function mostrarGrafico(idGrafico) {
 }
 
 function atualizarGraficos(listaDoacoes) {
-    const idsGraficosLinha = ["graficoFinanceiro", "graficoAlimento", "graficoPatrimonio"];
+    const idsGraficosLinha = ["graficoFinanceiro", "graficoAlimento"];
     const idGraficoPizza = "graficoPizzaTipos";
 
     idsGraficosLinha.forEach(id => mostrarGrafico(id));
@@ -404,22 +403,20 @@ function atualizarGraficos(listaDoacoes) {
 
     if (graficoFinanceiroMes) graficoFinanceiroMes.destroy();
     if (graficoAlimentoMes) graficoAlimentoMes.destroy();
-    if (graficoPatrimonioMes) graficoPatrimonioMes.destroy();
     if (graficoPizzaTipos) graficoPizzaTipos.destroy();
 
     graficoFinanceiroMes = null;
     graficoAlimentoMes = null;
-    graficoPatrimonioMes = null;
     graficoPizzaTipos = null;
 
     const anoAtual = new Date().getFullYear();
     const financeiroPorMes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
     const alimentoPorMes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    const patrimonioPorMes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
-    let valorTotalFinanceiro = 0;
-    let valorTotalAlimento = 0;
-    let valorTotalPatrimonio = 0;
+    const quantidadePorTipo = {
+        FINANCEIRO: 0,
+        ALIMENTO: 0,
+        PATRIMONIO: 0
+    };
     let temRegistroAnoAtual = false;
 
     listaDoacoes.forEach(doacao => {
@@ -427,9 +424,9 @@ function atualizarGraficos(listaDoacoes) {
         const data = new Date(doacao.dtDoacao);
         const valor = obterValorNumerico(doacao.valor);
 
-        if (tipo === "FINANCEIRO") valorTotalFinanceiro += valor;
-        if (tipo === "ALIMENTO") valorTotalAlimento += valor;
-        if (tipo === "PATRIMONIO") valorTotalPatrimonio += valor;
+        if (Object.prototype.hasOwnProperty.call(quantidadePorTipo, tipo)) {
+            quantidadePorTipo[tipo] += 1;
+        }
 
         if (Number.isNaN(data.getTime())) {
             return;
@@ -444,7 +441,6 @@ function atualizarGraficos(listaDoacoes) {
         const mes = data.getMonth();
         if (tipo === "FINANCEIRO") financeiroPorMes[mes] += valor;
         if (tipo === "ALIMENTO") alimentoPorMes[mes] += valor;
-        if (tipo === "PATRIMONIO") patrimonioPorMes[mes] += valor;
     });
 
     if (typeof ApexCharts === "undefined") {
@@ -454,25 +450,18 @@ function atualizarGraficos(listaDoacoes) {
     } else {
         const maxFinanceiro = obterMaximoEscala(financeiroPorMes);
         const maxAlimento = obterMaximoEscala(alimentoPorMes);
-        const maxPatrimonio = obterMaximoEscala(patrimonioPorMes);
 
         graficoFinanceiroMes = new ApexCharts(
             document.getElementById("graficoFinanceiro"),
-            criarOpcoesLinhaApex("Financeiro (R$)", financeiroPorMes, "var(--bs-primary)", maxFinanceiro, "R$")
+            criarOpcoesLinhaApex("Financeiro (R$)", financeiroPorMes, "#2563eb", maxFinanceiro, "R$")
         );
         graficoFinanceiroMes.render();
 
         graficoAlimentoMes = new ApexCharts(
             document.getElementById("graficoAlimento"),
-            criarOpcoesLinhaApex("Alimento (kg)", alimentoPorMes, "var(--bs-success)", maxAlimento, "kg")
+            criarOpcoesLinhaApex("Alimento (kg)", alimentoPorMes, "#16a34a", maxAlimento, "kg")
         );
         graficoAlimentoMes.render();
-
-        graficoPatrimonioMes = new ApexCharts(
-            document.getElementById("graficoPatrimonio"),
-            criarOpcoesLinhaApex("Patrimonio", patrimonioPorMes, "var(--bs-warning)", maxPatrimonio, "")
-        );
-        graficoPatrimonioMes.render();
 
         if (!temRegistroAnoAtual) {
             idsGraficosLinha.forEach(id => {
@@ -486,10 +475,16 @@ function atualizarGraficos(listaDoacoes) {
         return;
     }
 
-    let dadosPizza = [valorTotalFinanceiro, valorTotalAlimento, valorTotalPatrimonio];
-    let labelsPizza = ["Financeiro", "Alimento", "Patrimonio"];
-    let coresPizza = ["var(--bs-primary)", "var(--bs-success)", "var(--bs-warning)"];
-    let totalPizza = valorTotalFinanceiro + valorTotalAlimento + valorTotalPatrimonio;
+    const categoriasComDados = [
+        { chave: "FINANCEIRO", label: "Financeiro", cor: "#2563eb" },
+        { chave: "ALIMENTO", label: "Alimento", cor: "#16a34a" },
+        { chave: "PATRIMONIO", label: "Patrimônio", cor: "#f59e0b" }
+    ].filter(categoria => quantidadePorTipo[categoria.chave] > 0);
+
+    let dadosPizza = categoriasComDados.map(categoria => quantidadePorTipo[categoria.chave]);
+    let labelsPizza = categoriasComDados.map(categoria => categoria.label);
+    let coresPizza = categoriasComDados.map(categoria => categoria.cor);
+    let totalPizza = dadosPizza.reduce((total, quantidade) => total + quantidade, 0);
     let semDadosPizza = false;
 
     if (totalPizza <= 0) {
@@ -516,16 +511,25 @@ function atualizarGraficos(listaDoacoes) {
                 formatter: function (valor) {
                     if (semDadosPizza) return "";
                     return valor.toFixed(1).replace(".", ",") + "%";
+                },
+                style: {
+                    fontSize: "12px",
+                    fontWeight: 800,
+                    colors: ["#ffffff"]
+                },
+                dropShadow: {
+                    enabled: false
                 }
             },
             stroke: {
-                width: 0
+                width: 4,
+                colors: ["#ffffff"]
             },
             plotOptions: {
                 pie: {
                     expandOnClick: true,
                     donut: {
-                        size: "78%",
+                        size: "70%",
                         labels: {
                             show: true,
                             name: {
@@ -542,9 +546,9 @@ function atualizarGraficos(listaDoacoes) {
                             total: {
                                 show: true,
                                 showAlways: true,
-                                label: "",
+                                label: "Doações",
                                 formatter: function () {
-                                    return formatarNumero(totalPizza, 2);
+                                    return String(totalPizza);
                                 }
                             }
                         }
@@ -556,17 +560,17 @@ function atualizarGraficos(listaDoacoes) {
                 labels: {
                     colors: "#334155"
                 },
-                fontWeight: 700
+                fontWeight: 700,
+                formatter: function (nome, opcoes) {
+                    const quantidade = opcoes.w.globals.series[opcoes.seriesIndex];
+                    return `${nome} (${quantidade})`;
+                }
             },
             tooltip: {
                 y: {
-                    formatter: function (valor, { seriesIndex }) {
+                    formatter: function (valor) {
                         if (semDadosPizza) return "Sem dados";
-                        const tipo = labelsPizza[seriesIndex];
-                        if (tipo === "Financeiro") return formatarValorPorUnidade(valor, "R$");
-                        if (tipo === "Alimento") return formatarValorPorUnidade(valor, "kg");
-                        if (tipo === "Patrimonio") return formatarValorPorUnidade(valor, "");
-                        return "0";
+                        return `${valor} ${valor === 1 ? "doação" : "doações"}`;
                     }
                 }
             }
