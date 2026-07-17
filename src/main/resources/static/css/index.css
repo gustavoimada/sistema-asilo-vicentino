@@ -2107,11 +2107,18 @@ main {
 }
 
 @media (min-width: 901px) {
+  .cta-content > p {
+    grid-row: 3;
+    align-self: start;
+    max-width: 420px;
+  }
+
   .donation-kind-card {
     grid-row: 2;
     align-self: start;
     margin-top: 34px;
   }
+
 }
 
 .donation-goal {
@@ -2241,6 +2248,12 @@ main {
   grid-column: 2;
   grid-row: 2;
   align-self: start;
+}
+
+@media (min-width: 901px) {
+  .donation-use {
+    grid-row: 2 / span 2;
+  }
 }
 
 .cta-impact-grid {
