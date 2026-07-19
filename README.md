@@ -13,6 +13,37 @@ The project combines a public website for community visibility with a protected 
 
 **Live website:** [www.asilovicentino.com.br](https://www.asilovicentino.com.br)
 
+## Screenshots
+
+### Public Experience
+
+<p align="center">
+  <img src="docs/screenshots/public-home.png" alt="Asilo Vicentino public homepage" width="49%" />
+  <img src="docs/screenshots/public-history.png" alt="Asilo Vicentino institutional history section" width="49%" />
+</p>
+<p align="center">
+  <img src="docs/screenshots/public-routine.png" alt="Asilo Vicentino daily routine section" width="49%" />
+  <img src="docs/screenshots/public-transparency.png" alt="Asilo Vicentino transparency document area" width="49%" />
+</p>
+<p align="center">
+  <img src="docs/screenshots/public-news.png" alt="Asilo Vicentino public news area" width="49%" />
+  <img src="docs/screenshots/login.png" alt="Asilo Vicentino protected login page" width="49%" />
+</p>
+
+### Internal Management
+
+<p align="center">
+  <img src="docs/screenshots/coordinator-dashboard.png" alt="Coordinator dashboard with shift tracking" width="49%" />
+  <img src="docs/screenshots/schedule-management.png" alt="Weekly caregiver schedule management" width="49%" />
+</p>
+<p align="center">
+  <img src="docs/screenshots/occurrence-report.png" alt="Occurrence report dashboard" width="49%" />
+  <img src="docs/screenshots/occurrence-charts.png" alt="Occurrence report charts" width="49%" />
+</p>
+<p align="center">
+  <img src="docs/screenshots/caregiver-dashboard.png" alt="Caregiver shift control dashboard" width="49%" />
+</p>
+
 ## Highlights
 
 - Public institutional website with news, transparency documents and donation flow.
