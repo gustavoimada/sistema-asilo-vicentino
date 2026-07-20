@@ -170,11 +170,6 @@
                 </div>
 
                 <div class="form-field">
-                  <label for="ctps">CTPS</label>
-                  <input id="ctps" type="text" maxlength="12" placeholder="12345/6789" />
-                </div>
-
-                <div class="form-field">
                   <label for="telefone">Telefone</label>
                   <input id="telefone" type="text" maxlength="15" placeholder="(18) 99999-9999" />
                 </div>
@@ -192,7 +187,7 @@
               <div class="section-header section-header-inline">
                 <div>
                   <h2>Filtrar Funcionários</h2>
-                  <p>Pesquise por nome, categoria, CPF e CTPS.</p>
+                  <p>Pesquise por nome, categoria e CPF.</p>
                 </div>
                 <button type="button" id="fecharFiltrosFuncionario" class="close-panel-btn">
                   <span class="material-symbols-outlined">close</span>
@@ -220,11 +215,6 @@
                   <input id="filtroCpf" type="text" placeholder="000.000.000-00" />
                 </div>
 
-                <div class="form-field">
-                  <label for="filtroCtps">CTPS</label>
-                  <input id="filtroCtps" type="text" placeholder="12345/6789" />
-                </div>
-
                 <div class="form-actions form-actions-between">
                   <button type="button" id="limparFiltros" class="secondary-panel-btn">
                     <span class="material-symbols-outlined">cleaning_services</span>
@@ -241,14 +231,13 @@
                     <tr>
                       <th class="sortable" data-sort-key="nome" tabindex="0">Funcionário <span class="sort-indicator"></span></th>
                       <th class="sortable" data-sort-key="categoria" tabindex="0">Categoria <span class="sort-indicator"></span></th>
-                      <th class="sortable" data-sort-key="ctps" tabindex="0">CTPS <span class="sort-indicator"></span></th>
                       <th class="sortable" data-sort-key="telefone" tabindex="0">Telefone <span class="sort-indicator"></span></th>
                       <th class="text-right">Ações</th>
                     </tr>
                   </thead>
                   <tbody id="tabelaFuncionarios">
                     <tr>
-                      <td colspan="5" class="empty-row">Carregando funcionários...</td>
+                      <td colspan="4" class="empty-row">Carregando funcionários...</td>
                     </tr>
                   </tbody>
                 </table>

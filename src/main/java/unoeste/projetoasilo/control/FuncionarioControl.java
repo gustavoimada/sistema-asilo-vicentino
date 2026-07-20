@@ -26,7 +26,7 @@ public class FuncionarioControl
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @PostMapping("cadastrar")
-    public ResponseEntity<Object> cadastrarFuncionario(@RequestParam String nome, @RequestParam String cpf, @RequestParam String ctps, @RequestParam String telefone, @RequestParam String categoria, @RequestParam String username, @RequestParam String senha)
+    public ResponseEntity<Object> cadastrarFuncionario(@RequestParam String nome, @RequestParam String cpf, @RequestParam String telefone, @RequestParam String categoria, @RequestParam String username, @RequestParam String senha)
     {
         Banco conexao = Banco.getConnection();
 
@@ -34,25 +34,19 @@ public class FuncionarioControl
         {
             String categoriaPadronizada = padronizarCategoria(categoria);
             String cpfPadronizado = limparNumeros(cpf);
-            String ctpsPadronizada = limparNumeros(ctps);
 
-            ResponseEntity<Object> erroValidacao = validarDadosCadastro(cpf, ctps, categoriaPadronizada, username, senha);
+            ResponseEntity<Object> erroValidacao = validarDadosCadastro(cpf, categoriaPadronizada, username, senha);
             if (erroValidacao != null)
             {
                 return erroValidacao;
             }
 
             String nomeLimpo = padronizarTexto(nome);
-            Funcionario funcionario = new Funcionario(nomeLimpo, cpfPadronizado, ctpsPadronizada, telefone, categoriaPadronizada);
+            Funcionario funcionario = new Funcionario(nomeLimpo, cpfPadronizado, telefone, categoriaPadronizada);
 
             if (funcionario.buscarCpf(conexao))
             {
                 return ResponseEntity.badRequest().body(new Error("Erro", "CPF ja cadastrado"));
-            }
-
-            if (funcionario.buscarCtps(conexao))
-            {
-                return ResponseEntity.badRequest().body(new Error("Erro", "CTPS ja cadastrada"));
             }
 
             if (funcionario.buscarTelefone(conexao))
@@ -95,7 +89,7 @@ public class FuncionarioControl
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Object> editarFuncionario(@PathVariable int id, @RequestParam String nome, @RequestParam String cpf, @RequestParam String ctps, @RequestParam String telefone, @RequestParam String categoria, @RequestParam(required = false) String username, @RequestParam(required = false) String senha, HttpSession session)
+    public ResponseEntity<Object> editarFuncionario(@PathVariable int id, @RequestParam String nome, @RequestParam String cpf, @RequestParam String telefone, @RequestParam String categoria, @RequestParam(required = false) String username, @RequestParam(required = false) String senha, HttpSession session)
     {
         Banco conexao = Banco.getConnection();
 
@@ -105,11 +99,6 @@ public class FuncionarioControl
             if (!validarCpf(cpf))
             {
                 return ResponseEntity.badRequest().body(new Error("Erro", "CPF invalido"));
-            }
-
-            if (!validarCtps(ctps))
-            {
-                return ResponseEntity.badRequest().body(new Error("Erro", "CTPS invalida"));
             }
 
             if (categoriaPadronizada == null)
@@ -159,12 +148,6 @@ public class FuncionarioControl
                 return ResponseEntity.badRequest().body(new Error("Erro", "CPF ja cadastrado"));
             }
 
-            String ctpsPadronizada = limparNumeros(ctps);
-            if (ctpsJaExisteEmOutroFuncionario(id, funcionarioEncontrado, ctpsPadronizada, conexao))
-            {
-                return ResponseEntity.badRequest().body(new Error("Erro", "CTPS ja cadastrada"));
-            }
-
             if (telefoneJaExisteEmOutroFuncionario(id, funcionarioEncontrado, telefone, conexao))
             {
                 return ResponseEntity.badRequest().body(new Error("Erro", "Telefone ja cadastrado"));
@@ -172,7 +155,6 @@ public class FuncionarioControl
 
             funcionarioEncontrado.setNome(nome);
             funcionarioEncontrado.setCpf(cpfPadronizado);
-            funcionarioEncontrado.setCtps(ctpsPadronizada);
             funcionarioEncontrado.setTelefone(telefone);
             funcionarioEncontrado.setCategoria(categoriaPadronizada);
 
@@ -321,16 +303,11 @@ public class FuncionarioControl
         }
     }
 
-    private ResponseEntity<Object> validarDadosCadastro(String cpf, String ctps, String categoria, String username, String senha)
+    private ResponseEntity<Object> validarDadosCadastro(String cpf, String categoria, String username, String senha)
     {
         if (!validarCpf(cpf))
         {
             return ResponseEntity.badRequest().body(new Error("Erro", "CPF invalido"));
-        }
-
-        if (!validarCtps(ctps))
-        {
-            return ResponseEntity.badRequest().body(new Error("Erro", "CTPS invalida"));
         }
 
         if (categoria == null)
@@ -563,19 +540,6 @@ public class FuncionarioControl
         return funcionarioCpf.buscarCpf(conexao);
     }
 
-    private boolean ctpsJaExisteEmOutroFuncionario(int id, Funcionario funcionarioEncontrado, String ctpsPadronizada, Banco conexao) throws Exception
-    {
-        String ctpsExistente = limparNumeros(funcionarioEncontrado.getCtps());
-        if (ctpsExistente.equals(ctpsPadronizada))
-        {
-            return false;
-        }
-
-        Funcionario funcionarioCtps = new Funcionario();
-        funcionarioCtps.setCtps(ctpsPadronizada);
-        return funcionarioCtps.buscarCtpsExcluindoId(id, conexao);
-    }
-
     private boolean telefoneJaExisteEmOutroFuncionario(int id, Funcionario funcionarioEncontrado, String telefone, Banco conexao) throws Exception
     {
         String telefoneExistente = funcionarioEncontrado.getTelefone();
@@ -695,9 +659,4 @@ public class FuncionarioControl
         }
     }
 
-    private boolean validarCtps(String ctps)
-    {
-        String ctpsNumerica = limparNumeros(ctps);
-        return ctpsNumerica.length() >= 9 && ctpsNumerica.length() <= 11;
-    }
 }

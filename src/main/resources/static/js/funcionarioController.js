@@ -114,13 +114,6 @@ function formatarTelefone(valor)
         .replace(/(\d{5})(\d{1,4})$/, "$1-$2");
 }
 
-function formatarCtps(valor)
-{
-    const numeros = somenteDigitos(valor).slice(0, 11);
-    if (numeros.length <= 5) return numeros;
-    return `${numeros.slice(0, 5)}/${numeros.slice(5)}`;
-}
-
 function validarCpf(cpf)
 {
     const valor = somenteDigitos(cpf);
@@ -173,7 +166,6 @@ function limparFormulario()
     el("nome").value = "";
     el("categoria").value = "";
     el("cpf").value = "";
-    el("ctps").value = "";
     el("telefone").value = "";
     if (el("username")) el("username").value = "";
     if (el("senhaUsuario")) el("senhaUsuario").value = "";
@@ -268,7 +260,6 @@ function renderizarTabela()
     const filtroNome = padronizarTexto(el("filtroNome")?.value).toLowerCase();
     const filtroCategoria = el("filtroCategoria")?.value || "";
     const filtroCpf = somenteDigitos(el("filtroCpf")?.value || "");
-    const filtroCtps = somenteDigitos(el("filtroCtps")?.value || "");
 
     const dados = funcionarios
         .filter((item) =>
@@ -276,8 +267,7 @@ function renderizarTabela()
             const bateNome = !filtroNome || String(item.nome || "").toLowerCase().includes(filtroNome);
             const bateCategoria = !filtroCategoria || padronizarCategoriaValor(item.categoria) === filtroCategoria;
             const bateCpf = !filtroCpf || somenteDigitos(item.cpf).includes(filtroCpf);
-            const bateCtps = !filtroCtps || somenteDigitos(item.ctps).includes(filtroCtps);
-            return bateNome && bateCategoria && bateCpf && bateCtps;
+            return bateNome && bateCategoria && bateCpf;
         })
         .sort((a, b) => comparar(a, b, ordenacaoAtual.chave, ordenacaoAtual.direcao));
 
@@ -285,7 +275,7 @@ function renderizarTabela()
 
     if (dados.length === 0)
     {
-        corpo.innerHTML = '<tr><td colspan="5" class="empty-row">Nenhum funcionário encontrado.</td></tr>';
+        corpo.innerHTML = '<tr><td colspan="4" class="empty-row">Nenhum funcionário encontrado.</td></tr>';
         return;
     }
 
@@ -307,12 +297,6 @@ function renderizarTabela()
         </div>
       </td>
       <td><span class="categoria-badge ${classeCategoria(funcionario.categoria)}">${escaparHtml(formatarCargoInclusivo(funcionario.categoria) || "Nao informada")}</span></td>
-      <td>
-        <div class="funcionario-info-block">
-          <strong>${escaparHtml(formatarCtps(funcionario.ctps || "") || "-")}</strong>
-          <span>Carteira de trabalho</span>
-        </div>
-      </td>
       <td>
         <div class="funcionario-info-block">
           <strong>${escaparHtml(formatarTelefone(funcionario.telefone || "") || "-")}</strong>
@@ -339,7 +323,7 @@ async function carregarFuncionarios()
     const corpo = el("tabelaFuncionarios");
     if (corpo)
     {
-        corpo.innerHTML = '<tr><td colspan="5" class="empty-row">Carregando funcionários...</td></tr>';
+        corpo.innerHTML = '<tr><td colspan="4" class="empty-row">Carregando funcionários...</td></tr>';
     }
 
     try
@@ -359,7 +343,7 @@ async function carregarFuncionarios()
     {
         if (corpo)
         {
-            corpo.innerHTML = '<tr><td colspan="5" class="empty-row">Erro ao carregar os dados.</td></tr>';
+            corpo.innerHTML = '<tr><td colspan="4" class="empty-row">Erro ao carregar os dados.</td></tr>';
         }
         showToast("error", "Não foi possível listar os funcionários.");
     }
@@ -373,7 +357,6 @@ async function salvarFuncionario(event)
     const nome = padronizarTexto(el("nome")?.value || "");
     const categoria = el("categoria")?.value || "";
     const cpf = formatarCpf(el("cpf")?.value || "");
-    const ctps = formatarCtps(el("ctps")?.value || "");
     const telefone = formatarTelefone(el("telefone")?.value || "");
     const username = (el("username")?.value || "").trim();
     const senhaUsuario = el("senhaUsuario")?.value || "";
@@ -403,14 +386,6 @@ async function salvarFuncionario(event)
     {
         showToast("error", "CPF inválido.");
         el("cpf")?.focus();
-        return;
-    }
-
-    const ctpsDigitos = somenteDigitos(ctps);
-    if (ctpsDigitos.length < 9 || ctpsDigitos.length > 11)
-    {
-        showToast("error", "CTPS inválida. Informe entre 9 e 11 dígitos.");
-        el("ctps")?.focus();
         return;
     }
 
@@ -457,7 +432,6 @@ async function salvarFuncionario(event)
             {
                 nome,
                 cpf,
-                ctps,
                 telefone,
                 categoria,
                 username,
@@ -474,7 +448,6 @@ async function salvarFuncionario(event)
             {
                 nome,
                 cpf,
-                ctps,
                 telefone,
                 categoria,
                 username,
@@ -524,7 +497,6 @@ function abrirParaEditar(id)
     el("nome").value = funcionario.nome || "";
     el("categoria").value = padronizarCategoriaValor(funcionario.categoria || "");
     el("cpf").value = formatarCpf(funcionario.cpf || "");
-    el("ctps").value = formatarCtps(funcionario.ctps || "");
     el("telefone").value = formatarTelefone(funcionario.telefone || "");
     if (el("username"))
     {
@@ -607,27 +579,17 @@ function configurarEventos()
         event.target.value = formatarCpf(event.target.value);
         renderizarTabela();
     });
-    el("filtroCtps")?.addEventListener("input", (event) =>
-    {
-        event.target.value = formatarCtps(event.target.value);
-        renderizarTabela();
-    });
     el("limparFiltros")?.addEventListener("click", () =>
     {
         el("filtroNome").value = "";
         el("filtroCategoria").value = "";
         el("filtroCpf").value = "";
-        el("filtroCtps").value = "";
         renderizarTabela();
     });
 
     el("cpf")?.addEventListener("input", (event) =>
     {
         event.target.value = formatarCpf(event.target.value);
-    });
-    el("ctps")?.addEventListener("input", (event) =>
-    {
-        event.target.value = formatarCtps(event.target.value);
     });
     el("telefone")?.addEventListener("input", (event) =>
     {

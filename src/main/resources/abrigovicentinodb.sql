@@ -74,7 +74,6 @@ CREATE TABLE funcionario (
                              nome VARCHAR(45),
                              telefone VARCHAR(15),
                              categoria VARCHAR(45),
-                             ctps_numero VARCHAR(11),
                              ativo BOOLEAN NOT NULL DEFAULT TRUE,
                              User_idUser INTEGER NOT NULL UNIQUE,
                              CONSTRAINT fk_funcionario_user

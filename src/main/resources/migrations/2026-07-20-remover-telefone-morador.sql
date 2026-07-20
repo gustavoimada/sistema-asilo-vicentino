@@ -1,0 +1,6 @@
+BEGIN;
+
+ALTER TABLE morador
+    DROP COLUMN IF EXISTS telefone;
+
+COMMIT;

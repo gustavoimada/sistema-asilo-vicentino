@@ -13,25 +13,24 @@ import java.util.List;
 public class FuncionarioDAO
 {
     private static final String SQL_SELECT = """
-            SELECT idfuncionario, nome, cpf, ctps_numero, telefone, categoria, ativo, User_idUser
+            SELECT idfuncionario, nome, cpf, telefone, categoria, ativo, User_idUser
             FROM funcionario
             """;
 
     public boolean gravar(Funcionario funcionario, Banco conexao) throws SQLException
     {
         String sql = """
-                INSERT INTO funcionario (nome, cpf, ctps_numero, telefone, categoria, User_idUser)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO funcionario (nome, cpf, telefone, categoria, User_idUser)
+                VALUES (?, ?, ?, ?, ?)
                 """;
 
         try (PreparedStatement ps = conexao.prepararComChaves(sql))
         {
             ps.setString(1, funcionario.getNome());
             ps.setString(2, funcionario.getCpf());
-            ps.setString(3, funcionario.getCtps());
-            ps.setString(4, funcionario.getTelefone());
-            ps.setString(5, funcionario.getCategoria());
-            ps.setInt(6, funcionario.getIdUser());
+            ps.setString(3, funcionario.getTelefone());
+            ps.setString(4, funcionario.getCategoria());
+            ps.setInt(5, funcionario.getIdUser());
 
             if (ps.executeUpdate() <= 0)
             {
@@ -54,7 +53,7 @@ public class FuncionarioDAO
     {
         String sql = """
                 UPDATE funcionario
-                SET nome = ?, cpf = ?, ctps_numero = ?, telefone = ?, categoria = ?
+                SET nome = ?, cpf = ?, telefone = ?, categoria = ?
                 WHERE idfuncionario = ?
                 """;
 
@@ -62,10 +61,9 @@ public class FuncionarioDAO
         {
             ps.setString(1, funcionario.getNome());
             ps.setString(2, funcionario.getCpf());
-            ps.setString(3, funcionario.getCtps());
-            ps.setString(4, funcionario.getTelefone());
-            ps.setString(5, funcionario.getCategoria());
-            ps.setInt(6, funcionario.getIdFuncionario());
+            ps.setString(3, funcionario.getTelefone());
+            ps.setString(4, funcionario.getCategoria());
+            ps.setInt(5, funcionario.getIdFuncionario());
             return ps.executeUpdate() > 0;
         }
     }
@@ -252,16 +250,6 @@ public class FuncionarioDAO
         return existePorCampo("cpf", cpf, null, conexao);
     }
 
-    public boolean buscarPorCtps(String ctps, Banco conexao) throws SQLException
-    {
-        return existePorCampo("ctps_numero", ctps, null, conexao);
-    }
-
-    public boolean buscarPorCtpsExcluindoId(String ctps, int id, Banco conexao) throws SQLException
-    {
-        return existePorCampo("ctps_numero", ctps, id, conexao);
-    }
-
     public boolean buscarPorTelefone(String telefone, Banco conexao) throws SQLException
     {
         return existePorCampo("telefone", telefone, null, conexao);
@@ -328,7 +316,6 @@ public class FuncionarioDAO
         funcionario.setUser(user);
         funcionario.setNome(rs.getString("nome"));
         funcionario.setCpf(rs.getString("cpf"));
-        funcionario.setCtps(rs.getString("ctps_numero"));
         funcionario.setTelefone(rs.getString("telefone"));
         funcionario.setCategoria(rs.getString("categoria"));
         funcionario.setAtivo(rs.getBoolean("ativo"));

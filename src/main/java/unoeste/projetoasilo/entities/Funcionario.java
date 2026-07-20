@@ -12,7 +12,6 @@ public class Funcionario
     private User user;
     private String nome;
     private String cpf;
-    private String ctps;
     private String telefone;
     private String categoria;
     private boolean ativo = true;
@@ -21,11 +20,10 @@ public class Funcionario
     {
     }
 
-    public Funcionario(String nome, String cpf, String ctps, String telefone, String categoria)
+    public Funcionario(String nome, String cpf, String telefone, String categoria)
     {
         this.nome = nome;
         this.cpf = cpf;
-        this.ctps = ctps;
         this.telefone = telefone;
         this.categoria = categoria;
     }
@@ -79,11 +77,6 @@ public class Funcionario
         return cpf;
     }
 
-    public String getCtps()
-    {
-        return ctps;
-    }
-
     public String getTelefone()
     {
         return telefone;
@@ -107,11 +100,6 @@ public class Funcionario
     public void setCpf(String cpf)
     {
         this.cpf = cpf;
-    }
-
-    public void setCtps(String ctps)
-    {
-        this.ctps = ctps;
     }
 
     public void setTelefone(String telefone)
@@ -193,18 +181,6 @@ public class Funcionario
     {
         FuncionarioDAO dao = new FuncionarioDAO();
         return dao.buscarPorCpf(this.cpf, conexao);
-    }
-
-    public boolean buscarCtps(Banco conexao) throws SQLException
-    {
-        FuncionarioDAO dao = new FuncionarioDAO();
-        return dao.buscarPorCtps(this.ctps, conexao);
-    }
-
-    public boolean buscarCtpsExcluindoId(int id, Banco conexao) throws SQLException
-    {
-        FuncionarioDAO dao = new FuncionarioDAO();
-        return dao.buscarPorCtpsExcluindoId(this.ctps, id, conexao);
     }
 
     public boolean buscarTelefone(Banco conexao) throws SQLException
