@@ -239,7 +239,9 @@ async function enviarTransparencia(event)
     const form = document.getElementById("formTransparencia");
     const botao = form?.querySelector(".transparencia-submit");
     const arquivo = document.getElementById("transparenciaArquivo")?.files?.[0];
-    const ano = document.getElementById("transparenciaAno")?.value || "";
+    const dataReferencia = document.getElementById("transparenciaDataReferencia")?.value || "";
+    const evento = document.getElementById("transparenciaEvento")?.value || "Outros";
+    const observacao = document.getElementById("transparenciaObservacao")?.value || "";
     if (!arquivo)
     {
         mostrarMensagemEscala("Selecione um arquivo PDF.", "error");
@@ -252,15 +254,22 @@ async function enviarTransparencia(event)
         return;
     }
 
-    if (!/^\d{4}$/.test(String(ano)))
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dataReferencia)))
     {
-        mostrarMensagemEscala("Informe um ano valido.", "error");
+        mostrarMensagemEscala("Informe uma data de referencia valida.", "error");
         return;
     }
 
+    const ano = dataReferencia.slice(0, 4);
+    const mes = String(Number(dataReferencia.slice(5, 7)));
+
     const formData = new FormData();
     formData.append("arquivo", arquivo);
+    formData.append("dataReferencia", dataReferencia);
     formData.append("ano", ano);
+    formData.append("mes", mes);
+    formData.append("evento", evento);
+    formData.append("observacao", observacao.trim());
 
     if (botao)
     {

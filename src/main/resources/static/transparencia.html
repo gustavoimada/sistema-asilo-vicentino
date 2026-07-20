@@ -118,33 +118,14 @@
                   <span class="material-symbols-outlined">upload_file</span>
                   <div>
                     <h4>Enviar prestação de contas</h4>
-                    <p>Publique PDFs para consulta pública, separados por ano, mês e categoria.</p>
+                    <p>Publique PDFs para consulta pública, separados por data de referência e categoria.</p>
                   </div>
                 </div>
 
                 <div class="transparencia-fields">
                   <div class="form-field">
-                    <label for="transparenciaAno">Ano</label>
-                    <input id="transparenciaAno" name="ano" type="number" min="2000" max="2100" placeholder="2026" required />
-                  </div>
-
-                  <div class="form-field">
-                    <label for="transparenciaMes">Mês</label>
-                    <select id="transparenciaMes" name="mes" required>
-                      <option value="">Selecione</option>
-                      <option value="1">Janeiro</option>
-                      <option value="2">Fevereiro</option>
-                      <option value="3">Março</option>
-                      <option value="4">Abril</option>
-                      <option value="5">Maio</option>
-                      <option value="6">Junho</option>
-                      <option value="7">Julho</option>
-                      <option value="8">Agosto</option>
-                      <option value="9">Setembro</option>
-                      <option value="10">Outubro</option>
-                      <option value="11">Novembro</option>
-                      <option value="12">Dezembro</option>
-                    </select>
+                    <label for="transparenciaDataReferencia">Data de referência</label>
+                    <input id="transparenciaDataReferencia" name="dataReferencia" type="date" required />
                   </div>
 
                   <div class="form-field">
@@ -158,6 +139,12 @@
                       <option value="Doações">Doações</option>
                       <option value="Prestação de Contas">Prestação de Contas</option>
                     </select>
+                  </div>
+
+                  <div class="form-field transparencia-observacao-field">
+                    <label for="transparenciaObservacao">Observação</label>
+                    <textarea id="transparenciaObservacao" name="observacao" rows="4" maxlength="500" placeholder="Ex.: Documento referente ao evento realizado em julho."></textarea>
+                    <small class="field-hint">Opcional, até 500 caracteres.</small>
                   </div>
 
                   <div class="form-field transparencia-file-field">

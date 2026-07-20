@@ -306,6 +306,8 @@ CREATE TABLE transparencia (
                                idtransparencia SERIAL PRIMARY KEY,
                                nomearquivo VARCHAR(255) NOT NULL,
                                caminhoarquivo VARCHAR(500) NOT NULL,
+                               datareferencia DATE NOT NULL DEFAULT CURRENT_DATE,
+                               observacao VARCHAR(500),
                                dataupload TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                ano INTEGER NOT NULL,
                                mes INTEGER NOT NULL,

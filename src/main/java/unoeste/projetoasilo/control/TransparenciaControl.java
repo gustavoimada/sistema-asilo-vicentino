@@ -29,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.sql.SQLException;
 import java.util.Locale;
 
@@ -41,11 +42,36 @@ public class TransparenciaControl
     private final Path raizUpload = Paths.get(uploadDirBase(), "transparencia").toAbsolutePath().normalize();
     // Recebe o PDF enviado pelo coordenador e salva o arquivo no servidor.
     @PostMapping("upload")
-    public ResponseEntity<Object> upload(@RequestParam("arquivo") MultipartFile arquivo, @RequestParam("ano") String ano, @RequestParam(value = "mes", required = false) String mes, @RequestParam("evento") String evento, HttpSession session)
+    public ResponseEntity<Object> upload(@RequestParam("arquivo") MultipartFile arquivo,
+                                         @RequestParam(value = "dataReferencia", required = false) String dataReferencia,
+                                         @RequestParam(value = "ano", required = false) String ano,
+                                         @RequestParam(value = "mes", required = false) String mes,
+                                         @RequestParam("evento") String evento,
+                                         @RequestParam(value = "observacao", required = false) String observacao,
+                                         HttpSession session)
     {
+        LocalDate dataReferenciaLimpa;
+        String observacaoLimpa;
+        try
+        {
+            dataReferenciaLimpa = limparDataReferencia(dataReferencia);
+            observacaoLimpa = limparObservacao(observacao);
+        }
+        catch (IllegalArgumentException e)
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", e.getMessage()));
+        }
+
         String anoLimpo = limparAno(ano);
         int mesNumero = limparMes(mes);
         String eventoLimpo = limparEvento(evento);
+
+        if (dataReferenciaLimpa != null)
+        {
+            anoLimpo = String.valueOf(dataReferenciaLimpa.getYear());
+            mesNumero = dataReferenciaLimpa.getMonthValue();
+        }
+
         if (anoLimpo.isEmpty())
         {
             return ResponseEntity.badRequest().body(new Error("Erro", "Ano invalido"));
@@ -54,6 +80,11 @@ public class TransparenciaControl
         if (mesNumero <= 0)
         {
             return ResponseEntity.badRequest().body(new Error("Erro", "Mes invalido"));
+        }
+
+        if (dataReferenciaLimpa == null)
+        {
+            dataReferenciaLimpa = LocalDate.of(Integer.parseInt(anoLimpo), mesNumero, 1);
         }
 
         if (eventoLimpo.isEmpty())
@@ -121,6 +152,8 @@ public class TransparenciaControl
             transparencia.setMes(mesNumero);
             transparencia.setNomeArquivo(nomeArquivo);
             transparencia.setEvento(eventoLimpo);
+            transparencia.setDataReferencia(dataReferenciaLimpa);
+            transparencia.setObservacao(observacaoLimpa);
             transparencia.setCaminhoArquivo(raizUpload.relativize(destino).toString().replace("\\", "/"));
             transparencia.setFuncionario(funcionario);
 
@@ -292,6 +325,23 @@ public class TransparenciaControl
         return numero;
     }
 
+    private LocalDate limparDataReferencia(String dataReferencia)
+    {
+        if (dataReferencia == null || dataReferencia.isBlank())
+        {
+            return null;
+        }
+
+        try
+        {
+            return LocalDate.parse(dataReferencia.trim());
+        }
+        catch (Exception e)
+        {
+            throw new IllegalArgumentException("Data de referencia invalida");
+        }
+    }
+
     private String nomeMes(int mes)
     {
         return switch (mes)
@@ -360,6 +410,25 @@ public class TransparenciaControl
         if (valor.length() > 80)
         {
             valor = valor.substring(0, 80).trim();
+        }
+        return valor;
+    }
+
+    private String limparObservacao(String observacao)
+    {
+        if (observacao == null)
+        {
+            return null;
+        }
+
+        String valor = observacao.trim().replaceAll("\\s+", " ");
+        if (valor.isBlank())
+        {
+            return null;
+        }
+        if (valor.length() > 500)
+        {
+            throw new IllegalArgumentException("Observacao deve ter no maximo 500 caracteres");
         }
         return valor;
     }

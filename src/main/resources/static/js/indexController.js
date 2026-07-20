@@ -561,6 +561,15 @@ function nomeExibicaoArquivoTransparenciaPublica(arquivo) {
   return nome.replace(/^[0-9][a-z0-9]{9,}-/i, "") || "Documento PDF";
 }
 
+function escaparHtmlTransparenciaPublica(valor) {
+  return String(valor ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function formatarDataUploadTransparenciaPublica(valor) {
   if (!valor) return "Data nao informada";
 
@@ -603,9 +612,14 @@ function formatarDataUploadTransparenciaPublica(valor) {
   return texto.replace("T", " ").replace(/Z$/i, "");
 }
 
+function formatarDataReferenciaTransparenciaPublica(valor) {
+  return formatarDataUploadTransparenciaPublica(valor);
+}
+
 function prepararArquivoTransparenciaPublica(arquivo) {
   const idArquivo = Number(arquivo?.idTransparencia || arquivo?.id || 0);
   const mes = mesTransparenciaPublica(arquivo);
+  const dataReferencia = arquivo?.dataReferencia || arquivo?.datareferencia || arquivo?.dataUpload;
   return {
     ...arquivo,
     idTransparencia: idArquivo,
@@ -614,6 +628,8 @@ function prepararArquivoTransparenciaPublica(arquivo) {
     mesNome: nomeMesTransparenciaPublica(mes),
     mesRotulo: rotuloMesTransparenciaPublica(mes),
     nomeExibicao: nomeExibicaoArquivoTransparenciaPublica(arquivo),
+    dataReferenciaFormatada: formatarDataReferenciaTransparenciaPublica(dataReferencia),
+    observacao: String(arquivo?.observacao || "").trim(),
     dataUploadFormatada: formatarDataUploadTransparenciaPublica(arquivo?.dataUpload),
     url: `/transparencia/download/${idArquivo}`
   };
@@ -682,7 +698,7 @@ function renderizarTransparenciaLegado(filtro = "") {
       const eventos = eventosOriginais
         .map(function (evento) {
           const arquivos = (evento.arquivos || []).filter(function (arquivo) {
-            const alvo = `${pasta.ano} ${evento.evento || ""} ${arquivo.nomeArquivo || ""} ${arquivo.nomeExibicao || ""} ${arquivo.caminhoArquivo || ""}`
+            const alvo = `${pasta.ano} ${evento.evento || ""} ${arquivo.nomeArquivo || ""} ${arquivo.nomeExibicao || ""} ${arquivo.caminhoArquivo || ""} ${arquivo.dataReferenciaFormatada || ""} ${arquivo.observacao || ""}`
               .normalize("NFD")
               .replace(/[\u0300-\u036f]/g, "")
               .toLowerCase();
@@ -707,12 +723,16 @@ function renderizarTransparenciaLegado(filtro = "") {
   lista.innerHTML = pastasFiltradas.map(function (pasta, index) {
     const eventos = pasta.eventos.map(function (evento) {
       const arquivos = evento.arquivos.map(function (arquivo) {
+        const observacaoHtml = arquivo.observacao
+          ? `<span class="transparencia-file-note">${escaparHtmlTransparenciaPublica(arquivo.observacao)}</span>`
+          : "";
         return `
           <a class="transparencia-file" href="${arquivo.url}" download>
             <span class="material-symbols-outlined">picture_as_pdf</span>
             <span class="transparencia-file-info">
-              <strong>${arquivo.nomeExibicao || "Documento PDF"}</strong>
-              <span>${arquivo.dataUploadFormatada || "Data nao informada"}</span>
+              <strong>${escaparHtmlTransparenciaPublica(arquivo.nomeExibicao || "Documento PDF")}</strong>
+              <span>Referência: ${escaparHtmlTransparenciaPublica(arquivo.dataReferenciaFormatada || "Data nao informada")}</span>
+              ${observacaoHtml}
             </span>
             <span class="material-symbols-outlined">download</span>
           </a>
@@ -765,7 +785,7 @@ function renderizarTransparencia(filtro = "") {
           const eventos = eventosOriginais
             .map(function (evento) {
               const arquivos = (evento.arquivos || []).filter(function (arquivo) {
-                const alvo = `${pasta.ano} ${mes.rotulo || ""} ${mes.nome || ""} ${evento.evento || ""} ${arquivo.nomeArquivo || ""} ${arquivo.nomeExibicao || ""} ${arquivo.caminhoArquivo || ""}`
+                const alvo = `${pasta.ano} ${mes.rotulo || ""} ${mes.nome || ""} ${evento.evento || ""} ${arquivo.nomeArquivo || ""} ${arquivo.nomeExibicao || ""} ${arquivo.caminhoArquivo || ""} ${arquivo.dataReferenciaFormatada || ""} ${arquivo.observacao || ""}`
                   .normalize("NFD")
                   .replace(/[\u0300-\u036f]/g, "")
                   .toLowerCase();
@@ -798,12 +818,16 @@ function renderizarTransparencia(filtro = "") {
     const meses = pasta.meses.map(function (mes) {
       const eventos = mes.eventos.map(function (evento) {
         const arquivos = evento.arquivos.map(function (arquivo) {
+          const observacaoHtml = arquivo.observacao
+            ? `<span class="transparencia-file-note">${escaparHtmlTransparenciaPublica(arquivo.observacao)}</span>`
+            : "";
           return `
             <a class="transparencia-file" href="${arquivo.url}" download>
               <span class="material-symbols-outlined">picture_as_pdf</span>
               <span class="transparencia-file-info">
-                <strong>${arquivo.nomeExibicao || "Documento PDF"}</strong>
-                <span>${arquivo.dataUploadFormatada || "Data nao informada"}</span>
+                <strong>${escaparHtmlTransparenciaPublica(arquivo.nomeExibicao || "Documento PDF")}</strong>
+                <span>Referência: ${escaparHtmlTransparenciaPublica(arquivo.dataReferenciaFormatada || "Data nao informada")}</span>
+                ${observacaoHtml}
               </span>
               <span class="material-symbols-outlined transparencia-file-action">download</span>
             </a>

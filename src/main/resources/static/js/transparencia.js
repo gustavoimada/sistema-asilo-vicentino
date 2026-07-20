@@ -168,6 +168,21 @@ function validarArquivoTransparencia()
     return true;
 }
 
+function escaparHtmlTransparencia(valor)
+{
+    return String(valor ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+function textoObservacaoTransparencia(arquivo)
+{
+    return String(arquivo?.observacao || "").trim();
+}
+
 function eventoTransparencia(arquivo)
 {
     const evento = String(arquivo?.evento || "").trim();
@@ -213,6 +228,7 @@ function prepararArquivoTransparencia(arquivo)
 {
     const idArquivo = Number(arquivo?.idTransparencia || arquivo?.id || 0);
     const mes = mesTransparencia(arquivo);
+    const dataReferencia = arquivo?.dataReferencia || arquivo?.datareferencia || arquivo?.dataUpload;
     return {
         ...arquivo,
         idTransparencia: idArquivo,
@@ -220,6 +236,8 @@ function prepararArquivoTransparencia(arquivo)
         mes,
         mesNome: nomeMesTransparencia(mes),
         mesRotulo: rotuloMesTransparencia(mes),
+        dataReferencia: formatarDataReferenciaTransparencia(dataReferencia),
+        observacao: textoObservacaoTransparencia(arquivo),
         dataUpload: formatarDataUploadTransparencia(arquivo?.dataUpload),
         url: `/transparencia/download/${idArquivo}`
     };
@@ -279,6 +297,11 @@ function formatarDataUploadTransparencia(valor)
     }
 
     return texto.replace("T", " ").replace(/Z$/i, "");
+}
+
+function formatarDataReferenciaTransparencia(valor)
+{
+    return formatarDataUploadTransparencia(valor);
 }
 
 function agruparTransparenciaPorAnoMesEEvento(arquivos)
@@ -344,13 +367,17 @@ function renderizarTransparenciaCoordenadorLegado()
             {
                 const idArquivo = arquivo.idTransparencia || arquivo.id || 0;
                 const nomeExibicao = nomeExibicaoArquivoTransparencia(arquivo);
+                const observacaoHtml = arquivo.observacao
+                    ? `<span class="info observacao">Obs.: ${escaparHtmlTransparencia(arquivo.observacao)}</span>`
+                    : "";
                 return `
                 <div class="transparencia-file-admin">
                     <a class="transparencia-file-link" href="${arquivo.url}" download>
                         <span class="material-symbols-outlined">picture_as_pdf</span>
                         <span class="file-text">
-                            <strong title="${nomeExibicao}">${nomeExibicao}</strong>
-                            <span class="info">${arquivo.dataUpload || "Data não informada"}</span>
+                            <strong title="${escaparHtmlTransparencia(nomeExibicao)}">${escaparHtmlTransparencia(nomeExibicao)}</strong>
+                            <span class="info">Referência: ${escaparHtmlTransparencia(arquivo.dataReferencia || "Data não informada")}</span>
+                            ${observacaoHtml}
                         </span>
                         <span class="material-symbols-outlined">download</span>
                     </a>
@@ -415,13 +442,17 @@ function renderizarTransparenciaCoordenador()
                 {
                     const idArquivo = arquivo.idTransparencia || arquivo.id || 0;
                     const nomeExibicao = nomeExibicaoArquivoTransparencia(arquivo);
+                    const observacaoHtml = arquivo.observacao
+                        ? `<span class="info observacao">Obs.: ${escaparHtmlTransparencia(arquivo.observacao)}</span>`
+                        : "";
                     return `
                         <div class="transparencia-file-admin">
                             <a class="transparencia-file-link" href="${arquivo.url}" download>
                                 <span class="material-symbols-outlined">picture_as_pdf</span>
                                 <span class="file-text">
-                                    <strong title="${nomeExibicao}">${nomeExibicao}</strong>
-                                    <span class="info">${evento.evento || "Outros"} • ${arquivo.dataUpload || "Data nao informada"}</span>
+                                    <strong title="${escaparHtmlTransparencia(nomeExibicao)}">${escaparHtmlTransparencia(nomeExibicao)}</strong>
+                                    <span class="info">${escaparHtmlTransparencia(evento.evento || "Outros")} • Referência: ${escaparHtmlTransparencia(arquivo.dataReferencia || "Data nao informada")}</span>
+                                    ${observacaoHtml}
                                 </span>
                                 <span class="material-symbols-outlined">download</span>
                             </a>
@@ -573,8 +604,8 @@ async function enviarTransparencia(event)
     const form = document.getElementById("formTransparencia");
     const botao = form?.querySelector(".transparencia-submit");
     const arquivo = document.getElementById("transparenciaArquivo")?.files?.[0];
-    const ano = document.getElementById("transparenciaAno")?.value || "";
-    const mes = document.getElementById("transparenciaMes")?.value || "";
+    const dataReferencia = document.getElementById("transparenciaDataReferencia")?.value || "";
+    const observacao = document.getElementById("transparenciaObservacao")?.value || "";
     const evento = document.getElementById("transparenciaEvento")?.value || "";
     if (!arquivo)
     {
@@ -588,13 +619,39 @@ async function enviarTransparencia(event)
         return;
     }
 
-    if (!/^\d{4}$/.test(String(ano)))
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dataReferencia)))
     {
-        mostrarMensagemTransparencia("Informe um ano válido.", "error");
+        mostrarMensagemTransparencia("Informe a data de referência.", "error");
         return;
     }
 
+    const ano = dataReferencia.slice(0, 4);
+    const mes = String(Number(dataReferencia.slice(5, 7)));
     const mesNumero = Number(mes);
+    const diaNumero = Number(dataReferencia.slice(8, 10));
+    const dataValida = new Date(`${dataReferencia}T00:00:00`);
+    if (Number.isNaN(dataValida.getTime())
+        || dataValida.getFullYear() !== Number(ano)
+        || dataValida.getMonth() + 1 !== mesNumero
+        || dataValida.getDate() !== diaNumero
+        || Number(ano) < 2000
+        || Number(ano) > 2100
+        || !Number.isInteger(mesNumero)
+        || mesNumero < 1
+        || mesNumero > 12
+        || !Number.isInteger(diaNumero)
+        || diaNumero < 1)
+    {
+        mostrarMensagemTransparencia("Informe uma data de referência válida.", "error");
+        return;
+    }
+
+    if (String(observacao).trim().length > 500)
+    {
+        mostrarMensagemTransparencia("Observação deve ter no máximo 500 caracteres.", "error");
+        return;
+    }
+
     if (!Number.isInteger(mesNumero) || mesNumero < 1 || mesNumero > 12)
     {
         mostrarMensagemTransparencia("Selecione o mês de referência.", "error");
@@ -609,9 +666,11 @@ async function enviarTransparencia(event)
 
     const formData = new FormData();
     formData.append("arquivo", arquivo);
+    formData.append("dataReferencia", dataReferencia);
     formData.append("ano", ano);
     formData.append("mes", mes);
     formData.append("evento", evento);
+    formData.append("observacao", observacao.trim());
 
     if (botao)
     {
@@ -636,6 +695,7 @@ async function enviarTransparencia(event)
 
         mostrarMensagemTransparencia("PDF publicado na area de transparencia.", "success");
         form?.reset();
+        preencherDataReferenciaAtual();
         await carregarTransparenciaCoordenador();
     }
     catch (error)
@@ -651,6 +711,21 @@ async function enviarTransparencia(event)
             botao.innerHTML = '<span class="material-symbols-outlined">publish</span> Publicar PDF';
         }
     }
+}
+
+function preencherDataReferenciaAtual()
+{
+    const input = document.getElementById("transparenciaDataReferencia");
+    if (!input || input.value)
+    {
+        return;
+    }
+
+    const hoje = new Date();
+    const ano = hoje.getFullYear();
+    const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+    const dia = String(hoje.getDate()).padStart(2, "0");
+    input.value = `${ano}-${mes}-${dia}`;
 }
 
 async function excluirTransparencia(idArquivo)
@@ -716,6 +791,7 @@ async function inicializarTransparencia()
     await carregarFuncionarioSessaoTransparencia();
     preencherPerfilTopoSessaoTransparencia();
     atualizarLinksContextoCoordenador();
+    preencherDataReferenciaAtual();
     adicionarEventListenersTransparencia();
     await carregarTransparenciaCoordenador();
 }

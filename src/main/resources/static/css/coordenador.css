@@ -756,10 +756,30 @@
   font-family: inherit;
 }
 
+.form-field textarea {
+  width: 100%;
+  min-height: 96px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+  background: #ffffff;
+  outline: none;
+  font-family: inherit;
+  resize: vertical;
+}
+
 .form-field select:focus,
-.form-field input:focus {
+.form-field input:focus,
+.form-field textarea:focus {
   border-color: #93c5fd;
   box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.2);
+}
+
+.field-hint {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
 }
 .modal-actions {
   display: flex;
@@ -1143,6 +1163,12 @@
   color: #64748b;
   font-size: 11px;
   font-weight: 700;
+}
+
+.transparencia-file-admin span.observacao {
+  color: #334155;
+  font-weight: 600;
+  white-space: normal;
 }
 
 .transparencia-file-admin .file-text {

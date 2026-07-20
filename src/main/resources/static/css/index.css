@@ -1775,6 +1775,13 @@ main {
   font-weight: 700;
 }
 
+.transparencia-file-info .transparencia-file-note {
+  color: #334155;
+  font-weight: 600;
+  line-height: 1.35;
+  white-space: normal;
+}
+
 .transparencia-empty {
   margin: 0;
   padding: 24px;

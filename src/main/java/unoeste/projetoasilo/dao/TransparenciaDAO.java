@@ -8,13 +8,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TransparenciaDAO
 {
     private static final String SQL_SELECT = """
-            SELECT t.idtransparencia, t.nomearquivo, t.caminhoarquivo, t.evento, t.dataupload, t.ano, t.mes,
+            SELECT t.idtransparencia, t.nomearquivo, t.caminhoarquivo, t.evento,
+                   t.datareferencia, t.observacao, t.dataupload, t.ano, t.mes,
                    f.idfuncionario, f.nome
             FROM transparencia t
             INNER JOIN funcionario f ON f.idfuncionario = t.Funcionario_idFuncionario
@@ -22,20 +24,22 @@ public class TransparenciaDAO
 
     public boolean gravar(Transparencia transparencia, Banco conexao) throws SQLException
     {
-        garantirEstruturaMensal(conexao);
+        garantirEstruturaTransparencia(conexao);
         String sql = """
                 INSERT INTO transparencia
-                    (nomearquivo, caminhoarquivo, evento, dataupload, ano, mes, Funcionario_idFuncionario)
+                    (nomearquivo, caminhoarquivo, evento, datareferencia, observacao, dataupload, ano, mes, Funcionario_idFuncionario)
                 VALUES
-                    (#1, #2, #3, #4, #5, #6, #7)
+                    (#1, #2, #3, #4, #5, #6, #7, #8, #9)
                 """;
         sql = sql.replace("#1", textoSql(transparencia.getNomeArquivo()));
         sql = sql.replace("#2", textoSql(transparencia.getCaminhoArquivo()));
         sql = sql.replace("#3", textoSql(transparencia.getEvento()));
-        sql = sql.replace("#4", dataSql(transparencia.getDataUpload()));
-        sql = sql.replace("#5", String.valueOf(transparencia.getAno()));
-        sql = sql.replace("#6", String.valueOf(transparencia.getMes()));
-        sql = sql.replace("#7", String.valueOf(transparencia.getFuncionario().getIdFuncionario()));
+        sql = sql.replace("#4", dataReferenciaSql(transparencia.getDataReferencia()));
+        sql = sql.replace("#5", textoSql(transparencia.getObservacao()));
+        sql = sql.replace("#6", dataSql(transparencia.getDataUpload()));
+        sql = sql.replace("#7", String.valueOf(transparencia.getAno()));
+        sql = sql.replace("#8", String.valueOf(transparencia.getMes()));
+        sql = sql.replace("#9", String.valueOf(transparencia.getFuncionario().getIdFuncionario()));
 
         if (!conexao.manipular(sql))
         {
@@ -52,7 +56,7 @@ public class TransparenciaDAO
 
     public Transparencia buscarPorId(int id, Banco conexao) throws SQLException
     {
-        garantirEstruturaMensal(conexao);
+        garantirEstruturaTransparencia(conexao);
         String sql = SQL_SELECT + " WHERE t.idtransparencia = #1 LIMIT 1";
         sql = sql.replace("#1", String.valueOf(id));
         ResultSet rs = conexao.consultar(sql);
@@ -65,8 +69,12 @@ public class TransparenciaDAO
 
     public List<Transparencia> listar(Banco conexao) throws SQLException
     {
-        garantirEstruturaMensal(conexao);
-        String sql = SQL_SELECT + " ORDER BY t.ano DESC, t.mes DESC, t.evento ASC, t.dataupload DESC, t.idtransparencia DESC";
+        garantirEstruturaTransparencia(conexao);
+        String sql = SQL_SELECT + """
+                 ORDER BY t.ano DESC, t.mes DESC, t.evento ASC,
+                          COALESCE(t.datareferencia, t.dataupload::date) DESC,
+                          t.dataupload DESC, t.idtransparencia DESC
+                """;
         List<Transparencia> arquivos = new ArrayList<>();
         ResultSet rs = conexao.consultar(sql);
         if (rs != null)
@@ -97,6 +105,11 @@ public class TransparenciaDAO
         transparencia.setNomeArquivo(rs.getString("nomearquivo"));
         transparencia.setCaminhoArquivo(rs.getString("caminhoarquivo"));
         transparencia.setEvento(rs.getString("evento"));
+        if (rs.getDate("datareferencia") != null)
+        {
+            transparencia.setDataReferencia(rs.getDate("datareferencia").toLocalDate());
+        }
+        transparencia.setObservacao(rs.getString("observacao"));
         transparencia.setDataUpload(rs.getTimestamp("dataupload"));
         transparencia.setAno(rs.getInt("ano"));
         transparencia.setMes(rs.getInt("mes"));
@@ -104,10 +117,19 @@ public class TransparenciaDAO
         return transparencia;
     }
 
-    private void garantirEstruturaMensal(Banco conexao)
+    private void garantirEstruturaTransparencia(Banco conexao)
     {
         conexao.manipular("ALTER TABLE transparencia ADD COLUMN IF NOT EXISTS mes INTEGER");
         conexao.manipular("UPDATE transparencia SET mes = EXTRACT(MONTH FROM dataupload)::INTEGER WHERE mes IS NULL");
+        conexao.manipular("ALTER TABLE transparencia ADD COLUMN IF NOT EXISTS datareferencia DATE");
+        conexao.manipular("""
+                UPDATE transparencia
+                SET datareferencia = MAKE_DATE(ano, mes, 1)
+                WHERE datareferencia IS NULL
+                  AND ano BETWEEN 2000 AND 2100
+                  AND mes BETWEEN 1 AND 12
+                """);
+        conexao.manipular("ALTER TABLE transparencia ADD COLUMN IF NOT EXISTS observacao VARCHAR(500)");
     }
 
     private String textoSql(String valor)
@@ -127,5 +149,14 @@ public class TransparenciaDAO
         }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return "'" + sdf.format(data) + "'";
+    }
+
+    private String dataReferenciaSql(LocalDate data)
+    {
+        if (data == null)
+        {
+            return "NULL";
+        }
+        return "'" + data + "'";
     }
 }

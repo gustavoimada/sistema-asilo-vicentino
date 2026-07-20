@@ -5,6 +5,7 @@ import unoeste.projetoasilo.db.util.Banco;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.List;
 
 public class Transparencia
@@ -13,6 +14,8 @@ public class Transparencia
     private String nomeArquivo;
     private String caminhoArquivo;
     private String evento;
+    private LocalDate dataReferencia;
+    private String observacao;
     private Timestamp dataUpload;
     private int ano;
     private int mes;
@@ -56,6 +59,26 @@ public class Transparencia
     public void setEvento(String evento)
     {
         this.evento = evento;
+    }
+
+    public LocalDate getDataReferencia()
+    {
+        return dataReferencia;
+    }
+
+    public void setDataReferencia(LocalDate dataReferencia)
+    {
+        this.dataReferencia = dataReferencia;
+    }
+
+    public String getObservacao()
+    {
+        return observacao;
+    }
+
+    public void setObservacao(String observacao)
+    {
+        this.observacao = observacao;
     }
 
     public Timestamp getDataUpload()
@@ -128,6 +151,7 @@ public class Transparencia
         nomeArquivo = padronizarTexto(nomeArquivo);
         caminhoArquivo = padronizarTexto(caminhoArquivo);
         evento = padronizarTexto(evento);
+        observacao = padronizarTexto(observacao);
 
         if (nomeArquivo == null || nomeArquivo.isBlank())
         {
@@ -154,9 +178,24 @@ public class Transparencia
             throw new IllegalArgumentException("Mes invalido.");
         }
 
+        if (dataReferencia == null)
+        {
+            dataReferencia = LocalDate.of(ano, mes, 1);
+        }
+
+        if (dataReferencia.getYear() != ano || dataReferencia.getMonthValue() != mes)
+        {
+            throw new IllegalArgumentException("Data de referencia nao corresponde ao ano e mes informados.");
+        }
+
         if (evento == null || evento.isBlank())
         {
             throw new IllegalArgumentException("Evento e obrigatorio.");
+        }
+
+        if (observacao != null && observacao.length() > 500)
+        {
+            throw new IllegalArgumentException("Observacao deve ter no maximo 500 caracteres.");
         }
 
         if (funcionario == null || funcionario.getIdFuncionario() <= 0)
