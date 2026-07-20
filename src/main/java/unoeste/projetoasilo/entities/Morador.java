@@ -20,7 +20,6 @@ public class Morador {
 	private String cidade;
 	private String estado;
 	private String cep;
-	private String telefone;
 	private Integer quartoId;
 	private Quarto quarto;
 	private List<ComposicaoFamiliarMorador> familiares = new ArrayList<>();
@@ -28,7 +27,7 @@ public class Morador {
 	public Morador() {
 	}
 
-	public Morador(String cpf, String nome, String genero, String endereco, int numero, LocalDate dtNascimento, String cidade, String estado, String cep, String telefone, Integer quartoId) {
+	public Morador(String cpf, String nome, String genero, String endereco, int numero, LocalDate dtNascimento, String cidade, String estado, String cep, Integer quartoId) {
 		this.cpf = cpf;
 		this.nome = nome;
 		this.genero = genero;
@@ -38,7 +37,6 @@ public class Morador {
 		this.cidade = cidade;
 		this.estado = estado;
 		this.cep = cep;
-		this.telefone = telefone;
 		this.quartoId = quartoId;
 	}
 
@@ -122,14 +120,6 @@ public class Morador {
 		this.cep = cep;
 	}
 
-	public String getTelefone() {
-		return telefone;
-	}
-
-	public void setTelefone(String telefone) {
-		this.telefone = telefone;
-	}
-
 	public Integer getQuartoId() {
 		return quartoId;
 	}
@@ -156,7 +146,7 @@ public class Morador {
 
 
 	public boolean gravar(Banco conexao) throws SQLException {
-		if (cpf != null && validarCpf() && nome != null && genero != null && endereco != null && numero > 0 && dtNascimento != null && cidade != null && estado != null && cep != null && telefone != null) {
+		if (cpf != null && validarCpf() && nome != null && genero != null && endereco != null && numero > 0 && dtNascimento != null && cidade != null && estado != null && cep != null) {
 			MoradorDAO dao = new MoradorDAO();
 			return dao.gravar(this, conexao);
 		}
@@ -169,7 +159,7 @@ public class Morador {
 	}
 
 	public boolean editar(Banco conexao) throws SQLException {
-		if (idMorador > 0 && cpf != null && validarCpf() && nome != null && genero != null && endereco != null && numero > 0 && dtNascimento != null && cidade != null && estado != null && cep != null && telefone != null) {
+		if (idMorador > 0 && cpf != null && validarCpf() && nome != null && genero != null && endereco != null && numero > 0 && dtNascimento != null && cidade != null && estado != null && cep != null) {
 			MoradorDAO dao = new MoradorDAO();
 			return dao.editar(this, conexao);
 		}
@@ -193,16 +183,16 @@ public class Morador {
 	}
 
 	public List<Morador> filtrar(String nome, String cpf, LocalDate dtNascimento, String endereco, String cidade,
-		String estado, String telefone, String ordenacao, String direcao, Banco conexao) throws SQLException
+		String estado, String ordenacao, String direcao, Banco conexao) throws SQLException
 	{
-		return filtrar(nome, cpf, dtNascimento, dtNascimento, endereco, cidade, estado, telefone, ordenacao, direcao, conexao);
+		return filtrar(nome, cpf, dtNascimento, dtNascimento, endereco, cidade, estado, ordenacao, direcao, conexao);
 	}
 
 	public List<Morador> filtrar(String nome, String cpf, LocalDate dtNascimentoInicio, LocalDate dtNascimentoFim, String endereco, String cidade,
-		String estado, String telefone, String ordenacao, String direcao, Banco conexao) throws SQLException
+		String estado, String ordenacao, String direcao, Banco conexao) throws SQLException
 	{
 		MoradorDAO dao = new MoradorDAO();
-		return dao.filtrar(nome, cpf, dtNascimentoInicio, dtNascimentoFim, endereco, cidade, estado, telefone, ordenacao, direcao, conexao);
+		return dao.filtrar(nome, cpf, dtNascimentoInicio, dtNascimentoFim, endereco, cidade, estado, ordenacao, direcao, conexao);
 	}
 
 	public Morador buscarPorCpf(String cpf, Banco conexao) throws SQLException

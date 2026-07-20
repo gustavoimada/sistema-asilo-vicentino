@@ -220,11 +220,6 @@
                   <input id="cep" type="text" placeholder="00000-000" inputmode="numeric" autocomplete="postal-code" aria-describedby="cepStatus" oninput="this.value = formatarCep(this.value)" />
                 </div>
 
-                <div class="form-field campo-telefone">
-                  <label for="telefone">Telefone de Contato</label>
-                  <input id="telefone" type="tel" placeholder="(00) 00000-0000" oninput="this.value = formatarTelefone(this.value)" />
-                </div>
-
                 <div class="form-field campo-quarto">
                   <label for="quartoId">Quarto</label>
                   <select id="quartoId">
@@ -355,11 +350,6 @@
                   </select>
                 </div>
 
-                <div class="form-field">
-                  <label for="filtroTelefone">Telefone</label>
-                  <input id="filtroTelefone" type="text" placeholder="Ex: (00) 00000-0000" oninput="aplicarFiltros()" />
-                </div>
-
                 <div class="form-actions form-actions-between">
                   <button type="button" class="secondary-panel-btn" onclick="limparFiltros()">
                     <span class="material-symbols-outlined">cleaning_services</span>
@@ -376,7 +366,6 @@
                     <tr>
                       <th id="th-nome" class="sortable" onclick="definirOrdenacaoMoradores('nome')">Morador <span id="sort-nome" class="sort-indicator"></span></th>
                       <th>Ala/Quarto</th>
-                      <th>Contato</th>
                       <th id="th-cidade" class="sortable" onclick="definirOrdenacaoMoradores('cidade')">Localização <span id="sort-cidade" class="sort-indicator"></span></th>
                       <th class="text-right">Ações</th>
                     </tr>

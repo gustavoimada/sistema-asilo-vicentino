@@ -26,7 +26,6 @@ CREATE TABLE morador (
                          cidade VARCHAR(45),
                          estado VARCHAR(45),
                          cep VARCHAR(9),
-                         telefone VARCHAR(15),
                          Quartos_idQuartos INTEGER,
                          FOREIGN KEY (Quartos_idQuartos)
                              REFERENCES quartos(idQuartos)

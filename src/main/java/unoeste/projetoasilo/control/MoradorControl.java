@@ -40,14 +40,14 @@ public class MoradorControl {
     }
 
     @GetMapping("filtrar")
-    public ResponseEntity<Object> filtrarMoradores(@RequestParam(required = false) String nome, @RequestParam(required = false) String cpf, @RequestParam(required = false) LocalDate dtNascimento, @RequestParam(required = false) LocalDate dtNascimentoInicio, @RequestParam(required = false) LocalDate dtNascimentoFim, @RequestParam(required = false) String endereco, @RequestParam(required = false) String cidade, @RequestParam(required = false) String estado, @RequestParam(required = false) String telefone, @RequestParam(required = false) String ordenacao, @RequestParam(required = false) String direcao) {
+    public ResponseEntity<Object> filtrarMoradores(@RequestParam(required = false) String nome, @RequestParam(required = false) String cpf, @RequestParam(required = false) LocalDate dtNascimento, @RequestParam(required = false) LocalDate dtNascimentoInicio, @RequestParam(required = false) LocalDate dtNascimentoFim, @RequestParam(required = false) String endereco, @RequestParam(required = false) String cidade, @RequestParam(required = false) String estado, @RequestParam(required = false) String ordenacao, @RequestParam(required = false) String direcao) {
         Banco conexao = Banco.getConnection();
         try {
             if (dtNascimento != null && dtNascimentoInicio == null && dtNascimentoFim == null) {
                 dtNascimentoInicio = dtNascimento;
                 dtNascimentoFim = dtNascimento;
             }
-            List<Morador> moradores = new Morador().filtrar(nome, cpf, dtNascimentoInicio, dtNascimentoFim, endereco, cidade, estado, telefone, ordenacao, direcao, conexao);
+            List<Morador> moradores = new Morador().filtrar(nome, cpf, dtNascimentoInicio, dtNascimentoFim, endereco, cidade, estado, ordenacao, direcao, conexao);
             return ResponseEntity.ok(moradores);
         } catch (SQLException e) {
             return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao acessar banco de dados"));
@@ -57,9 +57,9 @@ public class MoradorControl {
     }
 
     @PostMapping("cadastrar")
-    public ResponseEntity<Object> cadastrarMorador(@RequestParam String nome, @RequestParam String cpf, @RequestParam String genero, @RequestParam LocalDate dtNascimento, @RequestParam String endereco, @RequestParam int numero, @RequestParam String cidade, @RequestParam String estado, @RequestParam String cep, @RequestParam String telefone, @RequestParam Integer quartoId) {
+    public ResponseEntity<Object> cadastrarMorador(@RequestParam String nome, @RequestParam String cpf, @RequestParam String genero, @RequestParam LocalDate dtNascimento, @RequestParam String endereco, @RequestParam int numero, @RequestParam String cidade, @RequestParam String estado, @RequestParam String cep, @RequestParam Integer quartoId) {
         Banco conexao = Banco.getConnection();
-        Morador morador = new Morador(cpf, nome, genero, endereco, numero, dtNascimento, cidade, estado, cep, telefone, quartoId);
+        Morador morador = new Morador(cpf, nome, genero, endereco, numero, dtNascimento, cidade, estado, cep, quartoId);
         try {
             if (!morador.validarCpf()) {
                 return ResponseEntity.badRequest().body(new Error("Erro", "CPF invalido"));
@@ -89,9 +89,9 @@ public class MoradorControl {
     }
 
     @PostMapping("cadastrarCompleto")
-    public ResponseEntity<Object> cadastrarMoradorCompleto(@RequestParam String nome, @RequestParam String cpf, @RequestParam String genero, @RequestParam LocalDate dtNascimento, @RequestParam String endereco, @RequestParam int numero, @RequestParam String cidade, @RequestParam String estado, @RequestParam String cep, @RequestParam String telefone, @RequestParam Integer quartoId, @RequestParam(required = false) String familiares) {
+    public ResponseEntity<Object> cadastrarMoradorCompleto(@RequestParam String nome, @RequestParam String cpf, @RequestParam String genero, @RequestParam LocalDate dtNascimento, @RequestParam String endereco, @RequestParam int numero, @RequestParam String cidade, @RequestParam String estado, @RequestParam String cep, @RequestParam Integer quartoId, @RequestParam(required = false) String familiares) {
         Banco conexao = Banco.getConnection();
-        Morador morador = new Morador(cpf, nome, genero, endereco, numero, dtNascimento, cidade, estado, cep, telefone, quartoId);
+        Morador morador = new Morador(cpf, nome, genero, endereco, numero, dtNascimento, cidade, estado, cep, quartoId);
         morador.setFamiliares(montarFamiliares(familiares));
 
         try {
@@ -161,7 +161,7 @@ public class MoradorControl {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Object> editarMorador(@PathVariable int id, @RequestParam String nome, @RequestParam String cpf, @RequestParam String genero, @RequestParam LocalDate dtNascimento, @RequestParam String endereco, @RequestParam int numero, @RequestParam String cidade, @RequestParam String estado, @RequestParam String cep, @RequestParam String telefone, @RequestParam Integer quartoId) {
+    public ResponseEntity<Object> editarMorador(@PathVariable int id, @RequestParam String nome, @RequestParam String cpf, @RequestParam String genero, @RequestParam LocalDate dtNascimento, @RequestParam String endereco, @RequestParam int numero, @RequestParam String cidade, @RequestParam String estado, @RequestParam String cep, @RequestParam Integer quartoId) {
         Banco conexao = Banco.getConnection();
 
         try {
@@ -178,7 +178,6 @@ public class MoradorControl {
                 morador.setCidade(cidade);
                 morador.setEstado(estado);
                 morador.setCep(cep);
-                morador.setTelefone(telefone);
                 morador.setQuartoId(quartoId);
 
                 if (!morador.validarCpf())
@@ -209,7 +208,7 @@ public class MoradorControl {
     }
 
     @PutMapping("editarCompleto/{id}")
-    public ResponseEntity<Object> editarMoradorCompleto(@PathVariable int id, @RequestParam String nome, @RequestParam String cpf, @RequestParam String genero, @RequestParam LocalDate dtNascimento, @RequestParam String endereco, @RequestParam int numero, @RequestParam String cidade, @RequestParam String estado, @RequestParam String cep, @RequestParam String telefone, @RequestParam Integer quartoId, @RequestParam(required = false) String familiares) {
+    public ResponseEntity<Object> editarMoradorCompleto(@PathVariable int id, @RequestParam String nome, @RequestParam String cpf, @RequestParam String genero, @RequestParam LocalDate dtNascimento, @RequestParam String endereco, @RequestParam int numero, @RequestParam String cidade, @RequestParam String estado, @RequestParam String cep, @RequestParam Integer quartoId, @RequestParam(required = false) String familiares) {
         Banco conexao = Banco.getConnection();
 
         try {
@@ -227,7 +226,6 @@ public class MoradorControl {
                 morador.setCidade(cidade);
                 morador.setEstado(estado);
                 morador.setCep(cep);
-                morador.setTelefone(telefone);
                 morador.setQuartoId(quartoId);
                 boolean deveAtualizarFamiliares = familiares != null;
 

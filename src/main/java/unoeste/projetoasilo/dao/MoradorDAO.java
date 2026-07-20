@@ -24,8 +24,8 @@ public class MoradorDAO {
     public boolean gravar(Morador morador, Banco conexao) throws SQLException {
         String sql = """
                 INSERT INTO morador(
-                    cpf, nome, genero, endereco, numero, dtnasc, cidade, estado, cep, telefone, quartos_idquartos)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    cpf, nome, genero, endereco, numero, dtnasc, cidade, estado, cep, quartos_idquartos)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
         try (PreparedStatement ps = conexao.prepararComChaves(sql)) {
@@ -57,15 +57,15 @@ public class MoradorDAO {
         return listarPorSql(sql, List.of(), conexao);
     }
 
-    public List<Morador> filtrar(String nome, String cpf, LocalDate dtNascimento, String endereco, String cidade, String estado, String telefone, String ordenacao, Banco conexao) throws SQLException {
-        return filtrar(nome, cpf, dtNascimento, dtNascimento, endereco, cidade, estado, telefone, ordenacao, null, conexao);
+    public List<Morador> filtrar(String nome, String cpf, LocalDate dtNascimento, String endereco, String cidade, String estado, String ordenacao, Banco conexao) throws SQLException {
+        return filtrar(nome, cpf, dtNascimento, dtNascimento, endereco, cidade, estado, ordenacao, null, conexao);
     }
 
-    public List<Morador> filtrar(String nome, String cpf, LocalDate dtNascimento, String endereco, String cidade, String estado, String telefone, String ordenacao, String direcao, Banco conexao) throws SQLException {
-        return filtrar(nome, cpf, dtNascimento, dtNascimento, endereco, cidade, estado, telefone, ordenacao, direcao, conexao);
+    public List<Morador> filtrar(String nome, String cpf, LocalDate dtNascimento, String endereco, String cidade, String estado, String ordenacao, String direcao, Banco conexao) throws SQLException {
+        return filtrar(nome, cpf, dtNascimento, dtNascimento, endereco, cidade, estado, ordenacao, direcao, conexao);
     }
 
-    public List<Morador> filtrar(String nome, String cpf, LocalDate dtNascimentoInicio, LocalDate dtNascimentoFim, String endereco, String cidade, String estado, String telefone, String ordenacao, String direcao, Banco conexao) throws SQLException {
+    public List<Morador> filtrar(String nome, String cpf, LocalDate dtNascimentoInicio, LocalDate dtNascimentoFim, String endereco, String cidade, String estado, String ordenacao, String direcao, Banco conexao) throws SQLException {
         StringBuilder sql = new StringBuilder(SQL_SELECT_COMPLETO);
         sql.append(" WHERE 1=1");
 
@@ -106,11 +106,6 @@ public class MoradorDAO {
             params.add(estado);
         }
 
-        if (telefone != null && !telefone.isBlank()) {
-            sql.append(" AND m.telefone LIKE ?");
-            params.add("%" + telefone + "%");
-        }
-
         sql.append(montarClausulaOrdenacao(ordenacao, direcao));
 
         return listarPorSql(sql.toString(), params, conexao);
@@ -128,7 +123,7 @@ public class MoradorDAO {
     public boolean editar(Morador morador, Banco conexao) throws SQLException {
         String sql = """
                 UPDATE morador
-                SET cpf = ?, nome = ?, genero = ?, endereco = ?, numero = ?, dtnasc = ?, cidade = ?, estado = ?, cep = ?, telefone = ?, quartos_idquartos = ?
+                SET cpf = ?, nome = ?, genero = ?, endereco = ?, numero = ?, dtnasc = ?, cidade = ?, estado = ?, cep = ?, quartos_idquartos = ?
                 WHERE idmorador = ?
                 """;
 
@@ -184,16 +179,15 @@ public class MoradorDAO {
         ps.setString(7, morador.getCidade());
         ps.setString(8, morador.getEstado());
         ps.setString(9, morador.getCep());
-        ps.setString(10, morador.getTelefone());
 
         if (morador.getQuartoId() == null) {
-            ps.setNull(11, Types.INTEGER);
+            ps.setNull(10, Types.INTEGER);
         } else {
-            ps.setInt(11, morador.getQuartoId());
+            ps.setInt(10, morador.getQuartoId());
         }
 
         if (incluirId) {
-            ps.setInt(12, morador.getIdMorador());
+            ps.setInt(11, morador.getIdMorador());
         }
     }
 
@@ -236,7 +230,6 @@ public class MoradorDAO {
         morador.setCidade(rs.getString("cidade"));
         morador.setEstado(rs.getString("estado"));
         morador.setCep(rs.getString("cep"));
-        morador.setTelefone(rs.getString("telefone"));
 
         int quartoId = rs.getInt("quartos_idquartos");
         if (!rs.wasNull()) {

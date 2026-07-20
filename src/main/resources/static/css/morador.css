@@ -81,7 +81,6 @@
 /* Mantem os dados pessoais no inicio e deixa todo o endereco ao final. */
 #moradorForm .campo-cpf { order: 1; }
 #moradorForm .campo-cep { order: 2; }
-#moradorForm .campo-telefone { order: 3; }
 #moradorForm .campo-quarto { order: 4; }
 #moradorForm .campo-endereco { order: 5; }
 #moradorForm .campo-numero { order: 6; }

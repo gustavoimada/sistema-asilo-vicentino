@@ -440,7 +440,6 @@ function carregarMoradores() {
     const filtroEndereco = document.getElementById('filtroEndereco');
     const filtroCidade = document.getElementById('filtroCidade');
     const filtroEstado = document.getElementById('filtroEstado');
-    const filtroTelefone = document.getElementById('filtroTelefone');
     let url;
 
     if (filtroNome != null) {
@@ -466,9 +465,6 @@ function carregarMoradores() {
 
         if (filtroEstado.value !== '')
             params.append('estado', filtroEstado.value);
-
-        if (filtroTelefone.value.trim() !== '')
-            params.append('telefone', filtroTelefone.value.trim());
 
         if (ordenacaoMoradores !== '')
             params.append('ordenacao', ordenacaoMoradores);
@@ -583,7 +579,7 @@ function renderizarMoradores(moradores) {
     if (listaMoradores.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5">
+                <td colspan="4">
                     <div class="placeholder-table">Nenhum morador cadastrado.</div>
                 </td>
             </tr>
@@ -617,18 +613,12 @@ function renderizarMoradores(moradores) {
 
         row.insertCell(2).innerHTML = `
             <div class="morador-info-block">
-                <strong>${escaparHtml(m.telefone || '-')}</strong>
-            </div>
-        `;
-
-        row.insertCell(3).innerHTML = `
-            <div class="morador-info-block">
                 <strong>${escaparHtml(localizacao || '-')}</strong>
                 <span>${escaparHtml(enderecoCurto || 'Endereco nao informado')}</span>
             </div>
         `;
 
-        const acoes = row.insertCell(4);
+        const acoes = row.insertCell(3);
 
         const btnDetalhes = document.createElement('button');
         btnDetalhes.type = 'button';
@@ -727,7 +717,6 @@ async function abrirDetalhesMorador(idMorador) {
                     ${montarLinhaDetalhe('G&ecirc;nero', formatarGenero(morador.genero))}
                     ${montarLinhaDetalhe('Nascimento', formatarData(morador.dtNascimento))}
                     ${montarLinhaDetalhe('Idade', idade ? idade + ' anos' : '')}
-                    ${montarLinhaDetalhe('Telefone', morador.telefone)}
                     ${montarLinhaDetalhe('Quarto', quartoTexto)}
                 </div>
             </section>
@@ -790,7 +779,6 @@ function limparFiltros() {
     document.getElementById('filtroEndereco').value = '';
     document.getElementById('filtroCidade').value = '';
     document.getElementById('filtroEstado').value = '';
-    document.getElementById('filtroTelefone').value = '';
 
     carregarMoradores();
 }
@@ -844,12 +832,10 @@ function salvarMorador(event) {
     const cidade = document.getElementById('cidade').value;
     const estado = document.getElementById('estado').value;
     const cep = formatarCep(document.getElementById('cep').value);
-    const telefone = formatarTelefone(document.getElementById('telefone').value);
     const quartoId = document.getElementById('quartoId').value;
 
     document.getElementById('cpf').value = cpf;
     document.getElementById('cep').value = cep;
-    document.getElementById('telefone').value = telefone;
 
     if (genero === '')
         exibirMensagem('error', 'Selecione o genero do morador.');
@@ -857,8 +843,6 @@ function salvarMorador(event) {
         exibirMensagem('error', 'Selecione um quarto disponivel.');
     else if (!validarCpf(cpf))
         exibirMensagem('error', 'CPF invalido. Use o formato xxx.xxx.xxx-xx.');
-    else if (!validarTelefone(telefone))
-        exibirMensagem('error', 'Telefone invalido. Use o formato (xx) xxxxx-xxxx.');
     else if (!validarCep(cep))
         exibirMensagem('error', 'CEP invalido. Use o formato xxxxx-xxx.');
     else if (!validarIdadeMinima(dtNascimento))
@@ -882,10 +866,10 @@ function salvarMorador(event) {
         }
 
         if (id) {
-            url = `${URL}/editarCompleto/${id}?nome=${encodeURIComponent(nome)}&cpf=${encodeURIComponent(cpf)}&genero=${encodeURIComponent(genero)}&dtNascimento=${dtNascimento}&endereco=${encodeURIComponent(endereco)}&numero=${numero}&cidade=${encodeURIComponent(cidade)}&estado=${estado}&cep=${encodeURIComponent(cep)}&telefone=${encodeURIComponent(telefone)}&quartoId=${quartoId}`;
+            url = `${URL}/editarCompleto/${id}?nome=${encodeURIComponent(nome)}&cpf=${encodeURIComponent(cpf)}&genero=${encodeURIComponent(genero)}&dtNascimento=${dtNascimento}&endereco=${encodeURIComponent(endereco)}&numero=${numero}&cidade=${encodeURIComponent(cidade)}&estado=${estado}&cep=${encodeURIComponent(cep)}&quartoId=${quartoId}`;
             method = 'PUT';
         } else {
-            url = `${URL}/cadastrarCompleto?nome=${encodeURIComponent(nome)}&cpf=${encodeURIComponent(cpf)}&genero=${encodeURIComponent(genero)}&dtNascimento=${dtNascimento}&endereco=${encodeURIComponent(endereco)}&numero=${numero}&cidade=${encodeURIComponent(cidade)}&estado=${estado}&cep=${encodeURIComponent(cep)}&telefone=${encodeURIComponent(telefone)}&quartoId=${quartoId}`;
+            url = `${URL}/cadastrarCompleto?nome=${encodeURIComponent(nome)}&cpf=${encodeURIComponent(cpf)}&genero=${encodeURIComponent(genero)}&dtNascimento=${dtNascimento}&endereco=${encodeURIComponent(endereco)}&numero=${numero}&cidade=${encodeURIComponent(cidade)}&estado=${estado}&cep=${encodeURIComponent(cep)}&quartoId=${quartoId}`;
             method = 'POST';
         }
 
@@ -928,7 +912,6 @@ function editarMorador(morador) {
     document.getElementById('cidade').value = morador.cidade;
     document.getElementById('estado').value = morador.estado;
     document.getElementById('cep').value = morador.cep;
-    document.getElementById('telefone').value = morador.telefone;
     carregarQuartosDisponiveis(morador.quartoId || '');
     limparContatoResponsavel();
 
