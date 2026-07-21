@@ -22,6 +22,23 @@ function formatarTipoAtividade(valor) {
     return String(valor || "");
 }
 
+function normalizarCategoriaTipoAtividade(categoria) {
+    return String(categoria || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[_-]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .toLowerCase();
+}
+
+function ehProfissionalAtividadesLogado() {
+    const categoria = normalizarCategoriaTipoAtividade(localStorage.getItem("funcionarioCategoria") || "");
+    return categoria === "artesao"
+        || categoria === "educador fisico"
+        || categoria === "fisioterapeuta";
+}
+
 function escaparApostrofo(valor) {
     return String(valor || "").replace(/'/g, "''");
 }
@@ -171,6 +188,7 @@ function renderizarTabela(tiposAtividades) {
     }
 
     let linhas = "";
+    const profissionalAtividades = ehProfissionalAtividadesLogado();
 
     if (tiposAtividades.length === 0) {
         linhas = `
@@ -184,6 +202,14 @@ function renderizarTabela(tiposAtividades) {
         tiposAtividades.forEach(tipoAtividade => {
             const tipoFormatado = escaparHtmlTipo(formatarTipoAtividade(tipoAtividade.tipo) || "Sem nome");
             const organizacaoFormatada = escaparHtmlTipo(formatarTipoAtividade(tipoAtividade.org) || "Não informada");
+            const acoes = profissionalAtividades ? "" : `
+                            <button type="button" class="action-icon-btn edit" aria-label="Editar tipo de atividade" onclick="abrirEdicaoTipoAtividade(${tipoAtividade.idtipoatividades})">
+                                <span class="material-symbols-outlined">edit</span>
+                            </button>
+                            <button type="button" class="action-icon-btn delete" aria-label="Excluir tipo de atividade" onclick="deletarTipoAtividade(${tipoAtividade.idtipoatividades})">
+                                <span class="material-symbols-outlined">delete</span>
+                            </button>
+            `;
             linhas += `
                 <tr>
                     <td>
@@ -205,12 +231,7 @@ function renderizarTabela(tiposAtividades) {
                     </td>
                     <td class="text-right">
                         <div style="display:inline-flex; gap:8px;">
-                            <button type="button" class="action-icon-btn edit" aria-label="Editar tipo de atividade" onclick="abrirEdicaoTipoAtividade(${tipoAtividade.idtipoatividades})">
-                                <span class="material-symbols-outlined">edit</span>
-                            </button>
-                            <button type="button" class="action-icon-btn delete" aria-label="Excluir tipo de atividade" onclick="deletarTipoAtividade(${tipoAtividade.idtipoatividades})">
-                                <span class="material-symbols-outlined">delete</span>
-                            </button>
+                            ${acoes}
                         </div>
                     </td>
                 </tr>

@@ -443,6 +443,23 @@ function formatarTipoAtividadeLegivel(valor) {
     return String(valor || "");
 }
 
+function normalizarCategoriaAtividade(categoria) {
+    return String(categoria || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[_-]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+        .toLowerCase();
+}
+
+function ehProfissionalAtividadesLogado() {
+    const categoria = normalizarCategoriaAtividade(localStorage.getItem("funcionarioCategoria") || "");
+    return categoria === "artesao"
+        || categoria === "educador fisico"
+        || categoria === "fisioterapeuta";
+}
+
 function obterDescricaoTipoAtividade(idTipoAtividade) {
     const tipo = tiposAtividadesCarregados.find(function (item) {
         return String(item.idtipoatividades) === String(idTipoAtividade);
@@ -574,6 +591,7 @@ function renderizarTabela(atividades) {
     }
 
     let linhas = "";
+    const profissionalAtividades = ehProfissionalAtividadesLogado();
 
     if (atividades.length === 0) {
         linhas = `
@@ -591,6 +609,14 @@ function renderizarTabela(atividades) {
             const descricao = escaparHtml(atividade.descricao || "Sem descricao informada");
             const periodo = escaparHtml(formatarPeriodoAtividade(atividade));
             const tipo = escaparHtml(obterDescricaoTipoAtividade(idTipo));
+            const acoesAdministrativas = profissionalAtividades ? "" : `
+                            <button type="button" class="action-icon-btn edit" title="Editar" aria-label="Editar atividade" onclick="abrirEdicaoAtividade(${atividade.idatividade})">
+                                <span class="material-symbols-outlined">edit</span>
+                            </button>
+                            <button type="button" class="action-icon-btn delete" title="Excluir" aria-label="Excluir atividade" onclick="deletarAtividade(${atividade.idatividade})">
+                                <span class="material-symbols-outlined">delete</span>
+                            </button>
+            `;
 
             linhas += `
                 <tr>
@@ -618,12 +644,7 @@ function renderizarTabela(atividades) {
                             <button type="button" class="action-icon-btn view" title="Visualizar participantes" aria-label="Ver moradores participantes" onclick="visualizarParticipantesAtividade(${atividade.idatividade})">
                                 <span class="material-symbols-outlined">visibility</span>
                             </button>
-                            <button type="button" class="action-icon-btn edit" title="Editar" aria-label="Editar atividade" onclick="abrirEdicaoAtividade(${atividade.idatividade})">
-                                <span class="material-symbols-outlined">edit</span>
-                            </button>
-                            <button type="button" class="action-icon-btn delete" title="Excluir" aria-label="Excluir atividade" onclick="deletarAtividade(${atividade.idatividade})">
-                                <span class="material-symbols-outlined">delete</span>
-                            </button>
+                            ${acoesAdministrativas}
                         </div>
                     </td>
                 </tr>

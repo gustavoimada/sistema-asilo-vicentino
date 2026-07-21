@@ -6,7 +6,7 @@
     }
 
     function formatarCargo(categoria) {
-        const valor = removerAcentos(String(categoria || "").trim()).toLowerCase();
+        const valor = removerAcentos(String(categoria || "").trim()).replace(/[_-]+/g, " ").replace(/\s+/g, " ").toLowerCase();
 
         if (valor === "coordenador")
             return "Coordenador(a)";
@@ -14,6 +14,14 @@
             return "Cuidador(a)";
         if (valor === "secretaria")
             return "Secretária";
+        if (valor === "nutricionista")
+            return "Nutricionista";
+        if (valor === "artesao")
+            return "Artesão";
+        if (valor === "educador fisico")
+            return "Educador Físico";
+        if (valor === "fisioterapeuta")
+            return "Fisioterapeuta";
 
         return String(categoria || "").trim() || "Acesso";
     }

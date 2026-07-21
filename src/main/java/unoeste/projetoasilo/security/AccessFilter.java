@@ -24,8 +24,6 @@ public class AccessFilter implements Filter
             "/tipoOcorrencia.html",
             "/doacao.html",
             "/quartos.html",
-            "/tipoAtividades.html",
-            "/atividades.html",
             "/tiposDespesas.html",
             "/despesa.html"
     );
@@ -48,6 +46,11 @@ public class AccessFilter implements Filter
             "/cuidador.html",
             "/ocorrencia.html",
             "/registrarUsoMedicacao.html"
+    );
+
+    private static final Set<String> PAGINAS_ATIVIDADES = Set.of(
+            "/atividades.html",
+            "/tipoAtividades.html"
     );
 
     private static final Set<String> PAGINAS_NUTRICIONISTA = Set.of(
@@ -86,7 +89,7 @@ public class AccessFilter implements Filter
             return;
         }
 
-        if (!podeAcessar(rota, categoria))
+        if (!podeAcessar(rota, categoria, request.getMethod()))
         {
             negarAcesso(request, response, "Usuário sem permissão para acessar este recurso", 403);
             return;
@@ -147,8 +150,12 @@ public class AccessFilter implements Filter
         return normalizar(String.valueOf(valor));
     }
 
-    private boolean podeAcessar(String rota, String categoria)
+    private boolean podeAcessar(String rota, String categoria, String metodo)
     {
+        if (PAGINAS_ATIVIDADES.contains(rota))
+        {
+            return ehSecretaria(categoria) || ehCoordenador(categoria) || ehProfissionalAtividades(categoria);
+        }
         if (PAGINAS_SECRETARIA.contains(rota))
         {
             return ehSecretaria(categoria) || ehCoordenador(categoria);
@@ -217,6 +224,22 @@ public class AccessFilter implements Filter
         if (rotaMin.startsWith("/morador/listarativos"))
         {
             return ehNutricionista(categoria) || ehSecretaria(categoria) || ehCoordenador(categoria);
+        }
+        if (rotaMin.startsWith("/morador/listar"))
+        {
+            return ehSecretaria(categoria) || ehCoordenador(categoria) || ehProfissionalAtividades(categoria);
+        }
+        if (rotaMin.startsWith("/atividades/"))
+        {
+            return ehSecretaria(categoria) || ehCoordenador(categoria) || podeAcessarAtividades(categoria, rotaMin, metodo);
+        }
+        if (rotaMin.startsWith("/atividadesmorador/"))
+        {
+            return ehSecretaria(categoria) || ehCoordenador(categoria) || podeAcessarAtividadesMorador(categoria, rotaMin, metodo);
+        }
+        if (rotaMin.startsWith("/tipoatividade/") || rotaMin.startsWith("/tipoatividades/") || rotaMin.startsWith("/tiposatividades/"))
+        {
+            return ehSecretaria(categoria) || ehCoordenador(categoria) || podeAcessarTiposAtividades(categoria, rotaMin, metodo);
         }
         if (rotaMin.startsWith("/funcionario/")
                 || rotaMin.startsWith("/funcionarios/")
@@ -385,10 +408,86 @@ public class AccessFilter implements Filter
         return "nutricionista".equals(categoria);
     }
 
+    private boolean ehProfissionalAtividades(String categoria)
+    {
+        return "artesao".equals(categoria)
+                || "educador fisico".equals(categoria)
+                || "fisioterapeuta".equals(categoria);
+    }
+
+    private boolean podeAcessarAtividades(String categoria, String rota, String metodo)
+    {
+        if (!ehProfissionalAtividades(categoria))
+        {
+            return false;
+        }
+
+        String metodoNormalizado = String.valueOf(metodo).toUpperCase();
+        if ("GET".equals(metodoNormalizado))
+        {
+            return rota.startsWith("/atividades/listar")
+                    || rota.startsWith("/atividades/listarantigas")
+                    || rota.startsWith("/atividades/buscar");
+        }
+        if ("POST".equals(metodoNormalizado))
+        {
+            return rota.startsWith("/atividades/cadastrar");
+        }
+
+        return false;
+    }
+
+    private boolean podeAcessarAtividadesMorador(String categoria, String rota, String metodo)
+    {
+        if (!ehProfissionalAtividades(categoria))
+        {
+            return false;
+        }
+
+        String metodoNormalizado = String.valueOf(metodo).toUpperCase();
+        if ("GET".equals(metodoNormalizado))
+        {
+            return rota.startsWith("/atividadesmorador/listarporatividade")
+                    || rota.startsWith("/atividadesmorador/buscar");
+        }
+        if ("POST".equals(metodoNormalizado))
+        {
+            return rota.startsWith("/atividadesmorador/cadastrar");
+        }
+
+        return false;
+    }
+
+    private boolean podeAcessarTiposAtividades(String categoria, String rota, String metodo)
+    {
+        if (!ehProfissionalAtividades(categoria))
+        {
+            return false;
+        }
+
+        String metodoNormalizado = String.valueOf(metodo).toUpperCase();
+        if ("GET".equals(metodoNormalizado))
+        {
+            return rota.startsWith("/tipoatividades/listarordenado")
+                    || rota.startsWith("/tipoatividade/listarordenado")
+                    || rota.startsWith("/tipoatividades/buscar")
+                    || rota.startsWith("/tipoatividade/buscar");
+        }
+        if ("POST".equals(metodoNormalizado))
+        {
+            return rota.startsWith("/tipoatividades/cadastrar")
+                    || rota.startsWith("/tipoatividade/cadastrar");
+        }
+
+        return false;
+    }
+
     private String normalizar(String texto)
     {
         return Normalizer.normalize(String.valueOf(texto), Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", "")
+                .replaceAll("[_-]+", " ")
+                .replaceAll("\\s+", " ")
                 .trim()
                 .toLowerCase();
     }

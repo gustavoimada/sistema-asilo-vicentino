@@ -44,6 +44,8 @@ function redirecionar(funcionario)
     const categoria = String((funcionario && funcionario.categoria) || "")
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[_-]+/g, " ")
+        .replace(/\s+/g, " ")
         .trim()
         .toLowerCase();
 
@@ -71,7 +73,13 @@ function redirecionar(funcionario)
         return;
     }
 
-    window.location.href = "../index.html";
+    if (categoria === "artesao" || categoria === "educador fisico" || categoria === "fisioterapeuta")
+    {
+        window.location.href = "../atividades.html";
+        return;
+    }
+
+    mostrarMensagem("error", "Categoria sem página de acesso vinculada: " + ((funcionario && funcionario.categoria) || "não informada") + ".");
 }
 
 function limparContextoLogin()

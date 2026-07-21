@@ -55,6 +55,33 @@
         return partes[partes.length - 1] || "secretaria.html";
     }
 
+    function normalizarCategoria(categoria) {
+        return String(categoria || "")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[_-]+/g, " ")
+            .replace(/\s+/g, " ")
+            .trim()
+            .toLowerCase();
+    }
+
+    function ehProfissionalAtividades(categoria) {
+        const normalizada = normalizarCategoria(categoria);
+        return normalizada === "artesao"
+            || normalizada === "educador fisico"
+            || normalizada === "fisioterapeuta";
+    }
+
+    function itensVisiveis(categoria) {
+        if (ehProfissionalAtividades(categoria)) {
+            return itensMenu.filter(function (item) {
+                return item.href === "atividades.html";
+            });
+        }
+
+        return itensMenu;
+    }
+
     function classeAtiva(item, pagina) {
         const aliases = item.aliases || [item.href];
         return aliases.indexOf(pagina) >= 0 ? " active" : "";
@@ -76,7 +103,9 @@
         sidebar.setAttribute("data-secretaria-sidebar", "true");
 
         const pagina = paginaAtual();
-        const links = itensMenu.map(function (item) {
+        const categoriaInicial = localStorage.getItem("funcionarioCategoria") || "";
+        const profissionalAtividadesInicial = ehProfissionalAtividades(categoriaInicial);
+        const links = itensVisiveis(categoriaInicial).map(function (item) {
             return montarLink(item, pagina);
         }).join("");
 
@@ -117,6 +146,10 @@
                 if (!funcionario) return;
                 if (funcionario.categoria) {
                     localStorage.setItem("funcionarioCategoria", funcionario.categoria);
+                }
+                if (profissionalAtividadesInicial !== ehProfissionalAtividades(funcionario.categoria || "")) {
+                    renderizarSidebarSecretaria();
+                    return;
                 }
                 atualizarAtalhoCoordenador(funcionario.categoria || "");
             })
@@ -213,11 +246,7 @@
         const link = document.getElementById("linkPainelCoordenador");
         if (!link) return;
 
-        const normalizada = String(categoria || "")
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .trim()
-            .toLowerCase();
+        const normalizada = normalizarCategoria(categoria);
 
         link.style.display = normalizada.indexOf("coordenador") >= 0 ? "flex" : "none";
     }
