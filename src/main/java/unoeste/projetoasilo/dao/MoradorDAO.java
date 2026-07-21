@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.sql.Connection;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -53,6 +54,10 @@ public class MoradorDAO {
         return listarPorSql(SQL_SELECT_COMPLETO + " WHERE m.ativo = TRUE ORDER BY m.nome ASC", List.of(), conexao);
     }
 
+    public List<Morador> listarInativos(Banco conexao) throws SQLException {
+        return listarPorSql(SQL_SELECT_COMPLETO + " WHERE m.ativo = FALSE ORDER BY m.nome ASC", List.of(), conexao);
+    }
+
     public List<Morador> listar(String ordenacao, Banco conexao) throws SQLException {
         return listar(ordenacao, null, conexao);
     }
@@ -71,6 +76,10 @@ public class MoradorDAO {
     }
 
     public List<Morador> filtrar(String nome, String cpf, LocalDate dtNascimentoInicio, LocalDate dtNascimentoFim, String endereco, String cidade, String estado, String ordenacao, String direcao, Banco conexao) throws SQLException {
+        return filtrar(nome, cpf, dtNascimentoInicio, dtNascimentoFim, endereco, cidade, estado, null, ordenacao, direcao, conexao);
+    }
+
+    public List<Morador> filtrar(String nome, String cpf, LocalDate dtNascimentoInicio, LocalDate dtNascimentoFim, String endereco, String cidade, String estado, Boolean ativo, String ordenacao, String direcao, Banco conexao) throws SQLException {
         StringBuilder sql = new StringBuilder(SQL_SELECT_COMPLETO);
         sql.append(" WHERE 1=1");
 
@@ -111,6 +120,11 @@ public class MoradorDAO {
             params.add(estado);
         }
 
+        if (ativo != null) {
+            sql.append(" AND m.ativo = ?");
+            params.add(ativo);
+        }
+
         sql.append(montarClausulaOrdenacao(ordenacao, direcao));
 
         return listarPorSql(sql.toString(), params, conexao);
@@ -126,12 +140,121 @@ public class MoradorDAO {
     }
 
     public boolean alterarAtivo(int id, boolean ativo, Banco conexao) throws SQLException {
-        String sql = ativo
-                ? "UPDATE morador SET ativo = TRUE WHERE idmorador = ?"
-                : "UPDATE morador SET ativo = FALSE, quartos_idquartos = NULL WHERE idmorador = ?";
-        try (PreparedStatement ps = conexao.preparar(sql)) {
-            ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
+        if (ativo) {
+            try (PreparedStatement ps = conexao.preparar("UPDATE morador SET ativo = TRUE WHERE idmorador = ?")) {
+                ps.setInt(1, id);
+                return ps.executeUpdate() > 0;
+            }
+        }
+
+        Connection conexaoJdbc = conexao.conexaoJdbc();
+        boolean autoCommitOriginal = conexaoJdbc.getAutoCommit();
+        try {
+            conexaoJdbc.setAutoCommit(false);
+            Integer quartoId = buscarQuartoAtual(conexaoJdbc, id);
+
+            boolean desligou;
+            try (PreparedStatement ps = conexaoJdbc.prepareStatement(
+                    "UPDATE morador SET ativo = FALSE, quartos_idquartos = NULL WHERE idmorador = ? AND ativo = TRUE")) {
+                ps.setInt(1, id);
+                desligou = ps.executeUpdate() > 0;
+            }
+
+            if (!desligou) {
+                conexaoJdbc.rollback();
+                return false;
+            }
+            if (quartoId != null && !new QuartoDAO().liberarVaga(quartoId, conexao)) {
+                throw new SQLException("Nao foi possivel liberar a vaga do quarto do morador");
+            }
+
+            conexaoJdbc.commit();
+            return true;
+        } catch (SQLException e) {
+            conexaoJdbc.rollback();
+            throw e;
+        } finally {
+            conexaoJdbc.setAutoCommit(autoCommitOriginal);
+        }
+    }
+
+    private Integer buscarQuartoAtual(Connection conexao, int idMorador) throws SQLException {
+        try (PreparedStatement ps = conexao.prepareStatement(
+                "SELECT quartos_idquartos FROM morador WHERE idmorador = ? FOR UPDATE")) {
+            ps.setInt(1, idMorador);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) return null;
+                Object valor = rs.getObject("quartos_idquartos");
+                return valor == null ? null : ((Number) valor).intValue();
+            }
+        }
+    }
+
+    public boolean deletarComDependencias(int id, Banco banco) throws SQLException {
+        Connection conexao = banco.conexaoJdbc();
+        boolean autoCommitOriginal = conexao.getAutoCommit();
+
+        try {
+            conexao.setAutoCommit(false);
+
+            Integer quartoId = buscarQuartoAtual(conexao, id);
+
+            executarExclusao(conexao, """
+                    DELETE FROM registrarusomedicacao
+                    WHERE prescricaodose_idprescricaodose IN (
+                        SELECT pd.idprescricaodose
+                        FROM prescricaodose pd
+                        JOIN prescricao p ON p.idprescricao = pd.prescricao_idprescricao
+                        WHERE p.morador_idmorador = ?
+                    )
+                    """, id);
+            executarExclusao(conexao, """
+                    DELETE FROM prescricaodose
+                    WHERE prescricao_idprescricao IN (
+                        SELECT idprescricao FROM prescricao WHERE morador_idmorador = ?
+                    )
+                    """, id);
+            executarExclusao(conexao, "DELETE FROM prescricao WHERE morador_idmorador = ?", id);
+            executarExclusao(conexao, """
+                    DELETE FROM evolucao_nutricional
+                    WHERE prontuario_id IN (
+                        SELECT id FROM prontuario_nutricional WHERE morador_id = ?
+                    )
+                    """, id);
+            executarExclusao(conexao, "DELETE FROM prontuario_nutricional WHERE morador_id = ?", id);
+            executarExclusao(conexao, "DELETE FROM atividadesmorador WHERE morador_idmorador = ?", id);
+            executarExclusao(conexao, "DELETE FROM moradorocorrencia WHERE morador_idmorador = ?", id);
+            executarExclusao(conexao, "DELETE FROM composicaofamiliarmorador WHERE morador_idmorador = ?", id);
+
+            if (quartoId != null && !new QuartoDAO().liberarVaga(quartoId, banco)) {
+                throw new SQLException("Nao foi possivel liberar a vaga do quarto do morador");
+            }
+
+            boolean excluiu;
+            try (PreparedStatement ps = conexao.prepareStatement("DELETE FROM morador WHERE idmorador = ?")) {
+                ps.setInt(1, id);
+                excluiu = ps.executeUpdate() > 0;
+            }
+
+            if (!excluiu) {
+                conexao.rollback();
+                return false;
+            }
+
+            conexao.commit();
+            return true;
+        } catch (SQLException e) {
+            conexao.rollback();
+            throw e;
+        } finally {
+            conexao.setAutoCommit(autoCommitOriginal);
+        }
+    }
+
+    private void executarExclusao(Connection conexao, String sql, int idMorador) throws SQLException {
+        try (PreparedStatement ps = conexao.prepareStatement(sql)) {
+            ps.setInt(1, idMorador);
+            ps.executeUpdate();
         }
     }
 

@@ -11,6 +11,7 @@ let funcionarioLogado = null;
 let ultimoCepConsultado = '';
 let cepEmConsulta = '';
 let estadoContatoResponsavel = 'pronto';
+let visualizacaoMoradores = 'ativos';
 
 function parseJsonSeguro(response) {
     return response.json().catch(function () {
@@ -498,12 +499,15 @@ function carregarMoradores() {
         if (ordenacaoMoradores !== '')
             params.append('ordenacao', ordenacaoMoradores);
 
+        params.append('ativo', visualizacaoMoradores === 'ativos');
         params.append('direcao', direcaoOrdenacaoMoradores);
 
         url = `${URL}/filtrar?${params.toString()}`;
     }
-    else
-        url = `${URL}/listar?ordenacao=${encodeURIComponent(ordenacaoMoradores)}&direcao=${encodeURIComponent(direcaoOrdenacaoMoradores)}`;
+    else {
+        const endpoint = visualizacaoMoradores === 'ativos' ? 'listarAtivos' : 'listarInativos';
+        url = `${URL}/${endpoint}`;
+    }
 
     fetch(url)
         .then(response => {
@@ -520,6 +524,34 @@ function carregarMoradores() {
             renderizarMoradores(moradores);
         })
         .catch(error => console.error('Erro ao carregar moradores:', error));
+}
+
+function atualizarCabecalhoMoradores() {
+    const mostrandoAtivos = visualizacaoMoradores === 'ativos';
+    const titulo = document.getElementById('tituloListaMoradores');
+    const descricao = document.getElementById('descricaoListaMoradores');
+    const botao = document.getElementById('btnAlternarMoradores');
+    const botaoNovo = document.getElementById('btnNovoMorador');
+
+    if (titulo)
+        titulo.textContent = mostrandoAtivos ? 'Lista de Moradores Ativos' : 'Moradores Desligados';
+    if (descricao)
+        descricao.textContent = mostrandoAtivos
+            ? 'Moradores que participam atualmente da rotina do asilo.'
+            : 'Histórico de moradores preservado fora das rotinas ativas.';
+    if (botao) {
+        botao.innerHTML = mostrandoAtivos
+            ? '<span class="material-symbols-outlined">person_off</span> Ver desligados'
+            : '<span class="material-symbols-outlined">groups</span> Ver ativos';
+    }
+    if (botaoNovo)
+        botaoNovo.hidden = !mostrandoAtivos;
+}
+
+function alternarVisualizacaoMoradores() {
+    visualizacaoMoradores = visualizacaoMoradores === 'ativos' ? 'inativos' : 'ativos';
+    atualizarCabecalhoMoradores();
+    carregarMoradores();
 }
 
 function inicializarPaginaMorador() {
@@ -611,10 +643,13 @@ function renderizarMoradores(moradores) {
         listaMoradores = moradores;
 
     if (listaMoradores.length === 0) {
+        const mensagemVazia = visualizacaoMoradores === 'ativos'
+            ? 'Nenhum morador ativo cadastrado.'
+            : 'Nenhum morador desligado.';
         tbody.innerHTML = `
             <tr>
                 <td colspan="4">
-                    <div class="placeholder-table">Nenhum morador cadastrado.</div>
+                    <div class="placeholder-table">${mensagemVazia}</div>
                 </td>
             </tr>
         `;
@@ -662,13 +697,17 @@ function renderizarMoradores(moradores) {
         btnDetalhes.innerHTML = '<span class="material-symbols-outlined">visibility</span>';
         btnDetalhes.onclick = () => abrirDetalhesMorador(idMorador);
 
-        const btnEditar = document.createElement('button');
-        btnEditar.type = 'button';
-        btnEditar.classList.add('morador-row-btn');
-        btnEditar.setAttribute('aria-label', 'Editar');
-        btnEditar.setAttribute('data-tooltip', 'Editar');
-        btnEditar.innerHTML = '<span class="material-symbols-outlined">edit</span>';
-        btnEditar.onclick = () => editarMorador(m);
+        const mostrandoAtivos = visualizacaoMoradores === 'ativos';
+
+        const btnAcaoEstado = document.createElement('button');
+        btnAcaoEstado.type = 'button';
+        btnAcaoEstado.classList.add('morador-row-btn', mostrandoAtivos ? 'warning' : 'success');
+        btnAcaoEstado.setAttribute('aria-label', mostrandoAtivos ? 'Desligar morador' : 'Reativar morador');
+        btnAcaoEstado.setAttribute('data-tooltip', mostrandoAtivos ? 'Desligar' : 'Reativar');
+        btnAcaoEstado.innerHTML = mostrandoAtivos
+            ? '<span class="material-symbols-outlined">person_off</span>'
+            : '<span class="material-symbols-outlined">person_check</span>';
+        btnAcaoEstado.onclick = () => mostrandoAtivos ? desligarMorador(m) : reativarMorador(m);
 
         const btnDeletar = document.createElement('button');
         btnDeletar.type = 'button';
@@ -680,7 +719,17 @@ function renderizarMoradores(moradores) {
 
         acoes.classList.add('morador-actions-cell');
         acoes.appendChild(btnDetalhes);
-        acoes.appendChild(btnEditar);
+        if (mostrandoAtivos) {
+            const btnEditar = document.createElement('button');
+            btnEditar.type = 'button';
+            btnEditar.classList.add('morador-row-btn');
+            btnEditar.setAttribute('aria-label', 'Editar');
+            btnEditar.setAttribute('data-tooltip', 'Editar');
+            btnEditar.innerHTML = '<span class="material-symbols-outlined">edit</span>';
+            btnEditar.onclick = () => editarMorador(m);
+            acoes.appendChild(btnEditar);
+        }
+        acoes.appendChild(btnAcaoEstado);
         acoes.appendChild(btnDeletar);
     });
 }
@@ -960,7 +1009,11 @@ function editarMorador(morador) {
 }
 
 async function deletarMorador(id) {
-    const confirmado = await confirmarAcaoMorador('Excluir morador', 'Deseja realmente excluir este morador?', 'Excluir');
+    const confirmado = await confirmarAcaoMorador(
+        'Excluir permanentemente',
+        'Esta ação apaga o morador e todos os registros vinculados. Para apenas retirá-lo das rotinas, use Desligar.',
+        'Excluir permanentemente'
+    );
     if (!confirmado)
         return;
 
@@ -991,6 +1044,49 @@ async function deletarMorador(id) {
         });
 }
 
+async function desligarMorador(morador) {
+    const confirmado = await confirmarAcaoMorador(
+        'Desligar morador',
+        `Desligar ${morador.nome || 'este morador'} das rotinas ativas? O histórico será preservado e o quarto será liberado.`,
+        'Desligar'
+    );
+    if (!confirmado)
+        return;
+
+    try {
+        const response = await fetch(`${URL}/${morador.idMorador}/desligar`, { method: 'PUT' });
+        const data = await parseJsonSeguro(response);
+        if (!response.ok)
+            throw new Error(data.descricao || data.error || 'Nao foi possivel desligar o morador.');
+        exibirMensagem('success', 'Morador desligado. O histórico foi preservado.');
+        carregarMoradores();
+        carregarQuartosDisponiveis();
+    } catch (error) {
+        exibirMensagem('error', error.message || 'Nao foi possivel desligar o morador.');
+    }
+}
+
+async function reativarMorador(morador) {
+    const confirmado = await confirmarAcaoMorador(
+        'Reativar morador',
+        `Reativar ${morador.nome || 'este morador'}? Ele voltará a aparecer nas rotinas, ainda sem quarto definido.`,
+        'Reativar'
+    );
+    if (!confirmado)
+        return;
+
+    try {
+        const response = await fetch(`${URL}/${morador.idMorador}/reativar`, { method: 'PUT' });
+        const data = await parseJsonSeguro(response);
+        if (!response.ok)
+            throw new Error(data.descricao || data.error || 'Nao foi possivel reativar o morador.');
+        exibirMensagem('success', 'Morador reativado com sucesso.');
+        carregarMoradores();
+    } catch (error) {
+        exibirMensagem('error', error.message || 'Nao foi possivel reativar o morador.');
+    }
+}
+
 function mostrarFormulario(titulo = 'Cadastrar Novo Morador') {
     document.getElementById('formTitle').textContent = titulo;
     document.getElementById('formContainer').hidden = false;
@@ -1016,6 +1112,7 @@ function esconderFormulario() {
 document.addEventListener('DOMContentLoaded', async function () {
     await carregarFuncionarioSessao();
     preencherPerfilTopo();
+    atualizarCabecalhoMoradores();
     inicializarPaginaMorador();
 
     const campoCep = document.getElementById('cep');

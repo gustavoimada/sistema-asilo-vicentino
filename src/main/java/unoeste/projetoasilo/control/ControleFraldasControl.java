@@ -24,7 +24,6 @@ public class ControleFraldasControl
 {
     @PostMapping
     public ResponseEntity<Object> registrar(@RequestParam int pacotes,
-                                             @RequestParam int fraldasPorPacote,
                                              @RequestParam(required = false) String dataRegistro,
                                              @RequestParam(required = false) String observacao,
                                              HttpSession session)
@@ -33,11 +32,11 @@ public class ControleFraldasControl
         {
             return ResponseEntity.status(403).body(new Error("Erro", "Apenas secretaria e coordenacao podem registrar o controle de fraldas."));
         }
-        if (pacotes <= 0 || fraldasPorPacote <= 0)
+        if (pacotes <= 0)
         {
-            return ResponseEntity.badRequest().body(new Error("Erro", "Informe uma quantidade valida de pacotes e fraldas por pacote."));
+            return ResponseEntity.badRequest().body(new Error("Erro", "Informe uma quantidade valida de pacotes comprados."));
         }
-        if (pacotes > 10000 || fraldasPorPacote > 10000 || (long) pacotes * fraldasPorPacote > 1_000_000L)
+        if (pacotes > 10000)
         {
             return ResponseEntity.badRequest().body(new Error("Erro", "A quantidade informada e muito alta. Verifique os dados."));
         }
@@ -57,8 +56,9 @@ public class ControleFraldasControl
         {
             ControleFraldas controle = new ControleFraldas();
             controle.setQuantidadePacotes(pacotes);
-            controle.setFraldasPorPacote(fraldasPorPacote);
-            controle.setTotalFraldas(Math.multiplyExact(pacotes, fraldasPorPacote));
+            // Mantem as colunas legadas preenchidas sem exigir um dado que a rotina nao utiliza.
+            controle.setFraldasPorPacote(1);
+            controle.setTotalFraldas(pacotes);
             controle.setDataRegistro(data);
             controle.setObservacao(observacao);
             controle.setIdFuncionario(idFuncionario(session));
@@ -68,10 +68,6 @@ public class ControleFraldasControl
                 return ResponseEntity.internalServerError().body(new Error("Erro", "Nao foi possivel registrar o controle de fraldas."));
             }
             return ResponseEntity.ok(controle);
-        }
-        catch (ArithmeticException ex)
-        {
-            return ResponseEntity.badRequest().body(new Error("Erro", "A quantidade calculada de fraldas e invalida."));
         }
         catch (Exception ex)
         {

@@ -111,11 +111,15 @@
           <section>
             <div class="list-header">
               <div class="list-header-left">
-                <h2>Lista de Moradores</h2>
-                <p>Visualização dos moradores registrados no sistema.</p>
+                <h2 id="tituloListaMoradores">Lista de Moradores Ativos</h2>
+                <p id="descricaoListaMoradores">Moradores que participam atualmente da rotina do asilo.</p>
               </div>
 
               <div class="list-header-actions">
+                <button id="btnAlternarMoradores" type="button" class="filter-open-btn" onclick="alternarVisualizacaoMoradores()">
+                  <span class="material-symbols-outlined">person_off</span>
+                  Ver desligados
+                </button>
                 <button id="btnNovoMorador" type="button" class="primary-action secondary-open-btn" onclick="mostrarFormulario()">
                   <span class="material-symbols-outlined">add</span>
                   Cadastrar Novo

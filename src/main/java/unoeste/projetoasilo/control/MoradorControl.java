@@ -51,15 +51,27 @@ public class MoradorControl {
         }
     }
 
+    @GetMapping("listarInativos")
+    public ResponseEntity<Object> listarMoradoresInativos() {
+        Banco conexao = Banco.getConnection();
+        try {
+            return ResponseEntity.ok(new Morador().listarInativos(conexao));
+        } catch (SQLException e) {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao acessar banco de dados"));
+        } finally {
+            conexao.fechar();
+        }
+    }
+
     @GetMapping("filtrar")
-    public ResponseEntity<Object> filtrarMoradores(@RequestParam(required = false) String nome, @RequestParam(required = false) String cpf, @RequestParam(required = false) LocalDate dtNascimento, @RequestParam(required = false) LocalDate dtNascimentoInicio, @RequestParam(required = false) LocalDate dtNascimentoFim, @RequestParam(required = false) String endereco, @RequestParam(required = false) String cidade, @RequestParam(required = false) String estado, @RequestParam(required = false) String ordenacao, @RequestParam(required = false) String direcao) {
+    public ResponseEntity<Object> filtrarMoradores(@RequestParam(required = false) String nome, @RequestParam(required = false) String cpf, @RequestParam(required = false) LocalDate dtNascimento, @RequestParam(required = false) LocalDate dtNascimentoInicio, @RequestParam(required = false) LocalDate dtNascimentoFim, @RequestParam(required = false) String endereco, @RequestParam(required = false) String cidade, @RequestParam(required = false) String estado, @RequestParam(required = false) Boolean ativo, @RequestParam(required = false) String ordenacao, @RequestParam(required = false) String direcao) {
         Banco conexao = Banco.getConnection();
         try {
             if (dtNascimento != null && dtNascimentoInicio == null && dtNascimentoFim == null) {
                 dtNascimentoInicio = dtNascimento;
                 dtNascimentoFim = dtNascimento;
             }
-            List<Morador> moradores = new Morador().filtrar(nome, cpf, dtNascimentoInicio, dtNascimentoFim, endereco, cidade, estado, ordenacao, direcao, conexao);
+            List<Morador> moradores = new Morador().filtrar(nome, cpf, dtNascimentoInicio, dtNascimentoFim, endereco, cidade, estado, ativo, ordenacao, direcao, conexao);
             return ResponseEntity.ok(moradores);
         } catch (SQLException e) {
             return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao acessar banco de dados"));
@@ -148,27 +160,37 @@ public class MoradorControl {
             Morador morador = new Morador().buscarId(id, conexao);
 
             if (morador != null) {
-                Integer quartoId = morador.getQuartoId();
-
-                if (!morador.isAtivo()) {
-                    return ResponseEntity.badRequest().body(new Error("Erro", "Morador ja esta inativo"));
-                }
-
-                if (morador.inativar(conexao)) {
-                    if (quartoId != null)
-                        new Quarto().liberarVaga(quartoId, conexao);
-
-                    morador.setAtivo(false);
-                    morador.setQuartoId(null);
+                if (morador.deletarComDependencias(conexao)) {
                     return ResponseEntity.ok(morador);
                 }
-                else
-                    return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel inativar o morador"));
-
-            }
-            else
+                return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel excluir permanentemente o morador"));
+            } else
                 return ResponseEntity.badRequest().body(new Error("Erro", "Morador nao existe"));
 
+        } catch (SQLException e) {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao acessar banco de dados"));
+        } finally {
+            conexao.fechar();
+        }
+    }
+
+    @PutMapping("{id}/desligar")
+    public ResponseEntity<Object> desligarMorador(@PathVariable int id) {
+        Banco conexao = Banco.getConnection();
+        try {
+            Morador morador = new Morador().buscarId(id, conexao);
+            if (morador == null)
+                return ResponseEntity.badRequest().body(new Error("Erro", "Morador nao existe"));
+            if (!morador.isAtivo())
+                return ResponseEntity.badRequest().body(new Error("Erro", "Morador ja esta desligado"));
+
+            if (!morador.inativar(conexao))
+                return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel desligar o morador"));
+
+            morador.setAtivo(false);
+            morador.setQuartoId(null);
+            morador.setQuarto(null);
+            return ResponseEntity.ok(morador);
         } catch (SQLException e) {
             return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao acessar banco de dados"));
         } finally {

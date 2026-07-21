@@ -109,9 +109,6 @@ function htmlNovoProntuario(morador) {
                 <input id="alturaCm" inputmode="decimal" placeholder="Ex: 162" oninput="atualizarImcDiretoNutri()" />
             </div>
             <div id="resultadoImcNutri" class="nutri-imc-preview full" hidden></div>
-            <div id="acaoEstimativaNutri" class="nutri-field full" hidden>
-                <button type="button" class="nutri-secondary" onclick="abrirEstimativaNutri()">Calcular medidas aproximadas</button>
-            </div>
             <div id="camposEstimativaNutri" class="nutri-estimativa-fields full" hidden>
                 <div class="nutri-field"><label>Grupo da formula</label><select id="grupoEquacao"><option value="BRANCA">Branca</option><option value="NEGRA">Negra</option></select></div>
                 <div class="nutri-field"><label>Altura do joelho (cm)</label><input id="alturaJoelhoCm" inputmode="decimal" placeholder="Ex: 48,5" /></div>
@@ -123,7 +120,7 @@ function htmlNovoProntuario(morador) {
                 <textarea id="diagnosticoInicial" placeholder="Registre o diagnostico nutricional inicial..."></textarea>
             </div>
             <div class="nutri-actions full">
-                <button type="submit" class="primary-action">
+                <button type="submit" class="nutri-primary">
                     <span class="material-symbols-outlined">save</span>
                     Salvar prontuario
                 </button>
@@ -134,9 +131,12 @@ function htmlNovoProntuario(morador) {
 
 function htmlProntuario(prontuario, evolucoes) {
     return `
-        <div class="nutri-card__header" style="padding:0 0 18px;border-bottom:none;">
-            <h3>${escapar(prontuario.morador?.nome || "Morador")}</h3>
-            <p>Prontuario criado em ${formatarDataHora(prontuario.criadoEm)} por ${escapar(prontuario.nutricionista?.nome || "Nutricionista")}.</p>
+        <div class="nutri-card__header nutri-title-row" style="padding:0 0 18px;border-bottom:none;">
+            <div>
+                <h3>${escapar(prontuario.morador?.nome || "Morador")}</h3>
+                <p>Prontuario criado em ${formatarDataHora(prontuario.criadoEm)} por ${escapar(prontuario.nutricionista?.nome || "Nutricionista")}.</p>
+            </div>
+            <button type="button" class="nutri-secondary" onclick="trocarMoradorNutri()">Trocar morador</button>
         </div>
 
         <div class="nutri-resumo">
@@ -178,7 +178,7 @@ function htmlProntuario(prontuario, evolucoes) {
                 <input id="observacoesEvolucao" placeholder="Opcional" />
             </div>
             <div class="nutri-actions full">
-                <button type="submit" class="primary-action">
+                <button type="submit" class="nutri-primary">
                     <span class="material-symbols-outlined">add_notes</span>
                     Registrar evolucao
                 </button>
@@ -229,28 +229,24 @@ function alternarFluxoAcamado() {
     const acamado = valor("acamado") === "true";
     const peso = document.getElementById("pesoKg");
     const altura = document.getElementById("alturaCm");
-    const acao = document.getElementById("acaoEstimativaNutri");
     const campos = document.getElementById("camposEstimativaNutri");
     if (!peso || !altura) return;
     peso.readOnly = acamado;
     altura.readOnly = acamado;
     peso.placeholder = acamado ? "Calculado pela estimativa" : "Ex: 68,4";
     altura.placeholder = acamado ? "Calculada pela estimativa" : "Ex: 162";
-    if (acamado) {
-        peso.value = "";
-        altura.value = "";
+    peso.value = "";
+    altura.value = "";
+    if (!acamado) {
+        ["alturaJoelhoCm", "circunferenciaBracoCm"].forEach((id) => {
+            const campo = document.getElementById(id);
+            if (campo) campo.value = "";
+        });
+        const previa = document.getElementById("previaEstimativa");
+        if (previa) previa.textContent = "";
     }
-    if (acao) acao.hidden = !acamado;
-    if (campos) campos.hidden = true;
+    if (campos) campos.hidden = !acamado;
     atualizarImcDiretoNutri();
-}
-
-function abrirEstimativaNutri() {
-    const campos = document.getElementById("camposEstimativaNutri");
-    if (campos) {
-        campos.hidden = false;
-        document.getElementById("alturaJoelhoCm")?.focus();
-    }
 }
 
 function atualizarImcDiretoNutri() {

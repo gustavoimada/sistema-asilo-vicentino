@@ -621,31 +621,22 @@ input {
 
 .controle-fraldas-conteudo {
   display: grid;
-  grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.85fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 24px;
   margin-top: 22px;
 }
 
 .controle-fraldas-form { min-width: 0; }
-.controle-fraldas-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.controle-fraldas-grid { display: grid; grid-template-columns: minmax(180px, .45fr) minmax(0, 1fr); gap: 14px; }
 .controle-fraldas-campo { display: grid; gap: 7px; color: #61748e; font-size: 12px; font-weight: 800; text-transform: uppercase; }
 .controle-fraldas-campo input { width: 100%; min-width: 0; min-height: 44px; padding: 10px 12px; border: 1px solid #d9e6f6; border-radius: 10px; background: #f9fbff; color: #1e3656; font: inherit; text-transform: none; }
-.controle-fraldas-observacao { grid-column: span 3; }
-.controle-fraldas-rodape { margin-top: 16px; }
+.controle-fraldas-observacao { grid-column: auto; }
+.controle-fraldas-rodape { justify-content: flex-end; margin-top: 16px; }
 .controle-fraldas-rodape p strong { color: var(--primary); }
 .controle-fraldas-rodape .btn-primary { min-height: 44px; border: 0; cursor: pointer; }
 .controle-fraldas-feedback { min-height: 18px; margin-top: 10px !important; font-size: 13px !important; }
 .controle-fraldas-feedback.sucesso { color: #15803d; }
 .controle-fraldas-feedback.erro { color: #dc2626; }
-.controle-fraldas-lancamentos { min-width: 0; padding-left: 22px; border-left: 1px solid #e3edf9; }
-.controle-fraldas-lancamentos h3 { margin: 0 0 12px; color: var(--primary); font-size: 16px; }
-.controle-fraldas-lista { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
-.controle-fraldas-item { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 10px; align-items: start; padding: 10px; border-radius: 10px; background: #f8fbff; }
-.controle-fraldas-item > span { color: #627995; font-size: 12px; font-weight: 800; }
-.controle-fraldas-item strong,.controle-fraldas-item small { display: block; }
-.controle-fraldas-item strong { color: #173f7a; font-size: 13px; }
-.controle-fraldas-item small { margin-top: 3px; color: #6e8198; font-size: 12px; line-height: 1.35; }
-.controle-fraldas-vazio { padding: 14px 0; color: #6e8198; font-size: 13px; font-weight: 600; }
 
 .telefone-campo {
   display: grid;
@@ -1127,8 +1118,6 @@ input {
   .controle-fraldas-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
   .controle-fraldas-observacao { grid-column: span 2; }
-
-  .controle-fraldas-lancamentos { padding-top: 18px; padding-left: 0; border-top: 1px solid #e3edf9; border-left: 0; }
 
   .controle-fraldas-rodape .btn-primary { width: 100%; justify-content: center; }
 

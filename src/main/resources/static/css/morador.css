@@ -314,6 +314,22 @@
   background: #ecfdf5;
 }
 
+.morador-row-btn.warning {
+  color: #c2410c;
+}
+
+.morador-row-btn.warning:hover {
+  background: #fff7ed;
+}
+
+.morador-row-btn.success {
+  color: #15803d;
+}
+
+.morador-row-btn.success:hover {
+  background: #ecfdf5;
+}
+
 .morador-row-btn.danger {
   color: var(--error);
 }

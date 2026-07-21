@@ -178,6 +178,10 @@ public class Morador {
 		return dao.deletar(this.idMorador, conexao);
 	}
 
+	public boolean deletarComDependencias(Banco conexao) throws SQLException {
+		return new MoradorDAO().deletarComDependencias(this.idMorador, conexao);
+	}
+
 	public boolean inativar(Banco conexao) throws SQLException {
 		return new MoradorDAO().alterarAtivo(idMorador, false, conexao);
 	}
@@ -208,6 +212,10 @@ public class Morador {
 		return new MoradorDAO().listarAtivos(conexao);
 	}
 
+	public List<Morador> listarInativos(Banco conexao) throws SQLException {
+		return new MoradorDAO().listarInativos(conexao);
+	}
+
 	public List<Morador> listar(String ordenacao, String direcao, Banco conexao) throws SQLException
 	{
 		MoradorDAO dao = new MoradorDAO();
@@ -225,6 +233,12 @@ public class Morador {
 	{
 		MoradorDAO dao = new MoradorDAO();
 		return dao.filtrar(nome, cpf, dtNascimentoInicio, dtNascimentoFim, endereco, cidade, estado, ordenacao, direcao, conexao);
+	}
+
+	public List<Morador> filtrar(String nome, String cpf, LocalDate dtNascimentoInicio, LocalDate dtNascimentoFim, String endereco, String cidade,
+		String estado, Boolean ativo, String ordenacao, String direcao, Banco conexao) throws SQLException
+	{
+		return new MoradorDAO().filtrar(nome, cpf, dtNascimentoInicio, dtNascimentoFim, endereco, cidade, estado, ativo, ordenacao, direcao, conexao);
 	}
 
 	public Morador buscarPorCpf(String cpf, Banco conexao) throws SQLException

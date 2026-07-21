@@ -22,22 +22,6 @@
       grid-template-columns: minmax(0, 1fr);
     }
 
-    .nutri-sidebar-hint {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
-      padding: 14px 16px;
-      border: 1px solid #dbeafe;
-      border-radius: 14px;
-      background: #f8fbff;
-      color: #4b6382;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .nutri-sidebar-hint .material-symbols-outlined { color: #004aad; }
-
     .nutri-title-row {
       display: flex;
       justify-content: space-between;
@@ -214,6 +198,70 @@
       cursor: pointer;
     }
 
+    .nutri-secondary:hover {
+      border-color: #93c5fd;
+      background: #eff6ff;
+      transform: translateY(-1px);
+    }
+
+    .nutri-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 48px;
+      padding: 13px 22px;
+      border: 0;
+      border-radius: 12px;
+      background: #004aad;
+      color: #fff;
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(0, 74, 173, .2);
+      transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+    }
+
+    .nutri-primary:hover {
+      background: #003b8b;
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(0, 74, 173, .26);
+    }
+
+    .nutri-search {
+      position: relative;
+      margin-top: 14px;
+    }
+
+    .nutri-search .material-symbols-outlined {
+      position: absolute;
+      top: 50%;
+      left: 14px;
+      color: #7186a3;
+      font-size: 21px;
+      pointer-events: none;
+      transform: translateY(-50%);
+    }
+
+    .nutri-search input {
+      width: 100%;
+      min-height: 46px;
+      padding: 12px 14px 12px 44px;
+      border: 1px solid #d7e3f5;
+      border-radius: 12px;
+      outline: none;
+      background: #f8fbff;
+      color: #172033;
+      font: inherit;
+      transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .nutri-search input:focus {
+      border-color: #60a5fa;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, .16);
+    }
+
     .nutri-history {
       display: grid;
       gap: 12px;
@@ -314,17 +362,15 @@
 
       <div class="content">
         <div class="content-wrap">
-          <div class="nutri-sidebar-hint">
-            <span class="material-symbols-outlined">menu_open</span>
-            Para ganhar mais espaco no prontuario, voce pode recolher o menu lateral.
-          </div>
-
           <section class="nutri-grid">
             <article id="seletorMoradorNutri" class="nutri-card">
               <div class="nutri-card__header">
                 <h3>Moradores ativos</h3>
                 <p>Selecione um morador para criar ou acompanhar o prontuario.</p>
-                <input id="buscaMoradorNutri" type="search" placeholder="Buscar morador" style="margin-top:14px;" />
+                <div class="nutri-search">
+                  <span class="material-symbols-outlined">search</span>
+                  <input id="buscaMoradorNutri" type="search" placeholder="Buscar morador pelo nome" aria-label="Buscar morador pelo nome" />
+                </div>
               </div>
               <div id="listaMoradoresNutri" class="morador-nutri-lista"></div>
             </article>

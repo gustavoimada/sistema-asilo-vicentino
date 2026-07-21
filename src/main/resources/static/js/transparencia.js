@@ -771,7 +771,7 @@ async function enviarTransparencia(event)
         {
             botao.disabled = false;
             botao.innerHTML = editando
-                ? '<span class="material-symbols-outlined">save</span> Salvar alteraÃ§Ãµes'
+                ? '<span class="material-symbols-outlined">save</span> Salvar alterações'
                 : '<span class="material-symbols-outlined">publish</span> Publicar PDF';
         }
     }
@@ -802,19 +802,19 @@ function atualizarFormularioTransparenciaModo()
     const cancelarBtn = document.getElementById("cancelarEdicaoTransparenciaBtn");
     const submit = document.querySelector("#formTransparencia .transparencia-submit");
 
-    if (titulo) titulo.textContent = editando ? "Editar documento" : "Enviar prestaÃ§Ã£o de contas";
+    if (titulo) titulo.textContent = editando ? "Editar documento" : "Enviar prestação de contas";
     if (descricao)
     {
         descricao.textContent = editando
-            ? "Atualize categoria, referÃªncia, observaÃ§Ã£o ou substitua o PDF publicado."
-            : "Publique PDFs de prestaÃ§Ã£o de contas, eventos e documentos de transparÃªncia.";
+            ? "Atualize categoria, referência, observação ou substitua o PDF publicado."
+            : "Publique PDFs de prestação de contas, eventos e documentos de transparência.";
     }
     if (arquivoInput) arquivoInput.required = !editando;
     if (arquivoHint)
     {
         arquivoHint.textContent = editando
             ? "Opcional: selecione outro PDF apenas se quiser substituir o arquivo atual."
-            : "ObrigatÃ³rio para nova publicaÃ§Ã£o. No modo ediÃ§Ã£o, envie outro PDF apenas se quiser substituir o arquivo atual.";
+            : "Obrigatório para nova publicação. No modo edição, envie outro PDF apenas se quiser substituir o arquivo atual.";
     }
     if (cancelarBtn)
     {
@@ -824,7 +824,7 @@ function atualizarFormularioTransparenciaModo()
     if (submit)
     {
         submit.innerHTML = editando
-            ? '<span class="material-symbols-outlined">save</span> Salvar alteraÃ§Ãµes'
+            ? '<span class="material-symbols-outlined">save</span> Salvar alterações'
             : '<span class="material-symbols-outlined">publish</span> Publicar PDF';
     }
 }

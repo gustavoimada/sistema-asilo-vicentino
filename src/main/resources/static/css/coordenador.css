@@ -881,6 +881,47 @@
   margin-bottom: 18px;
 }
 
+.transparencia-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.transparencia-new-button {
+  flex: 0 0 auto;
+  min-height: 48px;
+  border: 0;
+  border-radius: 12px;
+  padding: 0 22px;
+  background: #004aad;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(0, 74, 173, .2);
+  transition: background-color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+
+.transparencia-new-button:hover {
+  background: #003d8f;
+  transform: translateY(-1px);
+  box-shadow: 0 13px 28px rgba(0, 74, 173, .25);
+}
+
+@media (max-width: 720px) {
+  .transparencia-page-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .transparencia-new-button { width: 100%; }
+}
+
 #cadastroTransparenciaContainer[hidden],
 .transparencia-cancel-edit[hidden] {
   display: none !important;
