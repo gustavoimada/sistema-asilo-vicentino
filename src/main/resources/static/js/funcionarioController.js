@@ -102,18 +102,60 @@ function formatarCpf(valor)
         .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
 }
 
-function formatarTelefone(valor)
+function inferirTipoTelefone(valor)
 {
-    const numeros = somenteDigitos(valor).slice(0, 11);
-    if (numeros.length <= 10)
+    const numeros = somenteDigitos(valor);
+    return numeros.length === 10 && numeros.slice(2, 6) === "3269" ? "fixo" : "celular";
+}
+
+function tipoTelefoneSelecionado()
+{
+    return el("tipoTelefone")?.value || "celular";
+}
+
+function formatarTelefone(valor, tipo)
+{
+    const modo = tipo || inferirTipoTelefone(valor);
+    const numeros = somenteDigitos(valor);
+
+    if (modo === "fixo")
     {
-        return numeros
+        if (!numeros) return "";
+        const sufixo = numeros.length >= 10 && numeros.slice(2, 6) === "3269"
+            ? numeros.slice(6, 10)
+            : numeros.slice(-4);
+        return `(18) 3269-${sufixo}`;
+    }
+
+    const celular = numeros.slice(0, 11);
+    if (celular.length <= 10)
+    {
+        return celular
             .replace(/(\d{2})(\d)/, "($1) $2")
             .replace(/(\d{4})(\d{1,4})$/, "$1-$2");
     }
-    return numeros
+    return celular
         .replace(/(\d{2})(\d)/, "($1) $2")
         .replace(/(\d{5})(\d{1,4})$/, "$1-$2");
+}
+
+function atualizarTipoTelefone()
+{
+    const tipo = tipoTelefoneSelecionado();
+    const campo = el("telefone");
+    const ajuda = el("telefoneAjuda");
+    if (!campo) return;
+    campo.value = tipo === "fixo" ? formatarTelefone(campo.value, "fixo") : "";
+    campo.maxLength = tipo === "fixo" ? 14 : 15;
+    campo.placeholder = tipo === "fixo" ? "(18) 3269-0000" : "(18) 99999-9999";
+    if (ajuda) ajuda.textContent = tipo === "fixo" ? "Fixo: prefixo (18) 3269-XXXX" : "Celular: (DD) 99999-9999";
+}
+
+function telefoneValido(telefone, tipo)
+{
+    return tipo === "fixo"
+        ? /^\(18\)\s3269-\d{4}$/.test(telefone)
+        : /^\(\d{2}\)\s\d{5}-\d{4}$/.test(telefone);
 }
 
 function validarCpf(cpf)
@@ -169,6 +211,8 @@ function limparFormulario()
     el("categoria").value = "";
     el("cpf").value = "";
     el("telefone").value = "";
+    if (el("tipoTelefone")) el("tipoTelefone").value = "celular";
+    atualizarTipoTelefone();
     if (el("username")) el("username").value = "";
     if (el("senhaUsuario")) el("senhaUsuario").value = "";
     if (el("username")) el("username").placeholder = "Ex: maria.silva";
@@ -360,7 +404,7 @@ async function salvarFuncionario(event)
     const nome = padronizarTexto(el("nome")?.value || "");
     const categoria = el("categoria")?.value || "";
     const cpf = formatarCpf(el("cpf")?.value || "");
-    const telefone = formatarTelefone(el("telefone")?.value || "");
+    const telefone = formatarTelefone(el("telefone")?.value || "", tipoTelefoneSelecionado());
     const username = (el("username")?.value || "").trim();
     const senhaUsuario = el("senhaUsuario")?.value || "";
 
@@ -392,7 +436,7 @@ async function salvarFuncionario(event)
         return;
     }
 
-    if (somenteDigitos(telefone).length < 10)
+    if (!telefoneValido(telefone, tipoTelefoneSelecionado()))
     {
         showToast("error", "Telefone inválido.");
         el("telefone")?.focus();
@@ -500,7 +544,10 @@ function abrirParaEditar(id)
     el("nome").value = funcionario.nome || "";
     el("categoria").value = padronizarCategoriaValor(funcionario.categoria || "");
     el("cpf").value = formatarCpf(funcionario.cpf || "");
-    el("telefone").value = formatarTelefone(funcionario.telefone || "");
+    const tipoTelefone = inferirTipoTelefone(funcionario.telefone || "");
+    if (el("tipoTelefone")) el("tipoTelefone").value = tipoTelefone;
+    atualizarTipoTelefone();
+    el("telefone").value = formatarTelefone(funcionario.telefone || "", tipoTelefone);
     if (el("username"))
     {
         el("username").value = "";
@@ -596,8 +643,9 @@ function configurarEventos()
     });
     el("telefone")?.addEventListener("input", (event) =>
     {
-        event.target.value = formatarTelefone(event.target.value);
+        event.target.value = formatarTelefone(event.target.value, tipoTelefoneSelecionado());
     });
+    el("tipoTelefone")?.addEventListener("change", atualizarTipoTelefone);
 
     el("tabelaFuncionarios")?.addEventListener("click", (event) =>
     {

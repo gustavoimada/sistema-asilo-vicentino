@@ -7,7 +7,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="assets/favicon.png?v=2" />
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=2" />
   <link rel="stylesheet" href="css/cadastroTipoOcorrencia.css?v=12" />
-  <link rel="stylesheet" href="css/funcionario.css" />
+  <link rel="stylesheet" href="css/funcionario.css?v=20260721-fraldas-telefone" />
   <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260708-3" />
   <link rel="stylesheet" href="css/morador.css?v=7" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -239,7 +239,14 @@
 
                 <div class="form-field">
                   <label for="responsavelTelefone">Telefone</label>
-                  <input id="responsavelTelefone" type="tel" placeholder="(00) 00000-0000" oninput="this.value = formatarTelefone(this.value)" />
+                  <div class="telefone-campo">
+                    <select id="responsavelTipoTelefone" aria-label="Tipo de telefone do responsavel" onchange="atualizarTipoTelefoneResponsavel()">
+                      <option value="celular">Celular</option>
+                      <option value="fixo">Fixo</option>
+                    </select>
+                    <input id="responsavelTelefone" type="tel" inputmode="numeric" placeholder="(00) 00000-0000" oninput="this.value = formatarTelefone(this.value, obterTipoTelefoneResponsavel())" />
+                  </div>
+                  <small class="telefone-ajuda" id="responsavelTelefoneAjuda">Celular: (DD) 99999-9999</small>
                 </div>
 
                 <div class="form-field">
@@ -397,7 +404,7 @@
     </div>
   </div>
 
-  <script src="js/moradorController.js?v=20260715-1"></script>
+  <script src="js/moradorController.js?v=20260721-telefone"></script>
   <script src="js/sidebarSecretaria.js?v=20260707-1"></script>
   <script src="js/sidebarRecolhivel.js?v=20260708-1"></script>
 </body>

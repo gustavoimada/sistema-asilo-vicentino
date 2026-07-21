@@ -101,6 +101,26 @@
   letter-spacing: 0.08em;
 }
 
+.telefone-campo {
+  display: grid;
+  grid-template-columns: minmax(108px, 0.42fr) minmax(0, 1fr);
+  gap: 8px;
+}
+
+.telefone-campo select,
+.telefone-campo input {
+  width: 100%;
+  min-width: 0;
+}
+
+.telefone-ajuda {
+  display: block;
+  margin-top: 6px;
+  color: #667991;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .cep-status {
   display: none;
   width: fit-content;

@@ -142,13 +142,42 @@ function formatarCpf(valor) {
     return numeros.replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2');
 }
 
-function formatarTelefone(valor) {
-    const numeros = somenteDigitos(valor).slice(0, 11);
+function inferirTipoTelefone(valor) {
+    const numeros = somenteDigitos(valor);
+    return numeros.length === 10 && numeros.slice(2, 6) === '3269' ? 'fixo' : 'celular';
+}
 
-    if (numeros.length <= 10)
-        return numeros.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{4})(\d{1,4})$/, '$1-$2');
-    else
-        return numeros.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d{1,4})$/, '$1-$2');
+function obterTipoTelefoneResponsavel() {
+    return document.getElementById('responsavelTipoTelefone')?.value || 'celular';
+}
+
+function formatarTelefone(valor, tipo) {
+    const modo = tipo || inferirTipoTelefone(valor);
+    const numeros = somenteDigitos(valor);
+
+    if (modo === 'fixo') {
+        if (!numeros) return '';
+        const sufixo = numeros.length >= 10 && numeros.slice(2, 6) === '3269'
+            ? numeros.slice(6, 10)
+            : numeros.slice(-4);
+        return `(18) 3269-${sufixo}`;
+    }
+
+    const celular = numeros.slice(0, 11);
+    if (celular.length <= 10)
+        return celular.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{4})(\d{1,4})$/, '$1-$2');
+    return celular.replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d{1,4})$/, '$1-$2');
+}
+
+function atualizarTipoTelefoneResponsavel() {
+    const campo = document.getElementById('responsavelTelefone');
+    const ajuda = document.getElementById('responsavelTelefoneAjuda');
+    const tipo = obterTipoTelefoneResponsavel();
+    if (!campo) return;
+    campo.value = tipo === 'fixo' ? formatarTelefone(campo.value, 'fixo') : '';
+    campo.placeholder = tipo === 'fixo' ? '(18) 3269-0000' : '(00) 00000-0000';
+    campo.maxLength = tipo === 'fixo' ? 14 : 15;
+    if (ajuda) ajuda.textContent = tipo === 'fixo' ? 'Fixo: prefixo (18) 3269-XXXX' : 'Celular: (DD) 99999-9999';
 }
 
 function formatarCep(valor) {
@@ -313,10 +342,10 @@ function validarCep(cep) {
     return cepRegex.test(cep);
 }
 
-function validarTelefone(telefone) {
-    const telefoneRegex = /^\(\d{2}\)\s\d{5}-\d{4}$/;
-
-    return telefoneRegex.test(telefone);
+function validarTelefone(telefone, tipo) {
+    return tipo === 'fixo'
+        ? /^\(18\)\s3269-\d{4}$/.test(telefone)
+        : /^\(\d{2}\)\s\d{5}-\d{4}$/.test(telefone);
 }
 
 function validarIdadeMinima(dtNascimento) {
@@ -557,7 +586,11 @@ async function carregarContatoResponsavelMorador(idMorador) {
 function preencherContatoResponsavel(contato) {
     document.getElementById('responsavelId').value = contato.id || 0;
     document.getElementById('responsavelNome').value = contato.nome || '';
-    document.getElementById('responsavelTelefone').value = contato.telefone || '';
+    const tipoTelefone = inferirTipoTelefone(contato.telefone || '');
+    const tipoEl = document.getElementById('responsavelTipoTelefone');
+    if (tipoEl) tipoEl.value = tipoTelefone;
+    atualizarTipoTelefoneResponsavel();
+    document.getElementById('responsavelTelefone').value = formatarTelefone(contato.telefone || '', tipoTelefone);
     document.getElementById('responsavelCpf').value = contato.cpf || '';
     document.getElementById('responsavelVinculo').value = contato.vinculo || '';
 }
@@ -787,6 +820,9 @@ function limparContatoResponsavel() {
     document.getElementById('responsavelId').value = '';
     document.getElementById('responsavelNome').value = '';
     document.getElementById('responsavelTelefone').value = '';
+    const tipoEl = document.getElementById('responsavelTipoTelefone');
+    if (tipoEl) tipoEl.value = 'celular';
+    atualizarTipoTelefoneResponsavel();
     document.getElementById('responsavelCpf').value = '';
     document.getElementById('responsavelVinculo').value = '';
 }
@@ -794,7 +830,8 @@ function limparContatoResponsavel() {
 function montarContatoResponsavel() {
     const id = Number(document.getElementById('responsavelId').value || 0);
     const nome = document.getElementById('responsavelNome').value.trim();
-    const telefone = formatarTelefone(document.getElementById('responsavelTelefone').value);
+    const tipoTelefone = obterTipoTelefoneResponsavel();
+    const telefone = formatarTelefone(document.getElementById('responsavelTelefone').value, tipoTelefone);
     const cpf = formatarCpf(document.getElementById('responsavelCpf').value);
     const vinculo = document.getElementById('responsavelVinculo').value.trim();
     const temContato = nome !== '' || telefone !== '' || cpf !== '' || vinculo !== '';
@@ -806,7 +843,7 @@ function montarContatoResponsavel() {
         return { valido: true, valor: '' };
     else if (nome === '')
         return { valido: false, mensagem: 'Informe o nome do contato responsavel.' };
-    else if (telefone !== '' && !validarTelefone(telefone))
+    else if (telefone !== '' && !validarTelefone(telefone, tipoTelefone))
         return { valido: false, mensagem: 'Telefone do contato responsavel invalido.' };
     else if (cpf !== '' && !validarCpf(cpf))
         return { valido: false, mensagem: 'CPF do contato responsavel invalido.' };
