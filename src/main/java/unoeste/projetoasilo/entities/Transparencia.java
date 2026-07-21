@@ -146,6 +146,18 @@ public class Transparencia
         return dao.deletar(id, conexao);
     }
 
+    public boolean atualizar(Banco conexao) throws SQLException
+    {
+        validar();
+        if (idTransparencia <= 0)
+        {
+            throw new IllegalArgumentException("Arquivo de transparencia invalido.");
+        }
+
+        TransparenciaDAO dao = new TransparenciaDAO();
+        return dao.atualizar(this, conexao);
+    }
+
     private void validar()
     {
         nomeArquivo = padronizarTexto(nomeArquivo);

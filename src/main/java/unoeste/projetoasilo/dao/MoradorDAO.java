@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +47,10 @@ public class MoradorDAO {
 
     public List<Morador> listar(Banco conexao) throws SQLException {
         return listar(null, null, conexao);
+    }
+
+    public List<Morador> listarAtivos(Banco conexao) throws SQLException {
+        return listarPorSql(SQL_SELECT_COMPLETO + " WHERE m.ativo = TRUE ORDER BY m.nome ASC", List.of(), conexao);
     }
 
     public List<Morador> listar(String ordenacao, Banco conexao) throws SQLException {
@@ -116,6 +121,26 @@ public class MoradorDAO {
 
         try (PreparedStatement ps = conexao.preparar(sql)) {
             ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    public boolean alterarAtivo(int id, boolean ativo, Banco conexao) throws SQLException {
+        String sql = "UPDATE morador SET ativo = ?, atualizado_em = CURRENT_TIMESTAMP, quartos_idquartos = CASE WHEN ? THEN quartos_idquartos ELSE NULL END WHERE idmorador = ?";
+        try (PreparedStatement ps = conexao.preparar(sql)) {
+            ps.setBoolean(1, ativo);
+            ps.setBoolean(2, ativo);
+            ps.setInt(3, id);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+    public boolean atualizarAntropometria(int id, BigDecimal pesoKg, BigDecimal alturaCm, Banco conexao) throws SQLException {
+        String sql = "UPDATE morador SET peso_atual_kg = ?, altura_atual_cm = ?, dados_antropometricos_atualizados_em = CURRENT_TIMESTAMP, atualizado_em = CURRENT_TIMESTAMP WHERE idmorador = ? AND ativo = TRUE";
+        try (PreparedStatement ps = conexao.preparar(sql)) {
+            ps.setBigDecimal(1, pesoKg);
+            ps.setBigDecimal(2, alturaCm);
+            ps.setInt(3, id);
             return ps.executeUpdate() > 0;
         }
     }
@@ -230,6 +255,15 @@ public class MoradorDAO {
         morador.setCidade(rs.getString("cidade"));
         morador.setEstado(rs.getString("estado"));
         morador.setCep(rs.getString("cep"));
+        morador.setAtivo(rs.getBoolean("ativo"));
+        morador.setPesoAtualKg(rs.getBigDecimal("peso_atual_kg"));
+        morador.setAlturaAtualCm(rs.getBigDecimal("altura_atual_cm"));
+        if (rs.getTimestamp("dados_antropometricos_atualizados_em") != null) {
+            morador.setDadosAntropometricosAtualizadosEm(rs.getTimestamp("dados_antropometricos_atualizados_em").toLocalDateTime());
+        }
+        if (rs.getTimestamp("atualizado_em") != null) {
+            morador.setAtualizadoEm(rs.getTimestamp("atualizado_em").toLocalDateTime());
+        }
 
         int quartoId = rs.getInt("quartos_idquartos");
         if (!rs.wasNull()) {

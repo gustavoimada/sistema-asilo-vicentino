@@ -117,8 +117,8 @@
                 <div class="transparencia-upload-head">
                   <span class="material-symbols-outlined">upload_file</span>
                   <div>
-                    <h4>Enviar prestação de contas</h4>
-                    <p>Publique PDFs para consulta pública, separados por data de referência e categoria.</p>
+                    <h4 id="transparenciaFormTitulo">Enviar prestação de contas</h4>
+                    <p id="transparenciaFormDescricao">Publique PDFs para consulta pública, separados por data de referência e categoria.</p>
                   </div>
                 </div>
 
@@ -150,13 +150,20 @@
                   <div class="form-field transparencia-file-field">
                     <label for="transparenciaArquivo">Arquivo PDF</label>
                     <input id="transparenciaArquivo" name="arquivo" type="file" accept="application/pdf,.pdf" required />
+                    <small id="transparenciaArquivoHint" class="field-hint">Obrigatório para nova publicação. No modo edição, envie outro PDF apenas se quiser substituir o arquivo atual.</small>
                   </div>
                 </div>
 
-                <button type="submit" class="transparencia-submit">
-                  <span class="material-symbols-outlined">publish</span>
-                  Publicar PDF
-                </button>
+                <div class="transparencia-form-actions">
+                  <button type="button" id="cancelarEdicaoTransparenciaBtn" class="transparencia-cancel-edit" hidden>
+                    <span class="material-symbols-outlined">close</span>
+                    Cancelar edição
+                  </button>
+                  <button type="submit" class="transparencia-submit">
+                    <span class="material-symbols-outlined">publish</span>
+                    Publicar PDF
+                  </button>
+                </div>
               </form>
 
               <div class="transparencia-list-panel">

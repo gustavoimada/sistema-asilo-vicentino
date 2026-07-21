@@ -26,7 +26,7 @@ public class FuncionarioControl
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @PostMapping("cadastrar")
-    public ResponseEntity<Object> cadastrarFuncionario(@RequestParam String nome, @RequestParam String cpf, @RequestParam String telefone, @RequestParam String categoria, @RequestParam String username, @RequestParam String senha)
+    public ResponseEntity<Object> cadastrarFuncionario(@RequestParam String nome, @RequestParam String cpf, @RequestParam String telefone, @RequestParam String categoria, @RequestParam String username, @RequestParam String senha, HttpSession session)
     {
         Banco conexao = Banco.getConnection();
 
@@ -39,6 +39,12 @@ public class FuncionarioControl
             if (erroValidacao != null)
             {
                 return erroValidacao;
+            }
+
+            ResponseEntity<Object> erroPermissao = validarPermissaoCadastro(categoriaPadronizada, session);
+            if (erroPermissao != null)
+            {
+                return erroPermissao;
             }
 
             String nomeLimpo = padronizarTexto(nome);
@@ -339,17 +345,20 @@ public class FuncionarioControl
             return ResponseEntity.badRequest().body(new Error("Erro", "Nao e permitido excluir o proprio usuario logado. Entre com outra conta administrativa para fazer essa alteracao."));
         }
 
-        if ("coordenador".equals(categoriaAlvo))
+        if ("coordenador".equals(categoriaAlvo) || "nutricionista".equals(categoriaAlvo))
         {
             if (!"coordenador".equals(categoriaLogada))
             {
-                return ResponseEntity.status(403).body(new Error("Erro", "Apenas coordenadores podem excluir outro coordenador."));
+                return ResponseEntity.status(403).body(new Error("Erro", "Apenas coordenadores podem inativar coordenadores ou nutricionistas."));
             }
 
-            int coordenadoresAtivos = funcionario.contarAtivosPorCategoria("Coordenador", conexao);
-            if (coordenadoresAtivos <= 1)
+            if ("coordenador".equals(categoriaAlvo))
             {
-                return ResponseEntity.badRequest().body(new Error("Erro", "Nao e possivel excluir o ultimo coordenador ativo. Cadastre outro coordenador antes de remover este acesso."));
+                int coordenadoresAtivos = funcionario.contarAtivosPorCategoria("Coordenador", conexao);
+                if (coordenadoresAtivos <= 1)
+                {
+                    return ResponseEntity.badRequest().body(new Error("Erro", "Nao e possivel excluir o ultimo coordenador ativo. Cadastre outro coordenador antes de remover este acesso."));
+                }
             }
         }
 
@@ -362,7 +371,7 @@ public class FuncionarioControl
             }
         }
 
-        if (!"coordenador".equals(categoriaAlvo) && !"cuidador".equals(categoriaAlvo) && !"secretaria".equals(categoriaAlvo))
+        if (!"coordenador".equals(categoriaAlvo) && !"cuidador".equals(categoriaAlvo) && !"secretaria".equals(categoriaAlvo) && !"nutricionista".equals(categoriaAlvo))
         {
             return ResponseEntity.badRequest().body(new Error("Erro", "Categoria do funcionario invalida para exclusao."));
         }
@@ -379,16 +388,29 @@ public class FuncionarioControl
         }
 
         String categoriaAlvo = chaveCategoria(funcionario.getCategoria());
-        if ("coordenador".equals(categoriaAlvo))
+        if ("coordenador".equals(categoriaAlvo) || "nutricionista".equals(categoriaAlvo))
         {
             return ResponseEntity.status(403).body(new Error("Erro", "Secretarias podem editar apenas cuidadores e outras secretarias."));
         }
 
-        if ("coordenador".equals(chaveCategoria(categoriaSolicitada)))
+        String categoriaNova = chaveCategoria(categoriaSolicitada);
+        if ("coordenador".equals(categoriaNova) || "nutricionista".equals(categoriaNova))
         {
-            return ResponseEntity.status(403).body(new Error("Erro", "Secretarias nao podem alterar um funcionario para a categoria de coordenador."));
+            return ResponseEntity.status(403).body(new Error("Erro", "Secretarias nao podem atribuir a categoria de coordenador ou nutricionista."));
         }
 
+        return null;
+    }
+
+    private ResponseEntity<Object> validarPermissaoCadastro(String categoriaSolicitada, HttpSession session)
+    {
+        String categoriaLogada = chaveCategoria(obterCategoriaSessao(session));
+        String categoriaNova = chaveCategoria(categoriaSolicitada);
+        if ("secretaria".equals(categoriaLogada)
+                && ("coordenador".equals(categoriaNova) || "nutricionista".equals(categoriaNova)))
+        {
+            return ResponseEntity.status(403).body(new Error("Erro", "Secretarias podem cadastrar apenas cuidadores e outras secretarias."));
+        }
         return null;
     }
 
@@ -446,6 +468,10 @@ public class FuncionarioControl
         if (texto.contains("secret"))
         {
             return "secretaria";
+        }
+        if (texto.contains("nutricionista"))
+        {
+            return "nutricionista";
         }
 
         return "";
@@ -569,6 +595,11 @@ public class FuncionarioControl
         if ("Cuidador".equalsIgnoreCase(categoriaLimpa))
         {
             return "Cuidador";
+        }
+
+        if ("Nutricionista".equalsIgnoreCase(categoriaLimpa))
+        {
+            return "Nutricionista";
         }
 
         if ("Secretaria".equalsIgnoreCase(categoriaLimpa) || "Secretária".equalsIgnoreCase(categoriaLimpa))

@@ -52,6 +52,7 @@ function formatarCargoInclusivo(categoria)
     if (valor === "coordenador") return "Coordenador(a)";
     if (valor === "cuidador") return "Cuidador(a)";
     if (valor === "secretaria") return "Secretária";
+    if (valor === "nutricionista") return "Nutricionista";
     return String(categoria || "").trim();
 }
 
@@ -73,6 +74,7 @@ function padronizarCategoriaValor(categoria)
     if (valor === "coordenador") return "Coordenador";
     if (valor === "cuidador") return "Cuidador";
     if (valor === "secretaria") return "Secretaria";
+    if (valor === "nutricionista") return "Nutricionista";
     return String(categoria || "").trim();
 }
 
@@ -205,6 +207,7 @@ function classeCategoria(categoria)
     const valor = String(categoria || "").toLowerCase();
     if (valor === "coordenador") return "categoria-coordenador";
     if (valor === "cuidador") return "categoria-cuidador";
+    if (valor === "nutricionista") return "categoria-nutricionista";
     return "categoria-secretaria";
 }
 
@@ -219,7 +222,7 @@ function motivoBloqueioExclusao(funcionario)
         return "Nao e permitido excluir o proprio usuario logado";
     }
 
-    if (categoriaAlvo === "Coordenador" && categoriaLogada !== "Coordenador")
+    if ((categoriaAlvo === "Coordenador" || categoriaAlvo === "Nutricionista") && categoriaLogada !== "Coordenador")
     {
         return "Apenas coordenadores podem excluir outro coordenador";
     }
@@ -232,7 +235,7 @@ function motivoBloqueioEdicao(funcionario)
     const categoriaLogada = padronizarCategoriaValor(localStorage.getItem("funcionarioCategoria") || "");
     const categoriaAlvo = padronizarCategoriaValor(funcionario.categoria || "");
 
-    if (categoriaLogada === "Secretaria" && categoriaAlvo === "Coordenador")
+    if (categoriaLogada === "Secretaria" && (categoriaAlvo === "Coordenador" || categoriaAlvo === "Nutricionista"))
     {
         return "Secretárias só podem editar cuidadores e outras secretárias";
     }

@@ -1,6 +1,7 @@
 const estadoTransparencia = {
     transparencia: [],
     funcionario: null,
+    edicao: null,
     contexto: {
         idFuncionario: 0,
         idUser: 0,
@@ -236,11 +237,23 @@ function prepararArquivoTransparencia(arquivo)
         mes,
         mesNome: nomeMesTransparencia(mes),
         mesRotulo: rotuloMesTransparencia(mes),
+        dataReferenciaInput: formatarDataInputTransparencia(dataReferencia),
         dataReferencia: formatarDataReferenciaTransparencia(dataReferencia),
         observacao: textoObservacaoTransparencia(arquivo),
         dataUpload: formatarDataUploadTransparencia(arquivo?.dataUpload),
         url: `/transparencia/download/${idArquivo}`
     };
+}
+
+function listarArquivosTransparencia()
+{
+    return estadoTransparencia.transparencia.flatMap((pasta) => pasta.arquivos || []);
+}
+
+function buscarArquivoTransparencia(idArquivo)
+{
+    const id = Number(idArquivo || 0);
+    return listarArquivosTransparencia().find((item) => Number(item.idTransparencia || item.id || 0) === id);
 }
 
 function nomeExibicaoArquivoTransparencia(arquivo)
@@ -302,6 +315,29 @@ function formatarDataUploadTransparencia(valor)
 function formatarDataReferenciaTransparencia(valor)
 {
     return formatarDataUploadTransparencia(valor);
+}
+
+function formatarDataInputTransparencia(valor)
+{
+    if (!valor) return "";
+
+    const texto = String(valor).trim();
+    const partes = texto.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (partes)
+    {
+        return `${partes[1]}-${partes[2]}-${partes[3]}`;
+    }
+
+    const data = new Date(texto);
+    if (!Number.isNaN(data.getTime()))
+    {
+        const ano = data.getFullYear();
+        const mes = String(data.getMonth() + 1).padStart(2, "0");
+        const dia = String(data.getDate()).padStart(2, "0");
+        return `${ano}-${mes}-${dia}`;
+    }
+
+    return "";
 }
 
 function agruparTransparenciaPorAnoMesEEvento(arquivos)
@@ -381,13 +417,22 @@ function renderizarTransparenciaCoordenadorLegado()
                         </span>
                         <span class="material-symbols-outlined">download</span>
                     </a>
-                    <button
-                        type="button"
-                        class="transparencia-delete-btn"
-                        data-id="${idArquivo}"
-                        aria-label="Excluir arquivo">
-                        <span class="material-symbols-outlined">delete</span>
-                    </button>
+                    <div class="transparencia-file-actions">
+                        <button
+                            type="button"
+                            class="transparencia-edit-btn"
+                            data-id="${idArquivo}"
+                            aria-label="Editar arquivo">
+                            <span class="material-symbols-outlined">edit</span>
+                        </button>
+                        <button
+                            type="button"
+                            class="transparencia-delete-btn"
+                            data-id="${idArquivo}"
+                            aria-label="Excluir arquivo">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
+                    </div>
                 </div>
             `;
             }).join("");
@@ -456,13 +501,22 @@ function renderizarTransparenciaCoordenador()
                                 </span>
                                 <span class="material-symbols-outlined">download</span>
                             </a>
-                            <button
-                                type="button"
-                                class="transparencia-delete-btn"
-                                data-id="${idArquivo}"
-                                aria-label="Excluir arquivo">
-                                <span class="material-symbols-outlined">delete</span>
-                            </button>
+                            <div class="transparencia-file-actions">
+                                <button
+                                    type="button"
+                                    class="transparencia-edit-btn"
+                                    data-id="${idArquivo}"
+                                    aria-label="Editar arquivo">
+                                    <span class="material-symbols-outlined">edit</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    class="transparencia-delete-btn"
+                                    data-id="${idArquivo}"
+                                    aria-label="Excluir arquivo">
+                                    <span class="material-symbols-outlined">delete</span>
+                                </button>
+                            </div>
                         </div>
                     `;
                 }).join("");
@@ -585,6 +639,10 @@ async function carregarTransparenciaCoordenador()
         }
         estadoTransparencia.transparencia = agruparTransparenciaPorAnoMesEEvento(data);
         renderizarTransparenciaCoordenador();
+        if (estadoTransparencia.edicao?.idTransparencia && !buscarArquivoTransparencia(estadoTransparencia.edicao.idTransparencia))
+        {
+            cancelarEdicaoTransparencia(true);
+        }
     }
     catch (error)
     {
@@ -607,7 +665,9 @@ async function enviarTransparencia(event)
     const dataReferencia = document.getElementById("transparenciaDataReferencia")?.value || "";
     const observacao = document.getElementById("transparenciaObservacao")?.value || "";
     const evento = document.getElementById("transparenciaEvento")?.value || "";
-    if (!arquivo)
+    const editando = Boolean(estadoTransparencia.edicao?.idTransparencia);
+
+    if (!editando && !arquivo)
     {
         mostrarMensagemTransparencia("Selecione um arquivo PDF.", "error");
         return;
@@ -665,7 +725,10 @@ async function enviarTransparencia(event)
     }
 
     const formData = new FormData();
-    formData.append("arquivo", arquivo);
+    if (arquivo)
+    {
+        formData.append("arquivo", arquivo);
+    }
     formData.append("dataReferencia", dataReferencia);
     formData.append("ano", ano);
     formData.append("mes", mes);
@@ -675,14 +738,14 @@ async function enviarTransparencia(event)
     if (botao)
     {
         botao.disabled = true;
-        botao.innerHTML = '<span class="material-symbols-outlined">hourglass_top</span> Publicando...';
+        botao.innerHTML = `<span class="material-symbols-outlined">hourglass_top</span> ${editando ? "Atualizando..." : "Publicando..."}`;
     }
 
     try
     {
-        const response = await fetch("/transparencia/upload",
+        const response = await fetch(editando ? `/transparencia/editar/${estadoTransparencia.edicao.idTransparencia}` : "/transparencia/upload",
         {
-            method: "POST",
+            method: editando ? "PUT" : "POST",
             body: formData
         });
         const data = await parseJsonSeguro(response);
@@ -693,9 +756,16 @@ async function enviarTransparencia(event)
             return;
         }
 
-        mostrarMensagemTransparencia("PDF publicado na area de transparencia.", "success");
-        form?.reset();
-        preencherDataReferenciaAtual();
+        mostrarMensagemTransparencia(editando ? "Documento atualizado com sucesso." : "PDF publicado na area de transparencia.", "success");
+        if (editando)
+        {
+            cancelarEdicaoTransparencia(false);
+        }
+        else
+        {
+            form?.reset();
+            preencherDataReferenciaAtual();
+        }
         await carregarTransparenciaCoordenador();
     }
     catch (error)
@@ -708,7 +778,9 @@ async function enviarTransparencia(event)
         if (botao)
         {
             botao.disabled = false;
-            botao.innerHTML = '<span class="material-symbols-outlined">publish</span> Publicar PDF';
+            botao.innerHTML = editando
+                ? '<span class="material-symbols-outlined">save</span> Salvar alteraÃ§Ãµes'
+                : '<span class="material-symbols-outlined">publish</span> Publicar PDF';
         }
     }
 }
@@ -726,6 +798,76 @@ function preencherDataReferenciaAtual()
     const mes = String(hoje.getMonth() + 1).padStart(2, "0");
     const dia = String(hoje.getDate()).padStart(2, "0");
     input.value = `${ano}-${mes}-${dia}`;
+}
+
+function atualizarFormularioTransparenciaModo()
+{
+    const editando = Boolean(estadoTransparencia.edicao?.idTransparencia);
+    const titulo = document.getElementById("transparenciaFormTitulo");
+    const descricao = document.getElementById("transparenciaFormDescricao");
+    const arquivoInput = document.getElementById("transparenciaArquivo");
+    const arquivoHint = document.getElementById("transparenciaArquivoHint");
+    const cancelarBtn = document.getElementById("cancelarEdicaoTransparenciaBtn");
+    const submit = document.querySelector("#formTransparencia .transparencia-submit");
+
+    if (titulo) titulo.textContent = editando ? "Editar documento" : "Enviar prestaÃ§Ã£o de contas";
+    if (descricao)
+    {
+        descricao.textContent = editando
+            ? "Atualize categoria, referÃªncia, observaÃ§Ã£o ou substitua o PDF publicado."
+            : "Publique PDFs de prestaÃ§Ã£o de contas, eventos e documentos de transparÃªncia.";
+    }
+    if (arquivoInput) arquivoInput.required = !editando;
+    if (arquivoHint)
+    {
+        arquivoHint.textContent = editando
+            ? "Opcional: selecione outro PDF apenas se quiser substituir o arquivo atual."
+            : "ObrigatÃ³rio para nova publicaÃ§Ã£o. No modo ediÃ§Ã£o, envie outro PDF apenas se quiser substituir o arquivo atual.";
+    }
+    if (cancelarBtn) cancelarBtn.hidden = !editando;
+    if (submit)
+    {
+        submit.innerHTML = editando
+            ? '<span class="material-symbols-outlined">save</span> Salvar alteraÃ§Ãµes'
+            : '<span class="material-symbols-outlined">publish</span> Publicar PDF';
+    }
+}
+
+function entrarModoEdicaoTransparencia(idArquivo)
+{
+    const arquivo = buscarArquivoTransparencia(idArquivo);
+    if (!arquivo)
+    {
+        mostrarMensagemTransparencia("Documento nao encontrado para edicao.", "error");
+        return;
+    }
+
+    estadoTransparencia.edicao = arquivo;
+
+    const evento = document.getElementById("transparenciaEvento");
+    const dataReferencia = document.getElementById("transparenciaDataReferencia");
+    const observacao = document.getElementById("transparenciaObservacao");
+    const arquivoInput = document.getElementById("transparenciaArquivo");
+
+    if (evento) evento.value = arquivo.evento || "Outros";
+    if (dataReferencia) dataReferencia.value = arquivo.dataReferenciaInput || "";
+    if (observacao) observacao.value = arquivo.observacao || "";
+    if (arquivoInput) arquivoInput.value = "";
+
+    atualizarFormularioTransparenciaModo();
+    document.getElementById("formTransparencia")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function cancelarEdicaoTransparencia(limparCampos = true)
+{
+    estadoTransparencia.edicao = null;
+    const form = document.getElementById("formTransparencia");
+    if (limparCampos)
+    {
+        form?.reset();
+        preencherDataReferenciaAtual();
+    }
+    atualizarFormularioTransparenciaModo();
 }
 
 async function excluirTransparencia(idArquivo)
@@ -765,17 +907,23 @@ function adicionarEventListenersTransparencia()
     document.getElementById("formTransparencia")?.addEventListener("submit", enviarTransparencia);
     document.getElementById("transparenciaArquivo")?.addEventListener("change", validarArquivoTransparencia);
     document.getElementById("atualizarTransparenciaBtn")?.addEventListener("click", carregarTransparenciaCoordenador);
+    document.getElementById("cancelarEdicaoTransparenciaBtn")?.addEventListener("click", () => cancelarEdicaoTransparencia(true));
     document.getElementById("listaTransparenciaCoordenador")?.addEventListener("click", async (event) =>
     {
+        const botaoEditar = event.target.closest(".transparencia-edit-btn");
+        if (botaoEditar)
+        {
+            entrarModoEdicaoTransparencia(Number(botaoEditar.dataset.id || 0));
+            return;
+        }
+
         const botao = event.target.closest(".transparencia-delete-btn");
         if (!botao) return;
 
         const idArquivo = Number(botao.dataset.id || 0);
         if (!idArquivo) return;
 
-        const arquivo = estadoTransparencia.transparencia
-            .flatMap((pasta) => pasta.arquivos || [])
-            .find((item) => Number(item.idTransparencia || item.id || 0) === idArquivo);
+        const arquivo = buscarArquivoTransparencia(idArquivo);
         const nomeArquivo = nomeExibicaoArquivoTransparencia(arquivo);
         const confirmado = await confirmarExclusaoTransparencia(nomeArquivo);
         if (confirmado)

@@ -59,6 +59,12 @@ function redirecionar(funcionario)
         return;
     }
 
+    if (categoria === "nutricionista")
+    {
+        window.location.href = "../nutricionista.html";
+        return;
+    }
+
     window.location.href = "../secretaria.html";
 }
 

@@ -94,6 +94,35 @@ public class TransparenciaDAO
         return conexao.manipular(sql);
     }
 
+    public boolean atualizar(Transparencia transparencia, Banco conexao) throws SQLException
+    {
+        garantirEstruturaTransparencia(conexao);
+        String sql = """
+                UPDATE transparencia
+                SET nomearquivo = #1,
+                    caminhoarquivo = #2,
+                    evento = #3,
+                    datareferencia = #4,
+                    observacao = #5,
+                    ano = #6,
+                    mes = #7,
+                    atualizado_em = CURRENT_TIMESTAMP,
+                    atualizado_por = #8
+                WHERE idtransparencia = #9
+                """;
+        sql = sql.replace("#1", textoSql(transparencia.getNomeArquivo()));
+        sql = sql.replace("#2", textoSql(transparencia.getCaminhoArquivo()));
+        sql = sql.replace("#3", textoSql(transparencia.getEvento()));
+        sql = sql.replace("#4", dataReferenciaSql(transparencia.getDataReferencia()));
+        sql = sql.replace("#5", textoSql(transparencia.getObservacao()));
+        sql = sql.replace("#6", String.valueOf(transparencia.getAno()));
+        sql = sql.replace("#7", String.valueOf(transparencia.getMes()));
+        sql = sql.replace("#8", String.valueOf(transparencia.getFuncionario().getIdFuncionario()));
+        sql = sql.replace("#9", String.valueOf(transparencia.getIdTransparencia()));
+
+        return conexao.manipular(sql);
+    }
+
     private Transparencia popularTransparencia(ResultSet rs) throws SQLException
     {
         Funcionario funcionario = new Funcionario();
@@ -130,6 +159,8 @@ public class TransparenciaDAO
                   AND mes BETWEEN 1 AND 12
                 """);
         conexao.manipular("ALTER TABLE transparencia ADD COLUMN IF NOT EXISTS observacao VARCHAR(500)");
+        conexao.manipular("ALTER TABLE transparencia ADD COLUMN IF NOT EXISTS atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP");
+        conexao.manipular("ALTER TABLE transparencia ADD COLUMN IF NOT EXISTS atualizado_por INTEGER");
     }
 
     private String textoSql(String valor)

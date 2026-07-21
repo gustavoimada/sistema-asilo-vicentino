@@ -1,0 +1,1 @@
+ALTER TABLE evolucao_nutricional ADD COLUMN IF NOT EXISTS imc NUMERIC(6,2);

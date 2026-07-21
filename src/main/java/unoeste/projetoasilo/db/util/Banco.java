@@ -154,6 +154,19 @@ public class Banco
         return connect.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
     }
 
+    public Connection conexaoJdbc() throws SQLException
+    {
+        if (connect == null || connect.isClosed())
+        {
+            conectar();
+        }
+        if (connect == null)
+        {
+            throw new SQLException(erro);
+        }
+        return connect;
+    }
+
     public int getMaxPK(String tabela, String chave)
     {
         int max = 0;

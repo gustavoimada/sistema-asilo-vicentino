@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -172,6 +173,183 @@ public class TransparenciaControl
         catch (IOException | SQLException e)
         {
             return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao salvar arquivo"));
+        }
+        finally
+        {
+            conexao.fechar();
+        }
+    }
+
+    @PutMapping("editar/{id}")
+    public ResponseEntity<Object> editar(@PathVariable int id,
+                                         @RequestParam(value = "arquivo", required = false) MultipartFile arquivo,
+                                         @RequestParam(value = "dataReferencia", required = false) String dataReferencia,
+                                         @RequestParam(value = "ano", required = false) String ano,
+                                         @RequestParam(value = "mes", required = false) String mes,
+                                         @RequestParam("evento") String evento,
+                                         @RequestParam(value = "observacao", required = false) String observacao,
+                                         HttpSession session)
+    {
+        LocalDate dataReferenciaLimpa;
+        String observacaoLimpa;
+        try
+        {
+            dataReferenciaLimpa = limparDataReferencia(dataReferencia);
+            observacaoLimpa = limparObservacao(observacao);
+        }
+        catch (IllegalArgumentException e)
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", e.getMessage()));
+        }
+
+        String anoLimpo = limparAno(ano);
+        int mesNumero = limparMes(mes);
+        String eventoLimpo = limparEvento(evento);
+
+        if (dataReferenciaLimpa != null)
+        {
+            anoLimpo = String.valueOf(dataReferenciaLimpa.getYear());
+            mesNumero = dataReferenciaLimpa.getMonthValue();
+        }
+
+        if (anoLimpo.isEmpty())
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Ano invalido"));
+        }
+
+        if (mesNumero <= 0)
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Mes invalido"));
+        }
+
+        if (dataReferenciaLimpa == null)
+        {
+            dataReferenciaLimpa = LocalDate.of(Integer.parseInt(anoLimpo), mesNumero, 1);
+        }
+
+        if (eventoLimpo.isEmpty())
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Evento obrigatorio"));
+        }
+
+        Banco conexao = Banco.getConnection();
+        Path novoDestino = null;
+        try
+        {
+            Funcionario funcionario = buscarFuncionarioDaSessao(session, conexao);
+            if (funcionario == null)
+            {
+                return ResponseEntity.badRequest().body(new Error("Erro", "Funcionario responsavel nao encontrado"));
+            }
+            if (!ehCoordenador(funcionario))
+            {
+                return ResponseEntity.status(403).body(new Error("Erro", "Apenas coordenadores podem editar arquivos"));
+            }
+
+            Transparencia antiga = new Transparencia().buscarPorId(id, conexao);
+            if (antiga == null)
+            {
+                return ResponseEntity.notFound().build();
+            }
+
+            String nomeArquivo = antiga.getNomeArquivo();
+            String caminhoArquivo = antiga.getCaminhoArquivo();
+            boolean substituirArquivo = arquivo != null && !arquivo.isEmpty();
+
+            if (substituirArquivo)
+            {
+                String nomeOriginal = arquivo.getOriginalFilename() == null ? "" : arquivo.getOriginalFilename();
+                if (arquivo.getSize() > TAMANHO_MAXIMO_PDF)
+                {
+                    return ResponseEntity.badRequest().body(new Error("Erro", "O PDF deve ter no maximo 20 MB"));
+                }
+
+                if (!nomeOriginal.toLowerCase(Locale.ROOT).endsWith(".pdf") || !arquivoEhPdf(arquivo))
+                {
+                    return ResponseEntity.badRequest().body(new Error("Erro", "Somente arquivos PDF sao permitidos"));
+                }
+
+                String pastaEvento = limparNomePasta(eventoLimpo);
+                String pastaMes = String.format("%02d-%s", mesNumero, limparNomePasta(nomeMes(mesNumero)));
+                Files.createDirectories(raizUpload.resolve(anoLimpo).resolve(pastaMes).resolve(pastaEvento));
+                String baseNome = limparNomeArquivo(nomeOriginal);
+                nomeArquivo = Instant.now().toEpochMilli() + "-" + baseNome + ".pdf";
+                novoDestino = raizUpload.resolve(anoLimpo).resolve(pastaMes).resolve(pastaEvento).resolve(nomeArquivo).normalize();
+
+                if (!novoDestino.startsWith(raizUpload))
+                {
+                    return ResponseEntity.badRequest().body(new Error("Erro", "Nome de arquivo invalido"));
+                }
+
+                try (InputStream stream = arquivo.getInputStream())
+                {
+                    Files.copy(stream, novoDestino, StandardCopyOption.REPLACE_EXISTING);
+                }
+                caminhoArquivo = raizUpload.relativize(novoDestino).toString().replace("\\", "/");
+            }
+
+            Transparencia atualizada = new Transparencia();
+            atualizada.setIdTransparencia(id);
+            atualizada.setAno(Integer.parseInt(anoLimpo));
+            atualizada.setMes(mesNumero);
+            atualizada.setNomeArquivo(nomeArquivo);
+            atualizada.setEvento(eventoLimpo);
+            atualizada.setDataReferencia(dataReferenciaLimpa);
+            atualizada.setObservacao(observacaoLimpa);
+            atualizada.setCaminhoArquivo(caminhoArquivo);
+            atualizada.setDataUpload(antiga.getDataUpload());
+            atualizada.setFuncionario(funcionario);
+
+            if (!atualizada.atualizar(conexao))
+            {
+                if (novoDestino != null)
+                {
+                    Files.deleteIfExists(novoDestino);
+                }
+                return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel atualizar o registro no banco"));
+            }
+
+            if (substituirArquivo)
+            {
+                Path caminhoAntigo = raizUpload.resolve(antiga.getCaminhoArquivo()).normalize();
+                if (caminhoAntigo.startsWith(raizUpload)
+                        && !caminhoAntigo.equals(novoDestino)
+                        && Files.exists(caminhoAntigo)
+                        && Files.isRegularFile(caminhoAntigo))
+                {
+                    Files.deleteIfExists(caminhoAntigo);
+                }
+            }
+
+            return ResponseEntity.ok(atualizada);
+        }
+        catch (IllegalArgumentException e)
+        {
+            if (novoDestino != null)
+            {
+                try
+                {
+                    Files.deleteIfExists(novoDestino);
+                }
+                catch (IOException ignored)
+                {
+                }
+            }
+            return ResponseEntity.badRequest().body(new Error("Erro", e.getMessage()));
+        }
+        catch (IOException | SQLException e)
+        {
+            if (novoDestino != null)
+            {
+                try
+                {
+                    Files.deleteIfExists(novoDestino);
+                }
+                catch (IOException ignored)
+                {
+                }
+            }
+            return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao atualizar arquivo"));
         }
         finally
         {

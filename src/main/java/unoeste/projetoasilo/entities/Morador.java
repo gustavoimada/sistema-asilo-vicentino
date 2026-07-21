@@ -4,7 +4,10 @@ import unoeste.projetoasilo.dao.MoradorDAO;
 import unoeste.projetoasilo.db.util.Banco;
 
 import java.sql.SQLException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +25,11 @@ public class Morador {
 	private String cep;
 	private Integer quartoId;
 	private Quarto quarto;
+	private boolean ativo = true;
+	private BigDecimal pesoAtualKg;
+	private BigDecimal alturaAtualCm;
+	private LocalDateTime dadosAntropometricosAtualizadosEm;
+	private LocalDateTime atualizadoEm;
 	private List<ComposicaoFamiliarMorador> familiares = new ArrayList<>();
 
 	public Morador() {
@@ -136,6 +144,18 @@ public class Morador {
 		this.quarto = quarto;
 	}
 
+	public boolean isAtivo() { return ativo; }
+	public void setAtivo(boolean ativo) { this.ativo = ativo; }
+	public BigDecimal getPesoAtualKg() { return pesoAtualKg; }
+	public void setPesoAtualKg(BigDecimal pesoAtualKg) { this.pesoAtualKg = pesoAtualKg; }
+	public BigDecimal getAlturaAtualCm() { return alturaAtualCm; }
+	public void setAlturaAtualCm(BigDecimal alturaAtualCm) { this.alturaAtualCm = alturaAtualCm; }
+	public LocalDateTime getDadosAntropometricosAtualizadosEm() { return dadosAntropometricosAtualizadosEm; }
+	public void setDadosAntropometricosAtualizadosEm(LocalDateTime valor) { this.dadosAntropometricosAtualizadosEm = valor; }
+	public LocalDateTime getAtualizadoEm() { return atualizadoEm; }
+	public void setAtualizadoEm(LocalDateTime atualizadoEm) { this.atualizadoEm = atualizadoEm; }
+	public int getIdade() { return dtNascimento == null ? 0 : Period.between(dtNascimento, LocalDate.now()).getYears(); }
+
 	public List<ComposicaoFamiliarMorador> getFamiliares() {
 		return familiares;
 	}
@@ -158,6 +178,14 @@ public class Morador {
 		return dao.deletar(this.idMorador, conexao);
 	}
 
+	public boolean inativar(Banco conexao) throws SQLException {
+		return new MoradorDAO().alterarAtivo(idMorador, false, conexao);
+	}
+
+	public boolean reativar(Banco conexao) throws SQLException {
+		return new MoradorDAO().alterarAtivo(idMorador, true, conexao);
+	}
+
 	public boolean editar(Banco conexao) throws SQLException {
 		if (idMorador > 0 && cpf != null && validarCpf() && nome != null && genero != null && endereco != null && numero > 0 && dtNascimento != null && cidade != null && estado != null && cep != null) {
 			MoradorDAO dao = new MoradorDAO();
@@ -174,6 +202,10 @@ public class Morador {
 	public List<Morador> listar(Banco conexao) throws SQLException {
 		MoradorDAO dao = new MoradorDAO();
 		return dao.listar(conexao);
+	}
+
+	public List<Morador> listarAtivos(Banco conexao) throws SQLException {
+		return new MoradorDAO().listarAtivos(conexao);
 	}
 
 	public List<Morador> listar(String ordenacao, String direcao, Banco conexao) throws SQLException

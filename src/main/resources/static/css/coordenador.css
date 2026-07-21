@@ -961,6 +961,37 @@
   box-shadow: 0 12px 22px rgba(0, 53, 127, 0.18);
 }
 
+.transparencia-form-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.transparencia-form-actions .transparencia-submit {
+  margin-top: 0;
+}
+
+.transparencia-cancel-edit {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  background: #fff5f5;
+  color: #b91c1c;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.transparencia-cancel-edit:hover {
+  background: #fee2e2;
+}
+
 .transparencia-submit:disabled {
   opacity: 0.65;
   cursor: not-allowed;
@@ -1132,17 +1163,37 @@
   border-color: #93c5fd;
 }
 
+.transparencia-file-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.transparencia-edit-btn,
 .transparencia-delete-btn {
   width: 34px;
   height: 34px;
-  border: 1px solid #fecaca;
   border-radius: 10px;
-  background: #fff5f5;
-  color: #b91c1c;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.transparencia-edit-btn {
+  border: 1px solid #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.transparencia-edit-btn:hover {
+  background: #dbeafe;
+}
+
+.transparencia-delete-btn {
+  border: 1px solid #fecaca;
+  background: #fff5f5;
+  color: #b91c1c;
 }
 
 .transparencia-delete-btn:hover {

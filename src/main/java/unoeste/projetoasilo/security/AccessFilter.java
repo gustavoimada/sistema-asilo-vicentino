@@ -50,6 +50,10 @@ public class AccessFilter implements Filter
             "/registrarUsoMedicacao.html"
     );
 
+    private static final Set<String> PAGINAS_NUTRICIONISTA = Set.of(
+            "/nutricionista.html"
+    );
+
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException
     {
@@ -161,6 +165,10 @@ public class AccessFilter implements Filter
         {
             return ehCuidador(categoria);
         }
+        if (PAGINAS_NUTRICIONISTA.contains(rota))
+        {
+            return ehNutricionista(categoria);
+        }
 
         String rotaMin = rota.toLowerCase();
         if (rotaMin.startsWith("/login/funcionario/"))
@@ -201,6 +209,14 @@ public class AccessFilter implements Filter
         if (rotaMin.startsWith("/funcionario/listarcuidadores"))
         {
             return ehSecretaria(categoria) || ehCoordenador(categoria) || ehCuidador(categoria);
+        }
+        if (rotaMin.startsWith("/nutricao/"))
+        {
+            return ehNutricionista(categoria);
+        }
+        if (rotaMin.startsWith("/morador/listarativos"))
+        {
+            return ehNutricionista(categoria) || ehSecretaria(categoria) || ehCoordenador(categoria);
         }
         if (rotaMin.startsWith("/funcionario/")
                 || rotaMin.startsWith("/funcionarios/")
@@ -362,6 +378,11 @@ public class AccessFilter implements Filter
     private boolean ehCuidador(String categoria)
     {
         return "cuidador".equals(categoria);
+    }
+
+    private boolean ehNutricionista(String categoria)
+    {
+        return "nutricionista".equals(categoria);
     }
 
     private String normalizar(String texto)
