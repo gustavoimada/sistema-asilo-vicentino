@@ -219,11 +219,14 @@
 .morador-actions-cell {
   text-align: right;
   white-space: nowrap;
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 6px;
+  vertical-align: middle;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#listaMoradores .morador-actions-cell .icon-button,
+#listaMoradores .morador-actions-cell button {
+  margin-left: 6px;
 }
 
 .form-actions {

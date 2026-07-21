@@ -222,7 +222,7 @@ function nomeMesTransparencia(mes)
 function rotuloMesTransparencia(mes)
 {
     const numero = mesTransparencia({ mes });
-    return `${String(numero).padStart(2, "0")} - ${nomeMesTransparencia(numero)}`;
+    return nomeMesTransparencia(numero);
 }
 
 function prepararArquivoTransparencia(arquivo)
@@ -412,7 +412,7 @@ function renderizarTransparenciaCoordenadorLegado()
                         <span class="material-symbols-outlined">picture_as_pdf</span>
                         <span class="file-text">
                             <strong title="${escaparHtmlTransparencia(nomeExibicao)}">${escaparHtmlTransparencia(nomeExibicao)}</strong>
-                            <span class="info">Referência: ${escaparHtmlTransparencia(arquivo.dataReferencia || "Data não informada")}</span>
+                            <span class="info">Data: ${escaparHtmlTransparencia(arquivo.dataReferencia || "Data não informada")}</span>
                             ${observacaoHtml}
                         </span>
                         <span class="material-symbols-outlined">download</span>
@@ -496,7 +496,7 @@ function renderizarTransparenciaCoordenador()
                                 <span class="material-symbols-outlined">picture_as_pdf</span>
                                 <span class="file-text">
                                     <strong title="${escaparHtmlTransparencia(nomeExibicao)}">${escaparHtmlTransparencia(nomeExibicao)}</strong>
-                                    <span class="info">${escaparHtmlTransparencia(evento.evento || "Outros")} • Referência: ${escaparHtmlTransparencia(arquivo.dataReferencia || "Data nao informada")}</span>
+                                    <span class="info">${escaparHtmlTransparencia(evento.evento || "Outros")} • Data: ${escaparHtmlTransparencia(arquivo.dataReferencia || "Data nao informada")}</span>
                                     ${observacaoHtml}
                                 </span>
                                 <span class="material-symbols-outlined">download</span>
@@ -757,15 +757,7 @@ async function enviarTransparencia(event)
         }
 
         mostrarMensagemTransparencia(editando ? "Documento atualizado com sucesso." : "PDF publicado na area de transparencia.", "success");
-        if (editando)
-        {
-            cancelarEdicaoTransparencia(false);
-        }
-        else
-        {
-            form?.reset();
-            preencherDataReferenciaAtual();
-        }
+        cancelarEdicaoTransparencia(true);
         await carregarTransparenciaCoordenador();
     }
     catch (error)
@@ -824,7 +816,11 @@ function atualizarFormularioTransparenciaModo()
             ? "Opcional: selecione outro PDF apenas se quiser substituir o arquivo atual."
             : "ObrigatÃ³rio para nova publicaÃ§Ã£o. No modo ediÃ§Ã£o, envie outro PDF apenas se quiser substituir o arquivo atual.";
     }
-    if (cancelarBtn) cancelarBtn.hidden = !editando;
+    if (cancelarBtn)
+    {
+        cancelarBtn.hidden = !editando;
+        cancelarBtn.style.display = editando ? "" : "none";
+    }
     if (submit)
     {
         submit.innerHTML = editando
@@ -843,6 +839,8 @@ function entrarModoEdicaoTransparencia(idArquivo)
     }
 
     estadoTransparencia.edicao = arquivo;
+    const cadastro = document.getElementById("cadastroTransparenciaContainer");
+    if (cadastro) cadastro.hidden = false;
 
     const evento = document.getElementById("transparenciaEvento");
     const dataReferencia = document.getElementById("transparenciaDataReferencia");
@@ -868,6 +866,24 @@ function cancelarEdicaoTransparencia(limparCampos = true)
         preencherDataReferenciaAtual();
     }
     atualizarFormularioTransparenciaModo();
+    const cadastro = document.getElementById("cadastroTransparenciaContainer");
+    if (cadastro) cadastro.hidden = true;
+}
+
+function abrirCadastroTransparencia()
+{
+    estadoTransparencia.edicao = null;
+    const form = document.getElementById("formTransparencia");
+    form?.reset();
+    preencherDataReferenciaAtual();
+    atualizarFormularioTransparenciaModo();
+
+    const cadastro = document.getElementById("cadastroTransparenciaContainer");
+    if (cadastro)
+    {
+        cadastro.hidden = false;
+        cadastro.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
 }
 
 async function excluirTransparencia(idArquivo)
@@ -904,6 +920,7 @@ async function excluirTransparencia(idArquivo)
 
 function adicionarEventListenersTransparencia()
 {
+    document.getElementById("abrirCadastroTransparenciaBtn")?.addEventListener("click", abrirCadastroTransparencia);
     document.getElementById("formTransparencia")?.addEventListener("submit", enviarTransparencia);
     document.getElementById("transparenciaArquivo")?.addEventListener("change", validarArquivoTransparencia);
     document.getElementById("atualizarTransparenciaBtn")?.addEventListener("click", carregarTransparenciaCoordenador);

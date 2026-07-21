@@ -18,6 +18,48 @@
       align-items: start;
     }
 
+    .nutri-grid.resident-selected {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .nutri-sidebar-hint {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding: 14px 16px;
+      border: 1px solid #dbeafe;
+      border-radius: 14px;
+      background: #f8fbff;
+      color: #4b6382;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .nutri-sidebar-hint .material-symbols-outlined { color: #004aad; }
+
+    .nutri-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .nutri-estimativa-fields {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .nutri-imc-preview {
+      padding: 14px 16px;
+      border: 1px solid #bae6fd;
+      border-radius: 14px;
+      background: #f0f9ff;
+      color: #075985;
+      font-weight: 800;
+    }
+
     .nutri-card {
       background: #fff;
       border: 1px solid #dbeafe;
@@ -224,7 +266,8 @@
     @media (max-width: 1100px) {
       .nutri-grid,
       .nutri-form-grid,
-      .nutri-resumo {
+      .nutri-resumo,
+      .nutri-estimativa-fields {
         grid-template-columns: 1fr;
       }
     }
@@ -271,18 +314,17 @@
 
       <div class="content">
         <div class="content-wrap">
-          <section class="list-header">
-            <div class="list-header-left">
-              <h2>Painel de Nutricao</h2>
-              <p>Prontuario nutricional dos moradores ativos, com estimativas antropometricas e evolucoes clinicas.</p>
-            </div>
-          </section>
+          <div class="nutri-sidebar-hint">
+            <span class="material-symbols-outlined">menu_open</span>
+            Para ganhar mais espaco no prontuario, voce pode recolher o menu lateral.
+          </div>
 
           <section class="nutri-grid">
-            <article class="nutri-card">
+            <article id="seletorMoradorNutri" class="nutri-card">
               <div class="nutri-card__header">
                 <h3>Moradores ativos</h3>
                 <p>Selecione um morador para criar ou acompanhar o prontuario.</p>
+                <input id="buscaMoradorNutri" type="search" placeholder="Buscar morador" style="margin-top:14px;" />
               </div>
               <div id="listaMoradoresNutri" class="morador-nutri-lista"></div>
             </article>

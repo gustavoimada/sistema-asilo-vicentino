@@ -577,9 +577,10 @@ async function carregarContatoResponsavelMorador(idMorador) {
 
         estadoContatoResponsavel = 'pronto';
     } catch (error) {
-        estadoContatoResponsavel = 'erro';
-        console.error('Erro ao carregar contato responsavel:', error);
-        exibirMensagem('error', error.message || 'Nao foi possivel carregar o contato responsavel.');
+        // A ausencia de um contato antigo nao pode impedir a edicao do morador.
+        estadoContatoResponsavel = 'pronto';
+        console.warn('Contato responsavel nao carregado:', error);
+        limparContatoResponsavel();
     }
 }
 
@@ -751,6 +752,8 @@ async function abrirDetalhesMorador(idMorador) {
                     ${montarLinhaDetalhe('Nascimento', formatarData(morador.dtNascimento))}
                     ${montarLinhaDetalhe('Idade', idade ? idade + ' anos' : '')}
                     ${montarLinhaDetalhe('Quarto', quartoTexto)}
+                    ${montarLinhaDetalhe('Peso atual', morador.pesoAtualKg ? `${morador.pesoAtualKg} kg` : 'Nao informado')}
+                    ${montarLinhaDetalhe('Altura atual', morador.alturaAtualCm ? `${morador.alturaAtualCm} cm` : 'Nao informada')}
                 </div>
             </section>
             <section class="morador-detail-section">
@@ -962,7 +965,12 @@ async function deletarMorador(id) {
         return;
 
     fetch(`${URL}/${id}`, { method: 'DELETE' })
-        .then(response => response.json())
+        .then(async response => {
+            const data = await parseJsonSeguro(response);
+            if (!response.ok)
+                throw new Error(data?.descricao || data?.error || 'Nao foi possivel excluir o morador.');
+            return data;
+        })
         .then(data => {
             if (data && (data.error || data.descricao)) {
                 if (data.descricao)
@@ -977,7 +985,10 @@ async function deletarMorador(id) {
                 carregarQuartosDisponiveis();
             }
         })
-        .catch(error => console.error('Erro ao deletar:', error));
+        .catch(error => {
+            console.error('Erro ao deletar:', error);
+            exibirMensagem('error', error.message || 'Nao foi possivel excluir o morador.');
+        });
 }
 
 function mostrarFormulario(titulo = 'Cadastrar Novo Morador') {

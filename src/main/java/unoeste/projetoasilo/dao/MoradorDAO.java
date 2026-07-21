@@ -126,11 +126,11 @@ public class MoradorDAO {
     }
 
     public boolean alterarAtivo(int id, boolean ativo, Banco conexao) throws SQLException {
-        String sql = "UPDATE morador SET ativo = ?, atualizado_em = CURRENT_TIMESTAMP, quartos_idquartos = CASE WHEN ? THEN quartos_idquartos ELSE NULL END WHERE idmorador = ?";
+        String sql = ativo
+                ? "UPDATE morador SET ativo = TRUE WHERE idmorador = ?"
+                : "UPDATE morador SET ativo = FALSE, quartos_idquartos = NULL WHERE idmorador = ?";
         try (PreparedStatement ps = conexao.preparar(sql)) {
-            ps.setBoolean(1, ativo);
-            ps.setBoolean(2, ativo);
-            ps.setInt(3, id);
+            ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         }
     }

@@ -553,7 +553,7 @@ function nomeMesTransparenciaPublica(mes) {
 
 function rotuloMesTransparenciaPublica(mes) {
   const numero = mesTransparenciaPublica({ mes });
-  return `${String(numero).padStart(2, "0")} - ${nomeMesTransparenciaPublica(numero)}`;
+  return nomeMesTransparenciaPublica(numero);
 }
 
 function nomeExibicaoArquivoTransparenciaPublica(arquivo) {
@@ -731,7 +731,7 @@ function renderizarTransparenciaLegado(filtro = "") {
             <span class="material-symbols-outlined">picture_as_pdf</span>
             <span class="transparencia-file-info">
               <strong>${escaparHtmlTransparenciaPublica(arquivo.nomeExibicao || "Documento PDF")}</strong>
-              <span>Referência: ${escaparHtmlTransparenciaPublica(arquivo.dataReferenciaFormatada || "Data nao informada")}</span>
+              <span>Data: ${escaparHtmlTransparenciaPublica(arquivo.dataReferenciaFormatada || "Data nao informada")}</span>
               ${observacaoHtml}
             </span>
             <span class="material-symbols-outlined">download</span>
@@ -826,7 +826,7 @@ function renderizarTransparencia(filtro = "") {
               <span class="material-symbols-outlined">picture_as_pdf</span>
               <span class="transparencia-file-info">
                 <strong>${escaparHtmlTransparenciaPublica(arquivo.nomeExibicao || "Documento PDF")}</strong>
-                <span>Referência: ${escaparHtmlTransparenciaPublica(arquivo.dataReferenciaFormatada || "Data nao informada")}</span>
+                <span>Data: ${escaparHtmlTransparenciaPublica(arquivo.dataReferenciaFormatada || "Data nao informada")}</span>
                 ${observacaoHtml}
               </span>
               <span class="material-symbols-outlined transparencia-file-action">download</span>

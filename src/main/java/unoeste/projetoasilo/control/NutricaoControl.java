@@ -194,7 +194,7 @@ public class NutricaoControl
 
     private ProntuarioNutricional montarProntuario(ProntuarioRequest request, Morador morador, Funcionario nutricionista)
     {
-        String metodo = metodoObrigatorio(request.metodoMedicao());
+        String metodo = request.acamado() ? "ESTIMADO" : "AFERIDO";
         ProntuarioNutricional prontuario = new ProntuarioNutricional();
         prontuario.setMorador(morador);
         prontuario.setNutricionista(nutricionista);

@@ -871,8 +871,19 @@
 
 .transparencia-grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 18px;
+}
+
+.transparencia-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 18px;
+}
+
+#cadastroTransparenciaContainer[hidden],
+.transparencia-cancel-edit[hidden] {
+  display: none !important;
 }
 
 .transparencia-upload,
