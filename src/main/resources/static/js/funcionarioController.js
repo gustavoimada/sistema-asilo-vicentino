@@ -48,11 +48,14 @@ function carregarContextoUrl()
 
 function formatarCargoInclusivo(categoria)
 {
-    const valor = removerAcentos(String(categoria || "").trim()).toLowerCase();
+    const valor = removerAcentos(String(categoria || "").trim()).replace(/\s+/g, " ").toLowerCase();
     if (valor === "coordenador") return "Coordenador(a)";
     if (valor === "cuidador") return "Cuidador(a)";
     if (valor === "secretaria") return "Secretária";
     if (valor === "nutricionista") return "Nutricionista";
+    if (valor === "artesao") return "Artesão";
+    if (valor === "educador fisico") return "Educador Físico";
+    if (valor === "fisioterapeuta") return "Fisioterapeuta";
     return String(categoria || "").trim();
 }
 
@@ -70,11 +73,14 @@ function removerAcentos(texto)
 
 function padronizarCategoriaValor(categoria)
 {
-    const valor = removerAcentos(String(categoria || "").trim()).toLowerCase();
+    const valor = removerAcentos(String(categoria || "").trim()).replace(/\s+/g, " ").toLowerCase();
     if (valor === "coordenador") return "Coordenador";
     if (valor === "cuidador") return "Cuidador";
     if (valor === "secretaria") return "Secretaria";
     if (valor === "nutricionista") return "Nutricionista";
+    if (valor === "artesao") return "Artesao";
+    if (valor === "educador fisico") return "Educador Fisico";
+    if (valor === "fisioterapeuta") return "Fisioterapeuta";
     return String(categoria || "").trim();
 }
 
@@ -248,10 +254,13 @@ function comparar(a, b, chave, direcao)
 
 function classeCategoria(categoria)
 {
-    const valor = String(categoria || "").toLowerCase();
+    const valor = removerAcentos(String(categoria || "").trim()).replace(/\s+/g, " ").toLowerCase();
     if (valor === "coordenador") return "categoria-coordenador";
     if (valor === "cuidador") return "categoria-cuidador";
     if (valor === "nutricionista") return "categoria-nutricionista";
+    if (valor === "artesao") return "categoria-artesao";
+    if (valor === "educador fisico") return "categoria-educador-fisico";
+    if (valor === "fisioterapeuta") return "categoria-fisioterapeuta";
     return "categoria-secretaria";
 }
 
@@ -268,7 +277,7 @@ function motivoBloqueioExclusao(funcionario)
 
     if ((categoriaAlvo === "Coordenador" || categoriaAlvo === "Nutricionista") && categoriaLogada !== "Coordenador")
     {
-        return "Apenas coordenadores podem excluir outro coordenador";
+        return "Apenas coordenadores podem excluir coordenadores ou nutricionistas";
     }
 
     return "";
@@ -281,7 +290,7 @@ function motivoBloqueioEdicao(funcionario)
 
     if (categoriaLogada === "Secretaria" && (categoriaAlvo === "Coordenador" || categoriaAlvo === "Nutricionista"))
     {
-        return "Secretárias só podem editar cuidadores e outras secretárias";
+        return "Secretárias não podem editar coordenadores ou nutricionistas";
     }
 
     return "";

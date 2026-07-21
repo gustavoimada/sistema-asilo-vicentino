@@ -65,7 +65,13 @@ function redirecionar(funcionario)
         return;
     }
 
-    window.location.href = "../secretaria.html";
+    if (categoria === "secretaria")
+    {
+        window.location.href = "../secretaria.html";
+        return;
+    }
+
+    window.location.href = "../index.html";
 }
 
 function limparContextoLogin()

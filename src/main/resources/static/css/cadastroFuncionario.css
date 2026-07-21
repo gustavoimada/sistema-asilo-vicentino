@@ -598,6 +598,21 @@ select {
   color: #6d28d9;
 }
 
+.categoria-artesao {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.categoria-educador-fisico {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.categoria-fisioterapeuta {
+  background: #ccfbf1;
+  color: #0f766e;
+}
+
 .acoes {
   display: inline-flex;
   gap: 8px;

@@ -371,7 +371,7 @@ public class FuncionarioControl
             }
         }
 
-        if (!"coordenador".equals(categoriaAlvo) && !"cuidador".equals(categoriaAlvo) && !"secretaria".equals(categoriaAlvo) && !"nutricionista".equals(categoriaAlvo))
+        if (!categoriaFuncionarioValida(categoriaAlvo))
         {
             return ResponseEntity.badRequest().body(new Error("Erro", "Categoria do funcionario invalida para exclusao."));
         }
@@ -390,7 +390,7 @@ public class FuncionarioControl
         String categoriaAlvo = chaveCategoria(funcionario.getCategoria());
         if ("coordenador".equals(categoriaAlvo) || "nutricionista".equals(categoriaAlvo))
         {
-            return ResponseEntity.status(403).body(new Error("Erro", "Secretarias podem editar apenas cuidadores e outras secretarias."));
+            return ResponseEntity.status(403).body(new Error("Erro", "Secretarias nao podem editar coordenadores ou nutricionistas."));
         }
 
         String categoriaNova = chaveCategoria(categoriaSolicitada);
@@ -409,7 +409,7 @@ public class FuncionarioControl
         if ("secretaria".equals(categoriaLogada)
                 && ("coordenador".equals(categoriaNova) || "nutricionista".equals(categoriaNova)))
         {
-            return ResponseEntity.status(403).body(new Error("Erro", "Secretarias podem cadastrar apenas cuidadores e outras secretarias."));
+            return ResponseEntity.status(403).body(new Error("Erro", "Secretarias nao podem cadastrar coordenadores ou nutricionistas."));
         }
         return null;
     }
@@ -455,7 +455,8 @@ public class FuncionarioControl
         }
 
         String texto = Normalizer.normalize(categoria.trim().toLowerCase(), Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "");
+                .replaceAll("\\p{M}", "")
+                .replaceAll("\\s+", " ");
 
         if (texto.contains("coordenador"))
         {
@@ -472,6 +473,18 @@ public class FuncionarioControl
         if (texto.contains("nutricionista"))
         {
             return "nutricionista";
+        }
+        if (texto.contains("artesao"))
+        {
+            return "artesao";
+        }
+        if (texto.contains("educador fisico"))
+        {
+            return "educador_fisico";
+        }
+        if (texto.contains("fisioterapeuta"))
+        {
+            return "fisioterapeuta";
         }
 
         return "";
@@ -587,27 +600,57 @@ public class FuncionarioControl
         }
 
         String categoriaLimpa = categoria.trim();
-        if ("Coordenador".equalsIgnoreCase(categoriaLimpa))
+        String categoriaNormalizada = Normalizer.normalize(categoriaLimpa.toLowerCase(), Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .replaceAll("\\s+", " ");
+
+        if ("coordenador".equals(categoriaNormalizada))
         {
             return "Coordenador";
         }
 
-        if ("Cuidador".equalsIgnoreCase(categoriaLimpa))
+        if ("cuidador".equals(categoriaNormalizada))
         {
             return "Cuidador";
         }
 
-        if ("Nutricionista".equalsIgnoreCase(categoriaLimpa))
+        if ("nutricionista".equals(categoriaNormalizada))
         {
             return "Nutricionista";
         }
 
-        if ("Secretaria".equalsIgnoreCase(categoriaLimpa) || "Secretária".equalsIgnoreCase(categoriaLimpa))
+        if ("secretaria".equals(categoriaNormalizada))
         {
             return "Secretaria";
         }
 
+        if ("artesao".equals(categoriaNormalizada))
+        {
+            return "Artesao";
+        }
+
+        if ("educador fisico".equals(categoriaNormalizada))
+        {
+            return "Educador Fisico";
+        }
+
+        if ("fisioterapeuta".equals(categoriaNormalizada))
+        {
+            return "Fisioterapeuta";
+        }
+
         return null;
+    }
+
+    private boolean categoriaFuncionarioValida(String categoria)
+    {
+        return "coordenador".equals(categoria)
+                || "cuidador".equals(categoria)
+                || "secretaria".equals(categoria)
+                || "nutricionista".equals(categoria)
+                || "artesao".equals(categoria)
+                || "educador_fisico".equals(categoria)
+                || "fisioterapeuta".equals(categoria);
     }
 
     private String categoriaAlternativa(String categoria)
