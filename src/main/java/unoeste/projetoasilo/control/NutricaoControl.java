@@ -3,8 +3,10 @@ package unoeste.projetoasilo.control;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -185,6 +187,151 @@ public class NutricaoControl
         catch (SQLException e)
         {
             return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel salvar evolucao nutricional."));
+        }
+        finally
+        {
+            conexao.fechar();
+        }
+    }
+
+    @PutMapping("prontuario/{idProntuario}")
+    public ResponseEntity<Object> atualizarProntuario(@PathVariable int idProntuario,
+                                                       @RequestBody AtualizacaoProntuarioRequest request,
+                                                       HttpSession session)
+    {
+        if (!ehNutricionista(session))
+        {
+            return ResponseEntity.status(403).body(new Error("Erro", "Acesso permitido apenas para nutricionistas."));
+        }
+
+        Banco conexao = Banco.getConnection();
+        try
+        {
+            NutricaoDAO dao = new NutricaoDAO();
+            ProntuarioNutricional prontuario = dao.buscarProntuarioPorId(idProntuario, conexao);
+            if (prontuario == null)
+            {
+                return ResponseEntity.status(404).body(new Error("Erro", "Prontuário nutricional não encontrado."));
+            }
+
+            prontuario.setPesoKg(decimalObrigatorio(request.pesoKg(), "Informe o peso."));
+            prontuario.setAlturaCm(decimalObrigatorio(request.alturaCm(), "Informe a altura."));
+            prontuario.setDiagnosticoInicial(textoObrigatorio(request.diagnosticoInicial(), "Informe o diagnóstico inicial."));
+            return ResponseEntity.ok(dao.atualizarProntuario(prontuario, conexao));
+        }
+        catch (IllegalArgumentException e)
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", e.getMessage()));
+        }
+        catch (SQLException e)
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Não foi possível atualizar o prontuário nutricional."));
+        }
+        finally
+        {
+            conexao.fechar();
+        }
+    }
+
+    @DeleteMapping("prontuario/{idProntuario}")
+    public ResponseEntity<Object> excluirProntuario(@PathVariable int idProntuario, HttpSession session)
+    {
+        if (!ehNutricionista(session))
+        {
+            return ResponseEntity.status(403).body(new Error("Erro", "Acesso permitido apenas para nutricionistas."));
+        }
+
+        Banco conexao = Banco.getConnection();
+        try
+        {
+            NutricaoDAO dao = new NutricaoDAO();
+            if (dao.buscarProntuarioPorId(idProntuario, conexao) == null)
+            {
+                return ResponseEntity.status(404).body(new Error("Erro", "Prontuário nutricional não encontrado."));
+            }
+            dao.excluirProntuario(idProntuario, conexao);
+            return ResponseEntity.ok(Map.of("mensagem", "Prontuário nutricional excluído."));
+        }
+        catch (SQLException e)
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Não foi possível excluir o prontuário nutricional."));
+        }
+        finally
+        {
+            conexao.fechar();
+        }
+    }
+
+    @PutMapping("evolucao/{idEvolucao}")
+    public ResponseEntity<Object> atualizarEvolucao(@PathVariable int idEvolucao,
+                                                     @RequestBody EvolucaoRequest request,
+                                                     HttpSession session)
+    {
+        Funcionario nutricionista = nutricionistaDaSessao(session);
+        if (nutricionista == null)
+        {
+            return ResponseEntity.status(403).body(new Error("Erro", "Acesso permitido apenas para nutricionistas."));
+        }
+
+        Banco conexao = Banco.getConnection();
+        try
+        {
+            NutricaoDAO dao = new NutricaoDAO();
+            EvolucaoNutricional evolucao = dao.buscarEvolucaoPorId(idEvolucao, conexao);
+            if (evolucao == null)
+            {
+                return ResponseEntity.status(404).body(new Error("Erro", "Evolução nutricional não encontrada."));
+            }
+            ProntuarioNutricional prontuario = dao.buscarProntuarioPorId(evolucao.getProntuarioId(), conexao);
+            if (prontuario == null)
+            {
+                return ResponseEntity.status(404).body(new Error("Erro", "Prontuário nutricional não encontrado."));
+            }
+
+            evolucao.setNutricionista(nutricionista);
+            evolucao.setEvolucao(textoObrigatorio(request.evolucao(), "Informe a evolução nutricional."));
+            evolucao.setPesoKg(decimalOpcional(request.pesoKg()));
+            evolucao.setAlturaCm(decimalOpcional(request.alturaCm()));
+            evolucao.setMetodoMedicao(metodoOpcional(request.metodoMedicao()));
+            evolucao.setObservacoes(textoOpcional(request.observacoes()));
+            return ResponseEntity.ok(dao.atualizarEvolucao(evolucao, prontuario.getMorador().getIdMorador(), conexao));
+        }
+        catch (IllegalArgumentException e)
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", e.getMessage()));
+        }
+        catch (SQLException e)
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Não foi possível atualizar a evolução nutricional."));
+        }
+        finally
+        {
+            conexao.fechar();
+        }
+    }
+
+    @DeleteMapping("evolucao/{idEvolucao}")
+    public ResponseEntity<Object> excluirEvolucao(@PathVariable int idEvolucao, HttpSession session)
+    {
+        if (!ehNutricionista(session))
+        {
+            return ResponseEntity.status(403).body(new Error("Erro", "Acesso permitido apenas para nutricionistas."));
+        }
+
+        Banco conexao = Banco.getConnection();
+        try
+        {
+            NutricaoDAO dao = new NutricaoDAO();
+            if (dao.buscarEvolucaoPorId(idEvolucao, conexao) == null)
+            {
+                return ResponseEntity.status(404).body(new Error("Erro", "Evolução nutricional não encontrada."));
+            }
+            dao.excluirEvolucao(idEvolucao, conexao);
+            return ResponseEntity.ok(Map.of("mensagem", "Evolução nutricional excluída."));
+        }
+        catch (SQLException e)
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Não foi possível excluir a evolução nutricional."));
         }
         finally
         {
@@ -443,6 +590,7 @@ public class NutricaoControl
     public record ProntuarioRequest(int idMorador, boolean acamado, String metodoMedicao, String grupoEquacao,
                                     String alturaJoelhoCm, String circunferenciaBracoCm, String pesoKg,
                                     String alturaCm, String diagnosticoInicial) {}
+    public record AtualizacaoProntuarioRequest(String pesoKg, String alturaCm, String diagnosticoInicial) {}
     public record EvolucaoRequest(int idProntuario, String evolucao, String pesoKg, String alturaCm,
                                   String metodoMedicao, String observacoes) {}
     public record EstimativaResultado(BigDecimal pesoKg, BigDecimal alturaCm, BigDecimal imc,

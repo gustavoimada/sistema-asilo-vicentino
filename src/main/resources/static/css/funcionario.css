@@ -418,6 +418,58 @@ input {
   box-shadow: var(--shadow-md);
 }
 
+.team-summary-card {
+  grid-column: span 3;
+  border-bottom-color: var(--secondary);
+  padding: 20px 24px;
+}
+
+.team-summary-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.team-summary-heading .material-symbols-outlined {
+  color: var(--secondary);
+  font-size: 32px;
+}
+
+.team-role-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.team-role-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid #dbe7e1;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--secondary);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.team-role-item strong {
+  flex: 0 0 auto;
+  min-width: 24px;
+  color: var(--primary);
+  font-size: 17px;
+}
+
+.team-role-empty {
+  color: var(--secondary);
+  font-size: 13px;
+}
+
 .stat-card.primary {
   border-bottom-color: var(--primary);
 }
@@ -1045,6 +1097,14 @@ input {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .team-summary-card {
+    grid-column: 1 / -1;
+  }
+
+  .team-role-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .funcionario-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1133,6 +1193,8 @@ input {
 }
 
 @media (max-width: 560px) {
+  .team-role-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
   .controle-fraldas-card { padding: 18px; }
 
   .controle-fraldas-grid { grid-template-columns: 1fr; }

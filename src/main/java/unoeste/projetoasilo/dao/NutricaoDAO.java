@@ -8,6 +8,7 @@ import unoeste.projetoasilo.entities.ProntuarioNutricional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -152,6 +153,101 @@ public class NutricaoDAO
         return buscarEvolucaoPorId(evolucao.getIdEvolucao(), conexao);
     }
 
+    public ProntuarioNutricional atualizarProntuario(ProntuarioNutricional prontuario, Banco conexao) throws SQLException
+    {
+        String sql = """
+                UPDATE prontuario_nutricional
+                SET acamado = FALSE, metodo_medicao = 'AFERIDO', grupo_equacao = NULL,
+                    altura_joelho_cm = NULL, circunferencia_braco_cm = NULL,
+                    peso_kg = ?, altura_cm = ?, imc = ?, peso_estimado = FALSE,
+                    altura_estimada = FALSE, formula_peso = NULL, formula_altura = NULL,
+                    diagnostico_inicial = ?, atualizado_em = CURRENT_TIMESTAMP
+                WHERE idprontuario = ?
+                """;
+
+        try (PreparedStatement ps = conexao.preparar(sql))
+        {
+            ps.setBigDecimal(1, prontuario.getPesoKg());
+            ps.setBigDecimal(2, prontuario.getAlturaCm());
+            ps.setBigDecimal(3, calcularImc(prontuario.getPesoKg(), prontuario.getAlturaCm()));
+            ps.setString(4, prontuario.getDiagnosticoInicial());
+            ps.setInt(5, prontuario.getIdProntuario());
+            ps.executeUpdate();
+        }
+
+        new MoradorDAO().atualizarAntropometria(
+                prontuario.getMorador().getIdMorador(), prontuario.getPesoKg(), prontuario.getAlturaCm(), conexao);
+        return buscarProntuarioPorId(prontuario.getIdProntuario(), conexao);
+    }
+
+    public boolean excluirProntuario(int idProntuario, Banco conexao) throws SQLException
+    {
+        Connection jdbc = conexao.conexaoJdbc();
+        boolean autoCommitAnterior = jdbc.getAutoCommit();
+        try
+        {
+            jdbc.setAutoCommit(false);
+            try (PreparedStatement ps = conexao.preparar("DELETE FROM evolucao_nutricional WHERE prontuario_id = ?"))
+            {
+                ps.setInt(1, idProntuario);
+                ps.executeUpdate();
+            }
+            int removidos;
+            try (PreparedStatement ps = conexao.preparar("DELETE FROM prontuario_nutricional WHERE idprontuario = ?"))
+            {
+                ps.setInt(1, idProntuario);
+                removidos = ps.executeUpdate();
+            }
+            jdbc.commit();
+            return removidos > 0;
+        }
+        catch (SQLException e)
+        {
+            jdbc.rollback();
+            throw e;
+        }
+        finally
+        {
+            jdbc.setAutoCommit(autoCommitAnterior);
+        }
+    }
+
+    public EvolucaoNutricional atualizarEvolucao(EvolucaoNutricional evolucao, int idMorador, Banco conexao) throws SQLException
+    {
+        BigDecimal imc = evolucao.getPesoKg() != null && evolucao.getAlturaCm() != null
+                ? calcularImc(evolucao.getPesoKg(), evolucao.getAlturaCm()) : null;
+        String sql = """
+                UPDATE evolucao_nutricional
+                SET evolucao = ?, peso_kg = ?, altura_cm = ?, imc = ?, metodo_medicao = ?, observacoes = ?
+                WHERE idevolucao = ?
+                """;
+        try (PreparedStatement ps = conexao.preparar(sql))
+        {
+            ps.setString(1, evolucao.getEvolucao());
+            setBigDecimalOuNull(ps, 2, evolucao.getPesoKg());
+            setBigDecimalOuNull(ps, 3, evolucao.getAlturaCm());
+            setBigDecimalOuNull(ps, 4, imc);
+            setStringOuNull(ps, 5, evolucao.getMetodoMedicao());
+            setStringOuNull(ps, 6, evolucao.getObservacoes());
+            ps.setInt(7, evolucao.getIdEvolucao());
+            ps.executeUpdate();
+        }
+        if (evolucao.getPesoKg() != null && evolucao.getAlturaCm() != null)
+        {
+            new MoradorDAO().atualizarAntropometria(idMorador, evolucao.getPesoKg(), evolucao.getAlturaCm(), conexao);
+        }
+        return buscarEvolucaoPorId(evolucao.getIdEvolucao(), conexao);
+    }
+
+    public boolean excluirEvolucao(int idEvolucao, Banco conexao) throws SQLException
+    {
+        try (PreparedStatement ps = conexao.preparar("DELETE FROM evolucao_nutricional WHERE idevolucao = ?"))
+        {
+            ps.setInt(1, idEvolucao);
+            return ps.executeUpdate() > 0;
+        }
+    }
+
     public List<EvolucaoNutricional> listarEvolucoes(int idProntuario, Banco conexao) throws SQLException
     {
         String sql = """
@@ -177,7 +273,7 @@ public class NutricaoDAO
         return evolucoes;
     }
 
-    private EvolucaoNutricional buscarEvolucaoPorId(int idEvolucao, Banco conexao) throws SQLException
+    public EvolucaoNutricional buscarEvolucaoPorId(int idEvolucao, Banco conexao) throws SQLException
     {
         String sql = """
                 SELECT e.*, f.nome AS nutricionista_nome, f.categoria AS nutricionista_categoria
