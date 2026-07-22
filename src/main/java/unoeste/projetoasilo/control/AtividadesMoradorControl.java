@@ -22,7 +22,8 @@ import java.util.List;
 public class AtividadesMoradorControl
 {
 	@PostMapping("cadastrar")
-	public ResponseEntity<Object> cadastrarAtividadeMorador(@RequestParam int idatividade, @RequestParam int idmorador)
+	public ResponseEntity<Object> cadastrarAtividadeMorador(@RequestParam int idatividade, @RequestParam int idmorador,
+		@RequestParam(required = false) String observacao)
 	{
 		AtividadesMorador atividadesMorador = new AtividadesMorador();
 		Atividades atividade = new Atividades();
@@ -30,6 +31,12 @@ public class AtividadesMoradorControl
 		Banco conexao = Banco.getConnection();
 		try
 		{
+			String observacaoLimpa = padronizarObservacao(observacao);
+			if (observacaoLimpa.length() > 500)
+			{
+				return ResponseEntity.badRequest().body(new Error("Erro", "Observacao do morador deve ter no maximo 500 caracteres"));
+			}
+
 			Atividades atividadeEncontrada = atividade.buscarPorId(idatividade, conexao);
 			Morador moradorEncontrado = morador.buscarId(idmorador, conexao);
 			AtividadesMorador vinculoExistente = atividadesMorador.buscarPorIds(idatividade, idmorador, conexao);
@@ -40,6 +47,7 @@ public class AtividadesMoradorControl
 
 			atividadesMorador.setIdatividade(atividadeEncontrada);
 			atividadesMorador.setIdmorador(moradorEncontrado);
+			atividadesMorador.setObservacao(observacaoLimpa);
 			if (!atividadesMorador.gravar(conexao))
 			{
 				return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao acessar banco de dados"));
@@ -59,7 +67,7 @@ public class AtividadesMoradorControl
 
 	@PutMapping("editar")
 	public ResponseEntity<Object> editarAtividadeMorador(@RequestParam int idatividadeAnterior, @RequestParam int idmoradorAnterior,
-		@RequestParam int idatividade, @RequestParam int idmorador)
+		@RequestParam int idatividade, @RequestParam int idmorador, @RequestParam(required = false) String observacao)
 	{
 		AtividadesMorador atividadesMorador = new AtividadesMorador();
 		Atividades atividade = new Atividades();
@@ -67,6 +75,12 @@ public class AtividadesMoradorControl
 		Banco conexao = Banco.getConnection();
 		try
 		{
+			String observacaoLimpa = padronizarObservacao(observacao);
+			if (observacaoLimpa.length() > 500)
+			{
+				return ResponseEntity.badRequest().body(new Error("Erro", "Observacao do morador deve ter no maximo 500 caracteres"));
+			}
+
 			AtividadesMorador vinculoEncontrado = atividadesMorador.buscarPorIds(idatividadeAnterior, idmoradorAnterior, conexao);
 			Atividades atividadeEncontrada = atividade.buscarPorId(idatividade, conexao);
 			Morador moradorEncontrado = morador.buscarId(idmorador, conexao);
@@ -84,6 +98,7 @@ public class AtividadesMoradorControl
 
 			vinculoEncontrado.setIdatividade(atividadeEncontrada);
 			vinculoEncontrado.setIdmorador(moradorEncontrado);
+			vinculoEncontrado.setObservacao(observacaoLimpa);
 			if (!vinculoEncontrado.editar(idatividadeAnterior, idmoradorAnterior, conexao))
 			{
 				return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao acessar banco de dados"));
@@ -171,5 +186,14 @@ public class AtividadesMoradorControl
 		{
 			conexao.fechar();
 		}
+	}
+
+	private String padronizarObservacao(String observacao)
+	{
+		if (observacao == null)
+		{
+			return "";
+		}
+		return observacao.trim().replaceAll("\\s+", " ");
 	}
 }

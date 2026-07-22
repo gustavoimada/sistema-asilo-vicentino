@@ -126,6 +126,26 @@ body.sidebar-collapsible-demo.sidebar-collapsed.atividades-page .content {
     justify-self: end;
 }
 
+.morador-observacao {
+    width: calc(100% - 28px);
+    min-height: 70px;
+    margin: 0 14px 14px;
+    border: 1px solid #dbe3f1;
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 10px 12px;
+    color: #1f2a44;
+    font-size: 13px;
+    font-weight: 600;
+    outline: none;
+    resize: vertical;
+}
+
+.morador-observacao:focus {
+    border-color: #8aa8df;
+    box-shadow: 0 0 0 3px rgba(11, 78, 162, 0.12);
+}
+
 .participantes-wrap {
     display: flex;
     flex-wrap: wrap;

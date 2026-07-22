@@ -9,6 +9,7 @@ import java.util.List;
 public class AtividadesMorador {
     private Atividades idatividade;
     private Morador idmorador;
+    private String observacao;
 
     public AtividadesMorador(Atividades idatividade, Morador idmorador) {
         this.idatividade = idatividade;
@@ -32,6 +33,14 @@ public class AtividadesMorador {
 
     public void setIdatividade(Atividades idatividade) {
         this.idatividade = idatividade;
+    }
+
+    public String getObservacao() {
+        return observacao;
+    }
+
+    public void setObservacao(String observacao) {
+        this.observacao = observacao;
     }
 
     public boolean gravar(Banco conexao) throws SQLException {

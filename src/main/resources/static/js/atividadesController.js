@@ -9,6 +9,7 @@ let atividadesAntigasCarregadas = [];
 let tiposAtividadesCarregados = [];
 let moradoresCarregados = [];
 let moradoresSelecionados = new Set();
+let observacoesMoradores = {};
 let popupTimer;
 let ordenacaoAtualAtividades = "date";
 let ordemAtualAtividades = "asc";
@@ -137,7 +138,7 @@ function obterModalParticipantes() {
     return modal;
 }
 
-function renderizarModalParticipantes(idAtividade, idsMoradores) {
+function renderizarModalParticipantes(idAtividade, vinculosMoradores) {
     const modal = obterModalParticipantes();
     const subtitulo = document.getElementById("participantesModalSubtitle");
     const lista = document.getElementById("participantesModalList");
@@ -147,8 +148,8 @@ function renderizarModalParticipantes(idAtividade, idsMoradores) {
     }
 
     let total = 0;
-    if (Array.isArray(idsMoradores)) {
-        total = idsMoradores.length;
+    if (Array.isArray(vinculosMoradores)) {
+        total = vinculosMoradores.length;
     }
     subtitulo.textContent = total + " participante(s)";
 
@@ -159,10 +160,12 @@ function renderizarModalParticipantes(idAtividade, idsMoradores) {
     }
 
     let linhas = "";
-    idsMoradores.forEach(function (idMorador) {
+    vinculosMoradores.forEach(function (vinculo) {
+        const idMorador = obterIdMoradorVinculo(vinculo);
         const morador = moradoresCarregados.find(function (item) {
             return Number(obterIdMorador(item)) === Number(idMorador);
         });
+        const observacao = escaparHtml(obterObservacaoVinculo(vinculo));
 
         if (!morador) {
             linhas += `
@@ -182,11 +185,16 @@ function renderizarModalParticipantes(idAtividade, idsMoradores) {
             detalhes.push("CPF: " + cpf);
         }
         if (cidade) detalhes.push(cidade);
+        let observacaoHtml = "";
+        if (observacao) {
+            observacaoHtml = `<span>Observacao: ${observacao}</span>`;
+        }
 
         linhas += `
             <div class="participante-modal-item">
                 <strong>${nome}</strong>
                 <span>${detalhes.join(" | ") || "Sem dados complementares"}</span>
+                ${observacaoHtml}
             </div>
         `;
     });
@@ -247,6 +255,30 @@ function obterIdMoradorVinculo(vinculo) {
 
     return null;
 }
+
+function obterObservacaoVinculo(vinculo) {
+    if (!vinculo || vinculo.observacao === undefined || vinculo.observacao === null) {
+        return "";
+    }
+
+    return String(vinculo.observacao);
+}
+
+function obterObservacaoMorador(idMorador) {
+    const chave = String(Number(idMorador));
+    if (observacoesMoradores[chave] === undefined || observacoesMoradores[chave] === null) {
+        return "";
+    }
+
+    return String(observacoesMoradores[chave]);
+}
+
+function atualizarObservacaoMorador(idMorador, observacao) {
+    const chave = String(Number(idMorador));
+    observacoesMoradores[chave] = String(observacao || "");
+}
+
+window.atualizarObservacaoMorador = atualizarObservacaoMorador;
 
 function formatarData(valor) {
     if (!valor) {
@@ -512,10 +544,14 @@ function renderizarListaMoradores() {
             return;
         }
 
-        let checked = "";
-        if (moradoresSelecionados.has(Number(idMorador))) {
-            checked = "checked";
+        const selecionado = moradoresSelecionados.has(Number(idMorador));
+        const checked = selecionado ? "checked" : "";
+        const observacao = escaparHtml(obterObservacaoMorador(idMorador));
+        let campoObservacao = "";
+        if (selecionado) {
+            campoObservacao = `<textarea class="morador-observacao" maxlength="500" placeholder="Observacao deste morador..." oninput="atualizarObservacaoMorador(${idMorador}, this.value)">${observacao}</textarea>`;
         }
+
         linhas += `
             <div class="morador-item">
                 <label>
@@ -524,6 +560,7 @@ function renderizarListaMoradores() {
                     </div>
                     <input class="morador-checkbox" type="checkbox" ${checked} onchange="alternarMoradorSelecionado(${idMorador}, this.checked)" />
                 </label>
+                ${campoObservacao}
             </div>
         `;
     });
@@ -546,6 +583,7 @@ function alternarMoradorSelecionado(idMorador, selecionado) {
     }
 
     atualizarContadorMoradores();
+    renderizarListaMoradores();
 }
 
 window.alternarMoradorSelecionado = alternarMoradorSelecionado;
@@ -770,6 +808,7 @@ function limparFormularioAtividade() {
     form.reset();
     document.getElementById("atividadeId").value = "";
     moradoresSelecionados = new Set();
+    observacoesMoradores = {};
     renderizarListaMoradores();
 }
 
@@ -930,7 +969,7 @@ async function carregarAtividadePorId(idAtividade) {
     return body;
 }
 
-async function carregarIdsMoradoresDaAtividade(idAtividade) {
+async function carregarVinculosMoradoresDaAtividade(idAtividade) {
     const response = await fetch(`${API_ATIVIDADES_MORADOR}/listarPorAtividade?idatividade=${idAtividade}`);
     const body = await extrairRespostaJson(response);
 
@@ -942,7 +981,13 @@ async function carregarIdsMoradoresDaAtividade(idAtividade) {
         return [];
     }
 
-    return body
+    return body;
+}
+
+async function carregarIdsMoradoresDaAtividade(idAtividade) {
+    const vinculos = await carregarVinculosMoradoresDaAtividade(idAtividade);
+
+    return vinculos
         .map(function (vinculo) {
             return Number(obterIdMoradorVinculo(vinculo));
         })
@@ -956,8 +1001,8 @@ async function visualizarParticipantesAtividade(idAtividade) {
         await carregarMoradores();
     }
 
-    const idsMoradores = await carregarIdsMoradoresDaAtividade(idAtividade);
-    renderizarModalParticipantes(idAtividade, idsMoradores);
+    const vinculosMoradores = await carregarVinculosMoradoresDaAtividade(idAtividade);
+    renderizarModalParticipantes(idAtividade, vinculosMoradores);
 }
 
 function obterParamsFormularioAtividade(incluirId) {
@@ -979,10 +1024,11 @@ function obterParamsFormularioAtividade(incluirId) {
     return params;
 }
 
-async function cadastrarVinculoAtividadeMorador(idAtividade, idMorador) {
+async function cadastrarVinculoAtividadeMorador(idAtividade, idMorador, observacao) {
     const params = new URLSearchParams();
     params.append("idatividade", idAtividade);
     params.append("idmorador", idMorador);
+    params.append("observacao", String(observacao || "").trim());
 
     const response = await fetch(`${API_ATIVIDADES_MORADOR}/cadastrar`, {
         method: "POST",
@@ -1002,6 +1048,32 @@ async function cadastrarVinculoAtividadeMorador(idAtividade, idMorador) {
             descricaoErro = String(erro.descricao);
         }
         return {ok: false, mensagem: descricaoErro || "Falha ao vincular morador " + idMorador};
+    }
+
+    return {ok: true};
+}
+
+async function editarVinculoAtividadeMorador(idAtividade, idMorador, observacao) {
+    const params = new URLSearchParams();
+    params.append("idatividadeAnterior", idAtividade);
+    params.append("idmoradorAnterior", idMorador);
+    params.append("idatividade", idAtividade);
+    params.append("idmorador", idMorador);
+    params.append("observacao", String(observacao || "").trim());
+
+    const response = await fetch(`${API_ATIVIDADES_MORADOR}/editar`, {
+        method: "PUT",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: params.toString()
+    });
+
+    if (!response.ok) {
+        const erro = await extrairRespostaJson(response);
+        let descricaoErro = "";
+        if (erro && erro.descricao) {
+            descricaoErro = String(erro.descricao);
+        }
+        return {ok: false, mensagem: descricaoErro || "Falha ao atualizar observacao do morador " + idMorador};
     }
 
     return {ok: true};
@@ -1043,7 +1115,7 @@ async function vincularMoradoresNaAtividade(idAtividade, idsMoradores) {
 
     for (let i = 0; i < idsMoradores.length; i++) {
         const idMorador = idsMoradores[i];
-        const resultado = await cadastrarVinculoAtividadeMorador(idAtividade, idMorador);
+        const resultado = await cadastrarVinculoAtividadeMorador(idAtividade, idMorador, obterObservacaoMorador(idMorador));
         if (!resultado.ok) {
             falhas.push(resultado.mensagem);
         }
@@ -1053,7 +1125,10 @@ async function vincularMoradoresNaAtividade(idAtividade, idsMoradores) {
 }
 
 async function sincronizarMoradoresDaAtividade(idAtividade, idsNovosMoradores) {
-    const idsAtuais = await carregarIdsMoradoresDaAtividade(idAtividade);
+    const vinculosAtuais = await carregarVinculosMoradoresDaAtividade(idAtividade);
+    const idsAtuais = vinculosAtuais
+        .map(function (vinculo) { return Number(obterIdMoradorVinculo(vinculo)); })
+        .filter(function (idMorador) { return !isNaN(idMorador); });
     const conjuntoAtual = new Set(idsAtuais.map(function (id) { return Number(id); }));
     const conjuntoNovo = new Set(idsNovosMoradores.map(function (id) { return Number(id); }));
     const falhas = [];
@@ -1072,6 +1147,13 @@ async function sincronizarMoradoresDaAtividade(idAtividade, idsNovosMoradores) {
         }
     });
 
+    const idsAtualizar = [];
+    conjuntoNovo.forEach(function (id) {
+        if (conjuntoAtual.has(id)) {
+            idsAtualizar.push(id);
+        }
+    });
+
     for (let i = 0; i < idsRemover.length; i++) {
         const resultadoRemocao = await deletarVinculoAtividadeMorador(idAtividade, idsRemover[i]);
         if (!resultadoRemocao.ok) {
@@ -1080,9 +1162,16 @@ async function sincronizarMoradoresDaAtividade(idAtividade, idsNovosMoradores) {
     }
 
     for (let i = 0; i < idsAdicionar.length; i++) {
-        const resultadoAdicao = await cadastrarVinculoAtividadeMorador(idAtividade, idsAdicionar[i]);
+        const resultadoAdicao = await cadastrarVinculoAtividadeMorador(idAtividade, idsAdicionar[i], obterObservacaoMorador(idsAdicionar[i]));
         if (!resultadoAdicao.ok) {
             falhas.push(resultadoAdicao.mensagem);
+        }
+    }
+
+    for (let i = 0; i < idsAtualizar.length; i++) {
+        const resultadoAtualizacao = await editarVinculoAtividadeMorador(idAtividade, idsAtualizar[i], obterObservacaoMorador(idsAtualizar[i]));
+        if (!resultadoAtualizacao.ok) {
+            falhas.push(resultadoAtualizacao.mensagem);
         }
     }
 
@@ -1232,7 +1321,21 @@ async function abrirEdicaoAtividade(idAtividade) {
         return;
     }
 
-    const idsMoradores = await carregarIdsMoradoresDaAtividade(idAtividade);
+    const vinculosMoradores = await carregarVinculosMoradoresDaAtividade(idAtividade);
+    const idsMoradores = vinculosMoradores
+        .map(function (vinculo) {
+            return Number(obterIdMoradorVinculo(vinculo));
+        })
+        .filter(function (idMorador) {
+            return !isNaN(idMorador);
+        });
+    observacoesMoradores = {};
+    vinculosMoradores.forEach(function (vinculo) {
+        const idMorador = Number(obterIdMoradorVinculo(vinculo));
+        if (!isNaN(idMorador)) {
+            observacoesMoradores[String(idMorador)] = obterObservacaoVinculo(vinculo);
+        }
+    });
     moradoresSelecionados = new Set(idsMoradores);
 
     exibirFormularioAtividade("edicao");

@@ -22,7 +22,8 @@ public class DatabaseMigrationRunner implements ApplicationRunner
             "db/migration/V20260721_03__cargo_nutricionista.sql",
             "db/migration/V20260721_04__evolucao_nutricional_imc.sql",
             "db/migration/V20260721_05__prontuario_nutricional_imc.sql",
-            "db/migration/V20260721_06__controle_fraldas.sql"
+            "db/migration/V20260721_06__controle_fraldas.sql",
+            "db/migration/V20260722_01__atividades_morador_observacao.sql"
     );
 
     @Override

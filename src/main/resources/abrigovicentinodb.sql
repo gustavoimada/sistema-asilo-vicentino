@@ -290,6 +290,7 @@ CREATE TABLE atividades (
 CREATE TABLE atividadesmorador (
                                    Atividades_idAtividades INTEGER,
                                    Morador_idMorador INTEGER,
+                                   observacao VARCHAR(500),
                                    PRIMARY KEY (Atividades_idAtividades, Morador_idMorador),
                                    FOREIGN KEY (Atividades_idAtividades)
                                        REFERENCES atividades(idAtividades),
