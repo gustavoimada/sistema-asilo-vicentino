@@ -262,7 +262,7 @@ public class FuncionarioDAO
 
     private boolean existePorCampo(String campo, String valor, Integer idIgnorado, Banco conexao) throws SQLException
     {
-        String sql = "SELECT idfuncionario FROM funcionario WHERE " + campo + " = ?";
+        String sql = "SELECT idfuncionario FROM funcionario WHERE " + campo + " = ? AND ativo = TRUE";
         if (idIgnorado != null)
         {
             sql += " AND idfuncionario <> ?";
