@@ -84,6 +84,42 @@ class AccessFilterTest
     }
 
     @Test
+    void allowsSecretaryAndCoordinatorToUseDiaperControl() throws Exception
+    {
+        String[][] requests = {
+                {"GET", "/controle-fraldas/resumo", "Secretaria"},
+                {"POST", "/controle-fraldas", "Coordenador"}
+        };
+
+        for (String[] requestData : requests)
+        {
+            MockHttpServletRequest request = new MockHttpServletRequest(requestData[0], requestData[1]);
+            request.getSession(true).setAttribute("categoria", requestData[2]);
+            MockHttpServletResponse response = new MockHttpServletResponse();
+            boolean[] chainCalled = {false};
+
+            new AccessFilter().doFilter(request, response, (ignoredRequest, ignoredResponse) -> chainCalled[0] = true);
+
+            assertEquals(200, response.getStatus());
+            assertEquals(true, chainCalled[0]);
+        }
+    }
+
+    @Test
+    void blocksCaregiverFromDiaperControl() throws Exception
+    {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/controle-fraldas/resumo");
+        request.getSession(true).setAttribute("categoria", "Cuidador");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        new AccessFilter().doFilter(request, response, (ignoredRequest, ignoredResponse) -> {
+            throw new AssertionError("Caregivers must not access the diaper purchase control");
+        });
+
+        assertEquals(403, response.getStatus());
+    }
+
+    @Test
     void allowsActivityProfessionalToCreateActivityAndTypesButNotEditTypes() throws Exception
     {
         MockHttpServletRequest criarAtividade = new MockHttpServletRequest("POST", "/atividades/cadastrar");

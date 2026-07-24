@@ -818,8 +818,14 @@ function atualizarFormularioTransparenciaModo()
     }
     if (cancelarBtn)
     {
-        cancelarBtn.hidden = !editando;
-        cancelarBtn.style.display = editando ? "" : "none";
+        const cancelarLabel = cancelarBtn.querySelector(".transparencia-cancel-label");
+        cancelarBtn.hidden = false;
+        cancelarBtn.style.display = "";
+        cancelarBtn.setAttribute("aria-label", editando ? "Cancelar edição" : "Fechar formulário de cadastro");
+        if (cancelarLabel)
+        {
+            cancelarLabel.textContent = editando ? "Cancelar edição" : "Fechar formulário";
+        }
     }
     if (submit)
     {

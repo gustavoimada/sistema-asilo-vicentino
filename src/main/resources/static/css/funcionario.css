@@ -685,7 +685,37 @@ input {
 .controle-fraldas-observacao { grid-column: auto; }
 .controle-fraldas-rodape { justify-content: flex-end; margin-top: 16px; }
 .controle-fraldas-rodape p strong { color: var(--primary); }
-.controle-fraldas-rodape .btn-primary { min-height: 44px; border: 0; cursor: pointer; }
+.controle-fraldas-rodape .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 46px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 10px 22px rgba(0, 71, 171, 0.18);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+}
+.controle-fraldas-rodape .btn-primary:hover {
+  background: #003f98;
+  box-shadow: 0 12px 26px rgba(0, 71, 171, 0.24);
+  transform: translateY(-1px);
+}
+.controle-fraldas-rodape .btn-primary:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.28);
+  outline-offset: 3px;
+}
+.controle-fraldas-rodape .btn-primary:disabled {
+  cursor: wait;
+  opacity: 0.68;
+  transform: none;
+}
 .controle-fraldas-feedback { min-height: 18px; margin-top: 10px !important; font-size: 13px !important; }
 .controle-fraldas-feedback.sucesso { color: #15803d; }
 .controle-fraldas-feedback.erro { color: #dc2626; }

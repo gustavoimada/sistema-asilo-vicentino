@@ -221,6 +221,10 @@ public class AccessFilter implements Filter
         {
             return ehNutricionista(categoria);
         }
+        if (rotaMin.startsWith("/controle-fraldas"))
+        {
+            return ehSecretaria(categoria) || ehCoordenador(categoria);
+        }
         if (rotaMin.startsWith("/morador/listarativos"))
         {
             return ehNutricionista(categoria) || ehSecretaria(categoria) || ehCoordenador(categoria);
