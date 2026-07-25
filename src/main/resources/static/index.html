@@ -42,7 +42,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="assets/favicon.png?v=2" />
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=2" />
 
-  <link rel="stylesheet" href="css/index.css?v=20260716-9" />
+  <link rel="stylesheet" href="css/index.css?v=20260725-pix" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 </head>
@@ -430,13 +430,6 @@
                   </div>
                   <input type="hidden" id="doacaoTipo" value="Financeiro" />
                   <input type="hidden" id="doacaoData" />
-                  <div class="cta-pix-placeholder cta-field-full">
-                    <span class="material-symbols-outlined">security</span>
-                    <div>
-                      <strong>PIX oficial em configuração</strong>
-                      <p>O QR code e a chave PIX devem ser os dados oficiais da instituição. Assim que forem informados, eles entram aqui para o doador concluir o pagamento com segurança.</p>
-                    </div>
-                  </div>
                   <label class="cta-privacy-consent cta-field-full" for="doacaoConsentimento">
                     <input id="doacaoConsentimento" type="checkbox" required />
                     <span>Autorizo o uso destes dados exclusivamente para registrar a doação e permitir o contato da equipe do Asilo Vicentino.</span>
@@ -448,12 +441,39 @@
                     </button>
                   </div>
                 </form>
-                <div id="doacaoSucessoMsg" class="cta-success-msg">
-                  <span class="cta-success-icon material-symbols-outlined">check_circle</span>
-                  <div class="cta-success-text">
-                    <strong>Doação registrada. Muito obrigado!</strong>
-                    <p>A equipe do asilo acompanhará o recebimento e manterá a contribuição organizada no sistema.</p>
+                <div id="doacaoSucessoMsg" class="cta-success-msg" aria-live="polite">
+                  <div class="cta-success-heading">
+                    <span class="cta-success-icon material-symbols-outlined">check_circle</span>
+                    <div class="cta-success-text">
+                      <strong>Dados recebidos. Agora conclua pelo PIX.</strong>
+                      <p>Aponte a câmera do celular para o QR Code ou abra o aplicativo do seu banco.</p>
+                    </div>
                   </div>
+                  <div class="cta-pix-demo">
+                    <span class="cta-demo-badge">
+                      <span class="material-symbols-outlined">science</span>
+                      Demonstração
+                    </span>
+                    <div class="cta-qr-wrap">
+                      <div class="cta-qr-frame">
+                        <img src="assets/qrcode-doacao.svg" alt="QR Code PIX demonstrativo, sem validade para pagamento" />
+                        <span>QR Code fictício</span>
+                      </div>
+                      <div class="cta-qr-content">
+                        <span class="cta-pix-eyebrow">Pagamento por PIX</span>
+                        <strong class="cta-pix-title">Escaneie para visualizar a etapa de pagamento</strong>
+                        <p>Este QR Code é apenas uma prévia visual e não realiza pagamentos. Ele será substituído pelos dados oficiais da instituição.</p>
+                        <div class="cta-confirmed-value">
+                          <span>Valor informado</span>
+                          <strong id="doacaoValorConfirmado">R$ 0,00</strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <button type="button" id="btnNovaDoacao" class="cta-new-donation-btn">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    Fazer outra doação
+                  </button>
                 </div>
               </section>
             </div>
@@ -519,7 +539,7 @@
     </div>
   </div>
 
-  <script src="js/indexController.js?v=20260716-12"></script>
+  <script src="js/indexController.js?v=20260725-pix"></script>
   <script src="js/indexNoticias.js?v=20260714-7"></script>
 </body>
 </html>

@@ -391,6 +391,7 @@ function iniciarBotoesFinais() {
   const impactoDoacao = document.getElementById("doacaoImpacto");
   const formDoacaoPublica = document.getElementById("formDoacaoPublica");
   const inputCpfDoacao = document.getElementById("doacaoCpf");
+  const botaoNovaDoacao = document.getElementById("btnNovaDoacao");
 
   if (!painelDoacao) return;
 
@@ -496,6 +497,13 @@ function iniciarBotoesFinais() {
 
   if (formDoacaoPublica) {
     formDoacaoPublica.addEventListener("submit", enviarFormularioDoacaoDoador);
+  }
+
+  if (botaoNovaDoacao) {
+    botaoNovaDoacao.addEventListener("click", function () {
+      prepararPainelDoacao();
+      document.getElementById("doacaoNome")?.focus();
+    });
   }
 
   if (inputCpfDoacao) {
@@ -1315,12 +1323,22 @@ function enviarFormularioDoacaoDoador(event) {
 
       mostrarNotificacaoDoacaoDoador("success", "Doação registrada. Obrigado pelo apoio!");
 
+      const valorConfirmado = document.getElementById("doacaoValorConfirmado");
+      if (valorConfirmado) {
+        valorConfirmado.textContent = valor.toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL"
+        });
+      }
+
       // Limpa o formulário
       inputNome.value = "";
       inputEmail.value = "";
       inputCpf.value = "";
       inputValor.value = "";
       inputMsg.value = "";
+      const inputConsentimento = document.getElementById("doacaoConsentimento");
+      if (inputConsentimento) inputConsentimento.checked = false;
 
       // Esconde o formulário e exibe o bloco de sucesso
       var formPublica = document.getElementById("formDoacaoPublica");
