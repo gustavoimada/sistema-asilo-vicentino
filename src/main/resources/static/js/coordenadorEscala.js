@@ -131,11 +131,9 @@ function atualizarLinksContextoCoordenador()
 {
     const linkPainel = document.querySelector('.sidebar-nav a.sidebar-link[href*="coordenador.html"]');
     const linkEscalas = document.querySelector('.sidebar-nav a.sidebar-link[href*="escalas.html"]');
-    const linkTransparencia = document.querySelector('.sidebar-nav a.sidebar-link[href*="transparencia.html"]');
     const linkSecretaria = document.querySelector('.sidebar-footer a.sidebar-link[href*="secretaria.html"]');
     if (linkPainel) linkPainel.setAttribute("href", "coordenador.html");
     if (linkEscalas) linkEscalas.setAttribute("href", "escalas.html");
-    if (linkTransparencia) linkTransparencia.setAttribute("href", "transparencia.html");
     if (linkSecretaria) linkSecretaria.setAttribute("href", "secretaria.html");
 }
 

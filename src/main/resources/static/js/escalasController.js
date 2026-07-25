@@ -12,6 +12,7 @@ var STORAGE_MODELO_ESCALA_LEGADO = "sgav.modeloEscalaSemanal.v1";
 var STORAGE_MODELOS_ESCALA = "sgav.modelosEscalaSemanal.v2";
 var planoPreviewAtual = null;
 var modeloEscalaPendenteExclusao = null;
+var buscaCuidadorEscala = "";
 
 function preencherPerfilTopo()
 {
@@ -953,7 +954,12 @@ function carregarCuidadores()
         {
             if (Array.isArray(data))
             {
-                cuidadores = data;
+                cuidadores = data.slice().sort(function(a, b)
+                {
+                    return String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR", {
+                        sensitivity: "base"
+                    });
+                });
             }
             else
             {
@@ -965,6 +971,21 @@ function carregarCuidadores()
             cuidadores = [];
             showToast("error", "Erro ao carregar cuidadores.");
         });
+}
+
+function normalizarBuscaCuidador(valor)
+{
+    return String(valor || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim()
+        .toLowerCase();
+}
+
+function filtrarCuidadoresEscala(valor)
+{
+    buscaCuidadorEscala = normalizarBuscaCuidador(valor);
+    renderizarCuidadores();
 }
 
 function renderizarCuidadores()
@@ -979,9 +1000,20 @@ function renderizarCuidadores()
         return;
     }
 
-    for (var i = 0; i < cuidadores.length; i++)
+    var cuidadoresVisiveis = cuidadores.filter(function(cuidador)
     {
-        var cuidador = cuidadores[i];
+        return !buscaCuidadorEscala || normalizarBuscaCuidador(cuidador.nome).indexOf(buscaCuidadorEscala) !== -1;
+    });
+
+    if (cuidadoresVisiveis.length === 0)
+    {
+        lista.innerHTML = '<p class="turno-list-empty">Nenhum cuidador encontrado para esta busca.</p>';
+        return;
+    }
+
+    for (var i = 0; i < cuidadoresVisiveis.length; i++)
+    {
+        var cuidador = cuidadoresVisiveis[i];
         var dataEscala = diaAtual ? datasSemana[diaAtual] : "";
         var conflito = dataEscala ? encontrarConflitoEscala(cuidador.idFuncionario, diaAtual, turnoAtual, dataEscala) : "";
         var option = document.createElement("div");
@@ -991,10 +1023,10 @@ function renderizarCuidadores()
             option.title = conflito;
         }
         option.innerHTML =
-            '<div class="cuidador-option-avatar">' + (cuidador.nome ? cuidador.nome.charAt(0).toUpperCase() : "?") + "</div>" +
+            '<div class="cuidador-option-avatar">' + escapeHtml(cuidador.nome ? cuidador.nome.charAt(0).toUpperCase() : "?") + "</div>" +
             '<div class="cuidador-option-info">' +
-            "<h4>" + (cuidador.nome || "Sem nome") + "</h4>" +
-            "<p>" + (conflito || formatarCargoInclusivo(cuidador.categoria || "Cuidador")) + "</p>" +
+            "<h4>" + escapeHtml(cuidador.nome || "Sem nome") + "</h4>" +
+            "<p>" + escapeHtml(conflito || formatarCargoInclusivo(cuidador.categoria || "Cuidador")) + "</p>" +
             "</div>" +
             '<button class="cuidador-option-select" type="button">' +
             '<span class="material-symbols-outlined">' + (conflito ? "block" : "check_circle") + "</span>" +
@@ -1027,8 +1059,18 @@ function abrirSelectorCuidador(dia, turno)
 
     diaAtual = dia;
     turnoAtual = turno;
+    buscaCuidadorEscala = "";
+    var campoBusca = document.getElementById("buscarCuidadorEscala");
+    if (campoBusca) campoBusca.value = "";
     renderizarCuidadores();
     document.getElementById("selectorModal").style.display = "flex";
+    if (campoBusca)
+    {
+        window.setTimeout(function()
+        {
+            campoBusca.focus();
+        }, 0);
+    }
 }
 
 function fecharSelectorModal()

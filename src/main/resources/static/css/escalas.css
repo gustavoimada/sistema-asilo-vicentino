@@ -769,10 +769,63 @@ body.sidebar-collapsible-demo.sidebar-collapsed .content {
   flex: 1;
 }
 
+.selector-modal-content {
+  min-height: min(560px, 80vh);
+}
+
+.selector-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.cuidador-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #64748b;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.cuidador-search:focus-within {
+  border-color: #004aad;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(0, 74, 173, 0.12);
+}
+
+.cuidador-search .material-symbols-outlined {
+  font-size: 21px;
+}
+
+.cuidador-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #1e293b;
+  font: inherit;
+  font-size: 14px;
+}
+
+.cuidador-search input::placeholder {
+  color: #94a3b8;
+}
+
 .cuidadores-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .cuidador-option {

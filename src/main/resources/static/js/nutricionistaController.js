@@ -5,11 +5,15 @@ let evolucoesAtuais = [];
 let editandoProntuario = false;
 let idEvolucaoEmEdicao = null;
 let acaoConfirmada = null;
+let estimativaProntuario = null;
 
 async function inicializarNutricao() {
     await carregarSessaoNutricionista();
     await carregarMoradoresNutri();
     document.getElementById("buscaMoradorNutri")?.addEventListener("input", renderizarMoradoresNutri);
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") fecharCalculoNutri();
+    });
 }
 
 async function carregarSessaoNutricionista() {
@@ -25,8 +29,8 @@ async function carregarSessaoNutricionista() {
         return;
     }
 
-    document.getElementById("perfilNome").textContent = sessao.funcionarioNome || sessao.usuarioNome || "Nutricionista";
-    document.getElementById("perfilCargo").textContent = "NUTRICIONISTA";
+    document.getElementById("perfilNome").textContent = sessao.nome || "Nutricionista";
+    document.getElementById("perfilCargo").textContent = String(sessao.categoria || "Nutricionista").toLocaleUpperCase("pt-BR");
 }
 
 async function carregarMoradoresNutri() {
@@ -68,6 +72,7 @@ async function selecionarMoradorNutri(idMorador) {
         evolucoesAtuais = dados.evolucoes || [];
         editandoProntuario = false;
         idEvolucaoEmEdicao = null;
+        estimativaProntuario = null;
         document.getElementById("seletorMoradorNutri").hidden = true;
         document.querySelector(".nutri-grid")?.classList.add("resident-selected");
         renderizarMoradoresNutri();
@@ -96,7 +101,13 @@ function htmlNovoProntuario(morador) {
             <h3>${escapar(morador.nome)}</h3>
             <p>${formatarGenero(morador.genero)} | ${morador.idade || "-"} anos | Prontuário ainda não iniciado.</p>
           </div>
-          <button type="button" class="nutri-secondary" onclick="trocarMoradorNutri()">Trocar morador</button>
+          <div class="nutri-record-actions">
+            <button type="button" class="nutri-secondary nutri-calculate-button" onclick="abrirCalculoNutri()">
+              <span class="material-symbols-outlined">calculate</span>
+              Fazer cálculo
+            </button>
+            <button type="button" class="nutri-secondary" onclick="trocarMoradorNutri()">Trocar morador</button>
+          </div>
         </div>
         ${htmlFormularioProntuario("salvarProntuarioNutri(event)", "Salvar prontuário")}
     `;
@@ -126,11 +137,11 @@ function htmlFormularioProntuario(acao, textoBotao, peso = "", altura = "", diag
         <form class="nutri-form-grid" onsubmit="${acao}">
             <div class="nutri-field">
                 <label>Peso (kg)</label>
-                <input id="pesoKg" inputmode="decimal" value="${escapar(valorFormulario(peso))}" placeholder="Ex: 68,4" oninput="atualizarImcDiretoNutri()" />
+                <input id="pesoKg" inputmode="decimal" value="${escapar(valorFormulario(peso))}" placeholder="Ex: 68,4" oninput="marcarMedidasAferidasNutri(); atualizarImcDiretoNutri()" />
             </div>
             <div class="nutri-field">
                 <label>Altura (cm)</label>
-                <input id="alturaCm" inputmode="decimal" value="${escapar(valorFormulario(altura))}" placeholder="Ex: 162" oninput="atualizarImcDiretoNutri()" />
+                <input id="alturaCm" inputmode="decimal" value="${escapar(valorFormulario(altura))}" placeholder="Ex: 162" oninput="marcarMedidasAferidasNutri(); atualizarImcDiretoNutri()" />
             </div>
             <div id="resultadoImcNutri" class="nutri-imc-preview full" hidden></div>
             <div class="nutri-field full">
@@ -270,6 +281,8 @@ function trocarMoradorNutri() {
     evolucoesAtuais = [];
     editandoProntuario = false;
     idEvolucaoEmEdicao = null;
+    estimativaProntuario = null;
+    fecharCalculoNutri();
     document.getElementById("seletorMoradorNutri").hidden = false;
     document.querySelector(".nutri-grid")?.classList.remove("resident-selected");
     document.getElementById("painelNutricional").innerHTML = `<div class="nutri-empty">Selecione um morador para iniciar.</div>`;
@@ -301,17 +314,71 @@ function atualizarImcDiretoNutri() {
     }
 }
 
+function abrirCalculoNutri() {
+    if (!moradorSelecionado) return;
+    const modal = document.getElementById("calculoNutri");
+    document.getElementById("moradorCalculoNutri").textContent = moradorSelecionado.nome || "Morador";
+    document.getElementById("formCalculoNutri")?.reset();
+    modal?.classList.add("show");
+    window.setTimeout(() => document.getElementById("grupoEquacaoNutri")?.focus(), 50);
+}
+
+function fecharCalculoNutri() {
+    document.getElementById("calculoNutri")?.classList.remove("show");
+}
+
+async function calcularEstimativaNutri(event) {
+    event.preventDefault();
+    if (!moradorSelecionado) return;
+
+    const corpo = {
+        idade: Number(moradorSelecionado.idade),
+        genero: moradorSelecionado.genero,
+        grupoEquacao: valor("grupoEquacaoNutri"),
+        alturaJoelhoCm: valor("alturaJoelhoNutri"),
+        circunferenciaBracoCm: valor("circunferenciaBracoNutri")
+    };
+
+    try {
+        const resposta = await fetch("/nutricao/estimativa", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(corpo)
+        });
+        const dados = await resposta.json();
+        if (!resposta.ok) throw new Error(mensagemErro(dados));
+
+        estimativaProntuario = {
+            grupoEquacao: corpo.grupoEquacao,
+            alturaJoelhoCm: corpo.alturaJoelhoCm,
+            circunferenciaBracoCm: corpo.circunferenciaBracoCm
+        };
+        document.getElementById("pesoKg").value = valorFormulario(dados.pesoKg);
+        document.getElementById("alturaCm").value = valorFormulario(dados.alturaCm);
+        atualizarImcDiretoNutri();
+        fecharCalculoNutri();
+        mostrarMensagem("Peso e altura estimados e preenchidos no prontuário.", "success");
+    } catch (erro) {
+        mostrarMensagem(erro.message, "error");
+    }
+}
+
+function marcarMedidasAferidasNutri() {
+    estimativaProntuario = null;
+}
+
 async function salvarProntuarioNutri(event) {
     event.preventDefault();
     if (!moradorSelecionado) return;
 
+    const medidasEstimadas = estimativaProntuario !== null;
     await executarRequisicaoNutri("/nutricao/prontuario", "POST", {
         idMorador: moradorSelecionado.idMorador,
-        acamado: false,
-        metodoMedicao: "AFERIDO",
-        grupoEquacao: null,
-        alturaJoelhoCm: null,
-        circunferenciaBracoCm: null,
+        acamado: medidasEstimadas,
+        metodoMedicao: medidasEstimadas ? "ESTIMADO" : "AFERIDO",
+        grupoEquacao: medidasEstimadas ? estimativaProntuario.grupoEquacao : null,
+        alturaJoelhoCm: medidasEstimadas ? estimativaProntuario.alturaJoelhoCm : null,
+        circunferenciaBracoCm: medidasEstimadas ? estimativaProntuario.circunferenciaBracoCm : null,
         pesoKg: valor("pesoKg"),
         alturaCm: valor("alturaCm"),
         diagnosticoInicial: valor("diagnosticoInicial")

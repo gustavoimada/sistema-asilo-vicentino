@@ -392,6 +392,10 @@ function iniciarBotoesFinais() {
   const formDoacaoPublica = document.getElementById("formDoacaoPublica");
   const inputCpfDoacao = document.getElementById("doacaoCpf");
   const botaoNovaDoacao = document.getElementById("btnNovaDoacao");
+  const botaoConfirmarPix = document.getElementById("btnConfirmarDoacaoPix");
+  const botaoCancelarPix = document.getElementById("btnCancelarDoacaoPix");
+  const botaoFecharPix = document.getElementById("fecharModalPix");
+  const fundoModalPix = document.querySelector("[data-close-pix-modal]");
 
   if (!painelDoacao) return;
 
@@ -498,6 +502,19 @@ function iniciarBotoesFinais() {
   if (formDoacaoPublica) {
     formDoacaoPublica.addEventListener("submit", enviarFormularioDoacaoDoador);
   }
+
+  if (botaoConfirmarPix) {
+    botaoConfirmarPix.addEventListener("click", confirmarDoacaoPix);
+  }
+
+  [botaoCancelarPix, botaoFecharPix, fundoModalPix].forEach(function (elemento) {
+    if (elemento) elemento.addEventListener("click", cancelarDoacaoPix);
+  });
+
+  document.addEventListener("keydown", function (event) {
+    const modal = document.getElementById("modalPixDoacao");
+    if (event.key === "Escape" && modal && !modal.hidden) cancelarDoacaoPix();
+  });
 
   if (botaoNovaDoacao) {
     botaoNovaDoacao.addEventListener("click", function () {
@@ -1216,6 +1233,153 @@ function mostrarNotificacaoDoacaoDoador(tipo, mensagem) {
   }, 3200);
 }
 
+const TEMPO_LIBERACAO_DOACAO_SEGUNDOS = 120;
+let doacaoPendentePix = null;
+let temporizadorDoacaoPix = null;
+let segundosRestantesDoacaoPix = 0;
+let focoAnteriorDoacaoPix = null;
+
+function formatarValorDoacao(valor) {
+  return Number(valor || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  });
+}
+
+function atualizarContagemDoacaoPix() {
+  const contador = document.getElementById("doacaoContagemRegressiva");
+  const botao = document.getElementById("btnConfirmarDoacaoPix");
+  if (!contador || !botao) return;
+
+  if (segundosRestantesDoacaoPix <= 0) {
+    contador.textContent = "Você já pode confirmar a doação";
+    botao.disabled = false;
+    botao.innerHTML = '<span class="material-symbols-outlined">check_circle</span>Confirmar doação';
+    if (temporizadorDoacaoPix) window.clearInterval(temporizadorDoacaoPix);
+    temporizadorDoacaoPix = null;
+    return;
+  }
+
+  const minutos = Math.floor(segundosRestantesDoacaoPix / 60);
+  const segundos = segundosRestantesDoacaoPix % 60;
+  contador.textContent = "Confirmação disponível em "
+    + String(minutos).padStart(2, "0") + ":" + String(segundos).padStart(2, "0");
+}
+
+function abrirModalDoacaoPix(dados) {
+  const modal = document.getElementById("modalPixDoacao");
+  const dialogo = document.getElementById("dialogPixDoacao");
+  const valorModal = document.getElementById("doacaoValorModal");
+  const botao = document.getElementById("btnConfirmarDoacaoPix");
+  if (!modal || !dialogo || !botao) return;
+
+  doacaoPendentePix = dados;
+  segundosRestantesDoacaoPix = TEMPO_LIBERACAO_DOACAO_SEGUNDOS;
+  focoAnteriorDoacaoPix = document.activeElement;
+  if (temporizadorDoacaoPix) window.clearInterval(temporizadorDoacaoPix);
+
+  if (valorModal) valorModal.textContent = formatarValorDoacao(dados.valor);
+  botao.disabled = true;
+  botao.innerHTML = '<span class="material-symbols-outlined">lock_clock</span>Aguardar para confirmar';
+  atualizarContagemDoacaoPix();
+
+  modal.hidden = false;
+  modal.setAttribute("aria-hidden", "false");
+  document.body.classList.add("donation-modal-open");
+  dialogo.focus();
+
+  temporizadorDoacaoPix = window.setInterval(function () {
+    segundosRestantesDoacaoPix -= 1;
+    atualizarContagemDoacaoPix();
+  }, 1000);
+}
+
+function fecharModalDoacaoPix(descartarDados) {
+  const modal = document.getElementById("modalPixDoacao");
+  if (temporizadorDoacaoPix) window.clearInterval(temporizadorDoacaoPix);
+  temporizadorDoacaoPix = null;
+  segundosRestantesDoacaoPix = 0;
+  if (descartarDados) doacaoPendentePix = null;
+
+  if (modal) {
+    modal.hidden = true;
+    modal.setAttribute("aria-hidden", "true");
+  }
+  document.body.classList.remove("donation-modal-open");
+  if (focoAnteriorDoacaoPix && typeof focoAnteriorDoacaoPix.focus === "function") focoAnteriorDoacaoPix.focus();
+  focoAnteriorDoacaoPix = null;
+}
+
+function cancelarDoacaoPix() {
+  fecharModalDoacaoPix(true);
+}
+
+function dataAtualDoacao() {
+  const agora = new Date();
+  return agora.getFullYear() + "-"
+    + String(agora.getMonth() + 1).padStart(2, "0") + "-"
+    + String(agora.getDate()).padStart(2, "0") + " "
+    + String(agora.getHours()).padStart(2, "0") + ":"
+    + String(agora.getMinutes()).padStart(2, "0") + ":"
+    + String(agora.getSeconds()).padStart(2, "0");
+}
+
+function confirmarDoacaoPix() {
+  const botao = document.getElementById("btnConfirmarDoacaoPix");
+  if (!doacaoPendentePix || segundosRestantesDoacaoPix > 0 || !botao || botao.disabled) return;
+
+  const dados = doacaoPendentePix;
+  botao.disabled = true;
+  botao.innerHTML = '<span class="material-symbols-outlined">hourglass_top</span>Enviando para análise...';
+
+  const params = new URLSearchParams({
+    valor: dados.valor,
+    tipo: "Financeiro",
+    cpfDoador: dados.cpf,
+    nomeDoador: dados.nome,
+    dtDoacao: dataAtualDoacao(),
+    observacoes: dados.observacoes,
+    pagEmail: dados.email
+  });
+
+  fetch("/doacao/cadastrar", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+    body: params.toString()
+  })
+    .then(function (response) {
+      const contentType = response.headers.get("content-type");
+      const leitura = contentType && contentType.includes("application/json") ? response.json() : response.text();
+      return leitura.then(function (data) {
+        return { ok: response.ok, data: data };
+      });
+    })
+    .then(function (resultado) {
+      if (!resultado.ok) {
+        const mensagem = resultado.data?.descricao || resultado.data?.title
+          || (typeof resultado.data === "string" ? resultado.data : "Erro desconhecido");
+        throw new Error(mensagem);
+      }
+
+      fecharModalDoacaoPix(true);
+      const formulario = document.getElementById("formDoacaoPublica");
+      const sucesso = document.getElementById("doacaoSucessoMsg");
+      formulario?.reset();
+      if (formulario) formulario.hidden = true;
+      if (sucesso) sucesso.classList.add("is-visible");
+      document.querySelectorAll(".js-doacao-valor").forEach(function (chip) {
+        chip.classList.remove("is-active");
+      });
+      mostrarNotificacaoDoacaoDoador("success", "Doação enviada para conferência. Obrigado pelo apoio!");
+    })
+    .catch(function (erro) {
+      console.error("Erro na doação:", erro);
+      mostrarNotificacaoDoacaoDoador("error", "Não foi possível enviar a doação: " + erro.message);
+      botao.disabled = false;
+      botao.innerHTML = '<span class="material-symbols-outlined">check_circle</span>Tentar confirmar novamente';
+    });
+}
+
 function enviarFormularioDoacaoDoador(event) {
   event.preventDefault();
 
@@ -1224,7 +1388,6 @@ function enviarFormularioDoacaoDoador(event) {
   const inputCpf = document.getElementById("doacaoCpf");
   const inputValor = document.getElementById("doacaoValor");
   const inputMsg = document.getElementById("doacaoMsg");
-  const botaoEnviar = document.getElementById("btnEnviarDoacao");
 
   // Validações
   const nome = (inputNome?.value || "").trim();
@@ -1269,91 +1432,5 @@ function enviarFormularioDoacaoDoador(event) {
     return;
   }
 
-  if (botaoEnviar) {
-    botaoEnviar.disabled = true;
-    botaoEnviar.dataset.originalText = botaoEnviar.innerHTML;
-    botaoEnviar.innerHTML = '<span class="material-symbols-outlined">hourglass_top</span>Enviando...';
-  }
-
-  // Monta os dados
-  const agora = new Date();
-  const dataAtual = agora.getFullYear() + "-"
-    + String(agora.getMonth() + 1).padStart(2, "0") + "-"
-    + String(agora.getDate()).padStart(2, "0") + " "
-    + String(agora.getHours()).padStart(2, "0") + ":"
-    + String(agora.getMinutes()).padStart(2, "0") + ":"
-    + String(agora.getSeconds()).padStart(2, "0");
-
-  const params = new URLSearchParams({
-    valor: valor,
-    tipo: "Financeiro",
-    cpfDoador: cpf,
-    nomeDoador: nome,
-    dtDoacao: dataAtual,
-    observacoes: observacoes,
-    pagEmail: email
-  });
-
-  fetch("/doacao/cadastrar", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-    },
-    body: params.toString()
-  })
-    .then(function (response) {
-      const contentType = response.headers.get("content-type");
-
-      if (contentType && contentType.includes("application/json")) {
-        return response.json().then(data => {
-          return { ok: response.ok, status: response.status, data: data };
-        });
-      } else {
-        return response.text().then(text => {
-          return { ok: response.ok, status: response.status, data: text };
-        });
-      }
-    })
-    .then(function (resultado) {
-      if (!resultado.ok) {
-        const errorMsg = resultado.data?.descricao || resultado.data?.title || (typeof resultado.data === 'string' ? resultado.data : "Erro desconhecido");
-        mostrarNotificacaoDoacaoDoador("error", "Erro: " + errorMsg);
-        return;
-      }
-
-      mostrarNotificacaoDoacaoDoador("success", "Doação registrada. Obrigado pelo apoio!");
-
-      const valorConfirmado = document.getElementById("doacaoValorConfirmado");
-      if (valorConfirmado) {
-        valorConfirmado.textContent = valor.toLocaleString("pt-BR", {
-          style: "currency",
-          currency: "BRL"
-        });
-      }
-
-      // Limpa o formulário
-      inputNome.value = "";
-      inputEmail.value = "";
-      inputCpf.value = "";
-      inputValor.value = "";
-      inputMsg.value = "";
-      const inputConsentimento = document.getElementById("doacaoConsentimento");
-      if (inputConsentimento) inputConsentimento.checked = false;
-
-      // Esconde o formulário e exibe o bloco de sucesso
-      var formPublica = document.getElementById("formDoacaoPublica");
-      var sucessoMsg = document.getElementById("doacaoSucessoMsg");
-      if (formPublica) formPublica.hidden = true;
-      if (sucessoMsg) sucessoMsg.classList.add("is-visible");
-    })
-    .catch(function (erro) {
-      console.error("Erro na doação:", erro);
-      mostrarNotificacaoDoacaoDoador("error", "Não foi possível processar a doação. Tente novamente.");
-    })
-    .finally(function () {
-      if (botaoEnviar) {
-        botaoEnviar.disabled = false;
-        botaoEnviar.innerHTML = botaoEnviar.dataset.originalText || '<span class="material-symbols-outlined">volunteer_activism</span>Fazer doação';
-      }
-    });
+  abrirModalDoacaoPix({ nome, email, cpf, valor, observacoes });
 }

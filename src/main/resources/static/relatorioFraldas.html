@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGAV - Relatório de Fraldas</title>
+    <link rel="icon" type="image/png" sizes="64x64" href="assets/favicon.png?v=2">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=2">
+    <link rel="stylesheet" href="css/relatorioFraldas.css?v=20260725-1">
+    <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260714-1">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+</head>
+<body class="bg-background text-on-surface sidebar-collapsible-demo" data-relatorio="Fraldas">
+<div class="page">
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-main">
+                <img src="assets/logo.png" alt="Logo Asilo Vicentino">
+                <h1>SGAV</h1>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="coordenador.html" class="sidebar-link">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span>Painel</span>
+            </a>
+            <a href="escalas.html" class="sidebar-link">
+                <span class="material-symbols-outlined">calendar_month</span>
+                <span>Escalas</span>
+            </a>
+
+            <details class="sidebar-group" open>
+                <summary class="sidebar-link sidebar-group-toggle active">
+                    <span class="material-symbols-outlined">analytics</span>
+                    <span>Relatórios</span>
+                    <span class="material-symbols-outlined sidebar-group-arrow">expand_more</span>
+                </summary>
+                <div class="sidebar-submenu">
+                    <a href="relatorioDoacoes.html" class="sidebar-link sidebar-sublink">
+                        <span class="material-symbols-outlined">volunteer_activism</span>
+                        <span>Relatório de Doações</span>
+                    </a>
+                    <a href="relatorioOcorrencias.html" class="sidebar-link sidebar-sublink">
+                        <span class="material-symbols-outlined">assignment_late</span>
+                        <span>Relatório de Ocorrências</span>
+                    </a>
+                    <a href="relatorioFuncionarios.html" class="sidebar-link sidebar-sublink">
+                        <span class="material-symbols-outlined">badge</span>
+                        <span>Relatório de Funcionários</span>
+                    </a>
+                    <a href="relatorioDespesas.html" class="sidebar-link sidebar-sublink">
+                        <span class="material-symbols-outlined">receipt_long</span>
+                        <span>Relatório de Despesas</span>
+                    </a>
+                    <a href="relatorioFraldas.html" class="sidebar-link sidebar-sublink active">
+                        <span class="material-symbols-outlined">inventory_2</span>
+                        <span>Relatório de Fraldas</span>
+                    </a>
+                </div>
+            </details>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="secretaria.html" class="sidebar-link secretaria-panel-link">
+                <span class="material-symbols-outlined">admin_panel_settings</span>
+                <span>Painel de Secretaria</span>
+            </a>
+            <a href="login.html" class="sidebar-link">
+                <span class="material-symbols-outlined">logout</span>
+                <span>Sair</span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="main-area">
+        <header class="topbar">
+            <div class="topbar-left"></div>
+            <div class="topbar-right">
+                <div class="profile-chip">
+                    <div class="profile-text">
+                        <p id="perfilNome">Usuário</p>
+                        <span id="perfilCargo">Acesso</span>
+                    </div>
+                    <img
+                        class="profile-avatar"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCodmM9L3Lxp3TOXze0s5ng6gdLuL6UAVgjli-uCdXTzEkbUGW02Hheh8ViQ9IWJQngxEVmN3PkjBy4wDQUFq6-YEiM2_0THjjLcJGGCmoOip-JxgrwZ8717px25oL1Jay3FWpfa0rFtZIWUl4ziBAV-Brk_KrPNka1CMvjgOj2VkctGNpmZeuD-h9E384DdNtUi5QYhfnBKjlzWndJCqrgrkoxZL2DwUV0yeu9VbpJ1wqJosFaUFqLa-oW-OzQ9gsKgXSN3d_IyOx1"
+                        alt="Perfil do funcionário"
+                    >
+                </div>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <div class="page-header">
+                <div>
+                    <h2 class="page-title">Relatório de Fraldas</h2>
+                    <p class="page-subtitle">Acompanhamento anual dos pacotes comprados e lançamentos mensais.</p>
+                </div>
+                <div class="report-actions">
+                    <button class="btn-voltar-relatorio" type="button" onclick="voltarAoRelatorio()">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                        <span>Voltar ao relatório</span>
+                    </button>
+                    <button class="btn-graficos" type="button" onclick="abrirVisaoGraficos()">
+                        <span class="material-symbols-outlined">monitoring</span>
+                        <span>Ver gráficos</span>
+                    </button>
+                    <button class="btn-pdf" id="btnGerarPdfFraldas" type="button">
+                        <span class="material-symbols-outlined">picture_as_pdf</span>
+                        <span>Exportar PDF</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="relatorio-layout">
+                <div class="relatorio-main">
+                    <div class="cards-grid">
+                        <div class="info-card">
+                            <p class="card-label">Pacotes no Ano</p>
+                            <h3 class="card-value" id="totalPacotes">0</h3>
+                        </div>
+                        <div class="info-card">
+                            <p class="card-label">Compras Registradas</p>
+                            <h3 class="card-value" id="totalLancamentos">0</h3>
+                        </div>
+                        <div class="info-card">
+                            <p class="card-label">Meses com Registros</p>
+                            <h3 class="card-value" id="mesesComRegistro">0</h3>
+                        </div>
+                        <div class="info-card">
+                            <p class="card-label">Maior Compra</p>
+                            <h3 class="card-value" id="maiorCompra">0</h3>
+                        </div>
+                    </div>
+
+                    <section class="filter-panel filtro-ano-fraldas">
+                        <div class="section-header">
+                            <h2>Período do Relatório</h2>
+                            <p>Selecione o ano para consultar as compras registradas.</p>
+                        </div>
+                        <div class="filtro-grid filtro-grid-fraldas">
+                            <div class="form-field">
+                                <label for="anoRelatorioFraldas">Ano de referência</label>
+                                <input type="number" id="anoRelatorioFraldas" min="2000" max="2100" step="1">
+                            </div>
+                            <button type="button" id="aplicarAnoFraldas" class="filter-open-btn">
+                                <span class="material-symbols-outlined">search</span>
+                                Consultar ano
+                            </button>
+                        </div>
+                    </section>
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <div class="table-header-row">
+                                <h4>Histórico de Compras</h4>
+                                <span class="periodo-chip" id="periodoSelecionado"></span>
+                            </div>
+                        </div>
+                        <table class="relatorio-table" id="tabelaFraldas">
+                            <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Pacotes</th>
+                                <th>Registrado por</th>
+                                <th>Observação</th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <aside class="charts-column">
+                    <section class="charts-grid">
+                        <div class="chart-card">
+                            <h4>Pacotes Comprados por Mês</h4>
+                            <div id="graficoPacotesMes" class="apex-line-chart"></div>
+                        </div>
+                        <div class="chart-card">
+                            <h4>Compras Registradas por Mês</h4>
+                            <div id="graficoComprasMes" class="apex-bar-chart"></div>
+                        </div>
+                    </section>
+                </aside>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="vendor/jspdf-2.5.1.umd.min.js"></script>
+<script src="vendor/jspdf-autotable-3.8.2.min.js"></script>
+<script src="vendor/apexcharts-3.54.1.min.js"></script>
+<script src="js/relatorioGraficos.js?v=20260716-1"></script>
+<script src="js/relatorioFraldasController.js?v=20260725-1"></script>
+<script src="js/sidebarRecolhivel.js?v=20260708-1"></script>
+</body>
+</html>

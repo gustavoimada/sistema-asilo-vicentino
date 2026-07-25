@@ -1,0 +1,58 @@
+@import url("relatorios.css?v=20260716-1");
+
+.filtro-ano-fraldas {
+    padding: 22px 24px;
+}
+
+.filtro-grid-fraldas {
+    grid-template-columns: minmax(220px, 320px) auto;
+    align-items: end;
+    justify-content: start;
+}
+
+.filtro-grid-fraldas .filter-open-btn {
+    min-height: 48px;
+    padding-inline: 20px;
+}
+
+.periodo-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: #eef5ff;
+    color: #0b4c9c;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.pacotes-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #003f91;
+    font-weight: 800;
+}
+
+.pacotes-cell .material-symbols-outlined {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: #e8f1ff;
+    font-size: 18px;
+}
+
+@media (max-width: 900px) {
+    .filtro-grid-fraldas {
+        grid-template-columns: 1fr;
+    }
+
+    .filtro-grid-fraldas .filter-open-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

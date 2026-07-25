@@ -199,6 +199,10 @@
     }
 
     .nutri-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       border: 1px solid #bfdbfe;
       background: #fff;
       color: #004aad;
@@ -206,6 +210,15 @@
       padding: 13px 18px;
       font-weight: 900;
       cursor: pointer;
+    }
+
+    .nutri-calculate-button {
+      border-color: #93c5fd;
+      background: #eff6ff;
+    }
+
+    .nutri-calculate-button .material-symbols-outlined {
+      font-size: 21px;
     }
 
     .nutri-record-actions,
@@ -419,6 +432,67 @@
       box-shadow: 0 24px 60px rgba(15, 23, 42, .25);
     }
 
+    .nutri-calculation-card {
+      width: min(640px, 100%);
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
+      padding: 28px;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, .25);
+    }
+
+    .nutri-calculation-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .nutri-calculation-header h3 {
+      color: #0f3f8f;
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .nutri-calculation-header p,
+    .nutri-calculation-note {
+      color: #64748b;
+      line-height: 1.5;
+    }
+
+    .nutri-calculation-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding: 13px 15px;
+      border: 1px solid #bfdbfe;
+      border-radius: 12px;
+      background: #eff6ff;
+      font-size: 13px;
+    }
+
+    .nutri-calculation-note .material-symbols-outlined {
+      color: #004aad;
+      font-size: 20px;
+    }
+
+    .nutri-modal-close {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 42px;
+      width: 42px;
+      height: 42px;
+      border: 0;
+      border-radius: 12px;
+      background: #fff1f2;
+      color: #dc2626;
+      cursor: pointer;
+    }
+
     .nutri-confirm-icon {
       display: grid;
       place-items: center;
@@ -556,6 +630,48 @@
         <button type="button" class="nutri-secondary" onclick="fecharConfirmacao()">Cancelar</button>
         <button type="button" class="nutri-danger-button" onclick="executarConfirmacao()">Excluir</button>
       </div>
+    </div>
+  </div>
+  <div id="calculoNutri" class="nutri-confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="tituloCalculoNutri" onclick="if (event.target === this) fecharCalculoNutri()">
+    <div class="nutri-calculation-card">
+      <div class="nutri-calculation-header">
+        <div>
+          <h3 id="tituloCalculoNutri">Calcular peso e altura</h3>
+          <p>Estimativa antropométrica de <strong id="moradorCalculoNutri">morador</strong>.</p>
+        </div>
+        <button type="button" class="nutri-modal-close" onclick="fecharCalculoNutri()" title="Fechar" aria-label="Fechar cálculo">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="nutri-calculation-note">
+        <span class="material-symbols-outlined">info</span>
+        <span>Informe as medidas em centímetros. O sistema aplicará as fórmulas configuradas e preencherá automaticamente peso, altura e IMC no prontuário.</span>
+      </div>
+      <form id="formCalculoNutri" class="nutri-form-grid" onsubmit="calcularEstimativaNutri(event)">
+        <div class="nutri-field full">
+          <label for="grupoEquacaoNutri">Grupo da fórmula</label>
+          <select id="grupoEquacaoNutri" required>
+            <option value="">Selecione</option>
+            <option value="BRANCA">Branca</option>
+            <option value="NEGRA">Negra</option>
+          </select>
+        </div>
+        <div class="nutri-field">
+          <label for="alturaJoelhoNutri">Altura do joelho (cm)</label>
+          <input id="alturaJoelhoNutri" inputmode="decimal" placeholder="Ex: 51,5" required />
+        </div>
+        <div class="nutri-field">
+          <label for="circunferenciaBracoNutri">Circunferência do braço - CB (cm)</label>
+          <input id="circunferenciaBracoNutri" inputmode="decimal" placeholder="Ex: 27,8" required />
+        </div>
+        <div class="nutri-actions full">
+          <button type="button" class="nutri-secondary" onclick="fecharCalculoNutri()">Cancelar</button>
+          <button type="submit" class="nutri-primary">
+            <span class="material-symbols-outlined">calculate</span>
+            Calcular e preencher
+          </button>
+        </div>
+      </form>
     </div>
   </div>
   <script src="js/sidebarRecolhivel.js"></script>

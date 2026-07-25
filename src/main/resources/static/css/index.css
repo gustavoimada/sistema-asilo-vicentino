@@ -2695,6 +2695,233 @@ main {
   font-size: 19px;
 }
 
+body.donation-modal-open {
+  overflow: hidden;
+}
+
+.donation-pix-modal[hidden] {
+  display: none;
+}
+
+.donation-pix-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.donation-pix-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 22, 47, 0.64);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+}
+
+.donation-pix-dialog {
+  position: relative;
+  z-index: 1;
+  width: min(900px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  border: 1px solid #d5e2f4;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 30px 80px rgba(3, 18, 43, 0.34);
+  padding: 34px;
+  animation: donation-pix-open 0.3s ease both;
+  outline: none;
+}
+
+@keyframes donation-pix-open {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.donation-pix-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff0f0;
+  color: #dc2626;
+  cursor: pointer;
+}
+
+.donation-pix-header {
+  max-width: 680px;
+  margin-bottom: 26px;
+  padding-right: 48px;
+}
+
+.donation-pix-kicker {
+  color: #1d5ba8;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.donation-pix-header h2 {
+  margin: 8px 0;
+  color: var(--primary);
+  font-size: 34px;
+}
+
+.donation-pix-header p,
+.donation-pix-wait p,
+.donation-pix-notice {
+  margin: 0;
+  color: #52657f;
+  line-height: 1.55;
+}
+
+.donation-pix-layout {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.82fr) minmax(320px, 1.18fr);
+  gap: 28px;
+  align-items: stretch;
+}
+
+.donation-pix-code-panel,
+.donation-pix-summary {
+  border: 1px solid #d5e2f4;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.donation-pix-code-panel {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 14px;
+  background: #f3f8ff;
+  text-align: center;
+}
+
+.donation-pix-code-panel img {
+  width: min(230px, 100%);
+  aspect-ratio: 1;
+  padding: 12px;
+  border: 1px solid #c9daf1;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.donation-pix-code-panel small {
+  color: #64748b;
+  font-weight: 700;
+}
+
+.donation-pix-demo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #fff4d6;
+  color: #8a5b00;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.donation-pix-demo-badge .material-symbols-outlined {
+  font-size: 16px;
+}
+
+.donation-pix-summary {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+}
+
+.donation-pix-value {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #dce7f6;
+}
+
+.donation-pix-value span {
+  color: #52657f;
+  font-weight: 700;
+}
+
+.donation-pix-value strong {
+  color: var(--primary);
+  font-size: 26px;
+}
+
+.donation-pix-wait {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 15px;
+  border-radius: 8px;
+  background: #eef5ff;
+  color: var(--primary);
+}
+
+.donation-pix-wait strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.donation-pix-wait p {
+  font-size: 13px;
+}
+
+.donation-pix-notice {
+  padding: 13px 14px;
+  border-left: 3px solid #f59e0b;
+  background: #fffbeb;
+  color: #78520a;
+  font-size: 13px;
+}
+
+.donation-pix-confirm,
+.donation-pix-cancel {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  min-height: 50px;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.donation-pix-confirm {
+  border: 1px solid var(--primary);
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 12px 24px rgba(0, 61, 139, 0.2);
+}
+
+.donation-pix-confirm:disabled {
+  border-color: #cbd5e1;
+  background: #d9e0e8;
+  color: #718096;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.donation-pix-cancel {
+  border: 1px solid #d9e3ef;
+  background: #ffffff;
+  color: #52657f;
+}
+
 .contato-direto {
   display: flex;
   flex-direction: column;
@@ -3321,6 +3548,37 @@ main {
 
   .cta-new-donation-btn {
     width: 100%;
+  }
+
+  .donation-pix-modal {
+    padding: 12px;
+  }
+
+  .donation-pix-dialog {
+    max-height: calc(100dvh - 24px);
+    padding: 24px 18px 18px;
+  }
+
+  .donation-pix-header {
+    margin-bottom: 18px;
+  }
+
+  .donation-pix-header h2 {
+    font-size: 28px;
+  }
+
+  .donation-pix-layout {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .donation-pix-code-panel,
+  .donation-pix-summary {
+    padding: 18px;
+  }
+
+  .donation-pix-code-panel img {
+    width: min(190px, 70vw);
   }
 
   .footer-grid {

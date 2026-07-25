@@ -42,7 +42,7 @@
   <link rel="icon" type="image/png" sizes="64x64" href="assets/favicon.png?v=2" />
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=2" />
 
-  <link rel="stylesheet" href="css/index.css?v=20260725-pix" />
+  <link rel="stylesheet" href="css/index.css?v=20260725-pix-modal" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
 </head>
@@ -445,29 +445,8 @@
                   <div class="cta-success-heading">
                     <span class="cta-success-icon material-symbols-outlined">check_circle</span>
                     <div class="cta-success-text">
-                      <strong>Dados recebidos. Agora conclua pelo PIX.</strong>
-                      <p>Aponte a câmera do celular para o QR Code ou abra o aplicativo do seu banco.</p>
-                    </div>
-                  </div>
-                  <div class="cta-pix-demo">
-                    <span class="cta-demo-badge">
-                      <span class="material-symbols-outlined">science</span>
-                      Demonstração
-                    </span>
-                    <div class="cta-qr-wrap">
-                      <div class="cta-qr-frame">
-                        <img src="assets/qrcode-doacao.svg" alt="QR Code PIX demonstrativo, sem validade para pagamento" />
-                        <span>QR Code fictício</span>
-                      </div>
-                      <div class="cta-qr-content">
-                        <span class="cta-pix-eyebrow">Pagamento por PIX</span>
-                        <strong class="cta-pix-title">Escaneie para visualizar a etapa de pagamento</strong>
-                        <p>Este QR Code é apenas uma prévia visual e não realiza pagamentos. Ele será substituído pelos dados oficiais da instituição.</p>
-                        <div class="cta-confirmed-value">
-                          <span>Valor informado</span>
-                          <strong id="doacaoValorConfirmado">R$ 0,00</strong>
-                        </div>
-                      </div>
+                      <strong>Doação enviada para conferência.</strong>
+                      <p>A equipe do Asilo Vicentino recebeu os dados e fará a validação do pagamento.</p>
                     </div>
                   </div>
                   <button type="button" id="btnNovaDoacao" class="cta-new-donation-btn">
@@ -526,6 +505,58 @@
     </div>
   </footer>
 
+  <div id="modalPixDoacao" class="donation-pix-modal" hidden aria-hidden="true">
+    <div class="donation-pix-backdrop" data-close-pix-modal></div>
+    <section id="dialogPixDoacao" class="donation-pix-dialog" role="dialog" aria-modal="true"
+      aria-labelledby="tituloModalPix" tabindex="-1">
+      <button id="fecharModalPix" class="donation-pix-close" type="button" aria-label="Fechar pagamento PIX">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <header class="donation-pix-header">
+        <span class="donation-pix-kicker">Pagamento por PIX</span>
+        <h2 id="tituloModalPix">Finalize sua doação</h2>
+        <p>Escaneie o QR Code no aplicativo do seu banco. A confirmação será liberada após o tempo de pagamento.</p>
+      </header>
+
+      <div class="donation-pix-layout">
+        <div class="donation-pix-code-panel">
+          <span class="donation-pix-demo-badge">
+            <span class="material-symbols-outlined">science</span>
+            Demonstração
+          </span>
+          <img src="assets/qrcode-doacao.svg" alt="QR Code PIX demonstrativo, sem validade para pagamento" />
+          <small>QR Code fictício para demonstração do fluxo.</small>
+        </div>
+
+        <div class="donation-pix-summary">
+          <div class="donation-pix-value">
+            <span>Valor da doação</span>
+            <strong id="doacaoValorModal">R$ 0,00</strong>
+          </div>
+
+          <div class="donation-pix-wait">
+            <span class="material-symbols-outlined">schedule</span>
+            <div>
+              <strong id="doacaoContagemRegressiva">Confirmação disponível em 02:00</strong>
+              <p>Use esse tempo para concluir o PIX no aplicativo do seu banco.</p>
+            </div>
+          </div>
+
+          <p class="donation-pix-notice">
+            A confirmação não verifica o pagamento automaticamente. Depois do envio, a doação ficará em análise até a conferência da secretaria.
+          </p>
+
+          <button id="btnConfirmarDoacaoPix" class="donation-pix-confirm" type="button" disabled>
+            <span class="material-symbols-outlined">lock_clock</span>
+            Aguardar para confirmar
+          </button>
+          <button id="btnCancelarDoacaoPix" class="donation-pix-cancel" type="button">Cancelar</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
   <div id="newsLightbox" class="news-lightbox" hidden>
     <div class="news-lightbox-toolbar">
       <button id="toggleNewsZoom" class="news-lightbox-toggle" type="button">Tamanho original</button>
@@ -539,7 +570,7 @@
     </div>
   </div>
 
-  <script src="js/indexController.js?v=20260725-pix"></script>
+  <script src="js/indexController.js?v=20260725-pix-modal"></script>
   <script src="js/indexNoticias.js?v=20260714-7"></script>
 </body>
 </html>

@@ -31,15 +31,16 @@ public class AccessFilter implements Filter
     private static final Set<String> PAGINAS_COORDENADOR = Set.of(
             "/coordenador.html",
             "/escalas.html",
-            "/transparencia.html",
             "/relatorioDoacoes.html",
             "/relatorioOcorrencias.html",
             "/relatorioFuncionarios.html",
-            "/relatorioDespesas.html"
+            "/relatorioDespesas.html",
+            "/relatorioFraldas.html"
     );
 
     private static final Set<String> PAGINAS_COORDENADOR_E_SECRETARIA = Set.of(
-            "/noticias.html"
+            "/noticias.html",
+            "/transparencia.html"
     );
 
     private static final Set<String> PAGINAS_CUIDADOR = Set.of(
@@ -192,7 +193,7 @@ public class AccessFilter implements Filter
         }
         if (rotaMin.startsWith("/transparencia/"))
         {
-            return ehCoordenador(categoria);
+            return ehCoordenador(categoria) || ehSecretaria(categoria);
         }
         if (rotaMin.startsWith("/backup/"))
         {

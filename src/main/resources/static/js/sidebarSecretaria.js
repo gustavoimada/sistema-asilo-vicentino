@@ -12,7 +12,8 @@
         { href: "atividades.html", icone: "event_note", texto: "Atividades", aliases: ["atividades.html", "tipoAtividades.html"] },
         { href: "doacao.html", icone: "volunteer_activism", texto: "Doações" },
         { href: "despesa.html", icone: "request_quote", texto: "Despesas", aliases: ["despesa.html", "tiposDespesas.html"] },
-        { href: "noticias.html", icone: "newspaper", texto: "Notícias" }
+        { href: "noticias.html", icone: "newspaper", texto: "Notícias" },
+        { href: "transparencia.html", icone: "folder", texto: "Transparência" }
     ];
 
     function salvarSeExistir(params, chaveUrl, chaveLocal) {

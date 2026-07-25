@@ -14,6 +14,7 @@ import unoeste.projetoasilo.entities.Error;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -123,6 +124,82 @@ public class ControleFraldasControl
         }
     }
 
+    @GetMapping("relatorio")
+    public ResponseEntity<Object> relatorio(@RequestParam(required = false) Integer ano,
+                                             HttpSession session)
+    {
+        if (!sessaoCoordenacao(session))
+        {
+            return ResponseEntity.status(403).body(new Error("Erro", "Apenas a coordenacao pode acessar o relatorio de fraldas."));
+        }
+
+        int anoReferencia = ano == null ? LocalDate.now().getYear() : ano;
+        if (anoReferencia < 2000 || anoReferencia > 2100)
+        {
+            return ResponseEntity.badRequest().body(new Error("Erro", "Ano de referencia invalido."));
+        }
+
+        Banco conexao = Banco.getConnection();
+        try
+        {
+            List<ControleFraldas> lancamentos = new ControleFraldasDAO().listarNoPeriodo(
+                    LocalDate.of(anoReferencia, 1, 1),
+                    LocalDate.of(anoReferencia, 12, 31),
+                    conexao
+            );
+
+            int[] pacotesPorMes = new int[12];
+            int[] comprasPorMes = new int[12];
+            int totalPacotes = 0;
+            int maiorCompra = 0;
+
+            for (ControleFraldas lancamento : lancamentos)
+            {
+                int pacotes = Math.max(0, lancamento.getQuantidadePacotes());
+                totalPacotes += pacotes;
+                maiorCompra = Math.max(maiorCompra, pacotes);
+
+                if (lancamento.getDataRegistro() != null)
+                {
+                    int indiceMes = lancamento.getDataRegistro().getMonthValue() - 1;
+                    pacotesPorMes[indiceMes] += pacotes;
+                    comprasPorMes[indiceMes]++;
+                }
+            }
+
+            int mesesComRegistro = 0;
+            List<Map<String, Object>> totaisMensais = new ArrayList<>();
+            for (int indiceMes = 0; indiceMes < 12; indiceMes++)
+            {
+                if (comprasPorMes[indiceMes] > 0) mesesComRegistro++;
+
+                Map<String, Object> totalMensal = new LinkedHashMap<>();
+                totalMensal.put("mes", indiceMes + 1);
+                totalMensal.put("totalPacotes", pacotesPorMes[indiceMes]);
+                totalMensal.put("lancamentos", comprasPorMes[indiceMes]);
+                totaisMensais.add(totalMensal);
+            }
+
+            Map<String, Object> relatorio = new LinkedHashMap<>();
+            relatorio.put("ano", anoReferencia);
+            relatorio.put("totalPacotes", totalPacotes);
+            relatorio.put("totalLancamentos", lancamentos.size());
+            relatorio.put("mesesComRegistro", mesesComRegistro);
+            relatorio.put("maiorCompra", maiorCompra);
+            relatorio.put("totaisMensais", totaisMensais);
+            relatorio.put("lancamentos", lancamentos);
+            return ResponseEntity.ok(relatorio);
+        }
+        catch (Exception ex)
+        {
+            return ResponseEntity.internalServerError().body(new Error("Erro", "Nao foi possivel carregar o relatorio de fraldas."));
+        }
+        finally
+        {
+            conexao.fechar();
+        }
+    }
+
     private LocalDate resolverData(String dataRegistro)
     {
         if (dataRegistro == null || dataRegistro.isBlank()) return LocalDate.now();
@@ -148,5 +225,11 @@ public class ControleFraldasControl
         if (session == null || session.getAttribute("categoria") == null) return false;
         String categoria = String.valueOf(session.getAttribute("categoria")).trim();
         return "secretaria".equalsIgnoreCase(categoria) || "coordenador".equalsIgnoreCase(categoria);
+    }
+
+    private boolean sessaoCoordenacao(HttpSession session)
+    {
+        if (session == null || session.getAttribute("categoria") == null) return false;
+        return "coordenador".equalsIgnoreCase(String.valueOf(session.getAttribute("categoria")).trim());
     }
 }

@@ -8,7 +8,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png?v=2" />
 
   <link rel="stylesheet" href="css/funcionario.css" />
-  <link rel="stylesheet" href="css/escalas.css?v=20260708-1" />
+  <link rel="stylesheet" href="css/escalas.css?v=20260725-1" />
   <link rel="stylesheet" href="css/sidebar-padrao.css?v=20260708-3" />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
@@ -35,11 +35,6 @@
           <span>Escalas</span>
         </a>
 
-        <a href="transparencia.html" class="sidebar-link">
-          <span class="material-symbols-outlined">folder</span>
-          <span>Transparência</span>
-        </a>
-
         <details class="sidebar-group">
           <summary class="sidebar-link sidebar-group-toggle">
             <span class="material-symbols-outlined">analytics</span>
@@ -64,6 +59,10 @@
         <a href="relatorioDespesas.html" class="sidebar-link sidebar-sublink">
           <span class="material-symbols-outlined">receipt_long</span>
           <span>Relatório de Despesas</span>
+        </a>
+        <a href="relatorioFraldas.html" class="sidebar-link sidebar-sublink">
+          <span class="material-symbols-outlined">inventory_2</span>
+          <span>Relatório de Fraldas</span>
         </a>
           </div>
         </details>
@@ -307,7 +306,7 @@
 
   <!-- MODAL SELETOR CUIDADOR -->
   <div id="selectorModal" class="modal" style="display:none;">
-    <div class="modal-content">
+    <div class="modal-content selector-modal-content">
       <div class="modal-header">
         <h2>Selecione um Cuidador(a)</h2>
         <button class="modal-close" onclick="fecharSelectorModal()">
@@ -315,7 +314,17 @@
         </button>
       </div>
 
-      <div class="modal-body">
+      <div class="modal-body selector-modal-body">
+        <label class="cuidador-search" for="buscarCuidadorEscala">
+          <span class="material-symbols-outlined" aria-hidden="true">search</span>
+          <input
+            id="buscarCuidadorEscala"
+            type="search"
+            placeholder="Pesquisar cuidador(a) pelo nome"
+            autocomplete="off"
+            oninput="filtrarCuidadoresEscala(this.value)"
+          />
+        </label>
         <div class="cuidadores-list" id="cuidadoresList">
           <p>Carregando cuidadores...</p>
         </div>
@@ -397,7 +406,7 @@
 
   <div id="mensagem-feedback" class="popup-msg"></div>
 
-  <script src="js/escalasController.js?v=20260706-3"></script>
+  <script src="js/escalasController.js?v=20260725-1"></script>
   <script src="js/sidebarRecolhivel.js?v=20260708-1"></script>
 </body>
 </html>
