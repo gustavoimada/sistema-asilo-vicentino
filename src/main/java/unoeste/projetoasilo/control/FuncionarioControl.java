@@ -1,5 +1,7 @@
 package unoeste.projetoasilo.control;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,6 +25,7 @@ import java.util.List;
 @RequestMapping({"funcionario", "funcionarios"})
 public class FuncionarioControl
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FuncionarioControl.class);
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @PostMapping("cadastrar")
@@ -76,7 +79,7 @@ public class FuncionarioControl
             String detalheErro = conexao.getMensagemErro();
             if (detalheErro != null && !detalheErro.isBlank())
             {
-                return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel cadastrar o funcionario: " + detalheErro));
+                LOGGER.error("Falha ao cadastrar funcionario: {}", detalheErro);
             }
             return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel cadastrar o funcionario"));
         }
@@ -219,7 +222,7 @@ public class FuncionarioControl
                 String detalheErro = conexao.getMensagemErro();
                 if (detalheErro != null && !detalheErro.isBlank())
                 {
-                    return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel excluir o funcionario: " + detalheErro));
+                    LOGGER.error("Falha ao inativar funcionario: {}", detalheErro);
                 }
                 return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel excluir o funcionario"));
             }
@@ -510,7 +513,7 @@ public class FuncionarioControl
             String detalheErroUsuario = conexao.getMensagemErro();
             if (detalheErroUsuario != null && !detalheErroUsuario.isBlank())
             {
-                throw new IllegalArgumentException("Nao foi possivel criar usuario para o funcionario: " + detalheErroUsuario);
+                LOGGER.error("Falha ao criar usuario para funcionario: {}", detalheErroUsuario);
             }
             throw new IllegalArgumentException("Nao foi possivel criar usuario para o funcionario");
         }

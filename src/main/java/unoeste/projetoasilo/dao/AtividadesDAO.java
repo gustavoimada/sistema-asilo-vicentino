@@ -72,23 +72,25 @@ public class AtividadesDAO {
         garantirEstruturaPeriodo(conexao);
         String sql = """
                 INSERT INTO atividades (nome, descricao, data, datafim, horaini, horafim, tipoatividade_idtipoatividade)
-                VALUES ('#1', '#2', '#3', '#4', '#5', '#6', #7)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                RETURNING idatividades
                 """;
-        sql = sql.replace("#1", atividade.getNome());
-        sql = sql.replace("#2", atividade.getDescricao());
-        sql = sql.replace("#3", atividade.getDate().toString());
-        sql = sql.replace("#4", atividade.getDataFim().toString());
-        sql = sql.replace("#5", atividade.getHorainicio().toString());
-        sql = sql.replace("#6", atividade.getHorafim().toString());
-        sql = sql.replace("#7", String.valueOf(atividade.getTipoatividades().getIdtipoatividades()));
 
-        if (!conexao.manipular(sql)) {
-            return false;
-        }
+        try (PreparedStatement comando = conexao.preparar(sql)) {
+            comando.setString(1, atividade.getNome());
+            comando.setString(2, atividade.getDescricao());
+            comando.setObject(3, atividade.getDate());
+            comando.setObject(4, atividade.getDataFim());
+            comando.setObject(5, atividade.getHorainicio());
+            comando.setObject(6, atividade.getHorafim());
+            comando.setInt(7, atividade.getTipoatividades().getIdtipoatividades());
 
-        int novoId = conexao.getMaxPK("atividades", "idatividades");
-        if (novoId > 0) {
-            atividade.setIdatividade(novoId);
+            try (ResultSet rs = comando.executeQuery()) {
+                if (!rs.next()) {
+                    return false;
+                }
+                atividade.setIdatividade(rs.getInt("idatividades"));
+            }
         }
         return true;
     }
@@ -97,21 +99,22 @@ public class AtividadesDAO {
         garantirEstruturaPeriodo(conexao);
         String sql = """
                 UPDATE atividades
-                SET nome = '#1', descricao = '#2', data = '#3', datafim = '#4', horaini = '#5', horafim = '#6',
-                    tipoatividade_idtipoatividade = #7
-                WHERE idatividades = #8
+                SET nome = ?, descricao = ?, data = ?, datafim = ?, horaini = ?, horafim = ?,
+                    tipoatividade_idtipoatividade = ?
+                WHERE idatividades = ?
                 """;
 
-        sql = sql.replace("#1", atividade.getNome());
-        sql = sql.replace("#2", atividade.getDescricao());
-        sql = sql.replace("#3", atividade.getDate().toString());
-        sql = sql.replace("#4", atividade.getDataFim().toString());
-        sql = sql.replace("#5", atividade.getHorainicio().toString());
-        sql = sql.replace("#6", atividade.getHorafim().toString());
-        sql = sql.replace("#7", String.valueOf(atividade.getTipoatividades().getIdtipoatividades()));
-        sql = sql.replace("#8", String.valueOf(atividade.getIdatividade()));
-
-        return conexao.manipular(sql);
+        try (PreparedStatement comando = conexao.preparar(sql)) {
+            comando.setString(1, atividade.getNome());
+            comando.setString(2, atividade.getDescricao());
+            comando.setObject(3, atividade.getDate());
+            comando.setObject(4, atividade.getDataFim());
+            comando.setObject(5, atividade.getHorainicio());
+            comando.setObject(6, atividade.getHorafim());
+            comando.setInt(7, atividade.getTipoatividades().getIdtipoatividades());
+            comando.setInt(8, atividade.getIdatividade());
+            return comando.executeUpdate() > 0;
+        }
     }
 
     public boolean deletar(int id, Banco conexao) throws SQLException {

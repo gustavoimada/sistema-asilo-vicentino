@@ -1,5 +1,7 @@
 package unoeste.projetoasilo.control;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,7 @@ import java.util.List;
 @RequestMapping("login")
 public class UserControl
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserControl.class);
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     // ====================== CRUD ===========================
@@ -64,7 +67,7 @@ public class UserControl
             String detalheErro = conexao.getMensagemErro();
             if (detalheErro != null && !detalheErro.isBlank())
             {
-                return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel criar usuario: " + detalheErro));
+                LOGGER.error("Falha ao criar usuario: {}", detalheErro);
             }
             return ResponseEntity.badRequest().body(new Error("Erro", "Nao foi possivel criar usuario"));
         }

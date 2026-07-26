@@ -1,5 +1,7 @@
 package unoeste.projetoasilo.control;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +26,8 @@ import java.util.Map;
 @RequestMapping("turno")
 public class TurnoControl
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(TurnoControl.class);
+
     // Inicia o turno do funcionario que esta logado na sessao.
     @PostMapping("iniciar")
     public ResponseEntity<Object> iniciarTurno(@RequestParam(required = false) String descricao, HttpSession session)
@@ -274,7 +278,8 @@ public class TurnoControl
         }
         catch (Exception e)
         {
-            return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao acessar banco de dados: " + e.getMessage()));
+            LOGGER.error("Falha ao escalar funcionario", e);
+            return ResponseEntity.badRequest().body(new Error("Erro", "Falha ao acessar banco de dados"));
         }
         finally
         {

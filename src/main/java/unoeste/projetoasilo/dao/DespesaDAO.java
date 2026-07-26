@@ -4,6 +4,7 @@ import unoeste.projetoasilo.db.util.Banco;
 import unoeste.projetoasilo.entities.Despesa;
 import unoeste.projetoasilo.entities.TipoDespesa;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -21,21 +22,17 @@ public class DespesaDAO {
 
             String sql = """
                     INSERT INTO despesas(valor, observacoes, dtvencimento, dtquitacao, fixa, periodicidade, tipodespesas_idtipodespesas)
-                        VALUES (#1, '#2', #3, #4, #5, #6, #7);
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
+                    RETURNING iddespesas
                     """;
-            sql = sql.replace("#1", String.valueOf(despesa.getValor()));
-            sql = sql.replace("#2", despesa.getObservacoes());
-            sql = sql.replace("#3", formatDateValue(despesa.getDtVencimento()));
-            sql = sql.replace("#4", formatDateValue(despesa.getDtQuitacao()));
-            sql = sql.replace("#5", formatBooleanValue(despesa.isFixa()));
-            sql = sql.replace("#6", formatStringValue(despesa.getPeriodicidade()));
-            sql = sql.replace("#7", String.valueOf(idTipo));
 
-            if (conexao.manipular(sql)) {
-                int novoId = conexao.getMaxPK("despesas", "iddespesas");
-                if (novoId > 0) {
-                    despesa.setIdDespesa(novoId);
-                    gravou = true;
+            try (PreparedStatement comando = conexao.preparar(sql)) {
+                preencherDespesa(comando, despesa, idTipo);
+                try (ResultSet rs = comando.executeQuery()) {
+                    if (rs.next()) {
+                        despesa.setIdDespesa(rs.getInt("iddespesas"));
+                        gravou = true;
+                    }
                 }
             }
         }
@@ -56,51 +53,71 @@ public class DespesaDAO {
     }
 
     public List<Despesa> filtrar(String tipo, String status, String observacoes, LocalDate dtVencimentoInicio, LocalDate dtVencimentoFim, LocalDate dtQuitacaoInicio, LocalDate dtQuitacaoFim, String fixa, String periodicidade, String ordenacao, String direcao, Banco conexao) throws SQLException {
-        String sql = sqlBase() + " WHERE 1=1";
+        StringBuilder sql = new StringBuilder(sqlBase()).append(" WHERE 1=1");
+        List<Object> parametros = new ArrayList<>();
 
-        if (tipo != null) {
-            sql += " AND LOWER(t.tipo) = '" + tipo.toLowerCase() + "'";
+        if (tipo != null && !tipo.isBlank()) {
+            sql.append(" AND LOWER(t.tipo) = LOWER(?)");
+            parametros.add(tipo);
         }
 
         if (status != null && !status.isBlank()) {
             if (status.equalsIgnoreCase("pago"))
-                sql += " AND d.dtquitacao IS NOT NULL";
+                sql.append(" AND d.dtquitacao IS NOT NULL");
             else if (status.equalsIgnoreCase("pendente"))
-                sql += " AND d.dtquitacao IS NULL AND d.dtvencimento::date >= CURRENT_DATE";
+                sql.append(" AND d.dtquitacao IS NULL AND d.dtvencimento::date >= CURRENT_DATE");
             else if (status.equalsIgnoreCase("vencido"))
-                sql += " AND d.dtquitacao IS NULL AND d.dtvencimento::date < CURRENT_DATE";
+                sql.append(" AND d.dtquitacao IS NULL AND d.dtvencimento::date < CURRENT_DATE");
 
         }
 
-        if (observacoes != null)
-            sql += " AND LOWER(d.observacoes) LIKE '%" + observacoes.toLowerCase() + "%'";
+        if (observacoes != null && !observacoes.isBlank()) {
+            sql.append(" AND LOWER(COALESCE(d.observacoes, '')) LIKE LOWER(?)");
+            parametros.add("%" + observacoes + "%");
+        }
 
+        if (dtVencimentoInicio != null) {
+            sql.append(" AND d.dtvencimento::date >= ?");
+            parametros.add(dtVencimentoInicio);
+        }
 
-        if (dtVencimentoInicio != null)
-            sql += " AND d.dtvencimento::date >= '" + dtVencimentoInicio + "'";
+        if (dtVencimentoFim != null) {
+            sql.append(" AND d.dtvencimento::date <= ?");
+            parametros.add(dtVencimentoFim);
+        }
 
-        if (dtVencimentoFim != null)
-            sql += " AND d.dtvencimento::date <= '" + dtVencimentoFim + "'";
+        if (dtQuitacaoInicio != null) {
+            sql.append(" AND d.dtquitacao::date >= ?");
+            parametros.add(dtQuitacaoInicio);
+        }
 
-        if (dtQuitacaoInicio != null)
-            sql += " AND d.dtquitacao::date >= '" + dtQuitacaoInicio + "'";
-
-        if (dtQuitacaoFim != null)
-            sql += " AND d.dtquitacao::date <= '" + dtQuitacaoFim + "'";
+        if (dtQuitacaoFim != null) {
+            sql.append(" AND d.dtquitacao::date <= ?");
+            parametros.add(dtQuitacaoFim);
+        }
 
         if (fixa != null && !fixa.isBlank()) {
             if (fixa.equalsIgnoreCase("true"))
-                sql += " AND d.fixa = true";
+                sql.append(" AND d.fixa = true");
             else if (fixa.equalsIgnoreCase("false"))
-                sql += " AND d.fixa = false";
+                sql.append(" AND d.fixa = false");
         }
 
-        if (periodicidade != null && !periodicidade.isBlank())
-            sql += " AND LOWER(COALESCE(d.periodicidade, '')) = '" + periodicidade.toLowerCase() + "'";
+        if (periodicidade != null && !periodicidade.isBlank()) {
+            sql.append(" AND LOWER(COALESCE(d.periodicidade, '')) = LOWER(?)");
+            parametros.add(periodicidade);
+        }
 
-        sql += montarOrdenacao(ordenacao, direcao);
+        sql.append(montarOrdenacao(ordenacao, direcao));
 
-        return listarPorSql(sql, conexao);
+        try (PreparedStatement comando = conexao.preparar(sql.toString())) {
+            for (int i = 0; i < parametros.size(); i++) {
+                comando.setObject(i + 1, parametros.get(i));
+            }
+            try (ResultSet rs = comando.executeQuery()) {
+                return listarPorResultSet(rs);
+            }
+        }
     }
 
     public boolean deletar(int id, Banco conexao) {
@@ -120,19 +137,15 @@ public class DespesaDAO {
 
             String sql = """
                     UPDATE despesas
-                    SET valor = #1, observacoes = '#2', dtvencimento = #3, dtquitacao = #4, fixa = #5, periodicidade = #6, tipodespesas_idtipodespesas = #7
-                    WHERE iddespesas = #8
+                    SET valor = ?, observacoes = ?, dtvencimento = ?, dtquitacao = ?, fixa = ?, periodicidade = ?, tipodespesas_idtipodespesas = ?
+                    WHERE iddespesas = ?
                     """;
-            sql = sql.replace("#1", String.valueOf(despesa.getValor()));
-            sql = sql.replace("#2", despesa.getObservacoes());
-            sql = sql.replace("#3", formatDateValue(despesa.getDtVencimento()));
-            sql = sql.replace("#4", formatDateValue(despesa.getDtQuitacao()));
-            sql = sql.replace("#5", formatBooleanValue(despesa.isFixa()));
-            sql = sql.replace("#6", formatStringValue(despesa.getPeriodicidade()));
-            sql = sql.replace("#7", String.valueOf(idTipo));
-            sql = sql.replace("#8", String.valueOf(despesa.getIdDespesa()));
 
-            editou = conexao.manipular(sql);
+            try (PreparedStatement comando = conexao.preparar(sql)) {
+                preencherDespesa(comando, despesa, idTipo);
+                comando.setInt(8, despesa.getIdDespesa());
+                editou = comando.executeUpdate() > 0;
+            }
         }
 
         return editou;
@@ -207,8 +220,12 @@ public class DespesaDAO {
     }
 
     private List<Despesa> listarPorSql(String sql, Banco conexao) throws SQLException {
-        List<Despesa> despesas = new ArrayList<>();
         ResultSet rs = conexao.consultar(sql);
+        return listarPorResultSet(rs);
+    }
+
+    private List<Despesa> listarPorResultSet(ResultSet rs) throws SQLException {
+        List<Despesa> despesas = new ArrayList<>();
 
         if (rs != null) {
 
@@ -242,13 +259,27 @@ public class DespesaDAO {
     private int garantirTipoDespesa(TipoDespesa tipoDespesa, Banco conexao) throws SQLException {
         int idTipo = -1;
         String tipo = tipoDespesa.getTipo();
-        String sqlBusca = "SELECT idtipodespesas FROM tipodespesas WHERE tipo = '" + tipo + "' AND ativo = TRUE ORDER BY idtipodespesas LIMIT 1";
-        ResultSet rs = conexao.consultar(sqlBusca);
-
-        if (rs != null && rs.next())
-            idTipo = rs.getInt("idtipodespesas");
+        String sqlBusca = "SELECT idtipodespesas FROM tipodespesas WHERE tipo = ? AND ativo = TRUE ORDER BY idtipodespesas LIMIT 1";
+        try (PreparedStatement comando = conexao.preparar(sqlBusca)) {
+            comando.setString(1, tipo);
+            try (ResultSet rs = comando.executeQuery()) {
+                if (rs.next()) {
+                    idTipo = rs.getInt("idtipodespesas");
+                }
+            }
+        }
 
         return idTipo;
+    }
+
+    private void preencherDespesa(PreparedStatement comando, Despesa despesa, int idTipo) throws SQLException {
+        comando.setDouble(1, despesa.getValor());
+        comando.setString(2, despesa.getObservacoes());
+        comando.setObject(3, despesa.getDtVencimento());
+        comando.setObject(4, despesa.getDtQuitacao());
+        comando.setBoolean(5, despesa.isFixa());
+        comando.setString(6, despesa.getPeriodicidade());
+        comando.setInt(7, idTipo);
     }
 
     private String sqlBase() {
@@ -300,14 +331,4 @@ public class DespesaDAO {
         return valor;
     }
 
-    private String formatBooleanValue(boolean valor) {
-        return String.valueOf(valor);
-    }
-
-    private String formatStringValue(String valor) {
-        if (valor == null || valor.isBlank())
-            return "null";
-        else
-            return "'" + valor + "'";
-    }
 }

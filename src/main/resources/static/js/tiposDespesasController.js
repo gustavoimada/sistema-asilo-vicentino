@@ -83,7 +83,7 @@ function confirmarAcao(mensagem) {
                     <p id="confirmacaoTexto"></p>
                     <div class="confirm-actions">
                         <button type="button" class="btn btn-secondary" id="confirmacaoCancelar">Cancelar</button>
-                        <button style="background-color: red" type="button" class="btn" id="confirmacaoOk">Confirmar</button>
+                        <button type="button" class="btn btn-danger" id="confirmacaoOk">Confirmar</button>
                     </div>
                 </div>
             `;
