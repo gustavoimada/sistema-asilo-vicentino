@@ -329,7 +329,7 @@ CREATE TABLE noticia (
                          nomeimagem VARCHAR(255) NOT NULL,
                          caminhoimagem VARCHAR(500) NOT NULL,
                          dataupload TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                         titulo VARCHAR(64) NOT NULL,
-                         descricao VARCHAR(500) NOT NULL,
+                         titulo VARCHAR(160) NOT NULL,
+                         descricao TEXT NOT NULL,
                          categoria VARCHAR(45) NOT NULL
 );

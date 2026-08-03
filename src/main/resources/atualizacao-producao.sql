@@ -15,8 +15,9 @@ ALTER TABLE tiposocorrencias ADD COLUMN IF NOT EXISTS ativo BOOLEAN NOT NULL DEF
 ALTER TABLE tipoatividade ADD COLUMN IF NOT EXISTS ativo BOOLEAN NOT NULL DEFAULT TRUE;
 ALTER TABLE tipodespesas ADD COLUMN IF NOT EXISTS ativo BOOLEAN NOT NULL DEFAULT TRUE;
 
--- Permite descricoes maiores nas noticias publicas.
-ALTER TABLE noticia ALTER COLUMN descricao TYPE VARCHAR(500);
+-- Permite titulos e descricoes maiores nas noticias publicas.
+ALTER TABLE noticia ALTER COLUMN titulo TYPE VARCHAR(160);
+ALTER TABLE noticia ALTER COLUMN descricao TYPE TEXT;
 
 -- Cada quarto do Asilo Vicentino possui duas vagas fixas.
 UPDATE quartos
