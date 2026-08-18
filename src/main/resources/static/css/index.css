@@ -2807,33 +2807,31 @@ body.donation-modal-open {
 
 .donation-pix-code-panel img {
   width: min(230px, 100%);
-  aspect-ratio: 1;
+  height: auto;
   padding: 12px;
   border: 1px solid #c9daf1;
   border-radius: 8px;
   background: #ffffff;
+  image-rendering: pixelated;
 }
 
-.donation-pix-code-panel small {
-  color: #64748b;
+.donation-pix-receiver {
+  display: grid;
+  gap: 5px;
+  max-width: 100%;
+}
+
+.donation-pix-receiver span {
+  color: #52657f;
+  font-size: 12px;
   font-weight: 700;
 }
 
-.donation-pix-demo-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 10px;
-  border-radius: 999px;
-  background: #fff4d6;
-  color: #8a5b00;
-  font-size: 11px;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.donation-pix-demo-badge .material-symbols-outlined {
-  font-size: 16px;
+.donation-pix-receiver strong {
+  color: var(--primary);
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .donation-pix-summary {
